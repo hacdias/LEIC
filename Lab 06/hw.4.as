@@ -4,11 +4,13 @@ INT_MASK_ADDR   EQU FFFAh
 
 TEMP            EQU FFF6h
 TEMP_S          EQU FFF7h
-INT_MASK        EQU 1000000000000000b
+INT_MASK        EQU 1000000000000010b
 
                 ; Tabela de interrupcoes
                 ORIG FE0Fh
 INT_TEMP        WORD INT_TEMP_F
+                ORIG FE01h
+INT1            WORD INT1F ; key1
 
                 ; Codigo
                 ORIG 0000h
@@ -21,13 +23,17 @@ RESET_TEMP:     MOV R7, 10
                 RET
 
 INT_TEMP_F:     CALL RESET_TEMP
-                INC R2
+                ADD R2, R6
+                RTI
+
+INT1F:          NEG R6
                 RTI
 
 Inicio:         MOV R7, SP_INICIAL
                 MOV SP, R7
                 MOV R7, INT_MASK
                 MOV M[INT_MASK_ADDR], R7
+                MOV R6, 1
                 CALL RESET_TEMP
                 ENI
 
