@@ -24,13 +24,16 @@ def transforma(fn, lst):
     return [fn(lst[0])] + transforma(fn, lst[1:])
 
 def acumula(fn, lst):
-    if lst == []:
-        return 0
+    def aux(fn, lst, s):
+        if lst == []:
+            return s
 
-    return fn(lst[0]) + acumula(fn, lst[1:])
+        return fn(s, aux(fn, lst[1:], s))
+
+    return aux(fn, lst[1:], lst[0])
 
 def soma_quadrados_impares(lst):
-    return acumula(lambda x : x ** 2, filtra(lambda x : x % 2 != 0, lst))
+    return acumula(lambda x, y : y**2+ x ** 2, filtra(lambda x : x % 2 != 0, lst))
 
 def todos_lista(lst, cond):
     return (lst == []) or (cond(lst[0]) and todos_lista(lst[1:], cond))
@@ -61,7 +64,9 @@ def soma_dois(n):
     return muda(lambda x: x + 2, n)
 
 def junta_listas(lst):
-    return acumula(lambda x: x, lst)
+    return acumula(lambda x, y: x + y, lst)
+
+print(junta_listas([[1, 2], [[3]], [4, 5]]))
 
 def nenhum_p(n, fn):
     for i in range(1, n+1):
