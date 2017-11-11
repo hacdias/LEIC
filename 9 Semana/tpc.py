@@ -81,7 +81,7 @@ def espelho(n):
             return final
         else:
             return aux(inicial // 10, final * 10 + (inicial % 10))
-    
+
     return aux(n, 0)
 
 def maior_inteiro(limite):
@@ -90,7 +90,61 @@ def maior_inteiro(limite):
             return n - 1
         else:
             return aux(n + 1, soma - n)
-    
+
     return aux(1, limite)
 
-print(maior_inteiro(7))
+def num_divisores(n):
+    def aux(i):
+        if i > n:
+            return 0
+        elif n % i == 0:
+            return 1 + aux(i+1)
+        else:
+            return aux(i+1)
+
+    return aux(1)
+
+def soma_divisores(n):
+    def aux(i, soma):
+        if i > n:
+            return soma
+        elif n % i == 0:
+            return aux(i+1, soma + i)
+        else:
+            return aux(i+1, soma)
+
+    return aux(1, 0)
+
+def perfeito(n):
+    def aux(i, soma):
+        if i == n:
+            return soma == n
+        elif n % i == 0:
+            return aux(i+1, soma+i)
+        else:
+            return aux(i+1, soma)
+
+    return aux(1, 0)
+
+def perfeitos_entre(fi, la):
+    if fi > la:
+        return []
+    elif perfeito(fi):
+        return [fi] + perfeitos_entre(fi+1, la)
+    else:
+        return [] + perfeitos_entre(fi+1, la)
+
+def quick_sort(lst):
+    if len(lst) <= 1:
+        return lst
+
+    bigger = []
+    smaller = []
+
+    for el in lst[1:]:
+        if el > lst[0]:
+            bigger = bigger + [el]
+        else:
+            smaller = smaller + [el]
+
+    return quick_sort(smaller) + [lst[0]] + quick_sort(bigger)
