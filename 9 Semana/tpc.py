@@ -104,6 +104,8 @@ def num_divisores(n):
 
     return aux(1)
 
+print(num_divisores(0))
+
 def soma_divisores(n):
     def aux(i, soma):
         if i > n:
