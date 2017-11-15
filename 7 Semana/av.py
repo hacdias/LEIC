@@ -26,7 +26,6 @@ def max_lista_3(lst):
 
 print(max_lista_3([-1,-2,-3,-4,-5]))
 
-
 def num_occ_lista(lst, n):
     if lst == []:
         return 0
