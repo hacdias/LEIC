@@ -365,10 +365,10 @@ def numero_palavras(conj):
     return conj['tamanho']
 
 def subconjunto_por_tamanho(conj, tamanho):
-    if tamanho not in conj['palavras']:
-        return '[]'
+    if len(conj['palavras']) < tamanho:
+        return []
 
-    return str(conj['palavras'][tamanho])
+    return conj['palavras'][tamanho]
 
 def insere_ordenado(lst, el):
     if lst == []:
@@ -392,10 +392,16 @@ def insere_ordenado(lst, el):
     lst = lst[:indice+1] + [el] + lst[indice+1:]
     '''
 
-    for i in range(len(lst)):
+    adicionado = False
+
+    for i in range(len(lst)): # TODO: add + 1
         if lst[i] > el:
             lst = lst[:i] + [el] + lst[i:]
+            adicionado = True
             break
+
+    if not adicionado:
+        lst = lst + [el]
 
     return lst
 
@@ -469,6 +475,7 @@ def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
+    jogador['pontuacao'] = jogador['pontuacao'] + 1
     acrescenta_palavra(jogador['tentativas']['validas'], palavra)
 
 def adiciona_palavra_invalida(jogador, palavra):
@@ -543,25 +550,28 @@ def guru_mj(letras):
         n = n + 1
 
     palavras = gera_todas_palavras_validas(letras)
+    palavras_usadas = cria_conjunto_palavras()
     jogada = 1
+    faltam = numero_palavras(palavras)
 
-    while numero_palavras(palavras):
-        print('JOGADA', jogada, '- Falta descobrir', numero_palavras(palavras), 'palavras')
+    while faltam > 0:
+        print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
 
         for jogador in jogadores:
             tentativa = input('JOGADOR ' + jogador_nome(jogador) + ' -> ')
             palavra = cria_palavra_potencial(tentativa, letras)
-            
+         
             if palavra in subconjunto_por_tamanho(palavras, palavra_tamanho(palavra)):
                 print(palavra, ' - palavra VALIDA')
-                # valida
+
+                if palavra not in subconjunto_por_tamanho(palavras_usadas, palavra_tamanho(palavra)):
+                    adiciona_palavra_valida(jogador, palavra)
+                    acrescenta_palavra(palavras_usadas, palavra)
+                    faltam = faltam - 1
             else:
                 print(palavra, ' - palavra INVALIDA')
-                # invalida
 
-
-
-
+        jogada = jogada + 1
 
 # TESTES
 guru_mj(("A", "E", "L"))
