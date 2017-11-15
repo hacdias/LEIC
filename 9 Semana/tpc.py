@@ -65,15 +65,15 @@ def numero_digitos_iterativo(n):
     return digitos
 
 def e_capicua(n):
-    def aux(num, i):
-        if i == 0:
+    def aux(n, nd):
+        if n < 10:
             return True
-        elif num[0] != num[-1]:
-            return False
+        elif n % 10 == n // (10 ** nd):
+            return aux((n // 10) % 10 ** (nd - 1), nd - 2)
         else:
-            return aux(num[1:-1], i - 1)
-
-    return aux(str(n), numero_digitos_iterativo(n) / 2)
+            return False
+    
+    return aux(n, numero_digitos_iterativo(n) - 1)
 
 def espelho(n):
     def aux(inicial, final):
