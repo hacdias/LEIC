@@ -91,10 +91,16 @@ def insere_ordenado(lst, el):
     lst = lst[:indice+1] + [el] + lst[indice+1:]
     '''
 
-    for i in range(len(lst) + 1):
+    adicionado = False
+
+    for i in range(len(lst)):
         if lst[i] > el:
+            adicionado = True
             lst = lst[:i] + [el] + lst[i:]
             break
+
+    if not adicionado:
+        lst = [el] + lst
 
     return lst
 
@@ -262,4 +268,5 @@ def guru_mj(letras):
         jogada = jogada + 1
 
 # TESTES
-guru_mj(("A", "E", "L"))
+# guru_mj(("A", "E", "L"))
+gera_todas_palavras_validas(('A', 'L', 'E', 'L', 'E', 'L', 'E', 'B'))
