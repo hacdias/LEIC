@@ -1,7 +1,9 @@
 # 89455 - Henrique Dias
-from parte1 import e_palavra
 from bisect import insort
 from itertools import permutations
+
+from parte1 import e_palavra
+
 
 def contagem_repeticoes(l):
     """
@@ -19,6 +21,7 @@ def contagem_repeticoes(l):
             tabela[el] = 1
 
     return tabela
+
 
 def cria_palavra_potencial(palavra, letras):
     if not (isinstance(palavra, str) and isinstance(letras, tuple)):
@@ -41,20 +44,26 @@ def cria_palavra_potencial(palavra, letras):
 
     return palavra
 
+
 def palavra_tamanho(palavra):
     return len(palavra)
+
 
 def e_palavra_potencial(dados):
     return isinstance(dados, str)
 
+
 def palavras_potenciais_iguais(palavra1, palavra2):
     return palavra1 == palavra2
+
 
 def palavra_potencial_menor(palavra1, palavra2):
     return palavra1 < palavra2
 
+
 def palavra_potencial_para_cadeia(palavra):
     return palavra
+
 
 def cria_conjunto_palavras():
     return {
@@ -62,14 +71,17 @@ def cria_conjunto_palavras():
         'tamanho': 0
     }
 
+
 def numero_palavras(conj):
     return conj['tamanho']
+
 
 def subconjunto_por_tamanho(conj, tamanho):
     if len(conj['palavras']) < tamanho:
         return []
 
     return conj['palavras'][tamanho]
+
 
 def acrescenta_palavra(conj, palavra):
     if not (e_conjunto_palavras(conj) and e_palavra_potencial(palavra)):
@@ -86,16 +98,19 @@ def acrescenta_palavra(conj, palavra):
     insort(conj['palavras'][tamanho], palavra)
     conj['tamanho'] = conj['tamanho'] + 1
 
+
 def e_conjunto_palavras(dados):
     if not isinstance(dados, dict):
         return False
 
     # TODO: VERIFICAR TODA A ESTRUTURA
     return 'palavras' in dados and isinstance(dados['palavras'], list) and \
-        'tamanho' in dados and isinstance(dados['tamanho'], int)
+           'tamanho' in dados and isinstance(dados['tamanho'], int)
+
 
 def conjuntos_palavras_iguais(conj1, conj2):
     return conj1 == conj2
+
 
 def conjunto_palavras_para_cadeia(conj):
     cadeia = ''
@@ -112,6 +127,7 @@ def conjunto_palavras_para_cadeia(conj):
 
     return '[' + cadeia[:-1] + ']'
 
+
 def cria_jogador(nome):
     if not isinstance(nome, str):
         raise ValueError('cria_jogador:argumento invalido.')
@@ -125,17 +141,22 @@ def cria_jogador(nome):
         }
     }
 
+
 def jogador_nome(jogador):
     return jogador['nome']
+
 
 def jogador_pontuacao(jogador):
     return jogador['pontuacao']
 
+
 def jogador_palavras_validas(jogador):
     return jogador['tentativas']['validas']
 
+
 def jogador_palavras_invalidas(jogador):
     return jogador['tentativas']['invalidas']
+
 
 def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
@@ -144,6 +165,7 @@ def adiciona_palavra_valida(jogador, palavra):
     jogador['pontuacao'] = jogador['pontuacao'] + palavra_tamanho(palavra)
     acrescenta_palavra(jogador['tentativas']['validas'], palavra)
 
+
 def adiciona_palavra_invalida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
@@ -151,24 +173,27 @@ def adiciona_palavra_invalida(jogador, palavra):
     jogador['pontuacao'] = jogador['pontuacao'] - palavra_tamanho(palavra)
     acrescenta_palavra(jogador['tentativas']['invalidas'], palavra)
 
+
 def e_jogador(x):
     return isinstance(x, dict) and \
-        isinstance(x['nome'], str) and \
-        isinstance(x['pontuacao'], int) and \
-        isinstance(x['tentativas'], dict) and \
-        e_conjunto_palavras(x['tentativas']['validas']) and \
-        e_conjunto_palavras(x['tentativas']['invalidas'])
+           isinstance(x['nome'], str) and \
+           isinstance(x['pontuacao'], int) and \
+           isinstance(x['tentativas'], dict) and \
+           e_conjunto_palavras(x['tentativas']['validas']) and \
+           e_conjunto_palavras(x['tentativas']['invalidas'])
+
 
 def jogador_para_cadeia(jogador):
     return 'JOGADOR ' + jogador['nome'] + \
-        ' PONTOS=' + str(jogador['pontuacao']) + \
-        ' VALIDAS=' + conjunto_palavras_para_cadeia(jogador['tentativas']['validas']) + \
-        ' INVALIDAS=' + conjunto_palavras_para_cadeia(jogador['tentativas']['invalidas'])
+           ' PONTOS=' + str(jogador['pontuacao']) + \
+           ' VALIDAS=' + conjunto_palavras_para_cadeia(jogador['tentativas']['validas']) + \
+           ' INVALIDAS=' + conjunto_palavras_para_cadeia(jogador['tentativas']['invalidas'])
+
 
 def gera_todas_palavras_validas(letras):
     conj = cria_conjunto_palavras()
 
-    for i in range(1, len(letras)+1):
+    for i in range(1, len(letras) + 1):
         for e in permutations(letras, i):
             combo = ''.join(e)
             if e_palavra(combo):
@@ -192,6 +217,7 @@ def inscrever_jogadores():
 
     return jogadores
 
+
 def seleciona_vencedor(jogadores):
     max_pontuacao = -1
     vencedores = []
@@ -206,6 +232,7 @@ def seleciona_vencedor(jogadores):
         vencedores.append(j)
 
     return vencedores
+
 
 def guru_mj(letras):
     jogadores = inscrever_jogadores()
@@ -243,10 +270,14 @@ def guru_mj(letras):
     if len(vencedores) > 1:
         print('FIM DE JOGO! O jogo terminou em empate.')
     else:
-        print('FIM DE JOGO! O jogo terminou com a vitoria do jogador', jogador_nome(vencedores[0]), 'com' , str(jogador_pontuacao(vencedores[0])),  'pontos.')
+        print(
+            'FIM DE JOGO! O jogo terminou com a vitoria do jogador', jogador_nome(vencedores[0]),
+            'com', str(jogador_pontuacao(vencedores[0])), 'pontos.'
+        )
 
     for j in jogadores:
         print(jogador_para_cadeia(j))
+
 
 # TESTES
 guru_mj(("A", "E", "L"))
