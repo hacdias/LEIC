@@ -1,9 +1,16 @@
 SP_INICIAL          EQU     FDFFh
 OUT                 EQU     FFFEh
+IO_DISPLAY          EQU     FFF0h
 CRLF                EQU     000Ah               ; Line Feed
 RAN_MASK            EQU     1000000000010110b
 MAX_COLS            EQU     80
 ATTEMPTS            EQU     12
+INT_MASK_ADDR       EQU     FFFAh
+INT_MASK            EQU     1000010000000000b
+
+                    ; Tabela de interrupcoes
+                    ORIG    FE0Ah
+INT_KEY_IA          WORD    INT_IA      ; Interruptor IA
 
                     ORIG    8000h
 Logo00              STR     '\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/'
@@ -30,6 +37,9 @@ Attempts            WORD    0000h
 
                     ORIG    0000h
                     JMP     Start
+
+INT_IA:             CALL    PrintNewLine        ; TODO: COmeçar novo jogo?
+                    RTI
 
 ; ------------------------------------------------------------------------------------------------------------
 ; Gera um número pseudoaleatório através do algoritmo
@@ -247,6 +257,30 @@ CompareEnd:         MOV     R6, 4
                     POP     R1
                     RETN    2
 
+CleanCounter:       PUSH    R1
+                    MOV     M[Attempts], R0
+                    MOV     R1, IO_DISPLAY
+                    MOV     M[R1], R0
+                    MOV     M[R1+1], R0
+                    POP     R1
+                    RET
+
+UpdateCounter:      PUSH    R1
+                    PUSH    R2
+                    PUSH    R3
+                    MOV     R1, M[Attempts]
+                    CMP     R1, 10
+                    BR.N    UpdateCounterEnd
+                    SUB     R1, 10
+                    MOV     R2, 1
+                    MOV     R3, IO_DISPLAY
+                    MOV     M[R3+1], R2
+UpdateCounterEnd:   MOV     M[IO_DISPLAY], R1
+                    POP     R3
+                    POP     R2
+                    POP     R1
+                    RET
+
 ; ------------------------------------------------------------------------------------------------------------
 ; Lógica principal do jogo. Gera uma sequência
 ; aleatória sempre que começa um novo jogo e lê
@@ -264,7 +298,7 @@ Game:               CALL    PrintNewLine
                     POP     M[CurrentSequence]      ; Sequência aleatória
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
-                    MOV     M[Attempts], R0         ; Tentativas = 0
+                    CALL    CleanCounter
 
 GameLoop:           CMP     R2, R0
                     BR.Z    GameLoop
@@ -281,11 +315,12 @@ GameLoop:           CMP     R2, R0
                     CALL    Compare                 ; Compara números
                     CALL    PrintTip
                     INC     M[Attempts]
+                    CALL    UpdateCounter
                     MOV     R1, M[Attempts]
                     CMP     R1, ATTEMPTS
-                    BR.Z    Lost
+                    JMP.Z   Lost
                     MOV     M[PlayerSequence], R0
-                    BR      GameLoop
+                    JMP     GameLoop
 
                     ; Imprimir mensagem de vitória.
 Won:                PUSH    YouWon
@@ -306,6 +341,7 @@ Lost:               PUSH    YouLost
 ; ------------------------------------------------------------------------------------------------------------
 Start:              MOV     R7, SP_INICIAL
                     MOV     SP, R7
+                    ENI
                     CALL    PrintLogo
                     POP     R6
                     POP     R7
