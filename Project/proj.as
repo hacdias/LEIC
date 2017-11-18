@@ -24,13 +24,17 @@ YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ YOU WON! ~~~~~~
 NewGame             STR     'New game!'
 NewGameLen          WORD    9
 PreviousSequence    WORD    1234h
+CurrentSequence     WORD    0000h
+PlayerSequence      WORD    0000h
 
                     ORIG    0000h
                     JMP     Start
 
-                    ; Gera um número pseudoaleatório através do algoritmo
-                    ; indicado no enunciado. O valor anteriormente gerado
-                    ; é enviado através do Stack.
+; ------------------------------------------------------------------------------------------------------------
+; Gera um número pseudoaleatório através do algoritmo
+; indicado no enunciado. O valor anteriormente gerado
+; é enviado através do Stack.
+; ------------------------------------------------------------------------------------------------------------
 Random:             PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -63,9 +67,11 @@ DivideLoop:         ROR     R1, 4
                     POP     R1
                     RETN    1
 
-                    ; Imprime uma frase.
-                    ;   Arg 1: endereço de memória da Frase
-                    ;   Arg 2: comprimento da frase
+; ------------------------------------------------------------------------------------------------------------
+; Imprime uma frase.
+;   Arg 1: endereço de memória da Frase
+;   Arg 2: comprimento da frase
+; ------------------------------------------------------------------------------------------------------------
 PrintPhrase:        PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -120,19 +126,21 @@ PrintLogoLoop:      PUSH    R1
                     POP     R1
                     RET
 
-                    ; Imprime a "dica" a dar ao jogador de acordo com a comparação
-                    ; entre a sua jogada e a sequência secreta
-                    ;
-                    ; R3  armazena a comparação e está no formato
-                    ;           0000 ---- oooo xxxx
-                    ; binário, onde:
-                    ;
-                    ;   ---- -> Dígitos não encontrados
-                    ;   oooo -> Dígitos certos na posição errada
-                    ;   xxxx -> Dígitos certos na posição certa
-                    ;
-                    ; Os dígitos não encontrados são armazenados de forma a simplificar
-                    ; a impressão, recorrendo à variável TipChars.
+; ------------------------------------------------------------------------------------------------------------
+; Imprime a "dica" a dar ao jogador de acordo com a comparação
+; entre a sua jogada e a sequência secreta
+;
+; R3  armazena a comparação e está no formato
+;           0000 ---- oooo xxxx
+; binário, onde:
+;
+;   ---- -> Dígitos não encontrados
+;   oooo -> Dígitos certos na posição errada
+;   xxxx -> Dígitos certos na posição certa
+;
+; Os dígitos não encontrados são armazenados de forma a simplificar
+; a impressão, recorrendo à variável TipChars.
+; ------------------------------------------------------------------------------------------------------------
 PrintTip:           PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -156,7 +164,9 @@ PrintTipLoop:       MOV     R2, R1
                     POP     R1
                     RET
 
-                    ; Compara a jogada com a sequência secreta.
+; ------------------------------------------------------------------------------------------------------------
+; Compara a jogada com a sequência secreta.
+; ------------------------------------------------------------------------------------------------------------
 Compare:            PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -236,9 +246,11 @@ CompareEnd:         MOV     R6, 4
                     POP     R1
                     RETN    2
 
-                    ; Lógica principal do jogo. Gera uma sequência
-                    ; aleatória sempre que começa um novo jogo e lê
-                    ; repetidamente a jogada do jogador.
+; ------------------------------------------------------------------------------------------------------------
+; Lógica principal do jogo. Gera uma sequência
+; aleatória sempre que começa um novo jogo e lê
+; repetidamente a jogada do jogador.
+; ------------------------------------------------------------------------------------------------------------
 Game:               CALL    PrintNewLine
                     PUSH    NewGame
                     PUSH    M[NewGameLen]
@@ -284,7 +296,9 @@ Lost:               PUSH    YouLost
                     CALL    PrintNewLine
                     JMP     Game
 
-                    ; Início do programa.
+; ------------------------------------------------------------------------------------------------------------
+; Início do programa.
+; ------------------------------------------------------------------------------------------------------------
 Start:              MOV     R7, SP_INICIAL
                     MOV     SP, R7
                     CALL    PrintLogo
