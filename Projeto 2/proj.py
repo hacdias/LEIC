@@ -1,5 +1,7 @@
 # 89455 - Henrique Dias
 from parte1 import e_palavra
+from bisect import insort
+from itertools import permutations
 
 def contagem_repeticoes(l):
     """
@@ -69,41 +71,6 @@ def subconjunto_por_tamanho(conj, tamanho):
 
     return conj['palavras'][tamanho]
 
-def insere_ordenado(lst, el):
-    if lst == []:
-        return [el]
-    
-    '''
-    fi = 0
-    la = len(lst) - 1
-    indice = -1
-
-    while indice == -1:
-        meio = (fi + la) // 2
-
-        if fi == la or fi == la:
-            indice = fi
-        elif lst[meio] > el:
-            la = meio
-        else:
-            fi = meio
-
-    lst = lst[:indice+1] + [el] + lst[indice+1:]
-    '''
-
-    adicionado = False
-
-    for i in range(len(lst)):
-        if lst[i] > el:
-            adicionado = True
-            lst = lst[:i] + [el] + lst[i:]
-            break
-
-    if not adicionado:
-        lst = [el] + lst
-
-    return lst
-
 def acrescenta_palavra(conj, palavra):
     if not (e_conjunto_palavras(conj) and e_palavra_potencial(palavra)):
         raise ValueError('acrescenta_palavra:argumentos invalidos.')
@@ -116,7 +83,7 @@ def acrescenta_palavra(conj, palavra):
             conj['palavras'] = conj['palavras'] + [[]]
             diff = diff - 1
 
-    conj['palavras'][tamanho] = insere_ordenado(conj['palavras'][tamanho], palavra)
+    insort(conj['palavras'][tamanho], palavra)
     conj['tamanho'] = conj['tamanho'] + 1
 
 def e_conjunto_palavras(dados):
@@ -174,13 +141,14 @@ def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
-    jogador['pontuacao'] = jogador['pontuacao'] + 1
+    jogador['pontuacao'] = jogador['pontuacao'] + palavra_tamanho(palavra)
     acrescenta_palavra(jogador['tentativas']['validas'], palavra)
 
 def adiciona_palavra_invalida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
+    jogador['pontuacao'] = jogador['pontuacao'] - palavra_tamanho(palavra)
     acrescenta_palavra(jogador['tentativas']['invalidas'], palavra)
 
 def e_jogador(x):
@@ -198,75 +166,87 @@ def jogador_para_cadeia(jogador):
         ' INVALIDAS=' + conjunto_palavras_para_cadeia(jogador['tentativas']['invalidas'])
 
 def gera_todas_palavras_validas(letras):
-    def aux(lst):
-        if len(lst) == 1:
-            return lst
-
-        if len(lst) == 2:
-            return [lst[0]+lst[1], lst[1]+lst[0]]
-
-        els = []
-
-        for i in range(len(lst)):
-            for e in aux(lst[:i] + lst[i+1:]):
-                els.append(lst[i] + e)
-
-        return els
-
-    combos = list(letras)
-
-    for i in range(len(letras)):
-        combos += aux(letras[:i] + letras[i+1:])
-
-    combos += aux(letras)
-
     conj = cria_conjunto_palavras()
 
-    for combo in combos:
-        if e_palavra(combo):
-            acrescenta_palavra(conj, cria_palavra_potencial(combo, letras))
+    for i in range(1, len(letras)+1):
+        for e in permutations(letras, i):
+            combo = ''.join(e)
+            if e_palavra(combo):
+                acrescenta_palavra(conj, cria_palavra_potencial(combo, letras))
 
     return conj
 
-def guru_mj(letras):
-    print('Introduza o nome dos jogadores (-1 para terminar)...')
-    jogadores = []
 
+def inscrever_jogadores():
+    print('Introduza o nome dos jogadores (-1 para terminar)...')
+
+    jogadores = []
     n = 1
 
-    while True:
-        nome = input('JOGADOR ' + str(n) + ' -> ')
-        
-        if nome == '-1':
-            break
+    nome = input('JOGADOR ' + str(n) + ' -> ')
 
-        jogadores = jogadores + [cria_jogador(nome)]
+    while nome != '-1':
+        jogadores.append(cria_jogador(nome))
         n = n + 1
+        nome = input('JOGADOR ' + str(n) + ' -> ')
 
-    palavras = gera_todas_palavras_validas(letras)
-    palavras_usadas = cria_conjunto_palavras()
+    return jogadores
+
+def seleciona_vencedor(jogadores):
+    max_pontuacao = -1
+    vencedores = []
+
+    for j in jogadores:
+        pontuacao = jogador_pontuacao(j)
+        max_pontuacao = max(max_pontuacao, pontuacao)
+
+        if pontuacao != max_pontuacao:
+            vencedores = []
+
+        vencedores.append(j)
+
+    return vencedores
+
+def guru_mj(letras):
+    jogadores = inscrever_jogadores()
+
+    p_validas = gera_todas_palavras_validas(letras)
+    p_usadas = cria_conjunto_palavras()
+    faltam = numero_palavras(p_validas)
+
     jogada = 1
-    faltam = numero_palavras(palavras)
 
-    while faltam > 0:
-        print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
-
+    while faltam:
         for jogador in jogadores:
+            print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
             tentativa = input('JOGADOR ' + jogador_nome(jogador) + ' -> ')
             palavra = cria_palavra_potencial(tentativa, letras)
 
-            if palavra in subconjunto_por_tamanho(palavras, palavra_tamanho(palavra)):
+            if palavra in subconjunto_por_tamanho(p_validas, palavra_tamanho(palavra)):
                 print(palavra, ' - palavra VALIDA')
 
-                if palavra not in subconjunto_por_tamanho(palavras_usadas, palavra_tamanho(palavra)):
+                if palavra not in subconjunto_por_tamanho(p_usadas, palavra_tamanho(palavra)):
                     adiciona_palavra_valida(jogador, palavra)
-                    acrescenta_palavra(palavras_usadas, palavra)
+                    acrescenta_palavra(p_usadas, palavra)
                     faltam = faltam - 1
             else:
+                adiciona_palavra_invalida(jogador, palavra)
                 print(palavra, ' - palavra INVALIDA')
 
-        jogada = jogada + 1
+            if faltam < 1:
+                break
+
+            jogada = jogada + 1
+
+    vencedores = seleciona_vencedor(jogadores)
+
+    if len(vencedores) > 1:
+        print('FIM DE JOGO! O jogo terminou em empate.')
+    else:
+        print('FIM DE JOGO! O jogo terminou com a vitoria do jogador', jogador_nome(vencedores[0]), 'com' , str(jogador_pontuacao(vencedores[0])),  'pontos.')
+
+    for j in jogadores:
+        print(jogador_para_cadeia(j))
 
 # TESTES
-# guru_mj(("A", "E", "L"))
-gera_todas_palavras_validas(('A', 'L', 'E', 'L', 'E', 'L', 'E', 'B'))
+guru_mj(("A", "E", "L"))
