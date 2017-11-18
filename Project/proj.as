@@ -26,6 +26,7 @@ NewGameLen          WORD    9
 PreviousSequence    WORD    1234h
 CurrentSequence     WORD    0000h
 PlayerSequence      WORD    0000h
+Attempts            WORD    0000h
 
                     ORIG    0000h
                     JMP     Start
@@ -260,26 +261,30 @@ Game:               CALL    PrintNewLine
                     PUSH    R0
                     PUSH    M[PreviousSequence]     ; Sequência anterior
                     CALL    Random
-                    POP     R1                      ; Sequência aleatória
-                    POP     R2                      ; Sequência aleatória raw
-                    MOV     M[PreviousSequence], R2
-                    MOV     R2, R0                  ; Jogada do Jogador = 0
-                    MOV     R3, R0                  ; Semelhança = 0
-                    MOV     R4, R0                  ; Tentativas = 0
-GameLoop:           CMP     R2,R0
+                    POP     M[CurrentSequence]      ; Sequência aleatória
+                    POP     M[PreviousSequence]     ; Sequência aleatória raw
+                    MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
+                    MOV     M[Attempts], R0         ; Tentativas = 0
+
+GameLoop:           CMP     R2, R0
+                    BR.Z    GameLoop
+                    MOV     M[PlayerSequence], R2
+                    MOV     R2, R0
+                    CMP     M[PlayerSequence], R0
                     BR.Z    GameLoop                ; Esperar pela introdução da jogada
-                    CMP     R1, R2
+                    MOV     R1, M[CurrentSequence]
+                    CMP     R1, M[PlayerSequence]
                     BR.Z    Won
                     PUSH    R0
-                    PUSH    R1                      ; Seq Secreta
-                    PUSH    R2                      ; Seq do Jogador
+                    PUSH    M[CurrentSequence]      ; Seq Secreta
+                    PUSH    M[PlayerSequence]       ; Seq do Jogador
                     CALL    Compare                 ; Compara números
                     CALL    PrintTip
-                    INC     R4
-                    CMP     R4, ATTEMPTS
+                    INC     M[Attempts]
+                    MOV     R1, M[Attempts]
+                    CMP     R1, ATTEMPTS
                     BR.Z    Lost
-                    MOV     R2, R0
-                    MOV     R3, R0
+                    MOV     M[PlayerSequence], R0
                     BR      GameLoop
 
                     ; Imprimir mensagem de vitória.
