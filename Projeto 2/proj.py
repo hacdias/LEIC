@@ -191,6 +191,13 @@ def jogador_para_cadeia(jogador):
 
 
 def gera_todas_palavras_validas(letras):
+    """
+    Gera todos as palavras validas com as letras contidas no
+    tuplo letras e devolve o conjunto de palavras.
+
+    gera_todas_palavras_validas: tuplo -> conjunto de palavras
+    """
+
     conj = cria_conjunto_palavras()
 
     for i in range(1, len(letras) + 1):
@@ -203,6 +210,13 @@ def gera_todas_palavras_validas(letras):
 
 
 def inscrever_jogadores():
+    """
+    Permite a inscricao dos jogadores no jogo. Devolve
+    a lista com os jogadores que se inscreveram.
+
+    inscrever_jogadores: -> lista de jogadores
+    """
+
     print('Introduza o nome dos jogadores (-1 para terminar)...')
 
     jogadores = []
@@ -219,6 +233,14 @@ def inscrever_jogadores():
 
 
 def seleciona_vencedor(jogadores):
+    """
+    Recebe uma lista com jogadores e devolve a lista com os jogadores
+    vencedores. A lista contem apenas um jogador caso nao haja empate,
+    ou mais que um, caso haja empate.
+
+    seleciona_vencedor: lista de jogadores -> lista de jogadores
+    """
+
     max_pontuacao = -1
     vencedores = []
 
