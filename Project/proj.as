@@ -8,14 +8,14 @@ MAX_COLS            EQU     80
 ATTEMPTS            EQU     12
 INT_TEMP            EQU     FFF6h
 INT_TEMP_CTRL       EQU     FFF7h
-IO_LEDS				EQU		FFF8h
+IO_LEDS             EQU     FFF8h
 INT_MASK_ADDR       EQU     FFFAh
 INT_MASK            EQU     1000010000000000b
 
                     ; Tabela de interrupcoes
                     ORIG    FE0Ah
-INT_KEY_IA          WORD    INT_IA      		; Interruptor IA
-					ORIG    FE0Fh
+INT_KEY_IA          WORD    INT_IA              ; Interruptor IA
+                    ORIG    FE0Fh
 INT_TEMPK           WORD    INT_TEMP_F          ; TEMP
 
 
@@ -41,7 +41,7 @@ PreviousSequence    WORD    1234h
 CurrentSequence     WORD    0000h
 PlayerSequence      WORD    0000h
 Attempts            WORD    0000h
-CounterTimer        WORD	FFFFh
+CounterTimer        WORD    FFFFh
 TICK                WORD    0
 
                     ORIG    0000h
@@ -294,33 +294,33 @@ UpdateCounterEnd:   MOV     M[IO_DISPLAY], R1
 ; Interrupções controlando o temporizador e introdução
 ; das tentativas.
 ; ------------------------------------------------------------------------------------------------------------
-Reset_LEDS:		PUSH	R1
-				MOV		R1, FFFFh
-				MOV		M[CounterTimer], R1
-				POP		R1
-				RET
+ResetLEDS:          PUSH    R1
+                    MOV     R1, FFFFh
+                    MOV     M[CounterTimer], R1
+                    POP     R1
+                    RET
 
-Reset_Temp:     PUSH    R1
-                MOV     R1, 5
-                MOV     M[INT_TEMP], R1
-                MOV     R1, 1
-                MOV     M[INT_TEMP_CTRL], R1
-                POP     R1
-                RET
+ResetTemp:          PUSH    R1
+                    MOV     R1, 5
+                    MOV     M[INT_TEMP], R1
+                    MOV     R1, 1
+                    MOV     M[INT_TEMP_CTRL], R1
+                    POP     R1
+                    RET
 
-INT_TEMP_F:     CALL    Reset_Temp
-                PUSH    R1
-                SHL     M[CounterTimer], 1
-                INC     M[TICK]
-                POP     R1
-                RTI
+INT_TEMP_F:         CALL    ResetTemp
+                    PUSH    R1
+                    SHL     M[CounterTimer], 1
+                    INC     M[TICK]
+                    POP     R1
+                    RTI
 
-Update_LEDS:    PUSH    R1
-                DEC     M[TICK]
-				MOV		R1, M[CounterTimer]
-				MOV		M[IO_LEDS], R1
-                POP     R1
-                RET
+UpdateLEDS:         PUSH    R1
+                    DEC     M[TICK]
+                    MOV     R1, M[CounterTimer]
+                    MOV     M[IO_LEDS], R1
+                    POP     R1
+                    RET
 
 
 ; ------------------------------------------------------------------------------------------------------------
@@ -341,17 +341,17 @@ Game:               CALL    PrintNewLine
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
                     CALL    CleanCounter
-					CALL	Reset_LEDS
-					CALL	Reset_Temp
+                    CALL    ResetLEDS
+                    CALL    ResetTemp
 
-GameLoop:           CMP     M[TICK], R0				; Temporizador foi chamada
-					CALL.NZ Update_LEDS				; Update dos Leds
-					MOV		R1, M[CounterTimer]
-					CMP		R1, R0
-					JMP.Z	Lost
-					CMP     R2, R0
+GameLoop:           CMP     M[TICK], R0             ; Temporizador foi chamada
+                    CALL.NZ UpdateLEDS              ; Update dos Leds
+                    MOV     R1, M[CounterTimer]
+                    CMP     R1, R0
+                    JMP.Z   Lost
+                    CMP     R2, R0
                     BR.Z    GameLoop
-					MOV     M[PlayerSequence], R2
+                    MOV     M[PlayerSequence], R2
                     MOV     R2, R0
                     CMP     M[PlayerSequence], R0
                     BR.Z    GameLoop                ; Esperar pela introdução da jogada
@@ -369,7 +369,7 @@ GameLoop:           CMP     M[TICK], R0				; Temporizador foi chamada
                     CMP     R1, ATTEMPTS
                     JMP.Z   Lost
                     MOV     M[PlayerSequence], R0
-					CALL	Reset_LEDS
+                    CALL    ResetLEDS
                     JMP     GameLoop
 
                     ; Imprimir mensagem de vitória.
@@ -391,9 +391,9 @@ Lost:               PUSH    YouLost
 ; ------------------------------------------------------------------------------------------------------------
 Start:              MOV     R7, SP_INICIAL
                     MOV     SP, R7
-					MOV		R7, INT_MASK
-					MOV		M[INT_MASK_ADDR], R7
-					ENI
+                    MOV     R7, INT_MASK
+                    MOV     M[INT_MASK_ADDR], R7
+                    ENI
                     CALL    PrintLogo
                     POP     R6
                     POP     R7
