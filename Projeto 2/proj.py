@@ -383,7 +383,7 @@ def guru_mj(letras):
         for jogador in jogadores:
             print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
             tentativa = input('JOGADOR ' + jogador_nome(jogador) + ' -> ')
-    
+
             palavra = cria_palavra_potencial(tentativa, letras)
             tamanho = palavra_tamanho(palavra)
 
