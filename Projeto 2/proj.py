@@ -1,4 +1,5 @@
 # 89455 - Henrique Dias
+
 from bisect import insort
 from itertools import permutations
 
