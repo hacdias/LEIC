@@ -43,6 +43,8 @@ YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GAME OVER! YOU LOST! 
 YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ YOU WON! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 NewGame             STR     'New game!'
 NewGameLen          WORD    9
+MelhorPont          STR     'Melhor Pont: NA'
+MelhorPontLen       WORD    1000000000001110b
 PreviousSequence    WORD    1234h
 CurrentSequence     WORD    0000h
 PlayerSequence      WORD    0000h
@@ -339,18 +341,50 @@ UpdateLEDS:         PUSH    R1
                     POP     R1
                     RET
 
+PrintBestGame:      PUSH    R1
+                    PUSH    R2
+                    PUSH    R3
+                    MOV     R1, MelhorPont
+                    MOV     R2, 1000000000000000b
+PrintBestGameL:     MOV     M[CTRL_LCD], R2
+                    MOV     R3, M[R1]
+                    MOV     M[IO_LCD], R3
+                    INC     R1
+                    INC     R2
+                    CMP     R2, M[MelhorPontLen]
+                    BR.NP   PrintBestGameL
+                    POP     R3
+                    POP     R2
+                    POP     R1
+                    RET
+
 UpdateBestGame:     PUSH    R1
                     PUSH    R2
+                    PUSH    R3
                     MOV     R1, M[Attempts]
+                    INC     R1
                     MOV     R2, M[BestGame]
                     CMP     R1, R2
                     BR.N    UpdateBestGameEnd
                     MOV     M[BestGame], R1
-                    MOV     R2, 5
+                    CMP     R1, 10
+                    BR.P    UpdateBestGameBig
+
+                    MOV     R2, 1000000000001101b
                     MOV     M[CTRL_LCD], R2
+                    MOV     R3, R0
+                    ADD     R3, 48
+                    MOV     M[IO_LCD], R3
+                    MOV     R2, 1000000000001110b
+                    MOV     M[CTRL_LCD], R2
+                    ADD     R1, 48
                     MOV     M[IO_LCD], R1
-UpdateBestGameEnd:  POP R2
-                    POP R1
+
+                    BR      UpdateBestGameEnd
+UpdateBestGameBig:  MOV     R1, R0; FAZER
+UpdateBestGameEnd:  POP     R3
+                    POP     R2
+                    POP     R1
                     RET
 
 ; ------------------------------------------------------------------------------------------------------------
@@ -432,10 +466,10 @@ Start:              MOV     R7, SP_INICIAL
                     CALL    PrintLogo
                     POP     R6
                     POP     R7
-                    MOV     R7, 1000000000000000b
+                    MOV     M[CTRL_LCD], R0
+                    MOV     R7, 1000000000100000b
                     MOV     M[CTRL_LCD], R7
-                    MOV     R1, '2'
-                    MOV     M[IO_LCD], R1
+                    CALL    PrintBestGame
 
 Infinity:           MOV     M[IO_LEDS], R0
                     CMP     M[StartGame], R0
