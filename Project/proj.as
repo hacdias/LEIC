@@ -6,6 +6,8 @@ CRLF                EQU     000Ah               ; Line Feed
 RAN_MASK            EQU     1000000000010110b
 MAX_COLS            EQU     80
 ATTEMPTS            EQU     12
+CTRL_LCD            EQU     FFF4h
+IO_LCD              EQU     FFF5h
 INT_TEMP            EQU     FFF6h
 INT_TEMP_CTRL       EQU     FFF7h
 IO_LEDS             EQU     FFF8h
@@ -31,7 +33,11 @@ Logo07              STR     '/|\           |_|  |_|\__ _|___/\__\___|_|  |_|  |_
 Logo08              STR     '/|\                                                                          /|\'
 Logo09              STR     '/|\             Brought to you by Henrique Dias and Rodrigo Sousa            /|\'
 Logo10              STR     '/|\                                                                          /|\'
-Logo11              STR     '\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/'
+Logo11              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\||/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
+Logo12              STR     '/|\                                                                          /|\'
+Logo13              STR     '/|\                    Carregue no botao IA para iniciar!                    /|\'
+Logo14              STR     '/|\                                                                          /|\'
+Logo15              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\||/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
 TipChars            STR     'x', 'o', '-'
 YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GAME OVER! YOU LOST! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ YOU WON! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
@@ -42,12 +48,14 @@ CurrentSequence     WORD    0000h
 PlayerSequence      WORD    0000h
 Attempts            WORD    0000h
 CounterTimer        WORD    FFFFh
+BestGame            WORD    FFFFh      
+StartGame           WORD    0
 TICK                WORD    0
 
                     ORIG    0000h
                     JMP     Start
 
-INT_IA:             CALL    PrintNewLine        ; TODO: COmeçar novo jogo?
+INT_IA:             INC     M[StartGame]    ; Indicador de Início de Novo Jogo
                     RTI
 
 ; ------------------------------------------------------------------------------------------------------------
@@ -108,6 +116,15 @@ PrintPhraseLoop:    MOV     R3, M[R2]
                     POP     R1
                     RETN    2
 
+CleanWindow:        PUSH    R1
+                    MOV     R1, 24
+CleanWindowLoop:    CALL    PrintNewLine
+                    DEC     R1
+                    CMP     R1, R0
+                    BR.P    CleanWindowLoop
+                    POP     R1
+                    RET
+
                     ; Imprime um caractere um determinado número de vezes.
 PrintChar:          PUSH    R1
                     PUSH    R2
@@ -139,7 +156,7 @@ PrintLogoLoop:      PUSH    R1
                     CALL    PrintNewLine
                     ADD     R1, MAX_COLS
                     INC     R2
-                    CMP     R2, 11
+                    CMP     R2, 15
                     BR.NP   PrintLogoLoop
                     CALL    PrintNewLine
                     POP     R2
@@ -301,7 +318,7 @@ ResetLEDS:          PUSH    R1
                     RET
 
 ResetTemp:          PUSH    R1
-                    MOV     R1, 5
+                    MOV     R1, 30
                     MOV     M[INT_TEMP], R1
                     MOV     R1, 1
                     MOV     M[INT_TEMP_CTRL], R1
@@ -322,13 +339,28 @@ UpdateLEDS:         PUSH    R1
                     POP     R1
                     RET
 
+UpdateBestGame:     PUSH    R1
+                    PUSH    R2
+                    MOV     R1, M[Attempts]
+                    MOV     R2, M[BestGame]
+                    CMP     R1, R2
+                    BR.N    UpdateBestGameEnd
+                    MOV     M[BestGame], R1
+                    MOV     R2, 5
+                    MOV     M[CTRL_LCD], R2
+                    MOV     M[IO_LCD], R1
+UpdateBestGameEnd:  POP R2
+                    POP R1
+                    RET
 
 ; ------------------------------------------------------------------------------------------------------------
 ; Lógica principal do jogo. Gera uma sequência
 ; aleatória sempre que começa um novo jogo e lê
 ; repetidamente a jogada do jogador.
 ; ------------------------------------------------------------------------------------------------------------
-Game:               CALL    PrintNewLine
+Game:               MOV     M[StartGame], R0
+                    CALL    ResetLEDS
+                    CALL    PrintNewLine
                     PUSH    NewGame
                     PUSH    M[NewGameLen]
                     CALL    PrintPhrase
@@ -341,14 +373,15 @@ Game:               CALL    PrintNewLine
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
                     CALL    CleanCounter
-                    CALL    ResetLEDS
                     CALL    ResetTemp
 
-GameLoop:           CMP     M[TICK], R0             ; Temporizador foi chamada
+GameLoop:           CMP     M[StartGame], R0
+                    JMP.P   Game
+                    CMP     M[TICK], R0             ; Temporizador foi chamada
                     CALL.NZ UpdateLEDS              ; Update dos Leds
-                    MOV     R1, M[CounterTimer]
+                    MOV     R1, M[CounterTimer]     ; Se o tempo chegar a zero, RIP
                     CMP     R1, R0
-                    JMP.Z   Lost
+                    JMP.Z   Lost                    ; RIP
                     CMP     R2, R0
                     BR.Z    GameLoop
                     MOV     M[PlayerSequence], R2
@@ -369,6 +402,7 @@ GameLoop:           CMP     M[TICK], R0             ; Temporizador foi chamada
                     CMP     R1, ATTEMPTS
                     JMP.Z   Lost
                     MOV     M[PlayerSequence], R0
+                    CALL    ResetTemp
                     CALL    ResetLEDS
                     JMP     GameLoop
 
@@ -377,14 +411,15 @@ Won:                PUSH    YouWon
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    PrintNewLine
-                    JMP     Game
+                    CALL    UpdateBestGame
+                    JMP     Infinity
 
                     ; Imprimir mensagem de derrota.
 Lost:               PUSH    YouLost
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    PrintNewLine
-                    JMP     Game
+                    JMP     Infinity
 
 ; ------------------------------------------------------------------------------------------------------------
 ; Início do programa.
@@ -397,4 +432,12 @@ Start:              MOV     R7, SP_INICIAL
                     CALL    PrintLogo
                     POP     R6
                     POP     R7
-                    JMP     Game
+                    MOV     R7, 1000000000000000b
+                    MOV     M[CTRL_LCD], R7
+                    MOV     R1, '2'
+                    MOV     M[IO_LCD], R1
+
+Infinity:           MOV     M[IO_LEDS], R0
+                    CMP     M[StartGame], R0
+                    JMP.P   Game
+                    BR      Infinity
