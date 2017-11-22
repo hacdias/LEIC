@@ -20,7 +20,6 @@ INT_KEY_IA          WORD    INT_IA              ; Interruptor IA
                     ORIG    FE0Fh
 INT_TEMPK           WORD    INT_TEMP_F          ; TEMP
 
-
                     ORIG    8000h
 Logo00              STR     '\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/'
 Logo01              STR     '/|\                                                                          /|\'
@@ -320,7 +319,7 @@ ResetLEDS:          PUSH    R1
                     RET
 
 ResetTemp:          PUSH    R1
-                    MOV     R1, 30
+                    MOV     R1, 5
                     MOV     M[INT_TEMP], R1
                     MOV     R1, 1
                     MOV     M[INT_TEMP_CTRL], R1
@@ -367,22 +366,22 @@ UpdateBestGame:     PUSH    R1
                     CMP     R1, R2
                     BR.N    UpdateBestGameEnd
                     MOV     M[BestGame], R1
+                    MOV     R2, R1
                     CMP     R1, 10
                     BR.P    UpdateBestGameBig
-
-                    MOV     R2, 1000000000001101b
-                    MOV     M[CTRL_LCD], R2
-                    MOV     R3, R0
-                    ADD     R3, 48
-                    MOV     M[IO_LCD], R3
-                    MOV     R2, 1000000000001110b
-                    MOV     M[CTRL_LCD], R2
-                    ADD     R1, 48
-                    MOV     M[IO_LCD], R1
-
+                    MOV     R1, R0
                     BR      UpdateBestGameEnd
-UpdateBestGameBig:  MOV     R1, R0; FAZER
-UpdateBestGameEnd:  POP     R3
+UpdateBestGameBig:  MOV     R1, 1
+                    SUB     R2, 10
+UpdateBestGameEnd:  ADD     R1, 48
+                    ADD     R2, 48
+                    MOV     R3, 1000000000001101b
+                    MOV     M[CTRL_LCD], R3
+                    MOV     M[IO_LCD], R1
+                    MOV     R3, 1000000000001110b
+                    MOV     M[CTRL_LCD], R3
+                    MOV     M[IO_LCD], R2
+                    POP     R3
                     POP     R2
                     POP     R1
                     RET
@@ -445,6 +444,8 @@ Won:                PUSH    YouWon
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    PrintNewLine
+                    MOV     M[Attempts], R0
+                    CALL    UpdateCounter
                     CALL    UpdateBestGame
                     JMP     Infinity
 
@@ -453,6 +454,8 @@ Lost:               PUSH    YouLost
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    PrintNewLine
+                    MOV     M[Attempts], R0
+                    CALL    UpdateCounter
                     JMP     Infinity
 
 ; ------------------------------------------------------------------------------------------------------------
