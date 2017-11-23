@@ -529,8 +529,6 @@ Start:              MOV     R7, SP_INICIAL
                     MOV     M[OUT_CTRL], R0
                     ENI
                     CALL    PrintLogo
-                    POP     R6
-                    POP     R7
                     MOV     M[CTRL_LCD], R0
                     MOV     R7, 1000000000100000b
                     MOV     M[CTRL_LCD], R7
