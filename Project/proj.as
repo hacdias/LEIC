@@ -12,9 +12,16 @@ INT_TEMP            EQU     FFF6h
 INT_TEMP_CTRL       EQU     FFF7h
 IO_LEDS             EQU     FFF8h
 INT_MASK_ADDR       EQU     FFFAh
-INT_MASK            EQU     1000010000000000b
+INT_MASK            EQU     1000010001111110b
 
                     ; Tabela de interrupcoes
+                    ORIG    FE01h
+INT_KEY_I1          WORD    INT_I1              ; Interruptor I1
+INT_KEY_I2          WORD    INT_I2              ; Interruptor I2
+INT_KEY_I3          WORD    INT_I3              ; Interruptor I3
+INT_KEY_I4          WORD    INT_I4              ; Interruptor I4
+INT_KEY_I5          WORD    INT_I5              ; Interruptor I5
+INT_KEY_I6          WORD    INT_I6              ; Interruptor I6
                     ORIG    FE0Ah
 INT_KEY_IA          WORD    INT_IA              ; Interruptor IA
                     ORIG    FE0Fh
@@ -53,11 +60,31 @@ BestGame            WORD    FFFFh
 StartGame           WORD    0
 TICK                WORD    0
 Cursor              WORD    0
+Digit               WORD    4
+GuessInput          WORD    0000h
 InfinityCounter     WORD    0
 
                     ORIG    0000h
                     JMP     Start
 
+INT_I1:             PUSH    0001h
+                    CALL    AppendDigit
+                    RTI
+INT_I2:             PUSH    0002h
+                    CALL    AppendDigit
+                    RTI
+INT_I3:             PUSH    0003h
+                    CALL    AppendDigit
+                    RTI
+INT_I4:             PUSH    0004h
+                    CALL    AppendDigit
+                    RTI
+INT_I5:             PUSH    0005h
+                    CALL    AppendDigit
+                    RTI
+INT_I6:             PUSH    0006h
+                    CALL    AppendDigit
+                    RTI
 INT_IA:             INC     M[StartGame]    ; Indicador de Início de Novo Jogo
                     RTI
 
@@ -446,6 +473,33 @@ UpdateBestGameEnd:  ADD     R1, 48
                     RET
 
 ; ------------------------------------------------------------------------------------------------------------
+; Atualiza a tentativa do jogador quando carrega nos botoes
+; ------------------------------------------------------------------------------------------------------------
+AppendDigit:        PUSH    R1
+                    PUSH    R2
+                    MOV     R1, M[Digit]
+                    DEC     R1
+                    MOV     M[Digit], R1
+                    MOV     R2, M[SP+4]
+AppendDigitLoop:    ROL     R2, 4
+                    DEC     R1
+                    CMP     R1, R0
+                    JMP.NZ  AppendDigitLoop
+                    ADD     M[GuessInput], R2
+                    POP     R2
+                    POP     R1
+                    RETN    1
+                    
+TransferGuess:      PUSH    R1
+                    MOV     R1, M[GuessInput]
+                    MOV     M[PlayerSequence], R1
+                    MOV     R1, 4
+                    MOV     M[Digit], R1
+                    MOV     M[GuessInput], R0
+                    POP     R1
+                    RET
+                    
+; ------------------------------------------------------------------------------------------------------------
 ; Lógica principal do jogo. Gera uma sequência
 ; aleatória sempre que começa um novo jogo e lê
 ; repetidamente a jogada do jogador.
@@ -475,10 +529,11 @@ GameLoop:           CMP     M[StartGame], R0
                     MOV     R1, M[CounterTimer]     ; Se o tempo chegar a zero, RIP
                     CMP     R1, R0
                     JMP.Z   Lost                    ; RIP
-                    CMP     R2, R0
-                    BR.Z    GameLoop
-                    MOV     M[PlayerSequence], R2
-                    MOV     R2, R0
+                    MOV     R3, M[Digit]
+                    MOV     R4, M[GuessInput]
+                    MOV     R5, M[PlayerSequence]
+                    CMP     M[Digit], R0
+                    JMP.Z   TransferGuess
                     CMP     M[PlayerSequence], R0
                     BR.Z    GameLoop                ; Esperar pela introdução da jogada
                     MOV     R1, M[CurrentSequence]
