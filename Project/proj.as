@@ -435,8 +435,8 @@ GameLoop:           CMP     M[StartGame], R0
                     CMP     R1, ATTEMPTS
                     JMP.Z   Lost
                     MOV     M[PlayerSequence], R0
-                    CALL    ResetTemp
                     CALL    ResetLEDS
+                    CALL    ResetTemp
                     JMP     GameLoop
 
                     ; Imprimir mensagem de vitória.
