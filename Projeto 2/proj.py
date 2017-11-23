@@ -126,7 +126,7 @@ def subconjunto_por_tamanho(conj, tamanho):
 
     subconjunto_por_tamanho: conjunto_palavras X inteiro --> lista
     """
-    if len(conj[0]) < tamanho:
+    if len(conj[0]) <= tamanho:
         return []
 
     return conj[0][tamanho]
@@ -266,7 +266,7 @@ def adiciona_palavra_invalida(jogador, palavra):
     adiciona_palavra_invalida: jogador X palavra_potencial -->
     """
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
-        raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
+        raise ValueError('adiciona_palavra_invalida:argumentos invalidos.')
 
     jogador[1] = jogador[1] - palavra_tamanho(palavra)
     acrescenta_palavra(jogador[3], palavra)
@@ -388,7 +388,7 @@ def guru_mj(letras):
             tamanho = palavra_tamanho(palavra)
 
             if palavra in subconjunto_por_tamanho(p_validas, tamanho):
-                print(palavra, ' - palavra VALIDA')
+                print(palavra, '- palavra VALIDA')
 
                 if palavra not in subconjunto_por_tamanho(p_usadas, tamanho):
                     adiciona_palavra_valida(jogador, palavra)
@@ -396,7 +396,7 @@ def guru_mj(letras):
                     faltam = faltam - 1
             else:
                 adiciona_palavra_invalida(jogador, palavra)
-                print(palavra, ' - palavra INVALIDA')
+                print(palavra, '- palavra INVALIDA')
 
             if faltam < 1:
                 break
