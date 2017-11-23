@@ -563,7 +563,7 @@ GameEnd:            PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    NextLine
                     MOV     M[Attempts], R0
-                    CALL    UpdateCounter
+                    CALL    CleanCounter
                     PUSH    EndGamePhrase
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
