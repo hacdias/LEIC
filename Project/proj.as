@@ -98,17 +98,17 @@ Random:             PUSH    R1
                     PUSH    R3
                     PUSH    R4
                     PUSH    R5
-                    MOV     R1, M[SP+7]     ; Valor aleatório anterior
-                    CMP     R1, R0          ; Se for zero, utiliza o contador.
-                    BR.NZ   RandomContinue  
+                    MOV     R1, M[SP+7]             ; Valor aleatório anterior
+                    CMP     R1, R0                  ; Se não existir um valor anterior (1º jogo)
+                    BR.NZ   RandomContinue          ; utiliza um contador existente no loop inicial do jogo
                     MOV     R1, M[InfinityCounter]
 RandomContinue:     MOV     R2, R1
-                    AND     R2, 1           ; Obtém o último dígito
+                    AND     R2, 1                   ; Obtém o último dígito
                     BR.Z    RandomF
                     XOR     R1, RAN_MASK
 RandomF:            ROR     R1, 1
-                    MOV     R2, 0           ; Sequência aleatória c/ digitos entre 1 e 6
-                    MOV     R3, 4           ; Contador de repetições
+                    MOV     R2, 0                   ; Sequência aleatória c/ digitos entre 1 e 6
+                    MOV     R3, 4                   ; Contador de repetições
 DivideLoop:         ROR     R1, 4
                     MOV     R4, R1
                     AND     R4, 000Fh
@@ -381,7 +381,7 @@ UpdateCounterEnd:   MOV     M[IO_DISPLAY], R1
                     RET
 
 ; ------------------------------------------------------------------------------------------------------------
-; Faz reset aos LEDS
+; Faz reset aos LEDS de forma a estarem todos ligados
 ; ------------------------------------------------------------------------------------------------------------
 ResetLEDS:          PUSH    R1
                     MOV     R1, FFFFh
@@ -449,18 +449,18 @@ UpdateBestGame:     PUSH    R1
                     MOV     R1, M[Attempts]
                     INC     R1
                     MOV     R2, M[BestGame]
-                    CMP     R1, R2
+                    CMP     R1, R2                  ; Compara a melhor pontuacao ate ao momento com a atual
                     BR.N    UpdateBestGameEnd
                     MOV     M[BestGame], R1
                     MOV     R2, R1
-                    CMP     R1, 10
-                    BR.P    UpdateBestGameBig
-                    MOV     R1, R0
+                    CMP     R1, 10                      
+                    BR.P    UpdateBestGameBig       ; Caso seja uma melhor pontuacao e esta seja constituida por 2 digitos
+                    MOV     R1, R0                  ; Caso esta seja constituida por 1 digito o primeiro digito é zero
                     BR      UpdateBestGameEnd
-UpdateBestGameBig:  MOV     R1, 1
-                    SUB     R2, 10
-UpdateBestGameEnd:  ADD     R1, 48
-                    ADD     R2, 48
+UpdateBestGameBig:  MOV     R1, 1                   ; Caso esta seja constituida por 2 digitos o primeiro digito é 1
+                    SUB     R2, 10                  ; Subtraimos 10 a pontuacao de forma a obter o segundo digito
+UpdateBestGameEnd:  ADD     R1, 48                  ; Conversão do primeiro digito para ASCII
+                    ADD     R2, 48                  ; Conversão do segundo digito para ASCII
                     MOV     R3, 1000000000001101b
                     MOV     M[CTRL_LCD], R3
                     MOV     M[IO_LCD], R1
@@ -480,16 +480,16 @@ AppendDigit:        PUSH    R1
                     MOV     R1, M[SP+4]
                     MOV     R2, M[GuessInput]
                     ROL     R2, 4
-                    ADD     R2, R1
-                    MOV     M[GuessInput], R2
-                    DEC     M[Digit]
+                    ADD     R2, R1                  ; Adicionado o valor associado ao botao a variavel GuessInput
+                    MOV     M[GuessInput], R2       ; onde é guardada a informação sobre a tentativa que o jogador está a criar
+                    DEC     M[Digit]                ; Decrementar o numero de digitos por introduzir
                     POP     R2
                     POP     R1
                     RETN    1
                     
 TransferGuess:      PUSH    R1
-                    MOV     R1, M[GuessInput]
-                    MOV     M[PlayerSequence], R1
+                    MOV     R1, M[GuessInput]       ; Cópia do valor apos o jogador ter clicado nos 4 botões para
+                    MOV     M[PlayerSequence], R1   ; o endereço de memória associado a sequência do jogador
                     MOV     R1, 4
                     MOV     M[Digit], R1
                     MOV     M[GuessInput], R0
@@ -521,14 +521,10 @@ Game:               MOV     M[StartGame], R0
 
 GameLoop:           CMP     M[StartGame], R0
                     JMP.P   Game
-                    CMP     M[TICK], R0             ; Temporizador foi chamada
-                    CALL.NZ UpdateLEDS              ; Update dos Leds
-                    MOV     R1, M[CounterTimer]     ; Se o tempo chegar a zero, RIP
-                    CMP     R1, R0
-                    JMP.Z   Lost                    ; RIP
-                    MOV     R3, M[Digit]
-                    MOV     R4, M[GuessInput]
-                    MOV     R5, M[PlayerSequence]
+                    CMP     M[TICK], R0             ; Temporizador foi chamado
+                    CALL.NZ UpdateLEDS              ; Update dos Leds caso haja um update to tick do temporizador  
+                    CMP     M[CounterTimer], R0     ; Se o tempo chegar a zero, o jogador perde o jogo
+                    JMP.Z   Lost
                     CMP     M[Digit], R0
                     CALL.Z  TransferGuess
                     CMP     M[PlayerSequence], R0
