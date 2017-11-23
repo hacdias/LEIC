@@ -1,8 +1,8 @@
 SP_INICIAL          EQU     FDFFh
+OUT_CTRL            EQU     FFFCh
 OUT                 EQU     FFFEh
 IO_DISPLAY          EQU     FFF0h
 
-CRLF                EQU     000Ah               ; Line Feed
 RAN_MASK            EQU     1000000000010110b
 MAX_COLS            EQU     80
 ATTEMPTS            EQU     12
@@ -52,6 +52,7 @@ CounterTimer        WORD    FFFFh
 BestGame            WORD    FFFFh      
 StartGame           WORD    0
 TICK                WORD    0
+Cursor              WORD    0000h
 
                     ORIG    0000h
                     JMP     Start
@@ -101,13 +102,33 @@ DivideLoop:         ROR     R1, 4
 ;   Arg 1: endereço de memória da Frase
 ;   Arg 2: comprimento da frase
 ; ------------------------------------------------------------------------------------------------------------
+NextCol:            PUSH    R1
+                    MOV     R1, M[Cursor]
+                    INC     R1
+                    MOV     M[Cursor], R1
+                    MOV     M[OUT_CTRL], R1
+                    POP     R1
+                    RET
+
+                    ; Imprime uma nova linha.
+NextLine:       PUSH    R1
+                    MOV     R1, M[Cursor]
+                    AND     R1, FF00h
+                    ADD     R1, 0100h
+                    MOV     M[Cursor], R1
+                    MOV     M[OUT_CTRL], R1
+                    POP     R1
+                    RET
+
 PrintPhrase:        PUSH    R1
                     PUSH    R2
                     PUSH    R3
                     MOV     R1, R0
                     MOV     R2, M[SP+6]
 PrintPhraseLoop:    MOV     R3, M[R2]
-                    MOV     M[FFFEh], R3
+                    PUSH    R3
+                    PUSH    1
+                    CALL    PrintChar
                     INC     R1
                     INC     R2
                     CMP     R1, M[SP+5]
@@ -118,11 +139,26 @@ PrintPhraseLoop:    MOV     R3, M[R2]
                     RETN    2
 
 CleanWindow:        PUSH    R1
-                    MOV     R1, 24
-CleanWindowLoop:    CALL    PrintNewLine
-                    DEC     R1
-                    CMP     R1, R0
-                    BR.P    CleanWindowLoop
+                    PUSH    R2
+                    PUSH    R3
+                    MOV     R1, 0               ; Contagem Linhas
+                    MOV     R3, ' '             ; Espaço Branco
+                    MOV     M[Cursor], R0       ; Reset Cursor
+                    MOV     M[OUT_CTRL], R0     ; Reset Cursor
+CleanWindowLiLoop:  MOV     R2, 0               ; Contagem Colunas
+CleanWindowColLoop: MOV     M[OUT], R3
+                    CALL    NextCol
+                    INC     R2
+                    CMP     R2, 100
+                    BR.N    CleanWindowColLoop
+                    CALL    NextLine
+                    INC     R1
+                    CMP     R1, 30
+                    BR.N    CleanWindowLiLoop
+                    MOV     M[Cursor], R0       ; Reset Cursor
+                    MOV     M[OUT_CTRL], R0     ; Reset Cursor
+                    POP     R3
+                    POP     R2
                     POP     R1
                     RET
 
@@ -134,17 +170,12 @@ PrintChar:          PUSH    R1
                     CMP     R2, R0
                     BR.Z    PrintCharEnd        ; Se for 0, não imprime nada.
 PrintCharLoop:      MOV     M[OUT], R1
+                    CALL    NextCol
                     DEC     R2
                     BR.P    PrintCharLoop       ; Se continuar positivo, imprime.
 PrintCharEnd:       POP     R2
                     POP     R1
                     RETN    2
-
-                    ; Imprime uma nova linha.
-PrintNewLine:       PUSH    CRLF
-                    PUSH    1
-                    CALL    PrintChar
-                    RET
 
                     ; Imprime o logótipo.
 PrintLogo:          PUSH    R1
@@ -154,12 +185,12 @@ PrintLogo:          PUSH    R1
 PrintLogoLoop:      PUSH    R1
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     ADD     R1, MAX_COLS
                     INC     R2
                     CMP     R2, 15
                     BR.NP   PrintLogoLoop
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     POP     R2
                     POP     R1
                     RET
@@ -195,7 +226,7 @@ PrintTipLoop:       MOV     R2, R1
                     INC     R4
                     DEC     R3
                     BR.NN   PrintTipLoop
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     POP     R4
                     POP     R3
                     POP     R2
@@ -393,11 +424,11 @@ UpdateBestGameEnd:  ADD     R1, 48
 ; ------------------------------------------------------------------------------------------------------------
 Game:               MOV     M[StartGame], R0
                     CALL    ResetLEDS
-                    CALL    PrintNewLine
+                    CALL    CleanWindow
                     PUSH    NewGame
                     PUSH    M[NewGameLen]
                     CALL    PrintPhrase
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     PUSH    R0
                     PUSH    R0
                     PUSH    M[PreviousSequence]     ; Sequência anterior
@@ -443,7 +474,7 @@ GameLoop:           CMP     M[StartGame], R0
 Won:                PUSH    YouWon
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     MOV     M[Attempts], R0
                     CALL    UpdateCounter
                     CALL    UpdateBestGame
@@ -453,7 +484,7 @@ Won:                PUSH    YouWon
 Lost:               PUSH    YouLost
                     PUSH    MAX_COLS
                     CALL    PrintPhrase
-                    CALL    PrintNewLine
+                    CALL    NextLine
                     MOV     M[Attempts], R0
                     CALL    UpdateCounter
                     JMP     Infinity
@@ -465,6 +496,9 @@ Start:              MOV     R7, SP_INICIAL
                     MOV     SP, R7
                     MOV     R7, INT_MASK
                     MOV     M[INT_MASK_ADDR], R7
+                    MOV     R7, FFFFh
+                    MOV     M[OUT_CTRL], R7
+                    MOV     M[OUT_CTRL], R0
                     ENI
                     CALL    PrintLogo
                     POP     R6
