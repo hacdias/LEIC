@@ -38,10 +38,10 @@ Logo13              STR     '/|\                    Carregue no botao IA para in
 Logo14              STR     '/|\                                                                          /|\'
 Logo15              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\||/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
 TipChars            STR     'x', 'o', '-'
-YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GAME OVER! YOU LOST! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ YOU WON! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-NewGame             STR     'New game!'
-NewGameLen          WORD    9
+YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PERDESTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GANHASTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+EndGamePhrase       STR     '~~~~~~~~~~~~~~~~~~ FIM DO JOGO! Clique em IA para recomecar! ~~~~~~~~~~~~~~~~~~~'
+NewGame             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ NOVO JOGO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 MelhorPont          STR     'Melhor Pont: NA'
 MelhorPontLen       WORD    1000000000001110b
 PreviousSequence    WORD    1234h
@@ -52,8 +52,8 @@ CounterTimer        WORD    FFFFh
 BestGame            WORD    FFFFh      
 StartGame           WORD    0
 TICK                WORD    0
-Cursor              WORD    0000h
-InitialCounter      WORD    0000h
+Cursor              WORD    0
+InfinityCounter     WORD    0
 
                     ORIG    0000h
                     JMP     Start
@@ -74,7 +74,7 @@ Random:             PUSH    R1
                     MOV     R1, M[SP+7]     ; Valor aleatório anterior
                     CMP     R1, R0          ; Se for zero, utiliza o contador.
                     BR.NZ   RandomContinue  
-                    MOV     R1, M[InitialCounter]
+                    MOV     R1, M[InfinityCounter]
 RandomContinue:     MOV     R2, R1
                     AND     R2, 1           ; Obtém o último dígito
                     BR.Z    RandomF
@@ -166,7 +166,9 @@ CleanWindowColLoop: MOV     M[OUT], R3
                     POP     R1
                     RET
 
-                    ; Imprime um caractere um determinado número de vezes.
+; ------------------------------------------------------------------------------------------------------------
+; Imprime um caractere um determinado número de vezes.
+; ------------------------------------------------------------------------------------------------------------
 PrintChar:          PUSH    R1
                     PUSH    R2
                     MOV     R1, M[SP+5]         ; R1 = caractere a imprimir
@@ -181,7 +183,9 @@ PrintCharEnd:       POP     R2
                     POP     R1
                     RETN    2
 
-                    ; Imprime o logótipo.
+; ------------------------------------------------------------------------------------------------------------
+; Imprime o logótipo.
+; ------------------------------------------------------------------------------------------------------------
 PrintLogo:          PUSH    R1
                     PUSH    R2
                     MOV     R1, Logo00
@@ -319,6 +323,9 @@ CompareEnd:         MOV     R6, 4
                     POP     R1
                     RETN    2
 
+; ------------------------------------------------------------------------------------------------------------
+; Limpa o contador de tentativas
+; ------------------------------------------------------------------------------------------------------------
 CleanCounter:       PUSH    R1
                     MOV     M[Attempts], R0
                     MOV     R1, IO_DISPLAY
@@ -327,6 +334,9 @@ CleanCounter:       PUSH    R1
                     POP     R1
                     RET
 
+; ------------------------------------------------------------------------------------------------------------
+; Atualiza o contador de tentativas
+; ------------------------------------------------------------------------------------------------------------
 UpdateCounter:      PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -344,8 +354,7 @@ UpdateCounterEnd:   MOV     M[IO_DISPLAY], R1
                     RET
 
 ; ------------------------------------------------------------------------------------------------------------
-; Interrupções controlando o temporizador e introdução
-; das tentativas.
+; Faz reset aos LEDS
 ; ------------------------------------------------------------------------------------------------------------
 ResetLEDS:          PUSH    R1
                     MOV     R1, FFFFh
@@ -353,6 +362,9 @@ ResetLEDS:          PUSH    R1
                     POP     R1
                     RET
 
+; ------------------------------------------------------------------------------------------------------------
+; Faz reset ao Temporizador
+; ------------------------------------------------------------------------------------------------------------
 ResetTemp:          PUSH    R1
                     MOV     R1, 5
                     MOV     M[INT_TEMP], R1
@@ -361,6 +373,9 @@ ResetTemp:          PUSH    R1
                     POP     R1
                     RET
 
+; ------------------------------------------------------------------------------------------------------------
+; Rotina de Tratamento da Interrupção do Temporizador
+; ------------------------------------------------------------------------------------------------------------
 INT_TEMP_F:         CALL    ResetTemp
                     PUSH    R1
                     SHL     M[CounterTimer], 1
@@ -368,6 +383,9 @@ INT_TEMP_F:         CALL    ResetTemp
                     POP     R1
                     RTI
 
+; ------------------------------------------------------------------------------------------------------------
+; Atualiza os LEDS de acordo com o temporizador
+; ------------------------------------------------------------------------------------------------------------
 UpdateLEDS:         PUSH    R1
                     DEC     M[TICK]
                     MOV     R1, M[CounterTimer]
@@ -375,6 +393,9 @@ UpdateLEDS:         PUSH    R1
                     POP     R1
                     RET
 
+; ------------------------------------------------------------------------------------------------------------
+; Imprime a frase "Melhor Pont:" para a placa de texto
+; ------------------------------------------------------------------------------------------------------------
 PrintBestGame:      PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -392,6 +413,9 @@ PrintBestGameL:     MOV     M[CTRL_LCD], R2
                     POP     R1
                     RET
 
+; ------------------------------------------------------------------------------------------------------------
+; Atualiza a melhor pontuação na placa de texto
+; ------------------------------------------------------------------------------------------------------------
 UpdateBestGame:     PUSH    R1
                     PUSH    R2
                     PUSH    R3
@@ -430,7 +454,7 @@ Game:               MOV     M[StartGame], R0
                     CALL    ResetLEDS
                     CALL    CleanWindow
                     PUSH    NewGame
-                    PUSH    M[NewGameLen]
+                    PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    NextLine
                     PUSH    R0
@@ -475,23 +499,22 @@ GameLoop:           CMP     M[StartGame], R0
                     CALL    ResetTemp
                     JMP     GameLoop
 
-                    ; Imprimir mensagem de vitória.
+; ------------------------------------------------------------------------------------------------------------
+; Imprime mensagem de vitória ou derrota, atualiza o melhor jogo
+; e limpa o contador de jogadas atual.
+; ------------------------------------------------------------------------------------------------------------
 Won:                PUSH    YouWon
-                    PUSH    MAX_COLS
-                    CALL    PrintPhrase
-                    CALL    NextLine
-                    MOV     M[Attempts], R0
-                    CALL    UpdateCounter
                     CALL    UpdateBestGame
-                    JMP     Infinity
-
-                    ; Imprimir mensagem de derrota.
+                    BR      GameEnd
 Lost:               PUSH    YouLost
-                    PUSH    MAX_COLS
+GameEnd:            PUSH    MAX_COLS
                     CALL    PrintPhrase
                     CALL    NextLine
                     MOV     M[Attempts], R0
                     CALL    UpdateCounter
+                    PUSH    EndGamePhrase
+                    PUSH    MAX_COLS
+                    CALL    PrintPhrase
                     JMP     Infinity
 
 ; ------------------------------------------------------------------------------------------------------------
@@ -514,7 +537,7 @@ Start:              MOV     R7, SP_INICIAL
                     CALL    PrintBestGame
 
 Infinity:           MOV     M[IO_LEDS], R0
-                    INC     M[InitialCounter]
+                    INC     M[InfinityCounter]
                     CMP     M[StartGame], R0
                     JMP.P   Game
                     BR      Infinity
