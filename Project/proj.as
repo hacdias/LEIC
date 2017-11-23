@@ -477,15 +477,12 @@ UpdateBestGameEnd:  ADD     R1, 48
 ; ------------------------------------------------------------------------------------------------------------
 AppendDigit:        PUSH    R1
                     PUSH    R2
-                    MOV     R1, M[Digit]
-                    DEC     R1
-                    MOV     M[Digit], R1
-                    MOV     R2, M[SP+4]
-AppendDigitLoop:    ROL     R2, 4
-                    DEC     R1
-                    CMP     R1, R0
-                    JMP.NZ  AppendDigitLoop
-                    ADD     M[GuessInput], R2
+                    MOV     R1, M[SP+4]
+                    MOV     R2, M[GuessInput]
+                    ROL     R2, 4
+                    ADD     R2, R1
+                    MOV     M[GuessInput], R2
+                    DEC     M[Digit]
                     POP     R2
                     POP     R1
                     RETN    1
@@ -533,7 +530,7 @@ GameLoop:           CMP     M[StartGame], R0
                     MOV     R4, M[GuessInput]
                     MOV     R5, M[PlayerSequence]
                     CMP     M[Digit], R0
-                    JMP.Z   TransferGuess
+                    CALL.Z  TransferGuess
                     CMP     M[PlayerSequence], R0
                     BR.Z    GameLoop                ; Esperar pela introdução da jogada
                     MOV     R1, M[CurrentSequence]
