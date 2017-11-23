@@ -53,6 +53,7 @@ BestGame            WORD    FFFFh
 StartGame           WORD    0
 TICK                WORD    0
 Cursor              WORD    0000h
+InitialCounter      WORD    0000h
 
                     ORIG    0000h
                     JMP     Start
@@ -71,7 +72,10 @@ Random:             PUSH    R1
                     PUSH    R4
                     PUSH    R5
                     MOV     R1, M[SP+7]     ; Valor aleatório anterior
-                    MOV     R2, R1
+                    CMP     R1, R0          ; Se for zero, utiliza o contador.
+                    BR.NZ   RandomContinue  
+                    MOV     R1, M[InitialCounter]
+RandomContinue:     MOV     R2, R1
                     AND     R2, 1           ; Obtém o último dígito
                     BR.Z    RandomF
                     XOR     R1, RAN_MASK
@@ -111,7 +115,7 @@ NextCol:            PUSH    R1
                     RET
 
                     ; Imprime uma nova linha.
-NextLine:       PUSH    R1
+NextLine:           PUSH    R1
                     MOV     R1, M[Cursor]
                     AND     R1, FF00h
                     ADD     R1, 0100h
@@ -431,6 +435,7 @@ Game:               MOV     M[StartGame], R0
                     CALL    NextLine
                     PUSH    R0
                     PUSH    R0
+                    ; TODO: se for 0, contador
                     PUSH    M[PreviousSequence]     ; Sequência anterior
                     CALL    Random
                     POP     M[CurrentSequence]      ; Sequência aleatória
@@ -509,6 +514,7 @@ Start:              MOV     R7, SP_INICIAL
                     CALL    PrintBestGame
 
 Infinity:           MOV     M[IO_LEDS], R0
+                    INC     M[InitialCounter]
                     CMP     M[StartGame], R0
                     JMP.P   Game
                     BR      Infinity
