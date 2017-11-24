@@ -159,13 +159,21 @@ def e_conjunto_palavras(arg):
 
     e_conjunto_palavras: universal --> logico
     """
-    # TODO: verificar conteudo das listas?
-    return (
-        isinstance(arg, list) and
-        len(arg) == 2 and
-        isinstance(arg[0], list) and
-        isinstance(arg[1], int)
-    )
+    if not (isinstance(arg, list) and
+            len(arg) == 2 and
+            isinstance(arg[0], list) and
+            isinstance(arg[1], int)):
+        return False
+
+    for lst in arg[0]:
+        if not isinstance(lst, list):
+            return False
+
+        for el in lst:
+            if not e_palavra_potencial(el):
+                return False
+
+    return True
 
 def conjuntos_palavras_iguais(conj1, conj2):
     """
@@ -254,8 +262,9 @@ def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
-    jogador[1] = jogador[1] + palavra_tamanho(palavra)
-    acrescenta_palavra(jogador[2], palavra)
+    if palavra not in subconjunto_por_tamanho(jogador_palavras_validas(jogador), palavra_tamanho(palavra)):
+        jogador[1] = jogador[1] + palavra_tamanho(palavra)
+        acrescenta_palavra(jogador[2], palavra)
 
 def adiciona_palavra_invalida(jogador, palavra):
     """
@@ -268,8 +277,9 @@ def adiciona_palavra_invalida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_invalida:argumentos invalidos.')
 
-    jogador[1] = jogador[1] - palavra_tamanho(palavra)
-    acrescenta_palavra(jogador[3], palavra)
+    if palavra not in subconjunto_por_tamanho(jogador_palavras_invalidas(jogador), palavra_tamanho(palavra)):
+        jogador[1] = jogador[1] - palavra_tamanho(palavra)
+        acrescenta_palavra(jogador[3], palavra)
 
 def e_jogador(arg):
     """
@@ -378,30 +388,32 @@ def guru_mj(letras):
     faltam = numero_palavras(p_validas)
 
     jogada = 1
+    jogador_i = 0
 
     while faltam:
-        for jogador in jogadores:
-            print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
-            tentativa = input('JOGADOR ' + jogador_nome(jogador) + ' -> ')
+        print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
+        tentativa = input('JOGADOR ' + jogador_nome(jogadores[jogador_i]) + ' -> ')
 
-            palavra = cria_palavra_potencial(tentativa, letras)
-            tamanho = palavra_tamanho(palavra)
+        palavra = cria_palavra_potencial(tentativa, letras)
+        tamanho = palavra_tamanho(palavra)
 
-            if palavra in subconjunto_por_tamanho(p_validas, tamanho):
-                print(palavra, '- palavra VALIDA')
+        if palavra in subconjunto_por_tamanho(p_validas, tamanho):
+            print(palavra, '- palavra VALIDA')
 
-                if palavra not in subconjunto_por_tamanho(p_usadas, tamanho):
-                    adiciona_palavra_valida(jogador, palavra)
-                    acrescenta_palavra(p_usadas, palavra)
-                    faltam = faltam - 1
-            else:
-                adiciona_palavra_invalida(jogador, palavra)
-                print(palavra, '- palavra INVALIDA')
+            if palavra not in subconjunto_por_tamanho(p_usadas, tamanho):
+                adiciona_palavra_valida(jogadores[jogador_i], palavra)
+                acrescenta_palavra(p_usadas, palavra)
+                faltam = faltam - 1
+        else:
+            print(palavra, '- palavra INVALIDA')
+            adiciona_palavra_invalida(jogadores[jogador_i], palavra)
 
-            if faltam < 1:
-                break
+        jogada = jogada + 1
 
-            jogada = jogada + 1
+        if jogador_i < len(jogadores) - 1:
+            jogador_i = jogador_i + 1
+        else:
+            jogador_i = 0
 
     vencedores = seleciona_vencedor(jogadores)
 
