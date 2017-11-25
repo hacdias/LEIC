@@ -26,6 +26,9 @@ def cria_palavra_potencial(palavra, letras):
     Construtor do tipo palavra_potencial. Recebe como argumentos uma cadeia de
     caracteres e um conjunto de letras e devolve uma palavra_potencial.
 
+    Internamente, a palavra_potencial e representada por uma string composta
+    por letras maiusculas.
+
     cria_palavra_potencial: cad. caracteres X tuplo de letras --> palavra_potencial
     """
     if not (isinstance(palavra, str) and isinstance(letras, tuple)):
@@ -105,6 +108,12 @@ def cria_conjunto_palavras():
     """
     Construtor do tipo conjunto_palabras, constituido
     pelas palavras e pelo tamanho.
+
+    Internamente, o conjunto_palavras e uma lista de dois elementos:
+    - O primeiro e uma lista de listas de elementos do tipo palavra_potencial.
+      O indice de cada lista representa o comprimento das palavra_potenciais contidas
+      na mesma.
+    - O segundo elemento e um inteiro que contem o tamanho do conjunto_palavras.
 
     cria_conjunto_palavras: --> conjunto_palavras
     """
@@ -210,6 +219,12 @@ def cria_jogador(nome):
     Recebe uma cadeia de caracteres que corresponde ao nome do jogador,
     e devolve um jogador.
 
+    Internamente, o jogador e representado por uma lista de 4 elementos:
+    - O primeiro e uma cadeia de caracteres com o seu nome.
+    - O segundo e um inteiro com a sua pontuacao.
+    - O terceiro e o quarto contem, respetivamente, as palavras_potenciais validas
+      e invalidas em conjuntos_palavras.
+
     cria_jogador: cad. caracteres --> jogador
     """
     if not isinstance(nome, str):
@@ -262,7 +277,8 @@ def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
-    if palavra not in subconjunto_por_tamanho(jogador_palavras_validas(jogador), palavra_tamanho(palavra)):
+    if palavra not in \
+        subconjunto_por_tamanho(jogador_palavras_validas(jogador), palavra_tamanho(palavra)):
         jogador[1] = jogador[1] + palavra_tamanho(palavra)
         acrescenta_palavra(jogador[2], palavra)
 
@@ -277,7 +293,8 @@ def adiciona_palavra_invalida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_invalida:argumentos invalidos.')
 
-    if palavra not in subconjunto_por_tamanho(jogador_palavras_invalidas(jogador), palavra_tamanho(palavra)):
+    if palavra not in \
+        subconjunto_por_tamanho(jogador_palavras_invalidas(jogador), palavra_tamanho(palavra)):
         jogador[1] = jogador[1] - palavra_tamanho(palavra)
         acrescenta_palavra(jogador[3], palavra)
 
@@ -320,7 +337,7 @@ def gera_todas_palavras_validas(letras):
 
     for i in range(1, len(letras) + 1):
         for perm in permutations(letras, i):
-            combo = ''.join(perm)
+            combo = str.join('', perm)
             if e_palavra(combo):
                 acrescenta_palavra(conj, cria_palavra_potencial(combo, letras))
 
@@ -366,7 +383,7 @@ def seleciona_vencedor(jogadores):
             if len(vencedores) == 0:
                 vencedores = [j]
             elif jogador_pontuacao(vencedores[0]) == max_pontuacao:
-                vencedores.append(j)
+                vencedores = vencedores + [j]
             else:
                 vencedores = [j]
 
