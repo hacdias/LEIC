@@ -56,7 +56,7 @@ CurrentSequence     WORD    0000h
 PlayerSequence      WORD    0000h
 Attempts            WORD    0000h
 CounterTimer        WORD    FFFFh
-BestGame            WORD    FFFFh      
+BestGame            WORD    000Fh      
 StartGame           WORD    0
 TICK                WORD    0
 Cursor              WORD    0
@@ -449,25 +449,25 @@ UpdateBestGame:     PUSH    R1
                     MOV     R1, M[Attempts]
                     INC     R1
                     MOV     R2, M[BestGame]
-                    CMP     R1, R2                  ; Compara a melhor pontuacao ate ao momento com a atual
-                    BR.N    UpdateBestGameEnd
+                    CMP     R1, R2
+                    BR.P    UpdateBestGameEnd  
                     MOV     M[BestGame], R1
                     MOV     R2, R1
                     CMP     R1, 10                      
-                    BR.P    UpdateBestGameBig       ; Caso seja uma melhor pontuacao e esta seja constituida por 2 digitos
+                    BR.NN   UpdateBestGameBig       ; Caso seja uma melhor pontuacao e esta seja constituida por 2 digitos
                     MOV     R1, R0                  ; Caso esta seja constituida por 1 digito o primeiro digito é zero
-                    BR      UpdateBestGameEnd
+                    BR      UpdateBestGameDo
 UpdateBestGameBig:  MOV     R1, 1                   ; Caso esta seja constituida por 2 digitos o primeiro digito é 1
                     SUB     R2, 10                  ; Subtraimos 10 a pontuacao de forma a obter o segundo digito
-UpdateBestGameEnd:  ADD     R1, 48                  ; Conversão do primeiro digito para ASCII
-                    ADD     R2, 48                  ; Conversão do segundo digito para ASCII
+UpdateBestGameDo:   ADD     R1, 48                  ; Conversão do primeiro digito para ASCII
+                    ADD     R2, 48                  ; Conversão do segundo digito para ASCII        
                     MOV     R3, 1000000000001101b
                     MOV     M[CTRL_LCD], R3
-                    MOV     M[IO_LCD], R1
+                    MOV     M[IO_LCD], R1           ; Dígito da esquerda
                     MOV     R3, 1000000000001110b
                     MOV     M[CTRL_LCD], R3
-                    MOV     M[IO_LCD], R2
-                    POP     R3
+                    MOV     M[IO_LCD], R2           ; Dígito da direita
+UpdateBestGameEnd:  POP     R3
                     POP     R2
                     POP     R1
                     RET
@@ -510,11 +510,11 @@ Game:               MOV     M[StartGame], R0
                     CALL    NextLine
                     PUSH    R0
                     PUSH    R0
-                    ; TODO: se for 0, contador
                     PUSH    M[PreviousSequence]     ; Sequência anterior
                     CALL    Random
                     POP     M[CurrentSequence]      ; Sequência aleatória
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
+                    MOV     M[GuessInput], R0       ; Guess Input = 0
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
                     CALL    CleanCounter
                     CALL    ResetTemp
@@ -551,8 +551,8 @@ GameLoop:           CMP     M[StartGame], R0
 ; Imprime mensagem de vitória ou derrota, atualiza o melhor jogo
 ; e limpa o contador de jogadas atual.
 ; ------------------------------------------------------------------------------------------------------------
-Won:                PUSH    YouWon
-                    CALL    UpdateBestGame
+Won:                CALL    UpdateBestGame
+                    PUSH    YouWon
                     BR      GameEnd
 Lost:               PUSH    YouLost
 GameEnd:            PUSH    MAX_COLS
