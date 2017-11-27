@@ -180,11 +180,11 @@ CleanWindowLiLoop:  MOV     R2, 0               ; Contagem Colunas
 CleanWindowColLoop: MOV     M[OUT], R3
                     CALL    NextCol
                     INC     R2
-                    CMP     R2, 100
+                    CMP     R2, 80
                     BR.N    CleanWindowColLoop
                     CALL    NextLine
                     INC     R1
-                    CMP     R1, 30
+                    CMP     R1, 24
                     BR.N    CleanWindowLiLoop
                     MOV     M[Cursor], R0       ; Reset Cursor
                     MOV     M[OUT_CTRL], R0     ; Reset Cursor
@@ -574,8 +574,8 @@ Start:              MOV     R7, SP_INICIAL
                     MOV     M[INT_MASK_ADDR], R7
                     MOV     R7, FFFFh
                     MOV     M[OUT_CTRL], R7
-                    MOV     M[OUT_CTRL], R0
                     ENI
+                    CALL    CleanWindow
                     CALL    PrintLogo
                     MOV     M[CTRL_LCD], R0
                     MOV     R7, 1000000000100000b
