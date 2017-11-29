@@ -4,7 +4,7 @@ OUT                 EQU     FFFEh
 IO_DISPLAY          EQU     FFF0h
 
 RAN_MASK            EQU     1000000000010110b
-MAX_COLS            EQU     80
+MAX_COLS            EQU     78
 ATTEMPTS            EQU     12
 CTRL_LCD            EQU     FFF4h
 IO_LCD              EQU     FFF5h
@@ -28,27 +28,27 @@ INT_KEY_IA          WORD    INT_IA              ; Interruptor IA
 INT_TEMPK           WORD    INT_TEMP_F          ; TEMP
 
                     ORIG    8000h
-Logo00              STR     '\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/'
-Logo01              STR     '/|\                                                                          /|\'
-Logo02              STR     '/|\            __  __           _            __  __ _           _            /|\'
-Logo03              STR     '/|\           |  \/  |         | |          |  \/  (_)         | |           /|\'
-Logo04              STR     '/|\           | \  / | __ _ ___| |_ ___ _ __| \  / |_ _ __   __| |           /|\'
-Logo05              STR     '/|\           | |\/| |/ _  / __| __/ _ \  __| |\/| | |  _ \ / _  |           /|\'
-Logo06              STR     '/|\           | |  | | (_| \__ \ ||  __/ |  | |  | | | | | | (_| |           /|\'
-Logo07              STR     '/|\           |_|  |_|\__ _|___/\__\___|_|  |_|  |_|_|_| |_|\__ _|           /|\'
-Logo08              STR     '/|\                                                                          /|\'
-Logo09              STR     '/|\             Brought to you by Henrique Dias and Rodrigo Sousa            /|\'
-Logo10              STR     '/|\                                                                          /|\'
-Logo11              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\||/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
-Logo12              STR     '/|\                                                                          /|\'
-Logo13              STR     '/|\                    Carregue no botao IA para iniciar!                    /|\'
-Logo14              STR     '/|\                                                                          /|\'
-Logo15              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\||/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
+Logo00              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/\|/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
+Logo01              STR     '/|\                                                                        /|\'
+Logo02              STR     '/|\           __  __           _            __  __ _           _           /|\'
+Logo03              STR     '/|\          |  \/  |         | |          |  \/  (_)         | |          /|\'
+Logo04              STR     '/|\          | \  / | __ _ ___| |_ ___ _ __| \  / |_ _ __   __| |          /|\'
+Logo05              STR     '/|\          | |\/| |/ _  / __| __/ _ \  __| |\/| | |  _ \ / _  |          /|\'
+Logo06              STR     '/|\          | |  | | (_| \__ \ ||  __/ |  | |  | | | | | | (_| |          /|\'
+Logo07              STR     '/|\          |_|  |_|\__ _|___/\__\___|_|  |_|  |_|_|_| |_|\__ _|          /|\'
+Logo08              STR     '/|\                                                                        /|\'
+Logo09              STR     '/|\            Brought to you by Henrique Dias and Rodrigo Sousa           /|\'
+Logo10              STR     '/|\                                                                        /|\'
+Logo11              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/\|/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
+Logo12              STR     '/|\                                                                        /|\'
+Logo13              STR     '/|\                   Carregue no botao IA para iniciar!                   /|\'
+Logo14              STR     '/|\                                                                        /|\'
+Logo15              STR     '/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/\|/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\/|\'
 TipChars            STR     'x', 'o', '-'
-YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PERDESTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GANHASTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-EndGamePhrase       STR     '~~~~~~~~~~~~~~~~~~ FIM DO JOGO! Clique em IA para recomecar! ~~~~~~~~~~~~~~~~~~~'
-NewGame             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ NOVO JOGO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+YouLost             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PERDESTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+YouWon              STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GANHASTE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+EndGamePhrase       STR     '~~~~~~~~~~~~~~~~~ FIM DO JOGO! Clique em IA para recomecar! ~~~~~~~~~~~~~~~~~~'
+NewGame             STR     '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ NOVO JOGO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 MelhorPont          STR     'Melhor Pont: NA'
 MelhorPontLen       WORD    1000000000001110b
 PreviousSequence    WORD    1234h
@@ -514,6 +514,8 @@ Game:               MOV     M[StartGame], R0
                     CALL    Random
                     POP     M[CurrentSequence]      ; Sequência aleatória
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
+                    MOV     R1, 4
+                    MOV     M[Digit], R1
                     MOV     M[GuessInput], R0       ; Guess Input = 0
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
                     CALL    CleanCounter
