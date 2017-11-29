@@ -83,7 +83,8 @@ def palavras_potenciais_iguais(palavra1, palavra2):
 
     palavras_potenciais_iguais: palavra_potencial X palavra_potencial --> logico
     """
-    return palavra1 == palavra2
+    return palavra_tamanho(palavra1) == palavra_tamanho(palavra2) and \
+        palavra_potencial_para_cadeia(palavra1) == palavra_potencial_para_cadeia(palavra2)
 
 def palavra_potencial_menor(palavra1, palavra2):
     """
@@ -93,7 +94,7 @@ def palavra_potencial_menor(palavra1, palavra2):
 
     palavra_potencial_menor: palavra_potencial X palavra_potencial --> logico
     """
-    return palavra1 < palavra2
+    return palavra_potencial_para_cadeia(palavra1) < palavra_potencial_para_cadeia(palavra2)
 
 def palavra_potencial_para_cadeia(palavra):
     """
