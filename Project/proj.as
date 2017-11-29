@@ -67,24 +67,6 @@ InfinityCounter     WORD    0
                     ORIG    0000h
                     JMP     Start
 
-INT_I1:             PUSH    0001h
-                    CALL    AppendDigit
-                    RTI
-INT_I2:             PUSH    0002h
-                    CALL    AppendDigit
-                    RTI
-INT_I3:             PUSH    0003h
-                    CALL    AppendDigit
-                    RTI
-INT_I4:             PUSH    0004h
-                    CALL    AppendDigit
-                    RTI
-INT_I5:             PUSH    0005h
-                    CALL    AppendDigit
-                    RTI
-INT_I6:             PUSH    0006h
-                    CALL    AppendDigit
-                    RTI
 INT_IA:             INC     M[StartGame]    ; Indicador de Início de Novo Jogo
                     RTI
 
@@ -484,6 +466,25 @@ AppendDigit:        PUSH    R1
                     POP     R2
                     POP     R1
                     RETN    1
+
+INT_I1:             PUSH    0001h
+                    CALL    AppendDigit
+                    RTI
+INT_I2:             PUSH    0002h
+                    CALL    AppendDigit
+                    RTI
+INT_I3:             PUSH    0003h
+                    CALL    AppendDigit
+                    RTI
+INT_I4:             PUSH    0004h
+                    CALL    AppendDigit
+                    RTI
+INT_I5:             PUSH    0005h
+                    CALL    AppendDigit
+                    RTI
+INT_I6:             PUSH    0006h
+                    CALL    AppendDigit
+                    RTI
                     
 TransferGuess:      PUSH    R1
                     MOV     R1, M[GuessInput]       ; Cópia do valor apos o jogador ter clicado nos 4 botões para
