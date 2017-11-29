@@ -404,10 +404,8 @@ ResetTemp:          PUSH    R1
 ; Rotina de Tratamento da Interrupção do Temporizador
 ; ------------------------------------------------------------------------------------------------------------
 INT_TEMP_F:         CALL    ResetTemp
-                    PUSH    R1
                     SHL     M[CounterTimer], 1
                     INC     M[TICK]
-                    POP     R1
                     RTI
 
 ; ------------------------------------------------------------------------------------------------------------
@@ -515,7 +513,7 @@ Game:               MOV     M[StartGame], R0
                     POP     M[CurrentSequence]      ; Sequência aleatória
                     POP     M[PreviousSequence]     ; Sequência aleatória raw
                     MOV     R1, 4
-                    MOV     M[Digit], R1
+                    MOV     M[Digit], R1            ; Digit = 4
                     MOV     M[GuessInput], R0       ; Guess Input = 0
                     MOV     M[PlayerSequence], R0   ; Jogada do Jogador = 0
                     CALL    CleanCounter
