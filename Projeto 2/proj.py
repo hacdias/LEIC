@@ -158,7 +158,7 @@ def acrescenta_palavra(conj, palavra):
         conj[0] = conj[0] + [[]]
         diff = diff - 1
 
-    if palavra not in conj[0][tamanho]:
+    if not palavra_no_conjunto(conj, palavra):
         insort(conj[0][tamanho], palavra)
         conj[1] = conj[1] + 1
 
@@ -214,6 +214,23 @@ def conjunto_palavras_para_cadeia(conj):
         return '[]'
 
     return '[' + cadeia[:-1] + ']'
+
+def palavra_no_conjunto(conj, palavra):
+    """
+    Esta funcao tem como objetivo verificar se a palavra_potencial palavra
+    pertence ao conjunto_palavras conj. Isto e feito de forma a evitar
+    quebras de barreiras de abstracao no uso da funcionalidade nativa
+    do python 'not in'.
+
+    palavra_no_conjunto: conjunto_palavras X palavra_potencial --> logico
+    """
+    encontrada = False
+    cadeia = palavra_potencial_para_cadeia(palavra)
+    for p in subconjunto_por_tamanho(conj, palavra_tamanho(palavra)):
+        if cadeia == palavra_potencial_para_cadeia(p):
+            encontrada = True
+
+    return encontrada
 
 def cria_jogador(nome):
     """
@@ -278,8 +295,7 @@ def adiciona_palavra_valida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_valida:argumentos invalidos.')
 
-    if palavra not in \
-        subconjunto_por_tamanho(jogador_palavras_validas(jogador), palavra_tamanho(palavra)):
+    if not palavra_no_conjunto(jogador_palavras_validas(jogador), palavra):
         jogador[1] = jogador[1] + palavra_tamanho(palavra)
         acrescenta_palavra(jogador[2], palavra)
 
@@ -294,8 +310,7 @@ def adiciona_palavra_invalida(jogador, palavra):
     if not (e_jogador(jogador) and e_palavra_potencial(palavra)):
         raise ValueError('adiciona_palavra_invalida:argumentos invalidos.')
 
-    if palavra not in \
-        subconjunto_por_tamanho(jogador_palavras_invalidas(jogador), palavra_tamanho(palavra)):
+    if not palavra_no_conjunto(jogador_palavras_invalidas(jogador), palavra):
         jogador[1] = jogador[1] - palavra_tamanho(palavra)
         acrescenta_palavra(jogador[3], palavra)
 
@@ -415,10 +430,10 @@ def guru_mj(letras):
         palavra = cria_palavra_potencial(tentativa, letras)
         tamanho = palavra_tamanho(palavra)
 
-        if palavra in subconjunto_por_tamanho(p_validas, tamanho):
+        if palavra_no_conjunto(p_validas, palavra):
             print(palavra, '- palavra VALIDA')
 
-            if palavra not in subconjunto_por_tamanho(p_usadas, tamanho):
+            if not palavra_no_conjunto(p_usadas, palavra):
                 adiciona_palavra_valida(jogadores[jogador_i], palavra)
                 acrescenta_palavra(p_usadas, palavra)
                 faltam = faltam - 1
