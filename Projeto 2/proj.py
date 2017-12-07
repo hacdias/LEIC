@@ -222,15 +222,17 @@ def palavra_no_conjunto(conj, palavra):
     quebras de barreiras de abstracao no uso da funcionalidade nativa
     do python 'not in'.
 
+    Por exemplo, caso a representacao interna de palavra_potencial for um
+    tuplo/lista que contenha, tanto a palavra, como o conjunto que a gerou,
+    nao sera possivel utilizar o 'in'.
+
     palavra_no_conjunto: conjunto_palavras X palavra_potencial --> logico
     """
-    encontrada = False
-    cadeia = palavra_potencial_para_cadeia(palavra)
     for p in subconjunto_por_tamanho(conj, palavra_tamanho(palavra)):
-        if cadeia == palavra_potencial_para_cadeia(p):
-            encontrada = True
+        if palavras_potenciais_iguais(palavra, p):
+            return True
 
-    return encontrada
+    return False
 
 def cria_jogador(nome):
     """
@@ -359,76 +361,79 @@ def gera_todas_palavras_validas(letras):
 
     return conj
 
-def inscrever_jogadores():
-    """
-    Permite a inscricao dos jogadores no jogo. Devolve
-    a lista com os jogadores que se inscreveram.
-
-    inscrever_jogadores: -> lista de jogadores
-    """
-    print('Introduza o nome dos jogadores (-1 para terminar)...')
-
-    jogadores = []
-    n = 1
-
-    nome = input('JOGADOR ' + str(n) + ' -> ')
-
-    while nome != '-1':
-        jogadores.append(cria_jogador(nome))
-        n = n + 1
-        nome = input('JOGADOR ' + str(n) + ' -> ')
-
-    return jogadores
-
-def seleciona_vencedor(jogadores):
-    """
-    Recebe uma lista com jogadores e devolve a lista com os jogadores
-    vencedores. A lista contem apenas um jogador caso nao haja empate,
-    ou mais que um, caso haja empate.
-
-    seleciona_vencedor: lista de jogadores -> lista de jogadores
-    """
-    max_pontuacao = -1
-    vencedores = []
-
-    for j in jogadores:
-        pontuacao = jogador_pontuacao(j)
-        max_pontuacao = max(max_pontuacao, pontuacao)
-
-        if pontuacao == max_pontuacao:
-            if len(vencedores) == 0:
-                vencedores = [j]
-            elif jogador_pontuacao(vencedores[0]) == max_pontuacao:
-                vencedores = vencedores + [j]
-            else:
-                vencedores = [j]
-
-    return vencedores
-
 def guru_mj(letras):
     """
     Funcao que inicia o jogo GURU multijogador.
 
     guru_mj: tuplo de letras -->
     """
+    def inscrever_jogadores():
+        """
+        Permite a inscricao dos jogadores no jogo. Devolve
+        a lista com os jogadores que se inscreveram.
+
+        inscrever_jogadores: -> lista de jogadores
+        """
+        print('Introduza o nome dos jogadores (-1 para terminar)...')
+
+        jogadores = []
+        n = 1
+
+        nome = input('JOGADOR ' + str(n) + ' -> ')
+
+        while nome != '-1':
+            jogadores.append(cria_jogador(nome))
+            n = n + 1
+            nome = input('JOGADOR ' + str(n) + ' -> ')
+
+        return jogadores
+
+    def termina_jogo(jogadores):
+        """
+        Recebe uma lista com jogadores, seleciona o vencedor, e imprime
+        o resultado final do jogo.
+
+        termina_jogo: lista de jogadores ->
+        """
+        max_pontuacao = -1
+        vencedores = []
+
+        for j in jogadores:
+            pontuacao = jogador_pontuacao(j)
+            max_pontuacao = max(max_pontuacao, pontuacao)
+
+            if pontuacao == max_pontuacao:
+                if len(vencedores) == 0:
+                    vencedores = [j]
+                elif jogador_pontuacao(vencedores[0]) == max_pontuacao:
+                    vencedores = vencedores + [j]
+                else:
+                    vencedores = [j]
+
+        if len(vencedores) > 1:
+            print('FIM DE JOGO! O jogo terminou em empate.')
+        else:
+            print(
+              'FIM DE JOGO! O jogo terminou com a vitoria do jogador', jogador_nome(vencedores[0]),
+              'com', str(jogador_pontuacao(vencedores[0])), 'pontos.'
+            )
+
+        for j in jogadores:
+            print(jogador_para_cadeia(j))
+
     print('Descubra todas as palavras geradas a partir das letras:')
     print(str(letras))
 
     jogadores = inscrever_jogadores()
-
     p_validas = gera_todas_palavras_validas(letras)
     p_usadas = cria_conjunto_palavras()
     faltam = numero_palavras(p_validas)
-
-    jogada = 1
-    jogador_i = 0
+    jogada, jogador_i, num_jogadores = 1, 0, len(jogadores)
 
     while faltam:
         print('JOGADA', jogada, '- Falta descobrir', faltam, 'palavras')
         tentativa = input('JOGADOR ' + jogador_nome(jogadores[jogador_i]) + ' -> ')
-
         palavra = cria_palavra_potencial(tentativa, letras)
-        tamanho = palavra_tamanho(palavra)
 
         if palavra_no_conjunto(p_validas, palavra):
             print(palavra, '- palavra VALIDA')
@@ -441,22 +446,10 @@ def guru_mj(letras):
             print(palavra, '- palavra INVALIDA')
             adiciona_palavra_invalida(jogadores[jogador_i], palavra)
 
+        # Escolhe o indice do proximo jogador
+        jogador_i = jogada % num_jogadores
         jogada = jogada + 1
 
-        if jogador_i < len(jogadores) - 1:
-            jogador_i = jogador_i + 1
-        else:
-            jogador_i = 0
+    termina_jogo(jogadores)
 
-    vencedores = seleciona_vencedor(jogadores)
-
-    if len(vencedores) > 1:
-        print('FIM DE JOGO! O jogo terminou em empate.')
-    else:
-        print(
-            'FIM DE JOGO! O jogo terminou com a vitoria do jogador', jogador_nome(vencedores[0]),
-            'com', str(jogador_pontuacao(vencedores[0])), 'pontos.'
-        )
-
-    for j in jogadores:
-        print(jogador_para_cadeia(j))
+guru_mj(('M', 'R', 'O', 'A'))
