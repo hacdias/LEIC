@@ -1,0 +1,4 @@
+A primeir linha
+A primeir linha
+A segunda linha
+Seguida de uma ultima linha
