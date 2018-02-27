@@ -1,0 +1,8 @@
+ulimit -a
+gcc -O3 ack.c -o ack
+time ./ack 3 12
+gcc ack.c -o ack
+time ./ack 3 12
+javac ack.java
+time java -Xss4m ack 3 12
+time python ack.py 3 12
