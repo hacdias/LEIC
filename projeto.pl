@@ -19,3 +19,39 @@ nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas) :-
   sort(Posicoes, Posicoes_ordenadas),
   append(Linhas_anteriores, [(L, _)|_], Posicoes_ordenadas),
   e_sublista(Linhas_anteriores, Ja_Preenchidas), !.
+
+% peso_coluna(Posicoes, X, Peso)
+
+peso_coluna([], _, 0).
+
+peso_coluna([(_,X)|T], X, Peso) :-
+  peso_coluna(T, X, Peso1),
+  Peso is Peso1+1, !.
+
+peso_coluna([_|T], X, Peso) :-
+  peso_coluna(T, X, Peso), !.
+
+peso_colunas(Posicoes, 1, Res) :- peso_coluna(Posicoes, 1, Res).
+
+peso_colunas(Posicoes, Dim, Res) :-
+  peso_coluna(Posicoes, Dim, Col),
+  NextDim is Dim-1,
+  peso_colunas(Posicoes, NextDim, Res2),
+  flatten([Res2|Col], Res), !.
+
+menorOuIgual(X,Y) :-
+    ( X =< Y
+       -> true
+       ;  false
+    ).
+
+comparaPesos([H|T], [Z|V]) :-
+  menorOuIgual(H, Z),
+  comparaPesos(T, V).
+
+verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :- 
+  append(Ja_Preenchidas, Poss, Posicoes),
+  peso_colunas(Posicoes, Dim, Pesos),
+  comparaPesos(Pesos, Maximos), !.
+
+% verifica_parcial(Puz, Ja_Preenchidas, Dim, Poss)
