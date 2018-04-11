@@ -1,10 +1,8 @@
 % Henrique Afonso Coelho Dias: 89455
 
-:- [exemplos_puzzles].
-
 %---------------------------------------------------------------------
 % lista_que_contem(Listas, El, Lista) : dada a lista de listas Listas
-% e o elemento El, Lista é a lista pertencente a Listas que contem El.
+% e o elemento El, Lista e a lista pertencente a Listas que contem El.
 % --------------------------------------------------------------------
 lista_que_contem([H|T], El, Lista) :-
   (member(El, H) -> Lista = H ; lista_que_contem(T, El, Lista)).
@@ -21,7 +19,7 @@ propaga([Listas, _, _], Pos, Posicoes) :-
   sort([Pos|Lista2], Posicoes), !.
 
 %---------------------------------------------------------------------
-% e_sublista(Lista1, Lista2) : é True se a lista Lista1 estiver contida
+% e_sublista(Lista1, Lista2) : e True se a lista Lista1 estiver contida
 % na lista LIsta2.
 % --------------------------------------------------------------------
 
@@ -37,6 +35,8 @@ e_sublista([X|Tail], Y):-
 % anterior a L, pertencem a lista de posicoes Ja_Preenchidas. True se a
 % possibilidade Posicoes nao altera as linhas Ja_Preenchidas.
 % --------------------------------------------------------------------
+
+nao_altera_linhas_anteriores([], _, _).
 
 nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas) :-
   sort(Posicoes, Posicoes_ordenadas),
@@ -79,7 +79,7 @@ compara_pesos([H|T], [Z|V]) :-
 % verifica_parcial(Puz, Ja_Preenchidas, Dim, Poss) : dado um puzzle Puz,
 % uma lista de posicoes ja preenchidas Ja_Preenchidas, a dimensao Dim
 % do puzzle e uma lista de posicoes Poss que representa uma potencial
-% possibilidade para preencher uma linha, é True se Poss nao viola os
+% possibilidade para preencher uma linha, e True se Poss nao viola os
 % totais das colunas.
 % --------------------------------------------------------------------
 
