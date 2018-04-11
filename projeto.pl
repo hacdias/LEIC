@@ -103,33 +103,79 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
   compara_pesos(Pesos, Maximos), !.
 
 % --------------------------------------------------------------------
+% procura_aux(Puz, Pos, Ja_Preenchidas, Possibilidade) : dado um puzzle
+% Puz, uma posicao Pos, uma lista de posicoes Ja_Preenchidas, Possibilidade
+% e a possibilidade para preencher a posicao Pos.
+%
+% procura(Puz, Posicoes, Total, Ja_Preenchidas, Possibilidades_L) : dado
+% um puzzle Puz, uma lista de Posicoes Posicoes, o total de posicoes a preencher
+% Total, a lista de posicoes Ja_Preenchidas, entao Possibilidades_L e a
+% lista de possibilidades individuais (onde cada possibilidade preenche uma
+% e so uma posicao).
+% --------------------------------------------------------------------
 
-procura_aux([Listas, Max_Linhas, Max_Cols], (L, C), Ja_Preenchidas, Possibilidades_L) :-
-  length(Max_Linhas, Dim),
-  propaga([Listas, Max_Linhas, Max_Cols], (L, C), Posicoes),
+procura_aux([Listas, Max_L, Max_C], (L, C), Ja_Preenchidas, Possibilidade) :-
+  length(Max_L, Dim),
+  propaga([Listas, Max_L, Max_C], (L, C), Posicoes),
   nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas),
-  verifica_parcial([Listas, Max_Linhas, Max_Cols], Ja_Preenchidas, Dim, Posicoes),
-  sort(Posicoes, Possibilidades_L), !.
+  verifica_parcial([Listas, Max_L, Max_C], Ja_Preenchidas, Dim, Posicoes),
+  sort(Posicoes, Possibilidade), !.
 
-procura_aux(_, _, _, Possibilidades_L) :- Possibilidades_L = [].
+procura_aux(_, _, _, Possibilidade) :- Possibilidade = [].
 
 procura(_, [], _, _, P) :- P = [].
 
 procura(Puz, [H|T], Total, Ja_Preenchidas, Possibilidades_L) :-
   procura_aux(Puz, H, Ja_Preenchidas, P1),
   procura(Puz, T, Total, Ja_Preenchidas, P2),
-  Possibilidades_L = [P1|P2], !.
+  Possibilidades = [P1|P2],
+  delete(Possibilidades, [], Possibilidades_L), !.
+
+% --------------------------------------------------------------------
+% propaga_todos(Puz, Posicoes, Posicoes_propagadas) : dado um puzzle Puz
+% e uma lista de posicoes Posicoes, entao Posicoes_propagadas contem todas
+% as posicoes resultantes da propagacao de cada posicao em Posicoes.
+% --------------------------------------------------------------------
+
+propaga_todos(_, [], Posicoes) :- Posicoes = [].
+
+propaga_todos(Puz, [Pos|Outras], Posicoes) :-
+  propaga_todos(Puz, Outras, Outras_propagadas),
+  propaga(Puz, Pos, Pos_propagada),
+  Posicoes = [Pos_propagada|Outras_propagadas].
+
+% --------------------------------------------------------------------
+% intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) : dado um
+% puzzle Puz, uma linha de posicoes Linha, uma lista de posicoes Ja_Preenchidas,
+% entao, Intersecao e a lista de todas as posicoes Ja_Preenchidas pertencentes
+% a linha propagadas.
+% --------------------------------------------------------------------
+
+intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
+  intersection(Ja_Preenchidas, Linha, Linha_atual),
+  propaga_todos(Puz, Linha_atual, Propagados),
+  flatten(Propagados, Propagados_lista),
+  sort(Propagados_lista, Intersecao).
+
+% --------------------------------------------------------------------
+% junta_a_todos(Lista_De_Listas, A_Juntar, Resultado) : dada uma lista
+% de listas Lista_De_Listas, uma lista de itens a juntar A_Juntar, entao
+% Resultado e uma lista de listas resultante de juntar cada lista de
+% Lista_De_Listas a A_Juntar.
+% --------------------------------------------------------------------
+
+junta_a_todos([], _, Res) :- Res = [].
+
+junta_a_todos([Lista|Outras], A_Juntar, Resultado) :-
+  junta_a_todos(Outras, A_Juntar, Res),
+  delete(Res, [], Listas_juntadas),
+  append(Lista, A_Juntar, Lista_juntada),
+  sort(Lista_juntada, Lista_ordenada),
+  append([Lista_ordenada], Listas_juntadas, Resultado).
 
 % --------------------------------------------------------------------
 
-aaa(As, Bs, Line, Len) :-
-  comb(As, Cs),
-  sort(Cs, Ds),
-  findall(X, member((Line, X), Ds), Fs),
-  length(Fs, Len),
-  Bs = Ds.
-
-comb(As,Bs) :-
+combinacoes(As,Bs) :-
   same_length(As,Full),
   ASA = [_|_],
   prefix(ASA,Full),
@@ -137,13 +183,28 @@ comb(As,Bs) :-
   flatten(ASA, ASS),
   sort(ASS, Bs).
 
+aaa(As, Bs, Line, Len) :-
+  combinacoes(As, Cs),
+  sort(Cs, Ds),
+  findall(X, member((Line, X), Ds), Fs),
+  length(Fs, Len),
+  Bs = Ds.
+
+
+% --------------------------------------------------------------------
+% possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L) :
+% dado um puzzle Puz, uma lista de posicoes da linha a preencher Posicoes_linha,
+% o numero total de posicoes a preencher Total, a lista de posicoes ja preenchidas
+% Ja_Preenchidas, entao Possibilidades_L e a lista de possibilidades para preencher
+% a linha em questao.
 % --------------------------------------------------------------------
 
 possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
   Possibilidades_L = [[]].
 
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
+  intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
   procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, Posses),
-  delete(Posses, [], Posses2),
-  findall(X, aaa(Posses2, X, L, Total), P3),
+  junta_a_todos(Posses2, Necessarios, Posses3),
+  findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
