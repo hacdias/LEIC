@@ -43,6 +43,12 @@ nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas) :-
   append(Linhas_anteriores, [(L, _)|_], Posicoes_ordenadas),
   e_sublista(Linhas_anteriores, Ja_Preenchidas), !.
 
+% --------------------------------------------------------------------
+% peso_coluna(Posicoes, Coluna, Peso) : dada uma lista de posicoes
+% Posicoes e o numero de uma coluna Coluna, Peso e a quantidade de
+% colunas preenchidas na coluna Coluna.
+% --------------------------------------------------------------------
+
 peso_coluna([], _, 0).
 
 peso_coluna([(_,X)|T], X, Peso) :-
@@ -53,6 +59,13 @@ peso_coluna([_|T], X, Peso) :-
   peso_coluna(T, X, Peso), !.
 
 peso_colunas(Posicoes, 1, Res) :- peso_coluna(Posicoes, 1, Res).
+
+% --------------------------------------------------------------------
+% peso_colunas(Posicoes, Dim, Pesos) : dada uma lista de posicoes
+% Posicoes e a dimensao Dim de um pizzle, Pesos e uma lista de Pesos
+% onde cada numero corresponde a quantidade de colunas preenchidas
+% numa dada coluna.
+% --------------------------------------------------------------------
 
 peso_colunas(Posicoes, Dim, Res) :-
   peso_coluna(Posicoes, Dim, Col),
@@ -84,9 +97,12 @@ compara_pesos([H|T], [Z|V]) :-
 % --------------------------------------------------------------------
 
 verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :- 
-  append(Ja_Preenchidas, Poss, Posicoes),
+  append(Ja_Preenchidas, Poss, Pre_Posicoes),
+  sort(Pre_Posicoes, Posicoes),
   peso_colunas(Posicoes, Dim, Pesos),
   compara_pesos(Pesos, Maximos), !.
+
+% --------------------------------------------------------------------
 
 procura_aux([Listas, Max_Linhas, Max_Cols], (L, C), Ja_Preenchidas, Possibilidades_L) :-
   length(Max_Linhas, Dim),
@@ -95,12 +111,16 @@ procura_aux([Listas, Max_Linhas, Max_Cols], (L, C), Ja_Preenchidas, Possibilidad
   verifica_parcial([Listas, Max_Linhas, Max_Cols], Ja_Preenchidas, Dim, Posicoes),
   sort(Posicoes, Possibilidades_L), !.
 
+procura_aux(_, _, _, Possibilidades_L) :- Possibilidades_L = [].
+
 procura(_, [], _, _, P) :- P = [].
 
 procura(Puz, [H|T], Total, Ja_Preenchidas, Possibilidades_L) :-
-  (procura_aux(Puz, H, Ja_Preenchidas, P1) -> true ; P1 = [], true),
+  procura_aux(Puz, H, Ja_Preenchidas, P1),
   procura(Puz, T, Total, Ja_Preenchidas, P2),
   Possibilidades_L = [P1|P2], !.
+
+% --------------------------------------------------------------------
 
 aaa(As, Bs, Line, Len) :-
   comb(As, Cs),
@@ -117,9 +137,13 @@ comb(As,Bs) :-
   flatten(ASA, ASS),
   sort(ASS, Bs).
 
+% --------------------------------------------------------------------
+
+possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
+  Possibilidades_L = [[]].
+
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, Posses),
   delete(Posses, [], Posses2),
-  write(Posses2), nl,
   findall(X, aaa(Posses2, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
