@@ -205,6 +205,6 @@ possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
   procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, Posses),
-  junta_a_todos(Posses2, Necessarios, Posses3),
+  junta_a_todos(Posses, Necessarios, Posses3),
   findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
