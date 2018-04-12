@@ -2,4 +2,4 @@
 
 Programming Fundamentals course exercises and projects.
 
-You can find a summary [here](./SUMMARY.md).
+You can find a summary of the classes [here](./SUMMARY.md) (in Portuguese).
