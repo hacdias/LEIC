@@ -27,6 +27,7 @@ void removePoint (Matrix *m, int line, int column);
 void removePointByValue (Matrix *m, double value);
 void printPoints (Matrix *m);
 void matrixInfo (Matrix *m);
+void compress(Matrix *m);
 
 void atualizaCaracteristicaPonto (Matrix *m, Point *p);
 void atualizaCaracteristica (Matrix *m);
@@ -83,6 +84,7 @@ int main(int argc, char ** argv) {
         removePointByValue(&matriz, c);
         break;
       case 's':
+        compress(&matriz);
         break;
       case 'w':
         if (len != 1) {
@@ -184,9 +186,17 @@ void printPoints (Matrix *m) {
   }
 }
 
+int matrixDimension (Matrix *m) {
+  return (m->maxj - m->minj + 1) * (m->maxi - m->mini + 1);
+}
+
+double matrixDensity (Matrix *m) {
+  return (m->total / (double) matrixDimension(m)) * 100;
+}
+
 void matrixInfo (Matrix *m) {
-  int dim = (m->maxj - m->minj + 1) * (m->maxi - m->mini + 1);
-  double dens = (m->total / (double) dim) * 100;
+  int dim = matrixDimension(m);
+  double dens = matrixDensity(m);
 
   printf("[%d %d] [%d %d] %d / %d = %.3lf%%\n",
     m->mini,
@@ -329,4 +339,71 @@ void sort (Matrix *m, int byColumn) {
   } else {
     qsort(m->point, m->total, sizeof(Point), sortByLine);
   }
+}
+
+void getLine (double **storage, Matrix *m, unsigned int line) {
+  for (int i = 0; i < m->total; i++) {
+    if (m->point[i].line == line) {
+      storage[m->point[i].column - m->minj] = &m->point[i].value;
+    }
+  }
+}
+
+int calculateOffset (double **values, int n) {
+  for (int i = 0; i < n; i++)
+    if (*values[n] != 0)
+      return i;
+
+  return -1;
+}
+
+void compress (Matrix *m) {
+  if (matrixDensity(m) > 50) {
+    printf("dense matrix\n");
+    return;
+  }
+  
+  double value[m->total];
+  int height = m->maxi - m->mini + 1,
+    lineCount = 0, i, j,
+    line, density,
+    index[m->total],
+    densities[height];
+
+  for (i = 0; i < height; i++) densities[i] = 0;
+  for (i = 0; i < m->total; i++) densities[m->point[i].line - m->mini]++;
+  for (i = 0; i < height; i++) if (densities[i] != 0) lineCount++;
+
+  int columnCount = m->maxj - m->minj + 1;
+
+  double zero = 0;
+  double * values[columnCount];
+
+  int offsets[lineCount];
+
+  for (i = 0; i < lineCount; i++) {
+    for (j = 0; j < columnCount; j++) values[j] = &zero;
+    line = 0;
+    density = 0;
+
+    for (j = 0; j < height; j++) {
+      if (densities[j] == density) {
+        line = min(line, j);
+      } else if (densities[j] > density) {
+        line = j;
+        density = densities[j];
+      }      
+    }
+
+    getLine(values, m, line);
+    offsets[i] = calculateOffset(values, line);
+
+    densities[line] = 0;
+    line += m->mini;
+
+    printf("Line %d\n", line);  
+  }
+
+  printf("dens = ");
+  for (int i = 0; i < height; i++) printf("%d ", densities[i]);
 }
