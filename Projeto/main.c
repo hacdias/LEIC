@@ -405,15 +405,16 @@ void compress (Matrix *m) {
     return;
   }
 
-  int order[m->maxi - m->mini + 1];
+  int matrixHeight = m->maxi - m->mini + 1;
+  int order[matrixHeight];
   int linesCount = linesOrder(order, m);
   int columnsCount = m->maxj - m->minj + 1;
 
-  int offset[linesCount];
+  int offset[matrixHeight];
   double value[MAX];
   int index[MAX];
 
-  for (int i = 0; i < linesCount; i++) offset[i] = -1;
+  for (int i = 0; i < matrixHeight; i++) offset[i] = 0;
   for (int i = 0; i < MAX; i++) {
     value[i] = 0;
     index[i] = 0;
@@ -441,7 +442,11 @@ void compress (Matrix *m) {
       }
     }
 
-    offset[order[i] - m->minj] = o;
+    if (m->minj == 0) {
+      offset[order[i]] = o;
+    } else {
+      offset[order[i] - m->minj - 1] = o;
+    }
 
     int j;
     for (j = k, valueI = k+o; valueI < columnsCount+o; valueI++, j++) {
@@ -457,6 +462,6 @@ void compress (Matrix *m) {
   printf("\nindex = ");
   for (int i = 0; i < valueI; i++) printf("%d ", index[i]);
   printf("\noffset = ");
-  for (int i = 0; i < linesCount; i++) printf("%d ", offset[i]);
+  for (int i = 0; i < matrixHeight; i++) printf("%d ", offset[i]);
   printf("\n");
 }
