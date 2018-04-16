@@ -428,9 +428,9 @@ void compress (Matrix *m) {
 
     int count = getLine(line, m, order[i]);
 
-    int ok = 0;
-    int o = -1;
-    int k = 0;
+    int k, ok = 0,
+      o = -1;
+
     for (k = 0; line[k] == 0; k++);
 
     while (!ok) {
@@ -442,11 +442,7 @@ void compress (Matrix *m) {
       }
     }
 
-    if (m->minj == 0) {
-      offset[order[i]] = o;
-    } else {
-      offset[order[i] - m->minj - 1] = o;
-    }
+    offset[order[i] - m->mini] = o;
 
     int j;
     for (j = k, valueI = k+o; valueI < columnsCount+o; valueI++, j++) {
