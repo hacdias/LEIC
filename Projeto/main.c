@@ -391,14 +391,6 @@ int getLine (double *storage, Matrix *m, unsigned int line) {
   return counter;
 }
 
-int calculateOffset (double **values, int n) {
-  for (int i = 0; i < n; i++)
-    if (*values[n] != 0)
-      return i;
-
-  return -1;
-}
-
 void compress (Matrix *m) {
   if (matrixDensity(m) > 50) {
     printf("dense matrix\n");
