@@ -165,7 +165,7 @@ aaa([O], Poss, Line, Len) :-
 
 aaa(Posses, Poss, Line, Len) :-
   member(A, Posses),
-  member(B, Posses),
+  member(B, Posses), // problema: so da 2 a 2
   append(A, B, K),
   sort(K, Poss),
   findall(X, member((Line, X), Poss), Fs),
