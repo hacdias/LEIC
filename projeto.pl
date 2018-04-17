@@ -16,7 +16,7 @@ propaga([Listas, _, _], Pos, Posicoes) :-
 
 %---------------------------------------------------------------------
 % e_sublista(Lista1, Lista2) : e True se a lista Lista1 estiver contida
-% na lista LIsta2.
+% na lista Lista2.
 % --------------------------------------------------------------------
 
 e_sublista([], _).
@@ -54,10 +54,9 @@ peso_coluna([(_,X)|T], X, Peso) :-
 peso_coluna([_|T], X, Peso) :-
   peso_coluna(T, X, Peso), !.
 
-
 % --------------------------------------------------------------------
 % peso_colunas(Posicoes, Dim, Pesos) : dada uma lista de posicoes
-% Posicoes e a dimensao Dim de um pizzle, Pesos e uma lista de Pesos
+% Posicoes e a dimensao Dim de um puzzle, Pesos e uma lista de Pesos
 % onde cada numero corresponde a quantidade de colunas preenchidas
 % numa dada coluna.
 % --------------------------------------------------------------------
@@ -71,18 +70,14 @@ peso_colunas(Posicoes, Dim, Res) :-
   flatten([Res2|Col], Res), !.
 
 % --------------------------------------------------------------------
-% menor_igual(X, Y) : X e menor ou igual a Y.
-%
 % compara_pesos(Pesos, Maximos) : a lista de pesos Pesos nao excede
 % a lista de pesos maximos Maximos.
 % --------------------------------------------------------------------
 
-menor_igual(X,Y) :- (X =< Y -> true ; false).
-
 compara_pesos([], []).
 
 compara_pesos([H|T], [Z|V]) :-
-  menor_igual(H, Z),
+  H =< Z,
   compara_pesos(T, V).
 
 % --------------------------------------------------------------------
@@ -111,22 +106,24 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
 % e so uma posicao).
 % --------------------------------------------------------------------
 
-procura_aux([Listas, Max_L, Max_C], (L, C), Ja_Preenchidas, Possibilidade) :-
+/* procura_aux([Listas, Max_L, Max_C], (L, C), Ja_Preenchidas, Possibilidade) :-
   length(Max_L, Dim),
   propaga([Listas, Max_L, Max_C], (L, C), Posicoes),
   nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas),
   verifica_parcial([Listas, Max_L, Max_C], Ja_Preenchidas, Dim, Posicoes),
   sort(Posicoes, Possibilidade), !.
 
-procura_aux(_, _, _, Possibilidade) :- Possibilidade = [].
+procura_aux(_, _, _, Possibilidade) :- Possibilidade = []. */
 
 procura(_, [], _, _, P) :- P = [].
 
-procura(Puz, [H|T], Total, Ja_Preenchidas, Possibilidades_L) :-
-  procura_aux(Puz, H, Ja_Preenchidas, P1),
-  procura(Puz, T, Total, Ja_Preenchidas, P2),
-  Possibilidades = [P1|P2],
-  delete(Possibilidades, [], Possibilidades_L), !.
+procura([Listas, Max_L, Max_C], Posicoes, _, Ja_Preenchidas, Possibilidade) :-
+  member((L, C), Posicoes),
+  length(Max_L, Dim),
+  propaga([Listas, Max_L, Max_C], (L, C), Posicoes2),
+  nao_altera_linhas_anteriores(Posicoes2, L, Ja_Preenchidas),
+  verifica_parcial([Listas, Max_L, Max_C], Ja_Preenchidas, Dim, Posicoes2),
+  sort(Posicoes2, Possibilidade).
 
 % --------------------------------------------------------------------
 % propaga_todos(Puz, Posicoes, Posicoes_propagadas) : dado um puzzle Puz
@@ -203,7 +200,7 @@ possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
 
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
-  procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, Posses),
+  findall(X, procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, X), Posses),
   junta_a_todos(Posses, Necessarios, Posses3),
   findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
@@ -251,7 +248,6 @@ resolve_aux([T, ML, MC], NrLinha, Dim, Count, Ja_Preenchidas, Solucao) :-
   nth1(NrLinha, ML, Total),
   possibilidades_linha([T, ML, MC], Linha, Total, Ja_Preenchidas, Possibilidades),
   member(X, Possibilidades),
-  verifica_parcial([T, ML, MC], Ja_Preenchidas, Dim, X),
   verifica_linhas([T, ML, MC], Ja_Preenchidas, Dim, X),
   NextLinha is NrLinha+1,
   append(Ja_Preenchidas, X, AAA),
