@@ -1,0 +1,24 @@
+v = <12, 2, 18, 15, 16, -1, 35, 30, 15>
+
+k = <-1, 2, 12, 15, 18, 15, 16, 30, 35>
+
+Insertation sort:
+
+Selection sort:
+	<-1, 2, 18, 15, 16, 12, 35, 30, 15>
+	<-1, 2, 18, 15, 16, 12, 35, 30, 15>
+	<-1, 2, 12, 15, 16, 18, 35, 30, 15>
+	<-1, 2, 12, 15, 15, 18, 35, 30, 16>
+	<-1, 2, 12, 15, 15, 16, 35, 30, 18>
+	<-1, 2, 12, 15, 15, 16, 18, 30, 35>
+
+Merge Sort:
+	<12, 2, 18, 15, 16, -1, 35, 30, 15>
+	<12, 2, 18, 15> <16, -1, 35, 30 15>
+	...
+	Neste caso, k nunca seria um passo
+	intermédio porque o merge sort divide
+	o vetor original sucessivamente. Só
+	voltamos a ter um vetor com o mesmo
+	tamanho que o original no fim, ordenado
+	que nao é o caso.
