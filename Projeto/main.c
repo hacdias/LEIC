@@ -6,7 +6,7 @@
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 #define MAX 10000
 #define MAX_COMMAND 100
-#define MAX_FILENAME 300
+#define MAX_FILENAME 100
 
 typedef struct {
   unsigned int line;
@@ -21,7 +21,6 @@ typedef struct {
   Point point[MAX];
 } Matrix;
 
-int readLine (char *s, int n, FILE *stream);
 void loadFromFile (Matrix *m, const char *filename);
 void saveToFile (Matrix *m, const char *filename);
 Point * findPoint (Matrix *m, int line, int column);
@@ -47,7 +46,7 @@ int main(int argc, char ** argv) {
   char cmd[MAX_COMMAND + 1];
   char filename[MAX_FILENAME + 1];
 
-  int len = 0, a, b;
+  int a, b;
   double c;
   
   Matrix mx;
@@ -62,7 +61,7 @@ int main(int argc, char ** argv) {
     loadFromFile(&mx, filename);
   }
 
-  while ((len = readLine(cmd, MAX_COMMAND, stdin))) {
+  while (fgets(cmd, MAX_COMMAND, stdin) != NULL) {
     switch (cmd[0]) {
       case 'a':
         sscanf(cmd, "a %d %d %lf", &a, &b, &c);
@@ -83,7 +82,7 @@ int main(int argc, char ** argv) {
         printColumn(&mx, a);
         break;
       case 'o':
-        sort(&mx, len != 1);
+        sort(&mx, cmd[2] != '\0');
         break;
       case 'z':
         sscanf(cmd, "z %lf", &c);
@@ -93,7 +92,7 @@ int main(int argc, char ** argv) {
         compress(&mx);
         break;
       case 'w':
-        if (len != 1) {
+        if (cmd[1] != '\0') {
           sscanf(cmd, "w %s", filename);
         }
         saveToFile(&mx, filename);
@@ -107,22 +106,6 @@ int main(int argc, char ** argv) {
 }
 
 /**
- * Reads a line from a stream until the end of line,
- * end of file or n is reached and stores it into s.
- * Returns the number of read characters.
- */
-int readLine (char *s, int n, FILE *stream) {
-  char c;
-  int i = 0;
-  while ((c = fgetc(stream)) != '\n' && i < n && c != EOF) {
-    s[i] = c;
-    i++;
-  }
-  s[i] = '\0';
-  return i;
-}
-
-/**
  * Loads the elements of a matrix from a file.
  */
 void loadFromFile (Matrix *m, const char *filename) {
@@ -131,7 +114,7 @@ void loadFromFile (Matrix *m, const char *filename) {
   unsigned int l, c;
   double v;
 
-  while (readLine(s, MAX_COMMAND, file)) {
+  while (fgets(s, MAX_COMMAND, file)) {
     sscanf(s, "%d %d %lf", &l, &c, &v);
     addPoint(m, l, c, v);
   }
