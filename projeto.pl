@@ -1,11 +1,6 @@
 % Henrique Afonso Coelho Dias: 89455
 
-%---------------------------------------------------------------------
-% lista_que_contem(Listas, El, Lista) : dada a lista de listas Listas
-% e o elemento El, Lista e a lista pertencente a Listas que contem El.
-% --------------------------------------------------------------------
-lista_que_contem([H|T], El, Lista) :-
-  (member(El, H) -> Lista = H ; lista_que_contem(T, El, Lista)).
+:-[exemplos_puzzles].
 
 %---------------------------------------------------------------------
 % propaga(Puz, Pos, Posicoes) : dado o puzzle Puz, o preenchimento da
@@ -14,7 +9,8 @@ lista_que_contem([H|T], El, Lista) :-
 % --------------------------------------------------------------------
 
 propaga([Listas, _, _], Pos, Posicoes) :-
-  lista_que_contem(Listas, Pos, Lista),
+  member(Lista, Listas),
+  member(Pos, Lista),
   append(Lista2, [Pos|_], Lista),
   sort([Pos|Lista2], Posicoes), !.
 
@@ -58,7 +54,6 @@ peso_coluna([(_,X)|T], X, Peso) :-
 peso_coluna([_|T], X, Peso) :-
   peso_coluna(T, X, Peso), !.
 
-peso_colunas(Posicoes, 1, Res) :- peso_coluna(Posicoes, 1, Res).
 
 % --------------------------------------------------------------------
 % peso_colunas(Posicoes, Dim, Pesos) : dada uma lista de posicoes
@@ -66,6 +61,8 @@ peso_colunas(Posicoes, 1, Res) :- peso_coluna(Posicoes, 1, Res).
 % onde cada numero corresponde a quantidade de colunas preenchidas
 % numa dada coluna.
 % --------------------------------------------------------------------
+
+peso_colunas(Posicoes, 1, Res) :- peso_coluna(Posicoes, 1, Res).
 
 peso_colunas(Posicoes, Dim, Res) :-
   peso_coluna(Posicoes, Dim, Col),
@@ -199,6 +196,8 @@ aaa(As, Bs, Line, Len) :-
 % a linha em questao.
 % --------------------------------------------------------------------
 
+/* TODO: verificar pesos linhas ? */
+
 possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
   Possibilidades_L = [[]].
 
@@ -208,3 +207,59 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
   junta_a_todos(Posses, Necessarios, Posses3),
   findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
+
+% --------------------------------------------------------------------
+% peso_linhas(Posicoes, Dim, Pesos)
+% --------------------------------------------------------------------
+
+peso_linha([], _, 0).
+peso_linha([(X, _)|T], X, Peso) :-
+  peso_linha(T, X, Peso1),
+  Peso is Peso1+1, !.
+peso_linha([_|T], X, Peso) :-
+  peso_linha(T, X, Peso), !.
+
+peso_linhas(Posicoes, 1, Res) :- peso_linha(Posicoes, 1, Res).
+
+peso_linhas(Posicoes, Dim, Res) :-
+  peso_linha(Posicoes, Dim, Col),
+  NextDim is Dim-1,
+  peso_linhas(Posicoes, NextDim, Res2),
+  flatten([Res2|Col], Res), !.
+
+verifica_linhas([_, Maximos, _], Ja_Preenchidas, Dim, Poss) :-
+  append(Ja_Preenchidas, Poss, Preenchidas),
+  sort(Preenchidas, Preenchidas_Ordenadas),
+  peso_linhas(Preenchidas_Ordenadas, Dim, Pesos),
+  compara_pesos(Pesos, Maximos).
+
+% --------------------------------------------------------------------
+
+linha(_, 0, Linha) :- Linha = [], !.
+
+linha(X, Dim, Linha) :-
+  NextDim is Dim-1,
+  linha(X, NextDim, L),
+  L2 = [(X, Dim)|L],
+  sort(L2, Linha), !.
+
+resolve_aux(_, _, _, 0, Ja_Preenchidas, Solucao) :-
+  Solucao = Ja_Preenchidas.
+
+resolve_aux([T, ML, MC], NrLinha, Dim, Count, Ja_Preenchidas, Solucao) :-
+  linha(NrLinha, Dim, Linha),
+  nth1(NrLinha, ML, Total),
+  possibilidades_linha([T, ML, MC], Linha, Total, Ja_Preenchidas, Possibilidades),
+  member(X, Possibilidades),
+  verifica_parcial([T, ML, MC], Ja_Preenchidas, Dim, X),
+  verifica_linhas([T, ML, MC], Ja_Preenchidas, Dim, X),
+  NextLinha is NrLinha+1,
+  append(Ja_Preenchidas, X, AAA),
+  sort(AAA, CCC),
+  NextCount is Count-1,
+  resolve_aux([T, ML, MC], NextLinha, Dim, NextCount, CCC, Solucao), !.
+
+resolve([Termometros, Max_Linhas, Max_Cols], Solucao) :-
+  length(Max_Linhas, Dim),
+  resolve_aux([Termometros, Max_Linhas, Max_Cols], 1, Dim,  Dim, [], Solucao). 
+
