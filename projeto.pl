@@ -145,14 +145,33 @@ intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
 
 junta_a_todos([], _, Res) :- Res = [].
 
-junta_a_todos([Lista|Outras], A_Juntar, Resultado) :-
-  junta_a_todos(Outras, A_Juntar, Res),
-  delete(Res, [], Listas_juntadas),
-  append(Lista, A_Juntar, Lista_juntada),
-  sort(Lista_juntada, Lista_ordenada),
-  append([Lista_ordenada], Listas_juntadas, Resultado).
+junta_a_todos(Lista, A_Juntar, Resultado) :-
+  member(X, Lista),
+  append(X, A_Juntar, Lista_juntada),
+  sort(Lista_juntada, Resultado).
 
 % --------------------------------------------------------------------
+
+/*
+aaa([O], Poss, Line, Len) :-
+  findall(X, member((Line, X), O), C),
+  length(C, Len),
+  Poss = O.
+
+aaa([O], Poss, Line, Len) :-
+  findall(X, member((Line, X), O), C),
+  \+length(C, Len),
+  Poss = [].
+
+aaa(Posses, Poss, Line, Len) :-
+  member(A, Posses),
+  member(B, Posses),
+  append(A, B, K),
+  sort(K, Poss),
+  findall(X, member((Line, X), Poss), Fs),
+  length(Fs, Len).
+
+*/
 
 combinacoes(As,Bs) :-
   same_length(As,Full),
@@ -186,7 +205,7 @@ possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
   findall(X, procura(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
-  junta_a_todos(Posses, Necessarios, Posses3),
+  findall(X, junta_a_todos(Posses, Necessarios, X), Posses3),
   findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
 
