@@ -95,29 +95,14 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
   compara_pesos(Pesos, Maximos), !.
 
 % --------------------------------------------------------------------
-% procura_aux(Puz, Pos, Ja_Preenchidas, Possibilidade) : dado um puzzle
-% Puz, uma posicao Pos, uma lista de posicoes Ja_Preenchidas, Possibilidade
-% e a possibilidade para preencher a posicao Pos.
-%
-% procura(Puz, Posicoes, Total, Ja_Preenchidas, Possibilidades_L) : dado
-% um puzzle Puz, uma lista de Posicoes Posicoes, o total de posicoes a preencher
-% Total, a lista de posicoes Ja_Preenchidas, entao Possibilidades_L e a
-% lista de possibilidades individuais (onde cada possibilidade preenche uma
-% e so uma posicao).
+% procura(Puz, Posicoes, Ja_Preenchidas, Possibilidade) : dado
+% um puzzle Puz, uma lista de posicoes Posicoes, a lista de posicoes Ja_Preenchidas,
+% entao Possibilidade representa uma possibilidade para preencher uma posicao.
 % --------------------------------------------------------------------
 
-/* procura_aux([Listas, Max_L, Max_C], (L, C), Ja_Preenchidas, Possibilidade) :-
-  length(Max_L, Dim),
-  propaga([Listas, Max_L, Max_C], (L, C), Posicoes),
-  nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas),
-  verifica_parcial([Listas, Max_L, Max_C], Ja_Preenchidas, Dim, Posicoes),
-  sort(Posicoes, Possibilidade), !.
+procura(_, [], _, P) :- P = [].
 
-procura_aux(_, _, _, Possibilidade) :- Possibilidade = []. */
-
-procura(_, [], _, _, P) :- P = [].
-
-procura([Listas, Max_L, Max_C], Posicoes, _, Ja_Preenchidas, Possibilidade) :-
+procura([Listas, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
   member((L, C), Posicoes),
   length(Max_L, Dim),
   propaga([Listas, Max_L, Max_C], (L, C), Posicoes2),
@@ -200,7 +185,7 @@ possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
 
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
-  findall(X, procura(Puz, [(L, C)|K], Total, Ja_Preenchidas, X), Posses),
+  findall(X, procura(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
   junta_a_todos(Posses, Necessarios, Posses3),
   findall(X, aaa(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
