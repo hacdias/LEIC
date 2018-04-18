@@ -20,9 +20,12 @@ propaga([Listas, _, _], Pos, Posicoes) :-
 % --------------------------------------------------------------------
 
 e_sublista([], _).
-e_sublista([X|Tail], Y):-
-  member(X, Y),
-  e_sublista(Tail, Y), !.
+
+e_sublista([X|Xs], [X|Ys]) :-
+  e_sublista(Xs, Ys).
+
+e_sublista(Xs, [_|Ys]) :-
+  e_sublista(Xs, Ys).
 
 % --------------------------------------------------------------------
 % nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas) : dada uma
@@ -95,14 +98,14 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
   compara_pesos(Pesos, Maximos), !.
 
 % --------------------------------------------------------------------
-% procura(Puz, Posicoes, Ja_Preenchidas, Possibilidade) : dado
+% procura_singular(Puz, Posicoes, Ja_Preenchidas, Possibilidade) : dado
 % um puzzle Puz, uma lista de posicoes Posicoes, a lista de posicoes Ja_Preenchidas,
 % entao Possibilidade representa uma possibilidade para preencher uma posicao.
 % --------------------------------------------------------------------
 
-procura(_, [], _, P) :- P = [].
+procura_singular(_, [], _, P) :- P = [].
 
-procura([Listas, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
+procura_singular([Listas, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
   member((L, C), Posicoes),
   length(Max_L, Dim),
   propaga([Listas, Max_L, Max_C], (L, C), Posicoes2),
@@ -152,42 +155,12 @@ junta_a_todos(Lista, A_Juntar, Resultado) :-
 
 % --------------------------------------------------------------------
 
-/*
-aaa([O], Poss, Line, Len) :-
-  findall(X, member((Line, X), O), C),
-  length(C, Len),
-  Poss = O.
-
-aaa([O], Poss, Line, Len) :-
-  findall(X, member((Line, X), O), C),
-  \+length(C, Len),
-  Poss = [].
-
-aaa(Posses, Poss, Line, Len) :-
-  member(A, Posses),
-  member(B, Posses), // problema: so da 2 a 2
-  append(A, B, K),
-  sort(K, Poss),
+procura_final(Posses, Poss, Line, Len) :-
+  e_sublista(K, Posses),
+  flatten(K, K1),
+  sort(K1, Poss),
   findall(X, member((Line, X), Poss), Fs),
   length(Fs, Len).
-
-*/
-
-combinacoes(As,Bs) :-
-  same_length(As,Full),
-  ASA = [_|_],
-  prefix(ASA,Full),
-  foldl(select,ASA,As,_),
-  flatten(ASA, ASS),
-  sort(ASS, Bs).
-
-aaa(As, Bs, Line, Len) :-
-  combinacoes(As, Cs),
-  sort(Cs, Ds),
-  findall(X, member((Line, X), Ds), Fs),
-  length(Fs, Len),
-  Bs = Ds.
-
 
 % --------------------------------------------------------------------
 % possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L) :
@@ -204,9 +177,9 @@ possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
 
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
-  findall(X, procura(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
+  findall(X, procura_singular(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
   findall(X, junta_a_todos(Posses, Necessarios, X), Posses3),
-  findall(X, aaa(Posses3, X, L, Total), P3),
+  findall(X, procura_final(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
 
 % --------------------------------------------------------------------
