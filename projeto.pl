@@ -182,13 +182,8 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
 
 % --------------------------------------------------------------------
 
-linha(_, 0, Linha) :- Linha = [], !.
-
-linha(X, Dim, Linha) :-
-  NextDim is Dim-1,
-  linha(X, NextDim, L),
-  L2 = [(X, Dim)|L],
-  sort(L2, Linha), !.
+linha(N, Dim, Linha) :- 
+  findall((N, X), (between(0, Dim, X)), Linha), !.
 
 resolve_aux(_, _, _, 0, Ja_Preenchidas, Solucao) :-
   Solucao = Ja_Preenchidas.
