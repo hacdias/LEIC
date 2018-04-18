@@ -10,7 +10,6 @@
 
 propaga([Listas, _, _], Pos, Posicoes) :-
   member(Lista, Listas),
-  member(Pos, Lista),
   append(Lista2, [Pos|_], Lista),
   sort([Pos|Lista2], Posicoes), !.
 
