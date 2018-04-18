@@ -175,7 +175,7 @@ void addPoint (Matrix *m, unsigned int line, unsigned int col, double val) {
  */
 void printPoints (Matrix *m) {
   if (m->points == 0) {
-    printf("empty matriz\n");
+    printf("empty matrix\n");
     return;
   }
 
