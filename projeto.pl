@@ -1,6 +1,6 @@
 % Henrique Afonso Coelho Dias: 89455
 
-:-[exemplos_puzzles].
+:-[exemplos_puzzles]. % TODO: remover isto
 
 %---------------------------------------------------------------------
 % propaga(Puz, Pos, Posicoes) : dado o puzzle Puz, o preenchimento da
@@ -154,13 +154,18 @@ junta_a_todos(Lista, A_Juntar, Resultado) :-
   sort(Lista_juntada, Resultado).
 
 % --------------------------------------------------------------------
+% procura_final(Possibilidades, Possibilidade, Linha, Total) : dada uma
+% lista de possibilidades possibilidade, o numero de uma linha Linha e o
+% Total de posicoes a preencher da mesma, entao Possibilidade preenche
+% validamente a linha.
+% --------------------------------------------------------------------
 
-procura_final(Posses, Poss, Line, Len) :-
+procura_final(Posses, Poss, Line, Total) :-
   e_sublista(K, Posses),
   flatten(K, K1),
   sort(K1, Poss),
   findall(X, member((Line, X), Poss), Fs),
-  length(Fs, Len).
+  length(Fs, Total).
 
 % --------------------------------------------------------------------
 % possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L) :
@@ -181,25 +186,36 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
   sort(P3, Possibilidades_L), !.
 
 % --------------------------------------------------------------------
+% linha(N, Dim, Linha) : dado um numero N e uma dimensao Dim, Linha e
+% a lista de todas as posicoes da linha N num puzzle de dimensao Dim.
+% --------------------------------------------------------------------
 
 linha(N, Dim, Linha) :- 
-  findall((N, X), (between(0, Dim, X)), Linha), !.
+    findall((N, X), (between(0, Dim, X)), Linha), !.
 
-resolve_aux(_, _, _, 0, Ja_Preenchidas, Solucao) :-
+% --------------------------------------------------------------------
+% resolve(Puzz, Solucao) : dado um puzzle Puzz, a sua solucao e Solucao.
+%
+% resolve_aux(Puzz, Dim, Contagem, Ja_Preenchidas, Solucao) :- dado um
+% puzzle Puzz, a sua dimensao Dim, a contagem decrescente Contagem, a
+% lista de posicoes Ja_Preenchidas, entao Solucao e a sua solucao.
+% --------------------------------------------------------------------
+
+resolve_aux(_, _, 0, Ja_Preenchidas, Solucao) :-
   Solucao = Ja_Preenchidas.
 
-resolve_aux([T, ML, MC], NrLinha, Dim, Count, Ja_Preenchidas, Solucao) :-
-  linha(NrLinha, Dim, Linha),
-  nth1(NrLinha, ML, Total),
+resolve_aux([T, ML, MC], Dim, Count, Ja_Preenchidas, Solucao) :-
+  Numero_Linha is Dim - Count + 1,
+  linha(Numero_Linha, Dim, Linha),
+  nth1(Numero_Linha, ML, Total),
   possibilidades_linha([T, ML, MC], Linha, Total, Ja_Preenchidas, Possibilidades),
   member(X, Possibilidades),
-  NextLinha is NrLinha+1,
   append(Ja_Preenchidas, X, AAA),
   sort(AAA, CCC),
   NextCount is Count-1,
-  resolve_aux([T, ML, MC], NextLinha, Dim, NextCount, CCC, Solucao), !.
+  resolve_aux([T, ML, MC], Dim, NextCount, CCC, Solucao), !.
 
 resolve([Termometros, Max_Linhas, Max_Cols], Solucao) :-
   length(Max_Linhas, Dim),
-  resolve_aux([Termometros, Max_Linhas, Max_Cols], 1, Dim,  Dim, [], Solucao). 
+  resolve_aux([Termometros, Max_Linhas, Max_Cols], Dim,  Dim, [], Solucao). 
 
