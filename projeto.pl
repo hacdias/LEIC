@@ -170,8 +170,6 @@ procura_final(Posses, Poss, Line, Len) :-
 % a linha em questao.
 % --------------------------------------------------------------------
 
-/* TODO: verificar pesos linhas ? */
-
 possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
   Possibilidades_L = [[]].
 
@@ -181,31 +179,6 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
   findall(X, junta_a_todos(Posses, Necessarios, X), Posses3),
   findall(X, procura_final(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
-
-% --------------------------------------------------------------------
-% peso_linhas(Posicoes, Dim, Pesos)
-% --------------------------------------------------------------------
-
-peso_linha([], _, 0).
-peso_linha([(X, _)|T], X, Peso) :-
-  peso_linha(T, X, Peso1),
-  Peso is Peso1+1, !.
-peso_linha([_|T], X, Peso) :-
-  peso_linha(T, X, Peso), !.
-
-peso_linhas(Posicoes, 1, Res) :- peso_linha(Posicoes, 1, Res).
-
-peso_linhas(Posicoes, Dim, Res) :-
-  peso_linha(Posicoes, Dim, Col),
-  NextDim is Dim-1,
-  peso_linhas(Posicoes, NextDim, Res2),
-  flatten([Res2|Col], Res), !.
-
-verifica_linhas([_, Maximos, _], Ja_Preenchidas, Dim, Poss) :-
-  append(Ja_Preenchidas, Poss, Preenchidas),
-  sort(Preenchidas, Preenchidas_Ordenadas),
-  peso_linhas(Preenchidas_Ordenadas, Dim, Pesos),
-  compara_pesos(Pesos, Maximos).
 
 % --------------------------------------------------------------------
 
@@ -225,7 +198,6 @@ resolve_aux([T, ML, MC], NrLinha, Dim, Count, Ja_Preenchidas, Solucao) :-
   nth1(NrLinha, ML, Total),
   possibilidades_linha([T, ML, MC], Linha, Total, Ja_Preenchidas, Possibilidades),
   member(X, Possibilidades),
-  verifica_linhas([T, ML, MC], Ja_Preenchidas, Dim, X),
   NextLinha is NrLinha+1,
   append(Ja_Preenchidas, X, AAA),
   sort(AAA, CCC),
