@@ -72,17 +72,6 @@ peso_colunas(Posicoes, Dim, Res) :-
   flatten([Res2|Col], Res), !.
 
 % --------------------------------------------------------------------
-% compara_pesos(Pesos, Maximos) : a lista de pesos Pesos nao excede
-% a lista de pesos maximos Maximos.
-% --------------------------------------------------------------------
-
-compara_pesos([], []).
-
-compara_pesos([H|T], [Z|V]) :-
-  H =< Z,
-  compara_pesos(T, V).
-
-% --------------------------------------------------------------------
 % verifica_parcial(Puz, Ja_Preenchidas, Dim, Poss) : dado um puzzle Puz,
 % uma lista de posicoes ja preenchidas Ja_Preenchidas, a dimensao Dim
 % do puzzle e uma lista de posicoes Poss que representa uma potencial
@@ -94,7 +83,7 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
   append(Ja_Preenchidas, Poss, Pre_Posicoes),
   sort(Pre_Posicoes, Posicoes),
   peso_colunas(Posicoes, Dim, Pesos),
-  compara_pesos(Pesos, Maximos), !.
+  maplist(=<, Pesos, Maximos), !.
 
 % --------------------------------------------------------------------
 % procura_singular(Puz, Posicoes, Ja_Preenchidas, Possibilidade) : dado
