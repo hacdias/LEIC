@@ -47,14 +47,9 @@ nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas) :-
 % colunas preenchidas na coluna Coluna.
 % --------------------------------------------------------------------
 
-peso_coluna([], _, 0).
-
-peso_coluna([(_,X)|T], X, Peso) :-
-  peso_coluna(T, X, Peso1),
-  Peso is Peso1+1, !.
-
-peso_coluna([_|T], X, Peso) :-
-  peso_coluna(T, X, Peso), !.
+peso_coluna(Posicoes, Coluna, Peso) :-
+  findall(X, member((X, Coluna), Posicoes), Colunas),
+  length(Colunas, Peso).
 
 % --------------------------------------------------------------------
 % peso_colunas(Posicoes, Dim, Pesos) : dada uma lista de posicoes
@@ -133,8 +128,6 @@ intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
 % Resultado e uma lista de listas resultante de juntar cada lista de
 % Lista_De_Listas a A_Juntar.
 % --------------------------------------------------------------------
-
-junta_a_todos([], _, Res) :- Res = [].
 
 junta_a_todos(Lista, A_Juntar, Resultado) :-
   member(X, Lista),
