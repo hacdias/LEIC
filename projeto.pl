@@ -97,19 +97,6 @@ procura_singular([Listas, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade
   sort(Posicoes2, Possibilidade).
 
 % --------------------------------------------------------------------
-% propaga_todos(Puz, Posicoes, Posicoes_propagadas) : dado um puzzle Puz
-% e uma lista de posicoes Posicoes, entao Posicoes_propagadas contem todas
-% as posicoes resultantes da propagacao de cada posicao em Posicoes.
-% --------------------------------------------------------------------
-
-propaga_todos(_, [], Posicoes) :- Posicoes = [].
-
-propaga_todos(Puz, [Pos|Outras], Posicoes) :-
-  propaga_todos(Puz, Outras, Outras_propagadas),
-  propaga(Puz, Pos, Pos_propagada),
-  Posicoes = [Pos_propagada|Outras_propagadas].
-
-% --------------------------------------------------------------------
 % intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) : dado um
 % puzzle Puz, uma linha de posicoes Linha, uma lista de posicoes Ja_Preenchidas,
 % entao, Intersecao e a lista de todas as posicoes Ja_Preenchidas pertencentes
@@ -117,10 +104,13 @@ propaga_todos(Puz, [Pos|Outras], Posicoes) :-
 % --------------------------------------------------------------------
 
 intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
-  intersection(Ja_Preenchidas, Linha, Linha_atual),
-  propaga_todos(Puz, Linha_atual, Propagados),
-  flatten(Propagados, Propagados_lista),
-  sort(Propagados_lista, Intersecao).
+  findall(X, (
+    member(Pos, Linha),
+    member(Pos, Ja_Preenchidas),
+    propaga(Puz, Pos, X),
+    e_sublista(X, Ja_Preenchidas)
+  ), Propagacoes),
+  flatten(Propagacoes, Intersecao).
 
 % --------------------------------------------------------------------
 % junta_a_todos(Lista_De_Listas, A_Juntar, Resultado) : dada uma lista
