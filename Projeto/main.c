@@ -18,6 +18,7 @@ typedef struct {
   unsigned int points;
   unsigned int minLine, maxLine;
   unsigned int minCol, maxCol;
+  double zero;
   Point point[MAX];
 } Matrix;
 
@@ -55,6 +56,7 @@ int main(int argc, char ** argv) {
   mx.maxLine = 0;
   mx.minCol = MAX;
   mx.maxCol = 0;
+  mx.zero = 0;
 
   if (argc == 2) {
     strcpy(filename, argv[1]);
@@ -62,6 +64,7 @@ int main(int argc, char ** argv) {
   }
 
   while (fgets(cmd, MAX_COMMAND, stdin) != NULL) {
+    // printf("%s", cmd);
     switch (cmd[0]) {
       case 'a':
         sscanf(cmd, "a %d %d %lf", &a, &b, &c);
@@ -86,6 +89,7 @@ int main(int argc, char ** argv) {
         break;
       case 'z':
         sscanf(cmd, "z %lf", &c);
+        mx.zero = c;
         removePointByValue(&mx, c);
         break;
       case 's':
@@ -151,7 +155,7 @@ Point * findPoint (Matrix *m, int line, int column) {
  */
 void addPoint (Matrix *m, unsigned int line, unsigned int col, double val) {
   // Removes the element.
-  if (val == 0) {
+  if (val == m->zero) {
     return removePoint(m, line, col);
   }
 
@@ -235,7 +239,7 @@ void removePoint (Matrix *m, int line, int column) {
   if (p == NULL)
     return;
 
-  for (int i = m->point - p + 1; i < m->points; i++)
+  for (int i = m->point - p; i < m->points; i++)
     m->point[i - 1] = m->point[i];
 
   m->points--;
@@ -336,7 +340,7 @@ void printColumn (Matrix *m, unsigned int col) {
   }
 
   for(i = 0; i < dim; i++) {
-    printf("[%d;%d]=%.3lf\n", i, col, values[i]);
+    printf("[%d;%d]=%.3lf\n", i + m->minLine, col, values[i]);
   }
 }
 
