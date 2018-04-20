@@ -1,105 +1,108 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #define min(X,Y) (((X) < (Y)) ? (X) : (Y))
 #define max(X,Y) (((X) > (Y)) ? (X) : (Y))
 #define MAX 10000
-#define MAX_COMMAND 100
-#define MAX_FILENAME 100
+#define MAX_COMMAND 200
+#define MAX_FILENAME 80
 
 typedef struct {
-  unsigned int line;
-  unsigned int column;
+  unsigned long line;
+  unsigned long column;
   double value;
 } Point;
 
 typedef struct {
-  unsigned int points;
-  unsigned int minLine, maxLine;
-  unsigned int minCol, maxCol;
+  unsigned long points;
+  unsigned long minLine, maxLine;
+  unsigned long minCol, maxCol;
   double zero;
   Point point[MAX];
 } Matrix;
 
-void loadFromFile (Matrix *m, const char *filename);
-void saveToFile (Matrix *m, const char *filename);
-Point * findPoint (Matrix *m, int line, int column);
-void addPoint (Matrix *m, unsigned int line, unsigned int col, double val);
-void printPoints (Matrix *m);
-int matrixDimension (Matrix *m);
-double matrixDensity (Matrix *m);
-void matrixInfo (Matrix *m);
-void removePoint (Matrix *m, int line, int column);
-void removePointByValue (Matrix *m, double value);
-void updateInfoWithPoint (Matrix *m, Point *p);
-void recalculateInfo (Matrix *m);
-void printLine (Matrix *m, unsigned int line);
-void printColumn (Matrix *m, unsigned int col);
+void loadFromFile (const char filename[]);
+void saveToFile (const char filename[]);
+int findPoint (unsigned long line, unsigned long column);
+void addPoint (unsigned long line, unsigned long col, double val);
+void printPoints ();
+unsigned long matrixDimension ();
+double matrixDensity ();
+void matrixInfo ();
+void recalculateInfo ();
+void removePoint (unsigned long line, unsigned long column);
+void removePointByValue (double value);
+void updateInfoWithPoint (Point p);
+void printLine (unsigned long line);
+void printColumn (unsigned long col);
 int sortByColumn (const void * a, const void * b);
 int sortByLine (const void * a, const void * b);
-void sort (Matrix *m, int byColumn);
-int linesOrder (int *lines, Matrix *m);
-int getLine (double *storage, Matrix *m, unsigned int line);
-void compress (Matrix *m);
+void sort (int byColumn);
+int linesOrder (unsigned long lines[]);
+int getLine (double storage[], unsigned long line);
+void compress ();
+
+Matrix mx;
 
 int main(int argc, char ** argv) {
   char cmd[MAX_COMMAND + 1];
   char filename[MAX_FILENAME + 1];
 
-  int a, b;
+  int infoUpdateScheduled = 0;
+  unsigned long a, b;
   double c;
   
-  Matrix mx;
   mx.points = 0;
-  mx.minLine = MAX;
-  mx.maxLine = 0;
-  mx.minCol = MAX;
-  mx.maxCol = 0;
   mx.zero = 0;
 
   if (argc == 2) {
     strcpy(filename, argv[1]);
-    loadFromFile(&mx, filename);
+    loadFromFile(filename);
   }
 
   while (fgets(cmd, MAX_COMMAND, stdin) != NULL) {
-    // printf("%s", cmd);
+    if (infoUpdateScheduled && cmd[0] != 'a') {
+      recalculateInfo();
+      infoUpdateScheduled = 0;
+    }
+
     switch (cmd[0]) {
       case 'a':
-        sscanf(cmd, "a %d %d %lf", &a, &b, &c);
-        addPoint(&mx, a, b, c);
+        sscanf(cmd, "a %lu %lu %lf", &a, &b, &c);
+        infoUpdateScheduled = 1;
+        addPoint(a, b, c);
         break;
       case 'p':
-        printPoints(&mx);
+        printPoints();
         break;
       case 'i':
-        matrixInfo(&mx);
+        matrixInfo();
         break;
       case 'l':
-        sscanf(cmd, "l %d", &a);
-        printLine(&mx, a);
+        sscanf(cmd, "l %lu", &a);
+        printLine(a);
         break;
       case 'c':
-        sscanf(cmd, "c %d", &a);
-        printColumn(&mx, a);
+        sscanf(cmd, "c %lu", &a);
+        printColumn(a);
         break;
       case 'o':
-        sort(&mx, cmd[2] != '\0');
+        sort(cmd[2] != '\0');
         break;
       case 'z':
         sscanf(cmd, "z %lf", &c);
         mx.zero = c;
-        removePointByValue(&mx, c);
+        removePointByValue(c);
         break;
       case 's':
         compress(&mx);
         break;
       case 'w':
-        if (cmd[1] != '\0') {
+        if (cmd[1] != '\0')
           sscanf(cmd, "w %s", filename);
-        }
-        saveToFile(&mx, filename);
+        saveToFile(filename);
         break;
       case 'q':
         return 0;
@@ -112,15 +115,16 @@ int main(int argc, char ** argv) {
 /**
  * Loads the elements of a matrix from a file.
  */
-void loadFromFile (Matrix *m, const char *filename) {
-  FILE *file = fopen(filename, "r");
+void loadFromFile (const char filename[]) {
   char s[MAX_COMMAND + 1];
-  unsigned int l, c;
+  unsigned long l, c;
   double v;
 
-  while (fgets(s, MAX_COMMAND, file)) {
-    sscanf(s, "%d %d %lf", &l, &c, &v);
-    addPoint(m, l, c, v);
+  FILE *file = fopen(filename, "r");
+
+  while (fgets(s, MAX_COMMAND, file) != NULL) {
+    sscanf(s, "%lu %lu %lf", &l, &c, &v);
+    addPoint(l, c, v);
   }
 
   fclose(file);
@@ -129,12 +133,15 @@ void loadFromFile (Matrix *m, const char *filename) {
 /**
  * Saves the elements of a matrix to a file.
  */
-void saveToFile (Matrix *m, const char *filename) {
+void saveToFile (const char filename[]) {
+  int i;
   FILE *file = fopen(filename, "w");
 
-  for (int i = 0; i < m->points; i++) {
-    fprintf(file, "%d %d %lf\n", m->point[i].line, m->point[i].column, m->point[i].value);
-  }
+  for (i = 0; i < mx.points; i++)
+    fprintf(file, "%lu %lu %lf\n",
+      mx.point[i].line,
+      mx.point[i].column,
+      mx.point[i].value);
 
   fclose(file);
 }
@@ -142,67 +149,69 @@ void saveToFile (Matrix *m, const char *filename) {
 /**
  * Searches for a point in a matrix and returns its pointer.
  */
-Point * findPoint (Matrix *m, int line, int column) {
-  for (int i = 0; i < m->points; i++)
-    if (m->point[i].line == line && m->point[i].column == column)
-      return &m->point[i];
+int findPoint (unsigned long line, unsigned long column) {
+  int i;
 
-  return NULL;
+  for (i = 0; i < mx.points; i++)
+    if (mx.point[i].line == line && mx.point[i].column == column)
+      return i;
+
+  return -1;
 }
 
 /**
  * Adds a point to a matrix.
  */
-void addPoint (Matrix *m, unsigned int line, unsigned int col, double val) {
-  // Removes the element.
-  if (val == m->zero) {
-    return removePoint(m, line, col);
+void addPoint (unsigned long line, unsigned long col, double val) {
+  /* Removes the element. */
+  if (val == mx.zero) {
+    return removePoint(line, col);
   }
 
-  // Checks if the element already exists.
-  Point *p;
-  if ((p = findPoint(m, line, col)) != NULL) {
-    p->value = val;
+  /* Checks if the element already exists. */
+  int i;
+  if ((i = findPoint(line, col)) != -1) {
+    mx.point[i].value = val;
     return;
   }
 
-  // Adds the point.
-  m->point[m->points].line = line;
-  m->point[m->points].column = col;
-  m->point[m->points].value = val;
-  updateInfoWithPoint(m, &m->point[m->points]);
-  m->points++;
+  /* Adds the point. */
+  mx.point[mx.points].line = line;
+  mx.point[mx.points].column = col;
+  mx.point[mx.points].value = val;
+  mx.points++;
 }
 
 /**
  * Prints the list of points of a matrix.
  */
-void printPoints (Matrix *m) {
-  if (m->points == 0) {
+void printPoints () {
+  if (mx.points == 0) {
     printf("empty matrix\n");
     return;
   }
 
-  for (int i = 0; i < m->points; i++) {
-    printf("[%d;%d]=%.3lf\n",
-      m->point[i].line,
-      m->point[i].column,
-      m->point[i].value);
+  int i;
+  for (i = 0; i < mx.points; i++) {
+    printf("[%lu;%lu]=%.3lf\n",
+      mx.point[i].line,
+      mx.point[i].column,
+      mx.point[i].value);
   }
 }
 
 /**
  * Calculates a matrix's dimension.
  */
-int matrixDimension (Matrix *m) {
-  return (m->maxCol - m->minCol + 1) * (m->maxLine - m->minLine + 1);
+unsigned long matrixDimension () {
+  return (mx.maxCol - mx.minCol + 1) * (mx.maxLine - mx.minLine + 1);
 }
 
 /**
  * Calculates a matrix's density.
  */
-double matrixDensity (Matrix *m) {
-  return (m->points / (double) matrixDimension(m)) * 100;
+double matrixDensity () {
+  return (mx.points / (double) matrixDimension()) * 100;
 }
 
 /**
@@ -210,126 +219,131 @@ double matrixDensity (Matrix *m) {
  * the maximum column, the minimum line, the maximum line,
  * the number of points, the dimension and density.
  */
-void matrixInfo (Matrix *m) {
-  if (!m->points) {
+void matrixInfo () {
+  if (!mx.points) {
     printf("empty matrix\n");
     return;
   }
 
-  int dim = matrixDimension(m);
-  double dens = matrixDensity(m);
-
-  printf("[%d %d] [%d %d] %d / %d = %.3lf%%\n",
-    m->minLine,
-    m->minCol,
-    m->maxLine,
-    m->maxCol,
-    m->points,
-    dim,
-    dens);
+  printf("[%lu %lu] [%lu %lu] %lu / %lu = %.3lf%%\n",
+    mx.minLine,
+    mx.minCol,
+    mx.maxLine,
+    mx.maxCol,
+    mx.points,
+    matrixDimension(),
+    matrixDensity());
 }
 
 /**
  * Removes a point from a matrix knowing its line and column.
  */
-void removePoint (Matrix *m, int line, int column) {
-  Point *p = findPoint(m, line, column);
+void removePoint (unsigned long line, unsigned long column) {
+  int i = findPoint(line, column);
 
-  // The point doesnt't exist.
-  if (p == NULL)
+  /* The point doesnt't exist. */
+  if (i == -1)
     return;
 
-  for (int i = m->point - p; i < m->points; i++)
-    m->point[i - 1] = m->point[i];
+  for (i++; i < mx.points; i++)
+    mx.point[i - 1] = mx.point[i];
 
-  m->points--;
-  recalculateInfo(m);
+  mx.points--;
 }
 
 /**
  * Removes all points from a matrix knowing their value.
  */
-void removePointByValue (Matrix *m, double value) {
+void removePointByValue (double value) {
   int i = 0, j = 0;
 
-  while (i < m->points) {
-    if (m->point[j].value == value) {
-      j++;
-      m->points--;
+  while (i < mx.points) {
+    if (mx.point[j].value == value) {
+      mx.points--;
     } else {
-      m->point[i] = m->point[j];
+      mx.point[i] = mx.point[j];
       i++;
-      j++;
     }
+    j++;
   }
 
-  recalculateInfo(m);
-}
-
-/**
- * Updates a matrix's information according to a point's
- * coordinates.
- */
-void updateInfoWithPoint (Matrix *m, Point *p) {
-  m->minLine = min(m->minLine, p->line);
-  m->minCol = min(m->minCol, p->column);
-  m->maxLine = max(m->maxLine, p->line);
-  m->maxCol = max(m->maxCol, p->column);
+  recalculateInfo();
 }
 
 /**
  * Completely recalculates a matrix's information.
  */
-void recalculateInfo (Matrix *m) {
-  for (int i = 0; i < m->points; i++)
-    updateInfoWithPoint(m, &m->point[i]);
+void recalculateInfo () {
+  int i;
+
+  mx.minLine = ULONG_MAX;
+  mx.minCol = ULONG_MAX;
+  mx.maxCol = 0;
+  mx.maxLine = 0;
+
+  for (i = 0; i < mx.points; i++) {
+    mx.minLine = min(mx.minLine, mx.point[i].line);
+    mx.minCol = min(mx.minCol, mx.point[i].column);
+    mx.maxLine = max(mx.maxLine, mx.point[i].line);
+    mx.maxCol = max(mx.maxCol, mx.point[i].column);
+  }
+}
+
+/**
+ * Gets the values of a line on the matrix.
+ */
+int getLine (double storage[], unsigned long line) {
+  const unsigned long dim = mx.maxCol - mx.minCol + 1;
+  int i, count = 0;
+
+  for (i = 0; i < dim; i++)
+      storage[i] = mx.zero;
+
+  for (i = 0; i < mx.points; i++) {
+    if (mx.point[i].line == line) {
+      storage[mx.point[i].column - mx.minCol] = mx.point[i].value;
+      count++;
+    }
+  }
+
+  return count;
 }
 
 /**
  * Prints a line.
  */
-void printLine (Matrix *m, unsigned int line) {
-  int dim = m->maxCol - m->minCol + 1, i, empty = 1;
+void printLine (unsigned long line) {
+  unsigned long i, dim = mx.maxCol - mx.minCol + 1;
   double values[dim];
 
-  if (line > m->maxLine || line < m->minLine) {
+  if (line > mx.maxLine || line < mx.minLine || !getLine(values, line)) {
     printf("empty line\n");
     return;
   }
 
-  for (i = 0; i < dim; i++) values[i] = 0;
-  for (i = 0; i < m->points; i++) {
-    if (m->point[i].line == line) {
-      values[m->point[i].column - m->minCol] = m->point[i].value;
-      empty = 0;
-    }
-  }
+  for (i = 0; i < dim; i++)
+    printf(" %.3lf", values[i]);
 
-  if (empty) {
-    printf("empty line\n");
-    return;
-  }
-
-  for(i = 0; i < dim; i++) printf(" %.3lf", values[i]);
   printf("\n");
 }
 
 /**
  * Prints a column.
  */
-void printColumn (Matrix *m, unsigned int col) {
-  int dim = m->maxLine - m->minLine + 1, i, empty = 1;
+void printColumn (unsigned long col) {
+  unsigned long int dim = mx.maxLine - mx.minLine + 1, i;
+  int empty = 1;
   double values[dim];
 
-  if (col > m->maxCol || col < m->minCol) {
+  if (col > mx.maxCol || col < mx.minCol) {
     printf("empty column\n");
     return;
   }
 
-  for (i = 0; i < dim; i++) values[i] = 0;
-  for (i = 0; i < m->points; i++) {
-    if (m->point[i].column == col) {
-      values[m->point[i].line - m->minLine] = m->point[i].value;
+  for (i = 0; i < dim; i++) values[i] = mx.zero;
+  for (i = 0; i < mx.points; i++) {
+    if (mx.point[i].column == col) {
+      values[mx.point[i].line - mx.minLine] = mx.point[i].value;
       empty = 0;
     }
   }
@@ -339,9 +353,8 @@ void printColumn (Matrix *m, unsigned int col) {
     return;
   }
 
-  for(i = 0; i < dim; i++) {
-    printf("[%d;%d]=%.3lf\n", i + m->minLine, col, values[i]);
-  }
+  for (i = 0; i < dim; i++)
+    printf("[%lu;%lu]=%.3lf\n", i + mx.minLine, col, values[i]);
 }
 
 /**
@@ -383,30 +396,29 @@ int sortByLine (const void * a, const void * b) {
 /**
  * Sort the points of a matrix.
  */
-void sort (Matrix *m, int byColumn) {
-  if (byColumn) {
-    qsort(m->point, m->points, sizeof(Point), sortByColumn);
-  } else {
-    qsort(m->point, m->points, sizeof(Point), sortByLine);
-  }
+void sort (int byColumn) {
+  if (byColumn)
+    qsort(mx.point, mx.points, sizeof(Point), sortByColumn);
+  else
+    qsort(mx.point, mx.points, sizeof(Point), sortByLine);
 }
 
 /**
  * Get the order of lines to compress by their density.
  */
-int linesOrder (int *lines, Matrix *m) {
-  int maxLines = m->maxLine - m->minLine + 1,
-    densities[maxLines], i, j, lineCount = 0,
-    line = 0, dens = 0;
+int linesOrder (unsigned long lines[]) {
+  unsigned long maxLines = mx.maxLine - mx.minLine + 1,
+    i, j, line = 0, dens = 0;
+  int densities[maxLines], lineCount = 0;
 
   for (i = 0; i < maxLines; i++)
     densities[i] = 0;
 
-  for (i = 0; i < m->points; i++)
-    densities[m->point[i].line - m->minLine]++;
-
-  for (i = 0; i < maxLines; i++)
-    if (densities[i] != 0) lineCount++;
+  for (i = 0; i < mx.points; i++) {
+    if (densities[mx.point[i].line - mx.minLine] == 0)
+      lineCount++;
+    densities[mx.point[i].line - mx.minLine]++;
+  }
 
   for (i = 0; i < lineCount; i++) {
     line = 0;
@@ -426,97 +438,76 @@ int linesOrder (int *lines, Matrix *m) {
   }
 
   for (i = 0; i < lineCount; i++)
-    lines[i] += m->minLine;
+    lines[i] += mx.minLine;
 
   return lineCount;
 }
 
 /**
- * Gets the values of a line on the matrix.
- */
-int getLine (double *storage, Matrix *m, unsigned int line) {
-  int counter = 0, i;
-
-  for (i = 0; i < m->points; i++) {
-    if (m->point[i].line == line) {
-      counter++;
-      storage[m->point[i].column - m->minCol] = m->point[i].value;
-    }
-  }
-
-  return counter;
-}
-
-/**
  * Compress a matrix.
  */
-void compress (Matrix *m) {
-  if (matrixDensity(m) > 50) {
+void compress () {
+  if (matrixDensity() > 50) {
     printf("dense matrix\n");
     return;
   }
 
-  int matrixHeight = m->maxLine - m->minLine + 1;
-  int order[matrixHeight];
-  int linesCount = linesOrder(order, m);
-  int columnsCount = m->maxCol - m->minCol + 1;
+  unsigned long matrixHeight = mx.maxLine - mx.minLine + 1,
+    columnsCount = mx.maxCol - mx.minCol + 1,
+    order[matrixHeight],
+    linesCount = linesOrder(order),
+    i, valueI, j, fi, done, o, furthest = 0;
 
-  int offset[matrixHeight];
-  double value[MAX*2];
-  int index[MAX*2];
+  unsigned long offset[matrixHeight],
+    index[MAX*2];
+  double value[MAX*2],
+    line[columnsCount];
 
-  for (int i = 0; i < matrixHeight; i++) offset[i] = 0;
-  for (int i = 0; i < MAX*2; i++) {
-    value[i] = 0;
+  for (i = 0; i < matrixHeight; i++) offset[i] = 0;
+  for (i = 0; i < MAX*2; i++) {
+    value[i] = mx.zero;
     index[i] = 0;
   }
 
-  int valueI;
-  double line[columnsCount];
+  /* Iterate over the lines. */
+  for (i = 0; i < linesCount; i++) {   
+    /* Gets the current line. */
+    getLine(line, order[i]);
 
-  int i, j, count, fi, done, o;
+    /* fi is the first non-zero element of the current line. */
+    for (fi = 0; line[fi] == mx.zero; fi++);
 
-  // Iterate over the lines.
-  for (i = 0; i < linesCount; i++) {
-    // Resets the line values.
-    for (j = 0; j < columnsCount; j++)
-      line[j] = 0;
-    
-    // Gets the current line.
-    count = getLine(line, m, order[i]);
-
-    // fi is the first non-zero element of the current line.
-    for (fi = 0; line[fi] == 0; fi++);
-
-    // Done indicates if we've finished finding the offset.
-    // o is the offset.
+    /* done indicates if we've finished finding the offset. */
     done = 0;
+    /* o is the offset. */
     o = -1;
 
     while (!done) {
       o++;
       done = 1;
       for (j = fi, valueI = fi+o; valueI < columnsCount+o; valueI++, j++)
-        if (value[valueI] != 0 && line[j] != 0)
+        if (value[valueI] != mx.zero && line[j] != mx.zero)
           done = 0;
     }
 
-    offset[order[i] - m->minLine] = o;
+    offset[order[i] - mx.minLine] = o;
 
-    // Copies the values to the compressed lists.
+    /* Copies the values to the compressed lists. */
     for (j = fi, valueI = fi+o; valueI < columnsCount+o; valueI++, j++) {
-      if (line[j] != 0) {
+      if (line[j] != mx.zero) {
         value[valueI] = line[j];
         index[valueI] = order[i];
       }
     }
+
+    furthest = max(furthest, valueI);
   }
 
-  printf("value = ");
-  for (int i = 0; i < valueI; i++) printf("%.3lf ", value[i]);
-  printf("\nindex = ");
-  for (int i = 0; i < valueI; i++) printf("%d ", index[i]);
-  printf("\noffset = ");
-  for (int i = 0; i < matrixHeight; i++) printf("%d ", offset[i]);
+  printf("value =");
+  for (i = 0; i < furthest; i++) printf(" %.3lf", value[i]);
+  printf("\nindex =");
+  for (i = 0; i < furthest; i++) printf(" %lu", index[i]);
+  printf("\noffset =");
+  for (i = 0; i < matrixHeight; i++) printf(" %lu", offset[i]);
   printf("\n");
 }

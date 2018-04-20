@@ -1,2 +1,5 @@
 *.out
 *.o
+*.zip
+/Projeto/exemplos
+/Projeto/testes-publicos
