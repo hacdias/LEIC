@@ -207,6 +207,11 @@ double matrixDensity (Matrix *m) {
  * the number of points, the dimension and density.
  */
 void matrixInfo (Matrix *m) {
+  if (!m->points) {
+    printf("empty matrix\n");
+    return;
+  }
+
   int dim = matrixDimension(m);
   double dens = matrixDensity(m);
 
@@ -224,12 +229,14 @@ void matrixInfo (Matrix *m) {
  * Removes a point from a matrix knowing its line and column.
  */
 void removePoint (Matrix *m, int line, int column) {
-  int i;
+  Point *p = findPoint(m, line, column);
 
-  for (i = 0; (m->point[i].line != line || m->point[i].column != column); i++);
-  for (i = i + 1; i < m->points; i++) {
+  // The point doesnt't exist.
+  if (p == NULL)
+    return;
+
+  for (int i = m->point - p + 1; i < m->points; i++)
     m->point[i - 1] = m->point[i];
-  }
 
   m->points--;
   recalculateInfo(m);
@@ -451,11 +458,11 @@ void compress (Matrix *m) {
   int columnsCount = m->maxCol - m->minCol + 1;
 
   int offset[matrixHeight];
-  double value[MAX];
-  int index[MAX];
+  double value[MAX*2];
+  int index[MAX*2];
 
   for (int i = 0; i < matrixHeight; i++) offset[i] = 0;
-  for (int i = 0; i < MAX; i++) {
+  for (int i = 0; i < MAX*2; i++) {
     value[i] = 0;
     index[i] = 0;
   }
