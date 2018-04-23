@@ -141,26 +141,27 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
 % -----------------------------------------------------------------------------
 % resolve(Puzz, Solucao) : dado um puzzle Puzz, a sua solucao e Solucao.
 %
-% resolve_aux(Puzz, Dim, Contagem, Ja_Preenchidas, Solucao) :- dado um
+% resolve(Puzz, Dim, Contagem, Ja_Preenchidas, Solucao) :- dado um
 % puzzle Puzz, a sua dimensao Dim, a contagem decrescente Contagem, a
 % lista de posicoes Ja_Preenchidas, entao Solucao e a sua solucao.
 % -----------------------------------------------------------------------------
 
-resolve_aux(_, _, 0, Ja_Preenchidas, Solucao) :-
-  Solucao = Ja_Preenchidas.
+linha_aux([_, Maximos, _], Count, Total, Linha) :-
+  length(Maximos, Dim),
+  Numero is Dim - Count + 1,
+  findall((Numero, X), (between(0, Dim, X)), Linha),
+  nth1(Numero, Maximos, Total).
 
-resolve_aux([T, ML, MC], Dim, Count, Ja_Preenchidas, Solucao) :-
-  Numero_Linha is Dim - Count + 1,
-  findall((Numero_Linha, X), (between(0, Dim, X)), Linha),
-  nth1(Numero_Linha, ML, Total),
-  possibilidades_linha([T, ML, MC], Linha, Total, Ja_Preenchidas, Possibilidades),
+resolve(_, 0, Sol, Sol).
+resolve(Puz, Count, Ja_Preenchidas, Solucao) :-
+  linha_aux(Puz, Count, Total, Linha),
+  possibilidades_linha(Puz, Linha, Total, Ja_Preenchidas, Possibilidades),
   member(X, Possibilidades),
-  append(Ja_Preenchidas, X, AAA),
-  sort(AAA, CCC),
+  append(Ja_Preenchidas, X, Lista_Desordenada),
+  sort(Lista_Desordenada, Lista_Ordenada),
   NextCount is Count-1,
-  resolve_aux([T, ML, MC], Dim, NextCount, CCC, Solucao), !.
+  resolve(Puz, NextCount, Lista_Ordenada, Solucao), !.
 
 resolve([Termometros, Max_Linhas, Max_Cols], Solucao) :-
   length(Max_Linhas, Dim),
-  resolve_aux([Termometros, Max_Linhas, Max_Cols], Dim,  Dim, [], Solucao). 
-
+  resolve([Termometros, Max_Linhas, Max_Cols],  Dim, [], Solucao). 
