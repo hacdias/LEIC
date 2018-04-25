@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
   int infoUpdateScheduled = 0;
   unsigned long a, b;
   double c;
-  
+
   mx.points = 0;
   mx.zero = 0;
 
@@ -71,8 +71,8 @@ int main(int argc, char ** argv) {
     switch (cmd[0]) {
       case 'a':
         sscanf(cmd, "a %lu %lu %lf", &a, &b, &c);
-        infoUpdateScheduled = 1;
         addPoint(a, b, c);
+        infoUpdateScheduled = 1;
         break;
       case 'p':
         printPoints();
@@ -97,7 +97,7 @@ int main(int argc, char ** argv) {
         removePointByValue(c);
         break;
       case 's':
-        compress(&mx);
+        compress();
         break;
       case 'w':
         if (cmd[1] != '\0')
@@ -147,7 +147,7 @@ void saveToFile (const char filename[]) {
 }
 
 /**
- * Searches for a point in a matrix and returns its pointer.
+ * Searches for a point in a matrix and returns its position.
  */
 int findPoint (unsigned long line, unsigned long column) {
   int i;
@@ -297,7 +297,7 @@ int getLine (double storage[], unsigned long line) {
   int i, count = 0;
 
   for (i = 0; i < dim; i++)
-      storage[i] = mx.zero;
+    storage[i] = mx.zero;
 
   for (i = 0; i < mx.points; i++) {
     if (mx.point[i].line == line) {
@@ -454,14 +454,15 @@ void compress () {
 
   unsigned long matrixHeight = mx.maxLine - mx.minLine + 1,
     columnsCount = mx.maxCol - mx.minCol + 1,
-    order[matrixHeight],
-    linesCount = linesOrder(order),
-    i, valueI, j, fi, done, o, furthest = 0;
+    i, valueI, j, fi, done, o, linesCount, furthest = 0;
 
-  unsigned long offset[matrixHeight],
+  unsigned long order[matrixHeight],
+    offset[matrixHeight],
     index[MAX*2];
-  double value[MAX*2],
-    line[columnsCount];
+
+  double value[MAX*2], line[columnsCount];
+
+  linesCount = linesOrder(order);
 
   for (i = 0; i < matrixHeight; i++) offset[i] = 0;
   for (i = 0; i < MAX*2; i++) {
@@ -470,7 +471,7 @@ void compress () {
   }
 
   /* Iterate over the lines. */
-  for (i = 0; i < linesCount; i++) {   
+  for (i = 0; i < linesCount; i++) {
     /* Gets the current line. */
     getLine(line, order[i]);
 
@@ -479,6 +480,7 @@ void compress () {
 
     /* done indicates if we've finished finding the offset. */
     done = 0;
+
     /* o is the offset. */
     o = -1;
 
