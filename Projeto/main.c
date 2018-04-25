@@ -100,7 +100,7 @@ int main(int argc, char ** argv) {
         compress();
         break;
       case 'w':
-        if (cmd[1] != '\0')
+        if (cmd[2] != '\0')
           sscanf(cmd, "w %s", filename);
         saveToFile(filename);
         break;
