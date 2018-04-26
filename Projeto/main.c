@@ -113,7 +113,8 @@ int main(int argc, char ** argv) {
 }
 
 /**
- * Loads the elements of a matrix from a file.
+ * loadFromFile - Loads the elemnts of a matrix from a file.
+ * @filename: The name of the file.
  */
 void loadFromFile (const char filename[]) {
   char s[MAX_COMMAND + 1];
@@ -131,7 +132,8 @@ void loadFromFile (const char filename[]) {
 }
 
 /**
- * Saves the elements of a matrix to a file.
+ * saveToFile - Saves the elements of a matrix to a file.
+ * @filename: The name of the file.
  */
 void saveToFile (const char filename[]) {
   int i;
@@ -147,7 +149,9 @@ void saveToFile (const char filename[]) {
 }
 
 /**
- * Searches for a point in a matrix and returns its position.
+ * findPoint - Gets the position of a point in the matrix.
+ * @line: The line of the point.
+ * @column: The column of the point.
  */
 int findPoint (unsigned long line, unsigned long column) {
   int i;
@@ -160,7 +164,10 @@ int findPoint (unsigned long line, unsigned long column) {
 }
 
 /**
- * Adds a point to a matrix.
+ * addPoint - Adds a point to a matrix.
+ * @line: The line of the point.
+ * @col: The column of the point.
+ * @val: The value of the point.
  */
 void addPoint (unsigned long line, unsigned long col, double val) {
   /* Removes the element. */
@@ -183,7 +190,7 @@ void addPoint (unsigned long line, unsigned long col, double val) {
 }
 
 /**
- * Prints the list of points of a matrix.
+ * printPoints - Prints the list of points of a matrix.
  */
 void printPoints () {
   if (mx.points == 0) {
@@ -201,23 +208,21 @@ void printPoints () {
 }
 
 /**
- * Calculates a matrix's dimension.
+ * matrixDimension - Calculates a matrix's dimension.
  */
 unsigned long matrixDimension () {
   return (mx.maxCol - mx.minCol + 1) * (mx.maxLine - mx.minLine + 1);
 }
 
 /**
- * Calculates a matrix's density.
+ * matrixDensity - Calculates a matrix's density.
  */
 double matrixDensity () {
   return (mx.points / (double) matrixDimension()) * 100;
 }
 
 /**
- * Prints the matrix information, i.e., the minimum column,
- * the maximum column, the minimum line, the maximum line,
- * the number of points, the dimension and density.
+ * matrixInfo - Prints the matrix characteristics.
  */
 void matrixInfo () {
   if (!mx.points) {
@@ -236,7 +241,9 @@ void matrixInfo () {
 }
 
 /**
- * Removes a point from a matrix knowing its line and column.
+ * removePoint - Removes a point from the matrix.
+ * @line: The line of the point.
+ * @column: The column of the point.
  */
 void removePoint (unsigned long line, unsigned long column) {
   int i = findPoint(line, column);
@@ -252,7 +259,8 @@ void removePoint (unsigned long line, unsigned long column) {
 }
 
 /**
- * Removes all points from a matrix knowing their value.
+ * removePointByValue - Removes all points from the matrix by value.
+ * @value: The value of the points.
  */
 void removePointByValue (double value) {
   int i = 0, j = 0;
@@ -271,7 +279,7 @@ void removePointByValue (double value) {
 }
 
 /**
- * Completely recalculates a matrix's information.
+ * recalculateInfo - Recalculates the matrix's information.
  */
 void recalculateInfo () {
   int i;
@@ -290,7 +298,9 @@ void recalculateInfo () {
 }
 
 /**
- * Gets the values of a line on the matrix.
+ * getLine - Gets the values of a line on the matrix.
+ * @storage: Where to save the line values.
+ * @line: The line number.
  */
 int getLine (double storage[], unsigned long line) {
   const unsigned long dim = mx.maxCol - mx.minCol + 1;
@@ -310,7 +320,8 @@ int getLine (double storage[], unsigned long line) {
 }
 
 /**
- * Prints a line.
+ * printLine - Prints a line.
+ * @line: The line number.
  */
 void printLine (unsigned long line) {
   unsigned long i, dim = mx.maxCol - mx.minCol + 1;
@@ -328,7 +339,8 @@ void printLine (unsigned long line) {
 }
 
 /**
- * Prints a column.
+ * printColumn - Prints a column.
+ * @col: The column number.
  */
 void printColumn (unsigned long col) {
   unsigned long int dim = mx.maxLine - mx.minLine + 1, i;
@@ -358,7 +370,9 @@ void printColumn (unsigned long col) {
 }
 
 /**
- * Sort points by column. Comparison function to qsort.
+ * sortByColumn - Sort points by column.
+ * @a: The first point.
+ * @b: The second point.
  */
 int sortByColumn (const void * a, const void * b) {
   const Point *p1 = (Point *)a;
@@ -376,7 +390,9 @@ int sortByColumn (const void * a, const void * b) {
 }
 
 /**
- * Sort points by line. Comparison function to qsort.
+ * sortByLine - Sort points by line.
+ * @a: The first point.
+ * @b: The second point.
  */
 int sortByLine (const void * a, const void * b) {
   const Point *p1 = (Point *)a;
@@ -394,7 +410,8 @@ int sortByLine (const void * a, const void * b) {
 }
 
 /**
- * Sort the points of a matrix.
+ * sort - Sort the points of a matrix.
+ * @byColumn: Indicates if the matrix should be sorted by column.
  */
 void sort (int byColumn) {
   if (byColumn)
@@ -404,7 +421,8 @@ void sort (int byColumn) {
 }
 
 /**
- * Get the order of lines to compress by their density.
+ * linesOrder - Get the order of lines to compress by their density.
+ * @lines: Where to save the order of lines.
  */
 int linesOrder (unsigned long lines[]) {
   unsigned long maxLines = mx.maxLine - mx.minLine + 1,
@@ -444,7 +462,7 @@ int linesOrder (unsigned long lines[]) {
 }
 
 /**
- * Compress a matrix.
+ * compress - Compress a matrix.
  */
 void compress () {
   if (matrixDensity() > 50) {
