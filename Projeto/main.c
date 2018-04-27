@@ -1,3 +1,4 @@
+/* 89455 - Henrique Dias */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -199,12 +200,11 @@ void printPoints () {
   }
 
   int i;
-  for (i = 0; i < mx.points; i++) {
+  for (i = 0; i < mx.points; i++)
     printf("[%lu;%lu]=%.3lf\n",
       mx.point[i].line,
       mx.point[i].column,
       mx.point[i].value);
-  }
 }
 
 /**
@@ -324,7 +324,8 @@ int getLine (double storage[], unsigned long line) {
  * @line: The line number.
  */
 void printLine (unsigned long line) {
-  unsigned long i, dim = mx.maxCol - mx.minCol + 1;
+  const unsigned long dim = mx.maxCol - mx.minCol + 1;
+  unsigned long i;
   double values[dim];
 
   if (line > mx.maxLine || line < mx.minLine || !getLine(values, line)) {
@@ -343,7 +344,8 @@ void printLine (unsigned long line) {
  * @col: The column number.
  */
 void printColumn (unsigned long col) {
-  unsigned long int dim = mx.maxLine - mx.minLine + 1, i;
+  const unsigned long dim = mx.maxLine - mx.minLine + 1;
+  unsigned long i;
   int empty = 1;
   double values[dim];
 
@@ -411,10 +413,10 @@ int sortByLine (const void * a, const void * b) {
 
 /**
  * sort - Sort the points of a matrix.
- * @byColumn: Indicates if the matrix should be sorted by column.
+ * @columnFirst: Indicates if the matrix should be sorted by column.
  */
-void sort (int byColumn) {
-  if (byColumn)
+void sort (int columnFirst) {
+  if (columnFirst)
     qsort(mx.point, mx.points, sizeof(Point), sortByColumn);
   else
     qsort(mx.point, mx.points, sizeof(Point), sortByLine);
@@ -425,8 +427,8 @@ void sort (int byColumn) {
  * @lines: Where to save the order of lines.
  */
 int linesOrder (unsigned long lines[]) {
-  unsigned long maxLines = mx.maxLine - mx.minLine + 1,
-    i, j, line = 0, dens = 0;
+  const unsigned long maxLines = mx.maxLine - mx.minLine + 1;
+  unsigned long i, j, line = 0, dens = 0;
   int densities[maxLines], lineCount = 0;
 
   for (i = 0; i < maxLines; i++)
@@ -451,12 +453,9 @@ int linesOrder (unsigned long lines[]) {
       }
     }
 
-    lines[i] = line;
+    lines[i] = line + mx.minLine;
     densities[line] = 0;
   }
-
-  for (i = 0; i < lineCount; i++)
-    lines[i] += mx.minLine;
 
   return lineCount;
 }
@@ -483,13 +482,13 @@ void compress () {
   double value[MAX*2],
     line[columnsCount];
 
-  linesCount = linesOrder(order);
-
   for (i = 0; i < matrixHeight; i++) offset[i] = 0;
   for (i = 0; i < MAX*2; i++) {
     value[i] = mx.zero;
     index[i] = 0;
   }
+
+  linesCount = linesOrder(order);
 
   /* Iterate over the lines. */
   for (i = 0; i < linesCount; i++) {
@@ -507,7 +506,7 @@ void compress () {
       offs++;
       done = 1;
       for (j = fi; j < columnsCount && done; j++)
-        if (value[j+offs] != mx.zero && line[j] != mx.zero)
+        if (value[j + offs] != mx.zero && line[j] != mx.zero)
           done = 0;
     }
 
@@ -516,12 +515,12 @@ void compress () {
     /* copy the values to the compressed lists. */
     for (j = fi; j < columnsCount; j++) {
       if (line[j] != mx.zero) {
-        value[j+offs] = line[j];
-        index[j+offs] = order[i];
+        value[j + offs] = line[j];
+        index[j + offs] = order[i];
       }
     }
 
-    furthest = max(furthest, j+offs);
+    furthest = max(furthest, j + offs);
   }
 
   printf("value =");
