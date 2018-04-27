@@ -470,15 +470,18 @@ void compress () {
     return;
   }
 
-  unsigned long matrixHeight = mx.maxLine - mx.minLine + 1,
-    columnsCount = mx.maxCol - mx.minCol + 1,
-    i, j, fi, done, offs, linesCount, furthest = 0;
+  const unsigned long matrixHeight = mx.maxLine - mx.minLine + 1,
+    columnsCount = mx.maxCol - mx.minCol + 1;
 
-  unsigned long order[matrixHeight],
+  unsigned long i, j, done, fi, offs,
+    linesCount,
+    furthest = 0,
+    order[matrixHeight],
     offset[matrixHeight],
     index[MAX*2];
 
-  double value[MAX*2], line[columnsCount];
+  double value[MAX*2],
+    line[columnsCount];
 
   linesCount = linesOrder(order);
 
@@ -496,11 +499,10 @@ void compress () {
     /* fi is the first non-zero element of the current line. */
     for (fi = 0; line[fi] == mx.zero; fi++);
 
-    /* done indicates if we've finished finding the offset. */
-    done = 0;
     offs = -1;
+    done = 0;
 
-    /* calculates the offset */
+    /* calculate the offset */
     while (!done) {
       offs++;
       done = 1;
