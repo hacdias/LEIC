@@ -504,12 +504,9 @@ void compress () {
     while (!done) {
       offs++;
       done = 1;
-      for (j = fi; j < columnsCount; j++) {
-        if (value[j+offs] != mx.zero && line[j] != mx.zero) {
+      for (j = fi; j < columnsCount && done; j++)
+        if (value[j+offs] != mx.zero && line[j] != mx.zero)
           done = 0;
-          break;
-        }
-      }
     }
 
     offset[order[i] - mx.minLine] = offs;
