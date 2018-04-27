@@ -472,7 +472,7 @@ void compress () {
 
   unsigned long matrixHeight = mx.maxLine - mx.minLine + 1,
     columnsCount = mx.maxCol - mx.minCol + 1,
-    i, valueI, j, fi, done, o, linesCount, furthest = 0;
+    i, j, fi, done, offs, linesCount, furthest = 0;
 
   unsigned long order[matrixHeight],
     offset[matrixHeight],
@@ -498,29 +498,31 @@ void compress () {
 
     /* done indicates if we've finished finding the offset. */
     done = 0;
+    offs = -1;
 
-    /* o is the offset. */
-    o = -1;
-
+    /* calculates the offset */
     while (!done) {
-      o++;
+      offs++;
       done = 1;
-      for (j = fi, valueI = fi+o; valueI < columnsCount+o; valueI++, j++)
-        if (value[valueI] != mx.zero && line[j] != mx.zero)
+      for (j = fi; j < columnsCount; j++) {
+        if (value[j+offs] != mx.zero && line[j] != mx.zero) {
           done = 0;
-    }
-
-    offset[order[i] - mx.minLine] = o;
-
-    /* Copies the values to the compressed lists. */
-    for (j = fi, valueI = fi+o; valueI < columnsCount+o; valueI++, j++) {
-      if (line[j] != mx.zero) {
-        value[valueI] = line[j];
-        index[valueI] = order[i];
+          break;
+        }
       }
     }
 
-    furthest = max(furthest, valueI);
+    offset[order[i] - mx.minLine] = offs;
+
+    /* copy the values to the compressed lists. */
+    for (j = fi; j < columnsCount; j++) {
+      if (line[j] != mx.zero) {
+        value[j+offs] = line[j];
+        index[j+offs] = order[i];
+      }
+    }
+
+    furthest = max(furthest, j+offs);
   }
 
   printf("value =");
