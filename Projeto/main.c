@@ -153,6 +153,7 @@ void saveToFile (const char filename[]) {
  * findPoint - Gets the position of a point in the matrix.
  * @line: The line of the point.
  * @column: The column of the point.
+ * @returns: The index of the point.
  */
 int findPoint (unsigned long line, unsigned long column) {
   int i;
@@ -209,6 +210,7 @@ void printPoints () {
 
 /**
  * matrixDimension - Calculates a matrix's dimension.
+ * @returns: The matrix dimension.
  */
 unsigned long matrixDimension () {
   return (mx.maxCol - mx.minCol + 1) * (mx.maxLine - mx.minLine + 1);
@@ -216,6 +218,7 @@ unsigned long matrixDimension () {
 
 /**
  * matrixDensity - Calculates a matrix's density.
+ * @returns: The matrix density.
  */
 double matrixDensity () {
   return (mx.points / (double) matrixDimension()) * 100;
@@ -301,6 +304,7 @@ void recalculateInfo () {
  * getLine - Gets the values of a line on the matrix.
  * @storage: Where to save the line values.
  * @line: The line number.
+ * @returns: The number of non-zero elements on that line.
  */
 int getLine (double storage[], unsigned long line) {
   const unsigned long dim = mx.maxCol - mx.minCol + 1;
@@ -425,6 +429,7 @@ void sort (int columnFirst) {
 /**
  * linesOrder - Get the order of lines to compress by their density.
  * @lines: Where to save the order of lines.
+ * @returns: The number of non-zero lines.
  */
 int linesOrder (unsigned long lines[]) {
   const unsigned long maxLines = mx.maxLine - mx.minLine + 1;
