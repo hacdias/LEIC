@@ -9,6 +9,7 @@ typedef struct task {
   unsigned long depsCount;
   unsigned long early, late;
   struct task *next;
+  int validPath;
 } Task;
 
 Task * newTask (unsigned long id, unsigned long duration, char *desc, unsigned long *deps, unsigned long depsCount);
