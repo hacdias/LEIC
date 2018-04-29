@@ -3,9 +3,7 @@
 #include <string.h>
 #include <limits.h>
 #include "task.h"
-
-#define min(X,Y) (((X) < (Y)) ? (X) : (Y))
-#define max(X,Y) (((X) > (Y)) ? (X) : (Y))
+#include "utils.h"
 
 void printTask (Task *t) {
   unsigned long i;
@@ -26,7 +24,7 @@ void printTask (Task *t) {
   printf("\n");
 }
 
-void updateValidPath (Task *head, int validPath) {
+void updateValidPath (Task *head, Bool validPath) {
   for (; head != NULL; head = head->next)
     head->validPath = validPath;
 }
@@ -167,11 +165,11 @@ void taskDependencies (Task *head, unsigned long id) {
   printf("\n");
 }
 
-void printTasks (Task *head, unsigned long duration) {
+void printTasks (Task *head, unsigned long duration, Bool onlyCritical) {
   Task *t;
 
   for (t = head; t != NULL; t = t->next)
-    if (t->duration >= duration)
+    if (t->duration >= duration && (!onlyCritical || t->early == t->late))
       printTask(t);
 }
 
@@ -193,7 +191,7 @@ void calculateEarlyStart (Task *head, Task *t, unsigned long sum) {
 
 void calculateLateStart (Task *head, Task *t, unsigned long sub) {
   Task *p;
-  unsigned int i;
+  unsigned long i;
 
   for (i = 0; i < t->depsCount; i++) {
     p = lookupTask(head, t->deps[i]);
@@ -224,13 +222,6 @@ void tasksPath (Task *head) {
     }
 
   updateValidPath(head, 1);
-
-  duration = 0;
-  for (t = head; t != NULL; t = t->next) {
-    if (t->early == t->late)
-      printTask(t);
-    duration = max(duration, t->early+t->duration);
-  }
-  
+  printTasks(head, 0, 1);
   printf("project duration = %lu\n", duration);
 }

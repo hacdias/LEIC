@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
+#include "cmds.h"
 #include "task.h"
 
 void chop (char *str, int n) {
@@ -105,7 +105,7 @@ Task * runAdd (char *cmd, Task *head) {
 void runDuration (char *cmd, Task *head) {
   unsigned long duration = 0;
   sscanf(cmd, "%lu", &duration);
-  printTasks(head, duration);
+  printTasks(head, duration, 0);
 }
 
 void runDepend (char *cmd, Task *head) {
