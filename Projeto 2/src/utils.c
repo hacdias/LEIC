@@ -10,7 +10,7 @@ void chop (char *str, int n) {
   len = strlen(str);
   if (n > len)
     return;
-  
+
   for (n++; str[n] == ' ' && n < len; n++);
   memmove(str, str+n, len - n + 1);
 }
@@ -131,5 +131,5 @@ Task * runRemove (char *cmd, Task *head) {
 }
 
 void runPath (char *cmd, Task *head) {
-
+  tasksPath(head);
 }

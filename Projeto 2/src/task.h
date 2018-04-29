@@ -18,6 +18,7 @@ Task * lookupTask (Task *head, unsigned long id);
 void taskDependencies (Task *head, unsigned long id);
 void printTasks (Task *head, unsigned long duration);
 void freeAll (Task *head);
+void tasksPath ();
 unsigned long countTasks (Task *head);
 
 #endif

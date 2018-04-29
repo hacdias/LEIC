@@ -8,13 +8,17 @@ void printTask (Task *t) {
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
 
   if (t->early != 0 || t->late != 0) {
-    printf(" [%ld %ld]", t->early, t->late);
+    if (t->early == t->late) {
+      printf(" [%ld CRITICAL]", t->early);
+    } else {
+      printf(" [%ld %ld]", t->early, t->late);
+    }
   }
 
   if (t->depsCount != 0)
     for (i = 0; i < t->depsCount; i++)
       printf(" %ld", t->deps[i]);
-    
+
   printf("\n");
 }
 
@@ -77,11 +81,10 @@ Task * deleteTask (Task *head, unsigned long id) {
 
   for (t = head, prev = NULL; t != NULL; prev = t, t = t->next) {
     if (t->id == id) {
-      if (t == head) {
+      if (t == head)
         head = t->next;
-      } else {
+      else
         prev->next = t->next;
-      }
 
       freeTask(t);
       return head;
@@ -111,7 +114,7 @@ Task * insertTask (Task *head, Task *new) {
       printf("no such task\n");
       return head;
     }
-  } 
+  }
 
   for (t = head; t->next != NULL; t = t->next);
   t->next = new;
@@ -120,6 +123,7 @@ Task * insertTask (Task *head, Task *new) {
 
 Task * lookupTask (Task *head, unsigned long id) {
   Task *t;
+
   for (t = head; t != NULL; t = t->next)
     if (t->id == id)
       return t;
@@ -134,8 +138,8 @@ void taskDependencies (Task *head, unsigned long id) {
   if (t == NULL) {
     printf("no such task\n");
     return;
-  } 
-  
+  }
+
   printf("%ld:", id);
   i = 0;
 
@@ -144,12 +148,11 @@ void taskDependencies (Task *head, unsigned long id) {
     i++;
     head = t->next;
   }
-  
-  if (i == 0) {
-    printf(" no dependencies");
-  }
 
-  printf("\n");  
+  if (i == 0)
+    printf(" no dependencies");
+
+  printf("\n");
 }
 
 void printTasks (Task *head, unsigned long duration) {
@@ -165,4 +168,8 @@ unsigned long countTasks (Task *head) {
   Task *t;
   for (t = head, i = 0; t != NULL; t = t->next, i++);
   return i;
+}
+
+void tasksPath (Task *head) {
+
 }
