@@ -1,5 +1,5 @@
-#ifndef _commands_H
-#define _commands_H
+#ifndef _commands_h
+#define _commands_h
 
 #include "task.h"
 
