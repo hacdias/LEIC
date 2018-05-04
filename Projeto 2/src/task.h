@@ -7,16 +7,15 @@ typedef struct task {
   unsigned long id;
   unsigned long duration;
   char *desc;
-  unsigned long *deps;
   unsigned long depsCount;
   unsigned long early, late;
+  struct task **deps;
   struct task *next;
   Bool validPath;
 } Task;
 
-Task * newTask (unsigned long id, unsigned long duration, char *desc, unsigned long *deps, unsigned long depsCount);
 Task * deleteTask (Task *head, unsigned long id);
-Task * insertTask (Task *head, Task *new);
+Task * insertTask (Task *head, unsigned long id, unsigned long duration, char *desc, unsigned long *deps, unsigned long depsCount);
 Task * lookupTask (Task *head, unsigned long id);
 void taskDependencies (Task *head, unsigned long id);
 void printTasks (Task *head, unsigned long duration, Bool onlyCritical);

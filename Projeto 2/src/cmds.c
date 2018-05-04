@@ -41,7 +41,7 @@ Command getCommand (char *buffer) {
 }
 
 void illegalArg () {
-  printf("illegal arg\n");
+  printf("illegal arguments\n");
 }
 
 Task * runAdd (char *cmd, Task *head) {
@@ -49,7 +49,6 @@ Task * runAdd (char *cmd, Task *head) {
   int n;
   unsigned long *deps;
   unsigned long id, duration, depsCount, maxTasks;
-  Task *t;
 
   /* reads the id */
   if (sscanf(cmd, "%lu %n", &id, &n) != 1) {
@@ -84,6 +83,11 @@ Task * runAdd (char *cmd, Task *head) {
     return head;
   }
 
+  if (duration == 0 || id == 0) {
+    illegalArg();
+    return head;
+  }
+
   p += n;
 
   maxTasks = countTasks(head);
@@ -91,14 +95,21 @@ Task * runAdd (char *cmd, Task *head) {
   depsCount = 0;
 
   /* reads the dependencies */
-  while (sscanf(p, "%lu%n", &deps[depsCount], &n) == 1 && depsCount < maxTasks) {
+  while (depsCount < maxTasks && sscanf(p, "%lu%n", &deps[depsCount], &n) == 1) {
     depsCount++;
     p += n;
   }
 
-  t = newTask(id, duration, desc, deps, depsCount);
+  chop(p, 0);
+  if (*p != '\0') {
+    free(deps);
+    illegalArg();
+    return head;
+  }
+
+  head = insertTask(head, id, duration, desc, deps, depsCount);
   free(deps);
-  return insertTask(head, t);
+  return head;
 }
 
 
