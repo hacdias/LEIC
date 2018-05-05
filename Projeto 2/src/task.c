@@ -5,11 +5,124 @@
 #include "task.h"
 #include "utils.h"
 
-void printTask (Task *t) {
-  unsigned long i;
+void freeTask (Task t) {
+  free(t->deps);
+  free(t->desc);
+  free(t);
+}
+
+void resetTimes (TaskList lst) {
+  Task t;
+  lst->validPath = false;
+  for (t = lst->head; t != NULL; t = t->next) {
+    t->early = 0;
+    t->late = ULONG_MAX;
+  }
+}
+
+void insertTask (TaskList lst, ulong id, ulong duration, char *desc, ulong *deps, ulong depsCount) {
+  Task t, p, q;
+  ulong i;
+
+  for (t = lst->head; t != NULL && t->next != NULL; t = t->next) {
+    if (t->id == id) {
+      printf("id already exists\n");
+      return;
+    }
+  }
+
+  if (t != NULL && t->id == id) {
+    printf("id already exists\n");
+    return;
+  }
+
+  p = malloc(sizeof(struct task));
+  p->id = id;
+  p->duration = duration;
+  p->desc = malloc(sizeof(char) * (strlen(desc)+1));
+  p->deps = malloc(sizeof(Task) * depsCount);
+  p->early = 0;
+  p->late = ULONG_MAX;
+  p->next = NULL;
+  p->depsCount = depsCount;
+
+  strcpy(p->desc, desc);
+
+  for (i = 0; i < depsCount; i++) {
+    q = lookupTask(lst, deps[i]);
+
+    if (q != NULL) {
+      p->deps[i] = q;
+    } else {
+      freeTask(p);
+      printf("no such task\n");
+      return;
+    }
+  }
+
+  if (lst->head == NULL)
+    lst->head = p;
+  else
+    t->next = p;
+
+  if (lst->validPath)
+    resetTimes(lst);
+}
+
+Task nextDependant (Task head, ulong id) {
+  Task p;
+  ulong i;
+
+  for (p = head; p != NULL; p = p->next)
+    for (i = 0; i < p->depsCount; i++)
+      if (p->deps[i]->id == id)
+        return p;
+
+  return NULL;
+}
+
+void deleteTask (TaskList lst, ulong id) {
+  Task t, prev;
+
+  if (nextDependant(lst->head, id) != NULL) {
+    printf("task with dependencies\n");
+    return;
+  }
+
+  for (t = lst->head, prev = NULL; t != NULL; prev = t, t = t->next) {
+    if (t->id == id) {
+      if (t == lst->head)
+        lst->head = t->next;
+      else
+        prev->next = t->next;
+
+      freeTask(t);
+
+      if (lst->validPath)
+        resetTimes(lst);
+
+      return;
+    }
+  }
+
+  printf("no such task\n");
+}
+
+Task lookupTask (TaskList lst, ulong id) {
+  Task t;
+
+  for (t = lst->head; t != NULL; t = t->next)
+    if (t->id == id)
+      return t;
+
+  return NULL;
+}
+
+void printTask (Task t, Bool validPath) {
+  ulong i;
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
 
-  if (t->validPath) {
+  if (validPath) {
     if (t->early == t->late) {
       printf(" [%ld CRITICAL]", t->early);
     } else {
@@ -23,129 +136,20 @@ void printTask (Task *t) {
   printf("\n");
 }
 
-void updateValidPath (Task *head, Bool validPath) {
-  for (; head != NULL; head = head->next)
-    head->validPath = validPath;
+void printTasks (TaskList lst, ulong duration, Bool onlyCritical) {
+  Task t;
+
+  for (t = lst->head; t != NULL; t = t->next)
+    if (t->duration >= duration && (!onlyCritical || t->early == t->late))
+      printTask(t, lst->validPath);
 }
 
-void freeTask (Task *t) {
-  free(t->deps);
-  free(t->desc);
-  free(t);
-}
-
-void freeAll (Task *head) {
-  Task *prev;
-
-  while (head != NULL) {
-    prev = head;
-    head = head->next;
-    freeTask(prev);
-  }
-}
-
-Task * insertTask (Task *head, ulong id, ulong duration, char *desc, ulong *deps, ulong depsCount) {
-  Task *t, *p, *q;
+void taskDependencies (TaskList lst, ulong id) {
+  Task t, h;
   ulong i;
 
-  for (t = head; t != NULL && t->next != NULL; t = t->next) {
-    if (t->id == id) {
-      printf("id already exists\n");
-      return head;
-    }
-  }
-
-  if (t != NULL && t->id == id) {
-      printf("id already exists\n");
-      return head;
-    }
-
-  p = malloc(sizeof(Task));
-  p->id = id;
-  p->duration = duration;
-  p->desc = malloc(sizeof(char) * (strlen(desc)+1));
-  p->deps = malloc(sizeof(Task *) * depsCount);
-  p->early = 0;
-  p->late = ULONG_MAX;
-  p->next = NULL;
-  p->depsCount = depsCount;
-  p->validPath = 0;
-
-  strcpy(p->desc, desc);
-
-  for (i = 0; i < depsCount; i++) {
-    q = lookupTask(head, deps[i]);
-
-    if (q != NULL) {
-      p->deps[i] = q;
-    } else {
-      freeTask(p);
-      printf("no such task\n");
-      return head;
-    }
-  }
-
-  if (head == NULL)
-    return p;
-
-  t->next = p;
-
-  if (t->validPath)
-    updateValidPath(head, 0);
-
-  return head;
-}
-
-Task * nextDependant (Task *head, unsigned long id) {
-  Task *p;
-  unsigned long i;
-
-  for (p = head; p != NULL; p = p->next)
-    for (i = 0; i < p->depsCount; i++)
-      if (p->deps[i]->id == id)
-        return p;
-
-  return NULL;
-}
-
-Task * deleteTask (Task *head, unsigned long id) {
-  Task *t, *prev;
-
-  if (nextDependant(head, id) != NULL) {
-    printf("task with dependencies\n");
-    return head;
-  }
-
-  for (t = head, prev = NULL; t != NULL; prev = t, t = t->next) {
-    if (t->id == id) {
-      if (t == head)
-        head = t->next;
-      else
-        prev->next = t->next;
-
-      freeTask(t);
-      if (head->validPath) updateValidPath(head, 0);
-      return head;
-    }
-  }
-
-  printf("no such task\n");
-  return head;
-}
-
-Task * lookupTask (Task *head, unsigned long id) {
-  Task *t;
-
-  for (t = head; t != NULL; t = t->next)
-    if (t->id == id)
-      return t;
-
-  return NULL;
-}
-
-void taskDependencies (Task *head, unsigned long id) {
-  Task *t = lookupTask(head, id);
-  int i;
+  t = lookupTask(lst, id);
+  h = lst->head;
 
   if (t == NULL) {
     printf("no such task\n");
@@ -155,10 +159,10 @@ void taskDependencies (Task *head, unsigned long id) {
   printf("%ld:", id);
   i = 0;
 
-  while ((t = nextDependant(head, id)) != NULL) {
+  while ((t = nextDependant(h, id)) != NULL) {
     printf(" %ld", t->id);
     i++;
-    head = t->next;
+    h = t->next;
   }
 
   if (i == 0)
@@ -167,63 +171,76 @@ void taskDependencies (Task *head, unsigned long id) {
   printf("\n");
 }
 
-void printTasks (Task *head, unsigned long duration, Bool onlyCritical) {
-  Task *t;
+void freeAll (TaskList lst) {
+  Task curr, prev;
+  curr = lst->head;
 
-  for (t = head; t != NULL; t = t->next)
-    if (t->duration >= duration && (!onlyCritical || t->early == t->late))
-      printTask(t);
+  while (curr != NULL) {
+    prev = curr;
+    curr = curr->next;
+    freeTask(prev);
+  }
+
+  free(lst);
 }
 
-unsigned long countTasks (Task *head) {
-  unsigned long i;
-  Task *t;
-  for (t = head, i = 0; t != NULL; t = t->next, i++);
-  return i;
-}
+void calculateEarlyStart (TaskList lst, Task t, ulong sum) {
+  Task p;
 
-void calculateEarlyStart (Task *head, Task *t, unsigned long sum) {
-  Task *p;
-
-  for (p = nextDependant(head, t->id); p != NULL; p = nextDependant(p->next, t->id)) {
-    p->early = max(p->early, sum);
-    calculateEarlyStart(head, p, sum+p->duration);
+  for (p = nextDependant(lst->head, t->id); p != NULL; p = nextDependant(p->next, t->id)) {
+    if (sum > p->early) {
+      p->early = sum;
+      calculateEarlyStart(lst, p, sum+p->duration);
+    }
   }
 }
 
-void calculateLateStart (Task *head, Task *t, unsigned long sub) {
-  Task *p;
-  unsigned long i;
+void calculateLateStart (TaskList lst, Task t, ulong sub) {
+  Task p;
+  ulong i, h;
 
   for (i = 0; i < t->depsCount; i++) {
     p = t->deps[i];
-    p->late = min(p->late, sub - p->duration);
-    calculateLateStart(head, p, sub-p->duration);
+    h = sub - p->duration;
+
+    if (h < p->late) {
+      p->late = h;
+      calculateLateStart(lst, p, h);
+    }
   }
 }
 
-void tasksPath (Task *head) {
-  Task *t;
-  unsigned long duration;
+void tasksPath (TaskList lst) {
+  Task t;
+  ulong duration;
 
-  for (t = head; t != NULL; t = t->next) {
+  for (t = lst->head; t != NULL; t = t->next) {
     if (t->depsCount != 0)
       continue;
 
-    calculateEarlyStart(head, t, t->duration);
+    calculateEarlyStart(lst, t, t->duration);
   }
 
   duration = 0;
-  for (t = head; t != NULL; t = t->next)
+
+  for (t = lst->head; t != NULL; t = t->next)
     duration = max(duration, t->early+t->duration);
 
-  for (t = head; t != NULL; t = t->next)
-    if (nextDependant(head, t->id) == NULL) {
+  for (t = lst->head; t != NULL; t = t->next)
+    if (nextDependant(lst->head, t->id) == NULL) {
       t->late = duration - t->duration;
-      calculateLateStart(head, t, t->late);
+      calculateLateStart(lst, t, t->late);
     }
 
-  updateValidPath(head, 1);
-  printTasks(head, 0, 1);
+  lst->validPath = true;
+
+  printTasks(lst, 0, true);
   printf("project duration = %lu\n", duration);
+}
+
+ulong countTasks (TaskList lst) {
+  ulong i;
+  Task t;
+  for (t = lst->head, i = 0; t != NULL; t = t->next, i++);
+  return i;
 }

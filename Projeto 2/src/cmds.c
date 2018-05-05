@@ -44,22 +44,22 @@ void illegalArg () {
   printf("illegal arguments\n");
 }
 
-Task * runAdd (char *cmd, Task *head) {
+void runAdd (char *cmd, TaskList lst) {
   char *desc, *p;
   int n;
-  unsigned long *deps;
-  unsigned long id, duration, depsCount, maxTasks;
+  ulong *deps;
+  ulong id, duration, depsCount, maxTasks;
 
   /* reads the id */
   if (sscanf(cmd, "%lu %n", &id, &n) != 1) {
     illegalArg();
-    return head;
+    return;
   }
 
   /* seeks the beginning of the description */
   if ((desc = strchr(cmd + n, '"')) == NULL) {
     illegalArg();
-    return head;
+    return;
   }
 
   /* inscrements the description to avoid the quotation marks */
@@ -68,7 +68,7 @@ Task * runAdd (char *cmd, Task *head) {
   /* seeks the end of the description */
   if ((p = strchr(desc, '"')) == NULL) {
     illegalArg();
-    return head;
+    return;
   }
 
   /* changes the last quotation mark to the end of the string
@@ -80,17 +80,17 @@ Task * runAdd (char *cmd, Task *head) {
   /* reads the duration */
   if (sscanf(p, "%lu %n", &duration, &n) != 1) {
     illegalArg();
-    return head;
+    return;
   }
 
   if (duration == 0 || id == 0) {
     illegalArg();
-    return head;
+    return;
   }
 
   p += n;
 
-  maxTasks = countTasks(head);
+  maxTasks = countTasks(lst);
   deps = malloc(sizeof(unsigned long) * maxTasks);
   depsCount = 0;
 
@@ -104,43 +104,42 @@ Task * runAdd (char *cmd, Task *head) {
   if (*p != '\0') {
     free(deps);
     illegalArg();
-    return head;
+    return;
   }
 
-  head = insertTask(head, id, duration, desc, deps, depsCount);
+  insertTask(lst, id, duration, desc, deps, depsCount);
   free(deps);
-  return head;
 }
 
 
-void runDuration (char *cmd, Task *head) {
-  unsigned long duration = 0;
+void runDuration (char *cmd, TaskList lst) {
+  ulong duration = 0;
   sscanf(cmd, "%lu", &duration);
-  printTasks(head, duration, 0);
+  printTasks(lst, duration, false);
 }
 
-void runDepend (char *cmd, Task *head) {
-  unsigned long id;
+void runDepend (char *cmd, TaskList lst) {
+  ulong id;
 
   if (sscanf(cmd, "%lu", &id) != 1) {
     illegalArg();
     return;
   }
 
-  taskDependencies(head, id);
+  taskDependencies(lst, id);
 }
 
-Task * runRemove (char *cmd, Task *head) {
-  unsigned long id = 0;
+void runRemove (char *cmd, TaskList lst) {
+  ulong id = 0;
 
   if (sscanf(cmd, "%lu", &id) == 0) {
     illegalArg();
-    return head;
+    return;
   }
 
-  return deleteTask(head, id);
+  deleteTask(lst, id);
 }
 
-void runPath (char *cmd, Task *head) {
-  tasksPath(head);
+void runPath (char *cmd, TaskList lst) {
+  tasksPath(lst);
 }

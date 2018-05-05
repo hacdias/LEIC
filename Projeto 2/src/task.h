@@ -3,7 +3,7 @@
 
 #include "utils.h"
 
-typedef struct task {
+struct task {
   unsigned long id;
   unsigned long duration;
   char *desc;
@@ -11,16 +11,24 @@ typedef struct task {
   unsigned long early, late;
   struct task **deps;
   struct task *next;
-  Bool validPath;
-} Task;
+  Bool visited;
+};
 
-Task * deleteTask (Task *head, unsigned long id);
-Task * insertTask (Task *head, unsigned long id, unsigned long duration, char *desc, unsigned long *deps, unsigned long depsCount);
-Task * lookupTask (Task *head, unsigned long id);
-void taskDependencies (Task *head, unsigned long id);
-void printTasks (Task *head, unsigned long duration, Bool onlyCritical);
-void freeAll (Task *head);
-void tasksPath ();
-unsigned long countTasks (Task *head);
+struct taskList {
+  struct task *head;
+  Bool validPath;
+};
+
+typedef struct task* Task;
+typedef struct taskList* TaskList;
+
+void insertTask (TaskList lst, ulong id, ulong duration, char *desc, ulong *deps, ulong depsCount);
+void deleteTask (TaskList lst, ulong id);
+Task lookupTask (TaskList lst, ulong id);
+void printTasks (TaskList lst, ulong duration, Bool onlyCritical);
+void taskDependencies (TaskList lst, ulong id);
+void freeAll (TaskList lst);
+void tasksPath (TaskList lst);
+ulong countTasks (TaskList lst);
 
 #endif

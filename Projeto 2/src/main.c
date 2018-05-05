@@ -1,34 +1,37 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "cmds.h"
 #include "task.h"
 
 int main () {
   char buffer[MAX_LINE];
   Command cmd;
-  Task *head = NULL;
+  TaskList lst = malloc(sizeof(struct taskList));
+  lst->head = NULL;
+  lst->validPath = false;
 
   while ((cmd = getCommand(buffer)) != EXIT) {
     switch(cmd) {
       case ADD:
-        head = runAdd(buffer, head);
+        runAdd(buffer, lst);
         break;
       case DURATION:
-        runDuration(buffer, head);
+        runDuration(buffer, lst);
         break;
       case DEPEND:
-        runDepend(buffer, head);
+        runDepend(buffer, lst);
         break;
       case REMOVE:
-        head = runRemove(buffer, head);
+        runRemove(buffer, lst);
         break;
       case PATH:
-        runPath(buffer, head);
+        runPath(buffer, lst);
         break;
       default:
         printf("illegal command\n");
     }
   }
 
-  freeAll(head);
+  freeAll(lst);
   return 0;
 }

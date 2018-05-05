@@ -15,10 +15,10 @@ typedef enum {
 } Command;
 
 Command getCommand (char *buffer);
-Task * runAdd (char *cmd, Task *head);
-void runDuration (char *cmd, Task *head);
-void runDepend (char *cmd, Task *head);
-Task * runRemove (char *cmd, Task *head);
-void runPath (char *cmd, Task *head);
+void runAdd (char *cmd, TaskList lst);
+void runDuration (char *cmd, TaskList lst);
+void runDepend (char *cmd, TaskList lst);
+void runRemove (char *cmd, TaskList lst);
+void runPath (char *cmd, TaskList lst);
 
 #endif
