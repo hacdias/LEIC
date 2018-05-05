@@ -27,9 +27,8 @@ void resetTimes (TaskList lst) {
   }
 }
 
-void insertTask (TaskList lst, ulong id, ulong duration, char *desc, ulong *deps, ulong depsCount) {
-  Task t, p, q;
-  ulong i;
+void insertTask (TaskList lst, ulong id, ulong duration, char *desc, Task *deps, ulong depsCount) {
+  Task t, p;
 
   for (t = lst->head; t != NULL && t->next != NULL; t = t->next) {
     if (t->id == id) {
@@ -47,25 +46,13 @@ void insertTask (TaskList lst, ulong id, ulong duration, char *desc, ulong *deps
   p->id = id;
   p->duration = duration;
   p->desc = malloc(sizeof(char) * (strlen(desc)+1));
-  p->deps = malloc(sizeof(Task) * depsCount);
+  p->deps = deps;
   p->early = 0;
   p->late = ULONG_MAX;
   p->next = NULL;
   p->depsCount = depsCount;
 
   strcpy(p->desc, desc);
-
-  for (i = 0; i < depsCount; i++) {
-    q = lookupTask(lst, deps[i]);
-
-    if (q != NULL) {
-      p->deps[i] = q;
-    } else {
-      freeTask(p);
-      printf("no such task\n");
-      return;
-    }
-  }
 
   if (lst->head == NULL)
     lst->head = p;

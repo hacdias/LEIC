@@ -45,10 +45,10 @@ void illegalArg () {
 }
 
 void runAdd (char *cmd, TaskList lst) {
+  Task d, *deps;
   char *desc, *p;
   int n;
-  ulong *deps;
-  ulong id, duration, depsCount, maxTasks;
+  ulong id, duration, depsCount, maxTasks, tmp;
 
   /* reads the id */
   if (sscanf(cmd, "%lu %n", &id, &n) != 1) {
@@ -91,26 +91,29 @@ void runAdd (char *cmd, TaskList lst) {
   p += n;
 
   maxTasks = countTasks(lst);
-  deps = malloc(sizeof(unsigned long) * maxTasks);
+  deps = malloc(sizeof(Task) * maxTasks);
   depsCount = 0;
 
   /* reads the dependencies */
-  while (depsCount < maxTasks && sscanf(p, "%lu%n", &deps[depsCount], &n) == 1) {
-    depsCount++;
+  while (sscanf(p, "%lu%n", &tmp, &n) == 1) {
+    d = lookupTask(lst, tmp);
+
+    if (d == NULL) {
+      printf("no such task\n");
+      free(deps);
+      return;      
+    }
+
+    deps[depsCount++] = d;
     p += n;
   }
 
-  chop(p, 0);
-  if (*p != '\0') {
-    free(deps);
-    illegalArg();
-    return;
+  if (depsCount < maxTasks) {
+    deps = realloc(deps, sizeof(Task) * depsCount);
   }
 
   insertTask(lst, id, duration, desc, deps, depsCount);
-  free(deps);
 }
-
 
 void runDuration (char *cmd, TaskList lst) {
   ulong duration = 0;

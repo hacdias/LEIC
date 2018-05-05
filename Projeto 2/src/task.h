@@ -23,7 +23,7 @@ typedef struct task* Task;
 typedef struct taskList* TaskList;
 
 TaskList newTaskList ();
-void insertTask (TaskList lst, ulong id, ulong duration, char *desc, ulong *deps, ulong depsCount);
+void insertTask (TaskList lst, ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
 void deleteTask (TaskList lst, ulong id);
 Task lookupTask (TaskList lst, ulong id);
 void printTasks (TaskList lst, ulong duration, Bool onlyCritical);
