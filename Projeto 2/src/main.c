@@ -6,9 +6,7 @@
 int main () {
   char buffer[MAX_LINE];
   Command cmd;
-  TaskList lst = malloc(sizeof(struct taskList));
-  lst->head = NULL;
-  lst->validPath = false;
+  TaskList lst = newTaskList();
 
   while ((cmd = getCommand(buffer)) != EXIT) {
     switch(cmd) {

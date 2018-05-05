@@ -5,6 +5,13 @@
 #include "task.h"
 #include "utils.h"
 
+TaskList newTaskList () {
+  TaskList lst = malloc(sizeof(struct taskList));
+  lst->head = NULL;
+  lst->validPath = false;
+  return lst;
+}
+
 void freeTask (Task t) {
   free(t->deps);
   free(t->desc);
