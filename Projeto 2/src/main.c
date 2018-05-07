@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cmds.h"
-#include "task.h"
+#include "task_list.h"
 
 int main () {
   char buffer[MAX_LINE];
@@ -30,6 +30,6 @@ int main () {
     }
   }
 
-  freeAll(lst);
+  freeAll(lst); 
   return 0;
 }

@@ -1,35 +1,37 @@
 #ifndef _task_h
 #define _task_h
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 #include "utils.h"
 
-struct task {
-  unsigned long id;
-  unsigned long duration;
-  char *desc;
-  unsigned long depsCount;
-  unsigned long early, late;
-  struct task **deps;
-  struct task *next;
-  Bool visited;
-};
+#define key(a) (a != NULL ? a->id : 0)
+#define less(a,b) ((a) < (b))
+#define eq(a,b) ((a) == (b))
+#define deleteItem freeTask
 
-struct taskList {
-  struct task *head;
-  Bool validPath;
+struct task {
+  ulong id;
+  ulong duration;
+  ulong early, late;
+  ulong dependenciesCount, dependantsCount;
+  struct task **dependencies, **dependants;
+  char *desc;
+  Bool visited;
+  struct task *next, *prev;
 };
 
 typedef struct task* Task;
-typedef struct taskList* TaskList;
 
-TaskList newTaskList ();
-void insertTask (TaskList lst, ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
-void deleteTask (TaskList lst, ulong id);
-Task lookupTask (TaskList lst, ulong id);
-void printTasks (TaskList lst, ulong duration, Bool onlyCritical);
-void taskDependencies (TaskList lst, ulong id);
-void freeAll (TaskList lst);
-void tasksPath (TaskList lst);
-ulong countTasks (TaskList lst);
+#define Item Task
+#define Key ulong
+
+Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
+void freeTask (Task t);
+void resetTime (Task t);
+void printTask (Task t, Bool validPath);
+void taskDeps (Task t);
 
 #endif

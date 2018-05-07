@@ -1,8 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "cmds.h"
-#include "task.h"
 
 void chop (char *str, int n) {
   int len;
@@ -56,6 +52,11 @@ void runAdd (char *cmd, TaskList lst) {
     return;
   }
 
+  if (lookupTask(lst, id) != NULL) {
+    printf("id already exists\n");
+    return;
+  }
+
   /* seeks the beginning of the description */
   if ((desc = strchr(cmd + n, '"')) == NULL) {
     illegalArg();
@@ -90,7 +91,7 @@ void runAdd (char *cmd, TaskList lst) {
 
   p += n;
 
-  maxTasks = countTasks(lst);
+  maxTasks = lst->count;
   deps = malloc(sizeof(Task) * maxTasks);
   depsCount = 0;
 
@@ -111,8 +112,9 @@ void runAdd (char *cmd, TaskList lst) {
   if (depsCount < maxTasks) {
     deps = realloc(deps, sizeof(Task) * depsCount);
   }
-
-  insertTask(lst, id, duration, desc, deps, depsCount);
+  
+  d = newTask(id, duration, desc, deps, depsCount);
+  insertTask(lst, d);
 }
 
 void runDuration (char *cmd, TaskList lst) {
@@ -123,24 +125,43 @@ void runDuration (char *cmd, TaskList lst) {
 
 void runDepend (char *cmd, TaskList lst) {
   ulong id;
+  Task t;
 
   if (sscanf(cmd, "%lu", &id) != 1) {
     illegalArg();
     return;
   }
 
-  taskDependencies(lst, id);
+  t = lookupTask(lst, id);
+
+  if (t == NULL)
+    printf("no such task\n");
+  else
+    taskDeps(t);
 }
 
 void runRemove (char *cmd, TaskList lst) {
   ulong id = 0;
+  Task t;
 
   if (sscanf(cmd, "%lu", &id) == 0) {
     illegalArg();
     return;
   }
 
-  deleteTask(lst, id);
+  t = lookupTask(lst, id);
+
+  if (t == NULL) {
+    printf("no such task\n");
+    return;
+  }
+
+  if (t->dependantsCount) {
+    printf("task with dependencies\n");
+    return;
+  }
+
+  deleteTask(lst, t);
 }
 
 void runPath (char *cmd, TaskList lst) {

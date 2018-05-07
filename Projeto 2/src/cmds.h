@@ -1,7 +1,10 @@
 #ifndef _commands_h
 #define _commands_h
 
-#include "task.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "task_list.h"
 
 #define MAX_LINE 9000
 
