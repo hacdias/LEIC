@@ -12,7 +12,7 @@ Node newNode (Item item, Node l, Node r) {
   x->item = item;
   x->l = l;
   x->r = r;
-  x->height=1;
+  x->height = 1;
 
   return x;
 }
@@ -135,19 +135,24 @@ Node deleteR(Node h, Key k) {
   if (h == NULL)
     return h;
   else if (less(k, key(h->item)))
-    h->l=deleteR(h->l,k);
+    h->l = deleteR(h->l,k);
   else if (less(key(h->item), k))
-    h->r=deleteR(h->r,k);
+    h->r = deleteR(h->r,k);
   else {
     if (h->l !=NULL && h->r !=NULL) {
-      Node aux=maxNode(h->l);
-      {Item x; x=h->item; h->item=aux->item; aux->item=x;}
+      Node aux = maxNode(h->l);
+      {
+        Item x;
+        x = h->item;
+        h->item = aux->item;
+        aux->item = x;
+      }
       h->l= deleteR(h->l, key(aux->item));
     } else {
       Node aux=h;
       if (h->l == NULL && h->r == NULL)
         h = NULL;
-      else if (h->l==NULL)
+      else if (h->l == NULL)
         h = h->r;
       else
         h = h->l;
@@ -218,14 +223,4 @@ void traverseTree (Node head, void (*visit)(Item)) {
 
 void freeNode (Node *head) {
   *head = freeR(*head);
-}
-
-void treeToArray (Node node, Item arr[], unsigned long *i) {
-  if (node == NULL)
-      return;
-
-  arr[*i] = node->item;
-  ++*i;
-  treeToArray(node->l, arr, i);
-  treeToArray(node->r, arr, i);
 }

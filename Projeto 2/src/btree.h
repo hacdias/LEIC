@@ -15,6 +15,5 @@ void insertNode (Node*, Item);
 void deleteNode (Node*, Key);
 void traverseTree (Node, void (*visit)(Item));
 void freeNode (Node*);
-void treeToArray (Node node, Item arr[], unsigned long *i);
 
 #endif
