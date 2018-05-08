@@ -1,7 +1,5 @@
 % Henrique Afonso Coelho Dias: 89455
 
-:-[exemplos_puzzles]. % TODO: remover isto
-
 % -----------------------------------------------------------------------------
 % propaga(Puz, Pos, Posicoes). Dado um puzzle Puz, o preenchimendo da posicao
 % Pos implica o preenchimento das posicoes da lista ordenada Posicoes.
@@ -95,7 +93,7 @@ intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
   flatten(Propagacoes, Intersecao).
 
 % -----------------------------------------------------------------------------
-% junta_a_todos(Lista_De_Listas, A_Juntar, Resultado) : dada uma lista
+% junta_a_todos(Lista_De_Listas, A_Juntar, Resultado). Dada uma lista
 % de listas Lista_De_Listas, uma lista de itens a juntar A_Juntar, entao
 % Resultado e uma lista de listas resultante de juntar cada lista de
 % Lista_De_Listas a A_Juntar.
@@ -107,7 +105,7 @@ junta_a_todos(Lista, A_Juntar, Resultado) :-
   sort(Lista_juntada, Resultado).
 
 % -----------------------------------------------------------------------------
-% procura_final(Possibilidades, Possibilidade, Linha, Total) : dada uma
+% procura_final(Possibilidades, Possibilidade, Linha, Total). Dada uma
 % lista de possibilidades possibilidade, o numero de uma linha Linha e o
 % Total de posicoes a preencher da mesma, entao Possibilidade preenche
 % validamente a linha.
@@ -121,8 +119,8 @@ procura_final(Posses, Poss, Line, Total) :-
   length(Fs, Total).
 
 % -----------------------------------------------------------------------------
-% possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L) :
-% dado um puzzle Puz, uma lista de posicoes da linha a preencher Posicoes_linha,
+% possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L).
+% Dado um puzzle Puz, uma lista de posicoes da linha a preencher Posicoes_linha,
 % o numero total de posicoes a preencher Total, a lista de posicoes ja preenchidas
 % Ja_Preenchidas, entao Possibilidades_L e a lista de possibilidades para preencher
 % a linha em questao.
@@ -139,11 +137,8 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
   sort(P3, Possibilidades_L), !.
 
 % -----------------------------------------------------------------------------
-% resolve(Puzz, Solucao) : dado um puzzle Puzz, a sua solucao e Solucao.
-%
-% resolve(Puzz, Dim, Contagem, Ja_Preenchidas, Solucao) :- dado um
-% puzzle Puzz, a sua dimensao Dim, a contagem decrescente Contagem, a
-% lista de posicoes Ja_Preenchidas, entao Solucao e a sua solucao.
+% linha_aux(Puz, Count, Total, Linha). Dado um puzzle Puzz, o total de
+% elementos da linha Total, Linha sao os elementos da linha Linha.
 % -----------------------------------------------------------------------------
 
 linha_aux([_, Maximos, _], Count, Total, Linha) :-
@@ -151,6 +146,14 @@ linha_aux([_, Maximos, _], Count, Total, Linha) :-
   Numero is Dim - Count + 1,
   findall((Numero, X), (between(0, Dim, X)), Linha),
   nth1(Numero, Maximos, Total).
+
+% -----------------------------------------------------------------------------
+% resolve(Puzz, Solucao). Dado um puzzle Puzz, a sua solucao e Solucao.
+%
+% resolve(Puzz, Dim, Contagem, Ja_Preenchidas, Solucao). Dado um
+% puzzle Puzz, a sua dimensao Dim, a contagem decrescente Contagem, a
+% lista de posicoes Ja_Preenchidas, entao Solucao e a sua solucao.
+% -----------------------------------------------------------------------------
 
 resolve(_, 0, Sol, Sol).
 resolve(Puz, Count, Ja_Preenchidas, Solucao) :-
