@@ -5,18 +5,18 @@
 % Pos implica o preenchimento das posicoes da lista ordenada Posicoes.
 % -----------------------------------------------------------------------------
 
-propaga([Listas, _, _], Pos, Posicoes) :-
-  member(Lista, Listas),
-  append(Lista2, [Pos|_], Lista),
-  sort([Pos|Lista2], Posicoes), !.
+propaga([Termometros, _, _], Pos, Posicoes) :-
+  member(Termometro, Termometros),
+  append(Inicio, [Pos|_], Termometro),
+  sort([Pos|Inicio], Posicoes), !.
 
 % -----------------------------------------------------------------------------
 % e_sublista(Lista1, Lista2). Sucede se a Lista1 estiver contida na Lista2.
 % -----------------------------------------------------------------------------
 
 e_sublista([], _).
-e_sublista([X|Xs], [X|Ys]) :- e_sublista(Xs, Ys).
-e_sublista(Xs, [_|Ys]) :- e_sublista(Xs, Ys).
+e_sublista([P|Rs], [P|Ts]) :- e_sublista(Rs, Ts).
+e_sublista(Rs, [_|Ts]) :- e_sublista(Rs, Ts).
 
 % -----------------------------------------------------------------------------
 % nao_altera_linhas_anteriores(Posicoes, L, Ja_Preenchidas). Dada uma lista de
@@ -46,8 +46,7 @@ peso_coluna(Posicoes, Coluna, Peso) :-
 % -----------------------------------------------------------------------------
 
 peso_colunas(Posicoes, Dim, Res) :-
-  findall(X, between(1, Dim, X), Colunas),
-  findall(X, (member(I, Colunas), peso_coluna(Posicoes, I, X)), Res), !.
+  findall(X, (between(1, Dim, I), peso_coluna(Posicoes, I, X)), Res), !.
 
 % -----------------------------------------------------------------------------
 % verifica_parcial(Puz, Ja_Preenchidas, Dim, Poss). Dado um puzzle Puz, a lista
@@ -62,13 +61,13 @@ verifica_parcial([_, _, Maximos], Ja_Preenchidas, Dim, Poss) :-
   maplist(=<, Pesos, Maximos), !.
 
 % -----------------------------------------------------------------------------
-% procura_singular(Puz, Posicoes, Ja_Preenchidas, Possibilidade). Dado um puzzle
+% possibilidade(Puz, Posicoes, Ja_Preenchidas, Possibilidade). Dado um puzzle
 % Puz, uma lista de posicoes Posicoes, a lista de posicoes Ja_Preenchidas, entao
 % Possibilidade representa uma possibilidade para preencher uma posicao.
 % -----------------------------------------------------------------------------
 
-procura_singular(_, [], _, P) :- P = [].
-procura_singular([T, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
+possibilidade(_, [], _, []).
+possibilidade([T, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
   member((L, C), Posicoes),
   length(Max_L, Dim),
   propaga([T, Max_L, Max_C], (L, C), Posicoes2),
@@ -84,11 +83,10 @@ procura_singular([T, Max_L, Max_C], Posicoes, Ja_Preenchidas, Possibilidade) :-
 % -----------------------------------------------------------------------------
 
 intersecao_propagada(Puz, Linha, Ja_Preenchidas, Intersecao) :-
+  intersection(Linha, Ja_Preenchidas, Necessarios),
   findall(X, (
-    member(Pos, Linha),
-    member(Pos, Ja_Preenchidas),
-    propaga(Puz, Pos, X),
-    e_sublista(X, Ja_Preenchidas)
+    member(Pos, Necessarios),
+    propaga(Puz, Pos, X)
   ), Propagacoes),
   flatten(Propagacoes, Intersecao).
 
@@ -115,8 +113,8 @@ procura_final(Posses, Poss, Line, Total) :-
   e_sublista(K, Posses),
   flatten(K, K1),
   sort(K1, Poss),
-  findall(X, member((Line, X), Poss), Fs),
-  length(Fs, Total).
+  findall(X, member((Line, X), Poss), Cols),
+  length(Cols, Total).
 
 % -----------------------------------------------------------------------------
 % possibilidades_linha(Puz, Posicoes_linha, Total, Ja_Preenchidas, Possibilidades_L).
@@ -126,12 +124,10 @@ procura_final(Posses, Poss, Line, Total) :-
 % a linha em questao.
 % -----------------------------------------------------------------------------
 
-possibilidades_linha(_, _, 0, _, Possibilidades_L) :-
-  Possibilidades_L = [[]].
-
+possibilidades_linha(_, _, 0, _, [[]]).
 possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :-
   intersecao_propagada(Puz, [(L, C)|K], Ja_Preenchidas, Necessarios),
-  findall(X, procura_singular(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
+  findall(X, possibilidade(Puz, [(L, C)|K], Ja_Preenchidas, X), Posses),
   findall(X, junta_a_todos(Posses, Necessarios, X), Posses3),
   findall(X, procura_final(Posses3, X, L, Total), P3),
   sort(P3, Possibilidades_L), !.
@@ -143,9 +139,9 @@ possibilidades_linha(Puz, [(L, C)|K], Total, Ja_Preenchidas, Possibilidades_L) :
 
 linha_aux([_, Maximos, _], Count, Total, Linha) :-
   length(Maximos, Dim),
-  Numero is Dim - Count + 1,
-  findall((Numero, X), (between(0, Dim, X)), Linha),
-  nth1(Numero, Maximos, Total).
+  Numero_Linha is Dim - Count + 1,
+  findall((Numero_Linha, X), between(1, Dim, X), Linha),
+  nth1(Numero_Linha, Maximos, Total).
 
 % -----------------------------------------------------------------------------
 % resolve(Puzz, Solucao). Dado um puzzle Puzz, a sua solucao e Solucao.
@@ -167,4 +163,6 @@ resolve(Puz, Count, Ja_Preenchidas, Solucao) :-
 
 resolve([Termometros, Max_Linhas, Max_Cols], Solucao) :-
   length(Max_Linhas, Dim),
-  resolve([Termometros, Max_Linhas, Max_Cols],  Dim, [], Solucao). 
+  resolve([Termometros, Max_Linhas, Max_Cols],  Dim, [], Solucao),
+  peso_colunas(Solucao, Dim, Pesos),
+  maplist(=<, Pesos, Max_Cols), !.
