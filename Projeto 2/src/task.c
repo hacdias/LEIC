@@ -64,3 +64,21 @@ void taskDeps (Task t) {
   printf("\n");
 }
 
+void addDependant (Task t, Task dependant) {
+  t->dependantsCount++;
+  t->dependants = realloc(t->dependants, sizeof(Task) * t->dependantsCount);
+  t->dependants[t->dependantsCount - 1] = dependant;
+}
+
+void removeDependant (Task t, Task dependant) {
+  ulong i = 0;
+
+  while (t->dependants[i] != NULL && t->dependants[i] != dependant)
+    i++;
+
+  for (i = i + 1; i < t->dependantsCount; i++)
+    t->dependants[i-1] = t->dependants[i];
+
+  t->dependantsCount--;
+  t->dependants = realloc(t->dependants, sizeof(Task) * t->dependantsCount);
+}

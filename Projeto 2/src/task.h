@@ -11,27 +11,28 @@
 #define less(a,b) ((a) < (b))
 #define eq(a,b) ((a) == (b))
 #define deleteItem freeTask
+#define Item Task
+#define Key ulong
+
+typedef struct task* Task;
 
 struct task {
   ulong id;
   ulong duration;
   ulong early, late;
   ulong dependenciesCount, dependantsCount;
-  struct task **dependencies, **dependants;
+  Task *dependencies, *dependants;
   char *desc;
 
   struct task *next, *prev;
 };
 
-typedef struct task* Task;
-
-#define Item Task
-#define Key ulong
-
 Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
 void freeTask (Task t);
-void resetTime (Task t);
 void printTask (Task t, Bool validPath);
 void taskDeps (Task t);
+void resetTime (Task t);
+void addDependant (Task t, Task dependant);
+void removeDependant (Task t, Task dependant);
 
 #endif

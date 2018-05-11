@@ -18,15 +18,10 @@ void resetTimes (TaskList lst) {
 }
 
 void insertTask (TaskList lst, Task t) {
-  Task p;
   ulong i;
 
-  for (i = 0; i < t->dependenciesCount; i++) {
-    p = t->dependencies[i];
-    p->dependantsCount++;
-    p->dependants = realloc(p->dependants, sizeof(Task) * p->dependantsCount);
-    p->dependants[p->dependantsCount - 1] = t;
-  }
+  for (i = 0; i < t->dependenciesCount; i++)
+    addDependant(t->dependencies[i], t);
 
   if (lst->first == NULL) {
     lst->first = t;
@@ -54,19 +49,10 @@ Task lookupTask (TaskList lst, ulong id) {
 }
 
 void deleteTask (TaskList lst, Task t) {
-  ulong i, j;
-  Task p;
+  ulong i;
 
-  for (i = 0; i < t->dependenciesCount; i++) {
-    p = t->dependencies[i];
-    for (j = 0; p->dependants[j] != NULL && p->dependants[j] != t; j++);
-    for (j = j+1; j < p->dependantsCount; j++) {
-      p->dependants[j-1] = p->dependants[j];
-    }
-
-    p->dependantsCount--;
-    p->dependants = realloc(p->dependants, sizeof(Task) * p->dependantsCount);
-  }
+  for (i = 0; i < t->dependenciesCount; i++)
+    removeDependant(t->dependencies[i], t);
 
   if (t->prev != NULL)
     t->prev->next = t->next;
