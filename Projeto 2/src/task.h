@@ -23,13 +23,12 @@ struct task {
   ulong dependenciesCount, dependantsCount;
   Task *dependencies, *dependants;
   char *desc;
-
-  struct task *next, *prev;
+  Task next, prev;
 };
 
 Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
 void freeTask (Task t);
-void printTask (Task t, Bool validPath);
+void printTask (Task t, bool validPath);
 void taskDeps (Task t);
 void resetTime (Task t);
 void addDependant (Task t, Task dependant);

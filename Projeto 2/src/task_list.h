@@ -7,9 +7,8 @@
 struct taskList {
   Node head;
   ulong count;
-  Bool validPath;
-  Task first;
-  Task last;
+  Task first, last;
+  bool validPath;
 };
 
 typedef struct taskList* TaskList;
@@ -18,7 +17,7 @@ TaskList newTaskList ();
 void insertTask (TaskList, Task);
 void deleteTask (TaskList, Task);
 Task lookupTask (TaskList, ulong id);
-void printTasks (TaskList, ulong duration, Bool onlyCritical);
+void printTasks (TaskList, ulong duration, bool onlyCritical);
 void taskDependencies (TaskList, ulong id);
 void freeAll (TaskList);
 void tasksPath (TaskList);

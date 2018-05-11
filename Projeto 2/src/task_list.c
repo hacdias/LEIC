@@ -63,7 +63,7 @@ void deleteTask (TaskList lst, Task t) {
     resetTimes(lst);
 }
 
-void printTasks (TaskList lst, ulong duration, Bool onlyCritical) {
+void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
   Task t;
 
   for (t = lst->first; t != NULL; t = t->next)

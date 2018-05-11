@@ -32,7 +32,7 @@ void resetTime (Task t) {
   t->late = ULONG_MAX;
 }
 
-void printTask (Task t, Bool validPath) {
+void printTask (Task t, bool validPath) {
   ulong i;
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
 
