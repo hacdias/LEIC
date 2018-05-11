@@ -185,8 +185,6 @@ Node freeR (Node h) {
   return deleteR(h, key(h->item));
 }
 
-/* Public Functions */
-
 void initNode (Node *head) {
   *head = NULL;
 }

@@ -19,7 +19,7 @@ struct task {
   ulong dependenciesCount, dependantsCount;
   struct task **dependencies, **dependants;
   char *desc;
-  Bool visited;
+
   struct task *next, *prev;
 };
 
