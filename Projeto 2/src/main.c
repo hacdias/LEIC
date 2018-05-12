@@ -4,11 +4,11 @@
 #include "task_list.h"
 
 int main () {
-  char buffer[MAX_LINE];
+  char* buffer = NULL;
   Command cmd;
   TaskList lst = newTaskList();
 
-  while ((cmd = getCommand(buffer)) != EXIT) {
+  while ((cmd = getCommand(&buffer)) != EXIT) {
     switch(cmd) {
       case ADD:
         runAdd(buffer, lst);
@@ -30,6 +30,7 @@ int main () {
     }
   }
 
+  free(buffer);
   freeAll(lst); 
   return 0;
 }

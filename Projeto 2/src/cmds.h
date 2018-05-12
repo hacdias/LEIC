@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include "task_list.h"
 
-#define MAX_LINE 9000
-
 typedef enum {
   ADD = 0,
   DURATION = 1,
@@ -17,7 +15,7 @@ typedef enum {
   EXIT = 5
 } Command;
 
-Command getCommand (char *buffer);
+Command getCommand (char **buffer);
 void runAdd (char *cmd, TaskList lst);
 void runDuration (char *cmd, TaskList lst);
 void runDepend (char *cmd, TaskList lst);

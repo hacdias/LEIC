@@ -11,25 +11,43 @@ void chop (char *str, int n) {
   memmove(str, str+n, len - n + 1);
 }
 
-Command getCommand (char *buffer) {
-  fgets(buffer, MAX_LINE, stdin);
+char * getline(FILE * f) {
+    size_t size = 0;
+    size_t len  = 0;
+    size_t last = 0;
+    char * buf  = NULL;
 
-  if (strstr(buffer, "add") == buffer) {
-    chop(buffer, 3);
+    do {
+        size += BUFSIZ;
+        buf = realloc(buf, size);
+        fgets(buf+last, size, f);
+        len = strlen(buf);
+        last = len - 1;
+    } while (!feof(f) && buf[last]!='\n');
+
+    return buf;
+}
+
+Command getCommand (char **buffer) {
+  free(*buffer);
+  *buffer = getline(stdin);
+
+  if (strstr(*buffer, "add") == *buffer) {
+    chop(*buffer, 3);
     return ADD;
-  } else if (strstr(buffer, "duration") == buffer) {
-    chop(buffer, 8);
+  } else if (strstr(*buffer, "duration") == *buffer) {
+    chop(*buffer, 8);
     return DURATION;
-  } else if (strstr(buffer, "depend") == buffer) {
-    chop(buffer, 6);
+  } else if (strstr(*buffer, "depend") == *buffer) {
+    chop(*buffer, 6);
     return DEPEND;
-  } else if (strstr(buffer, "remove") == buffer) {
-    chop(buffer, 6);
+  } else if (strstr(*buffer, "remove") == *buffer) {
+    chop(*buffer, 6);
     return REMOVE;
-  } else if (strstr(buffer, "path") == buffer) {
-    chop(buffer, 4);
+  } else if (strstr(*buffer, "path") == *buffer) {
+    chop(*buffer, 4);
     return PATH;
-  } else if (strstr(buffer, "exit") == buffer) {
+  } else if (strstr(*buffer, "exit") == *buffer) {
     return EXIT;
   }
 
@@ -68,6 +86,11 @@ void runAdd (char *cmd, TaskList lst) {
 
   /* seeks the end of the description */
   if ((p = strchr(desc, '"')) == NULL) {
+    illegalArg();
+    return;
+  }
+
+  if (p - desc > MAX_DESC) {
     illegalArg();
     return;
   }
