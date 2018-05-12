@@ -13,7 +13,7 @@
 #define deleteItem freeTask
 #define Item Task
 #define Key ulong
-#define MAX_DESC 8000
+#define MAX_DESC 7998
 
 typedef struct task* Task;
 

@@ -26,7 +26,7 @@ int main () {
         runPath(buffer, lst);
         break;
       default:
-        printf("illegal command\n");
+        printf("illegal arguments\n");
     }
   }
 

@@ -80,56 +80,46 @@ void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
       printTask(t, lst->validPath);
 }
 
-void calculateEarlyStart (TaskList lst, Task t, ulong sum) {
-  Task p;
-  ulong i;
+ulong calculateEarlyStart (TaskList lst) {
+  ulong i, duration = 0;
+  Task p, t;
 
-  for (i = 0; i < t->dependantsCount; i++) {
-    p = t->dependants[i];
+  for (t = lst->first; t != NULL; t = t->next) {
+    for (i = 0; i < t->dependantsCount; i++) {
+      p = t->dependants[i];
 
-    if (sum > p->early) {
-      p->early = sum;
-      calculateEarlyStart(lst, p, sum+p->duration);
+      if (t->early + t->duration > p->early)
+        p->early = t->early + t->duration;
     }
+
+    duration = max(duration, t->early+t->duration);
   }
+
+  return duration;
 }
 
-void calculateLateStart (TaskList lst, Task t, ulong sub) {
-  Task p;
-  ulong i, h;
+void calculateLateStart (TaskList lst, ulong duration) {
+  ulong i;
+  Task p, t;
 
-  for (i = 0; i < t->dependenciesCount; i++) {
-    p = t->dependencies[i];
-    h = sub - p->duration;
+  for (t = lst->last; t != NULL; t = t->prev) {
+    if (t->dependantsCount == 0)
+      t->late = duration - t->duration;
 
-    if (h < p->late) {
-      p->late = h;
-      calculateLateStart(lst, p, h);
+    for (i = 0; i < t->dependenciesCount; i++) {
+      p = t->dependencies[i];
+
+      if (t->late - p->duration < p->late)
+        p->late = t->late - p->duration;
     }
   }
 }
 
 void tasksPath (TaskList lst) {
-  Task t;
-  ulong duration;
-
-  for (t = lst->first; t != NULL; t = t->next)
-    if (t->dependenciesCount == 0)
-      calculateEarlyStart(lst, t, t->duration);
-
-  duration = 0;
-
-  for (t = lst->first; t != NULL; t = t->next)
-    duration = max(duration, t->early+t->duration);
-
-  for (t = lst->first; t != NULL; t = t->next)
-    if (t->dependantsCount == 0) {
-      t->late = duration - t->duration;
-      calculateLateStart(lst, t, t->late);
-    }
+  ulong duration = calculateEarlyStart(lst);
+  calculateLateStart(lst, duration);
 
   lst->validPath = true;
-
   printTasks(lst, 0, true);
   printf("project duration = %lu\n", duration);
 }

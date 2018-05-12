@@ -11,21 +11,42 @@ void chop (char *str, int n) {
   memmove(str, str+n, len - n + 1);
 }
 
+int scanUlong (char *str, ulong *lu, int *n) {
+  int i, l;
+
+  for (i = 0; str[i] == ' '; i++);
+  l = i;
+  for (; isdigit(str[i]); i++);
+
+  if (i == l)
+    return 0;
+
+  if (n == NULL) {
+    if (sscanf(str, "%lu", lu) != 1)
+        return 0;
+  } else {
+    if (sscanf(str, "%lu%n", lu, n) != 1)
+      return 0;
+  }
+
+  return 1;
+}
+
 char * getline(FILE * f) {
-    size_t size = 0;
-    size_t len  = 0;
-    size_t last = 0;
-    char * buf  = NULL;
+  size_t size = 0;
+  size_t len  = 0;
+  size_t last = 0;
+  char * buf  = NULL;
 
-    do {
-        size += BUFSIZ;
-        buf = realloc(buf, size);
-        fgets(buf+last, size, f);
-        len = strlen(buf);
-        last = len - 1;
-    } while (!feof(f) && buf[last]!='\n');
+  do {
+      size += BUFSIZ;
+      buf = realloc(buf, size);
+      fgets(buf+last, size, f);
+      len = strlen(buf);
+      last = len - 1;
+  } while (!feof(f) && buf[last]!='\n');
 
-    return buf;
+  return buf;
 }
 
 Command getCommand (char **buffer) {
@@ -65,7 +86,7 @@ void runAdd (char *cmd, TaskList lst) {
   ulong id, duration, depsCount, maxTasks, tmp;
 
   /* reads the id */
-  if (sscanf(cmd, "%lu %n", &id, &n) != 1) {
+  if (scanUlong(cmd, &id, &n) != 1) {
     illegalArg();
     return;
   }
@@ -102,24 +123,30 @@ void runAdd (char *cmd, TaskList lst) {
   p++;
 
   /* reads the duration */
-  if (sscanf(p, "%lu %n", &duration, &n) != 1) {
-    illegalArg();
-    return;
-  }
-
-  if (duration == 0 || id == 0) {
+  if (scanUlong(p, &duration, &n) != 1) {
     illegalArg();
     return;
   }
 
   p += n;
 
+  if (duration == 0 || id == 0) {
+    illegalArg();
+    return;
+  }
+
   maxTasks = lst->count;
   deps = malloc(sizeof(Task) * maxTasks);
   depsCount = 0;
 
   /* reads the dependencies */
-  while (sscanf(p, "%lu%n", &tmp, &n) == 1) {
+  while (*p != '\n') {
+    if (scanUlong(p, &tmp, &n) != 1) {
+      illegalArg();
+      free(deps);
+      return;    
+    }
+
     d = lookupTask(lst, tmp);
 
     if (d == NULL) {
@@ -132,9 +159,8 @@ void runAdd (char *cmd, TaskList lst) {
     p += n;
   }
 
-  if (depsCount < maxTasks) {
+  if (depsCount < maxTasks)
     deps = realloc(deps, sizeof(Task) * depsCount);
-  }
   
   d = newTask(id, duration, desc, deps, depsCount);
   insertTask(lst, d);
@@ -142,7 +168,13 @@ void runAdd (char *cmd, TaskList lst) {
 
 void runDuration (char *cmd, TaskList lst) {
   ulong duration = 0;
-  sscanf(cmd, "%lu", &duration);
+
+  if (cmd[0] != '\n' && cmd[0] == '-') {
+    illegalArg();
+    return;
+  }
+
+  scanUlong(cmd, &duration, NULL);
   printTasks(lst, duration, false);
 }
 
@@ -150,7 +182,7 @@ void runDepend (char *cmd, TaskList lst) {
   ulong id;
   Task t;
 
-  if (sscanf(cmd, "%lu", &id) != 1) {
+  if (scanUlong(cmd, &id, NULL) != 1) {
     illegalArg();
     return;
   }
@@ -167,7 +199,7 @@ void runRemove (char *cmd, TaskList lst) {
   ulong id = 0;
   Task t;
 
-  if (sscanf(cmd, "%lu", &id) == 0) {
+  if (scanUlong(cmd, &id, NULL) == 0) {
     illegalArg();
     return;
   }
