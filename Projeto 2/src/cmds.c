@@ -32,19 +32,19 @@ int scanUlong (char *str, ulong *lu, int *n) {
   return 1;
 }
 
-char * getline(FILE * f) {
-  size_t size = 0;
-  size_t len  = 0;
+char * getline (FILE *f) {
+  size_t size = 25;
+  size_t len = 0;
   size_t last = 0;
-  char * buf  = NULL;
+  char * buf = NULL;
 
   do {
-      size += BUFSIZ;
-      buf = realloc(buf, size);
-      fgets(buf+last, size, f);
-      len = strlen(buf);
-      last = len - 1;
-  } while (!feof(f) && buf[last]!='\n');
+    size *= 2;
+    buf = realloc(buf, size);
+    fgets(buf+len, size - last - 1, f);
+    len = strlen(buf);
+    last = len - 1;
+  } while (!feof(f) && buf[last] != '\n');
 
   return buf;
 }
