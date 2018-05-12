@@ -54,8 +54,17 @@ void deleteTask (TaskList lst, Task t) {
   for (i = 0; i < t->dependenciesCount; i++)
     removeDependant(t->dependencies[i], t);
 
+  if (lst->first == t)
+    lst->first = t->next;
+
   if (t->prev != NULL)
     t->prev->next = t->next;
+
+  if (t->next != NULL)
+    t->next->prev = t->prev;
+
+  if (lst->last == t)
+    lst->last = t->prev;
 
   deleteNode(&lst->head, t->id);
 
