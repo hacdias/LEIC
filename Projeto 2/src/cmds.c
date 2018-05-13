@@ -33,13 +33,13 @@ int scanUlong (char *str, ulong *lu, int *n) {
 }
 
 char * getline (FILE *f) {
-  size_t size = 25;
+  size_t size = 0;
   size_t len = 0;
   size_t last = 0;
   char * buf = NULL;
 
   do {
-    size *= 2;
+    size += BUFFER_SIZE;
     buf = realloc(buf, size);
     fgets(buf+len, size - last - 1, f);
     len = strlen(buf);

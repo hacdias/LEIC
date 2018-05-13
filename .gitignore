@@ -1,5 +1,6 @@
 *.out
 *.o
+proj
 *.zip
 /Projeto 2/exemplos
 /Projeto 2/testes-publicos

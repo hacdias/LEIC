@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include "task_list.h"
 
+#define BUFFER_SIZE 100
+
 typedef enum {
   ADD = 0,
   DURATION = 1,
