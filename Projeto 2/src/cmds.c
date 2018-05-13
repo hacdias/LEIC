@@ -67,7 +67,7 @@ char * getline (FILE *f) {
 }
 
 /**
- * initBuffer - initializes a buffer.
+ * initBuffer - initializes a buffer by setting it to null.
  * @buffer - the pointer to a buffer.
  */
 void initBuffer (char **buffer) {
@@ -120,6 +120,13 @@ void illegalArg () {
   printf("illegal arguments\n");
 }
 
+/**
+ * runAdd - runs the ADD command by reading the input
+ * of the user in the form:
+ *   add <id> "<desc>" <duration> [dependencies...]
+ * @cmd - the buffer with the input.
+ * @lst - the task list.
+ */
 void runAdd (char *cmd, TaskList lst) {
   Task d, *deps;
   char *desc, *p;
@@ -185,7 +192,7 @@ void runAdd (char *cmd, TaskList lst) {
     if (scanUlong(p, &tmp, &n) != 1) {
       illegalArg();
       free(deps);
-      return;    
+      return;
     }
 
     d = lookupTask(lst, tmp);
@@ -193,7 +200,7 @@ void runAdd (char *cmd, TaskList lst) {
     if (d == NULL) {
       printf("no such task\n");
       free(deps);
-      return;      
+      return;
     }
 
     deps[depsCount++] = d;
@@ -202,11 +209,18 @@ void runAdd (char *cmd, TaskList lst) {
 
   if (depsCount < maxTasks)
     deps = realloc(deps, sizeof(Task) * depsCount);
-  
+
   d = newTask(id, duration, desc, deps, depsCount);
   insertTask(lst, d);
 }
 
+/**
+ * runDuration - runs the DURATION command by reading
+ * the input of the user in the form:
+ *   duration [value]
+ * @cmd - the buffer with the input.
+ * @lst - the task list.
+ */
 void runDuration (char *cmd, TaskList lst) {
   ulong duration = 0;
 
@@ -219,6 +233,13 @@ void runDuration (char *cmd, TaskList lst) {
   printTasks(lst, duration, false);
 }
 
+/**
+ * runDepend - runs the DEPEND command by reading
+ * the input of the user in the form:
+ *   duration <id>
+ * @cmd - the buffer with the input.
+ * @lst - the task list.
+ */
 void runDepend (char *cmd, TaskList lst) {
   ulong id;
   Task t;
@@ -236,6 +257,13 @@ void runDepend (char *cmd, TaskList lst) {
     taskDeps(t);
 }
 
+/**
+ * runRemove - runs the REMOVE command by reading
+ * the input of the user in the form:
+ *   remove <id>
+ * @cmd - the buffer with the input.
+ * @lst - the task list.
+ */
 void runRemove (char *cmd, TaskList lst) {
   ulong id = 0;
   Task t;
@@ -260,6 +288,11 @@ void runRemove (char *cmd, TaskList lst) {
   deleteTask(lst, t);
 }
 
+/**
+ * runPath - runs the PATH command.
+ * @cmd - the buffer with the input.
+ * @lst - the task list.
+ */
 void runPath (char *cmd, TaskList lst) {
   tasksPath(lst);
 }
