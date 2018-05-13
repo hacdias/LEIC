@@ -6,6 +6,13 @@ struct node {
   int height;
 };
 
+/**
+ * newNode - creates a new node based on an Item.
+ * @item - the item the node contains.
+ * @l - the left node.
+ * @r - the right node.
+ * @returns - the head of the node.
+ */
 Node newNode (Item item, Node l, Node r) {
   Node x = malloc(sizeof(struct node));
 
@@ -17,6 +24,11 @@ Node newNode (Item item, Node l, Node r) {
   return x;
 }
 
+/**
+ * height - returns the height of a node.
+ * @h - a node.
+ * @returns - the height.
+ */
 int height (Node h) {
   if (h == NULL)
     return 0;
@@ -24,6 +36,11 @@ int height (Node h) {
   return h->height;
 }
 
+/**
+ * rotL - rotates a node to the left.
+ * @h - a node
+ * @returns - a node.
+ */
 Node rotL (Node h) {
   Node x = h->r;
   h->r = x->l;
@@ -31,6 +48,11 @@ Node rotL (Node h) {
   return x;
 }
 
+/**
+ * rotR - rotates a node to the right.
+ * @h - a node
+ * @returns - a node.
+ */
 Node rotR (Node h) {
   Node x;
   int heightLeft, heightRight;
@@ -58,6 +80,11 @@ Node rotR (Node h) {
   return x;
 }
 
+/**
+ * rotLR - rotates a node to the left and right.
+ * @h - a node
+ * @returns - a node.
+ */
 Node rotLR (Node h) {
   if (h == NULL)
     return h;
@@ -66,6 +93,11 @@ Node rotLR (Node h) {
   return rotR(h);
 }
 
+/**
+ * rotRL - rotates a node to the right and left.
+ * @h - a node
+ * @returns - a node.
+ */
 Node rotRL (Node h) {
   if (h == NULL)
     return h;
@@ -74,6 +106,12 @@ Node rotRL (Node h) {
   return rotL(h);
 }
 
+/**
+ * balanceFactor - calculates the balance factor using
+ * the height of the child nodes.
+ * @h - a node
+ * @returns - the balance factor.
+ */
 int balanceFactor (Node h) {
   if (h == NULL)
     return 0;
@@ -81,6 +119,11 @@ int balanceFactor (Node h) {
   return height(h->l) - height(h->r);
 }
 
+/**
+ * AVLbalance - balances the tree.
+ * @h - a node.
+ * @returns - a node.
+ */
 Node AVLbalance (Node h) {
   int balance, heightLeft, heightRight;
 
@@ -112,6 +155,61 @@ Node AVLbalance (Node h) {
   return h;
 }
 
+/**
+ * maxNode - gets the max node of a tree.
+ * @h - a node.
+ * @returns - a node.
+ */
+Node maxNode (Node h) {
+  if (h == NULL || h->r == NULL)
+    return h;
+  else
+    return maxNode(h->r);
+}
+
+/**
+ * initNode - initializes a node by assigning it to NULL.
+ * @node - a pointer to a node.
+ */
+void initNode (Node *head) {
+  *head = NULL;
+}
+
+/**
+ * countNodes - counts the number of nodes recursively
+ * calling itself for each left and right node.
+ * @node - a node.
+ */
+int countNodes (Node h) {
+  if (h == NULL)
+    return 0;
+  else
+    return countNodes(h->r) + countNodes(h->l) + 1;
+}
+
+/**
+ * searchTree - searches the node tree recursively to find a certain node.
+ * @node - a node.
+ * @key - the key to search for.
+ */
+Item searchTree (Node h, Key v) {
+  if (h == NULL)
+    return NULL;
+  if (eq(v, key(h->item)))
+    return h->item;
+  if (less(v, key(h->item)))
+    return searchTree(h->l, v);
+  else
+    return searchTree(h->r, v);
+}
+
+/**
+ * insertR - inserts an item in the tree recursively
+ * and then balances the tree.
+ * @node - the pointer to a node.
+ * @item - the item.
+ * @returns - a node.
+ */
 Node insertR (Node h, Item item) {
   if (h == NULL)
     return newNode(item, NULL, NULL);
@@ -124,13 +222,21 @@ Node insertR (Node h, Item item) {
   return h;
 }
 
-Node maxNode (Node h) {
-  if (h == NULL || h->r == NULL)
-    return h;
-  else
-    return maxNode(h->r);
+/**
+ * insertNode - inserts an item in the tree.
+ * @node - the pointer to a node.
+ * @item - the item.
+ */
+void insertNode (Node *head, Item item) {
+  *head = insertR(*head, item);
 }
 
+/**
+ * deleteR - deletes an element from a tree recursively.
+ * @node - the pointer to a node.
+ * @key - key of the element to delete.
+ * @returns - a node.
+ */
 Node deleteR(Node h, Key k) {
   Node aux;
   Item x;
@@ -166,15 +272,48 @@ Node deleteR(Node h, Key k) {
   return h;
 }
 
-void sortR(Node h, void (*visit)(Item)) {
+/**
+ * deleteNode - deletes an element from a tree.
+ * @node - the pointer to a node.
+ * @key - key of the element to delete.
+ */
+void deleteNode (Node *head, Key k){
+  *head = deleteR(*head, k);
+}
+
+/**
+ * traverseR - traverses a tree recursively from the smallest
+ * element to the biggest one by going down to the most down left
+ * leaf and going upwards.
+ * @h - the head of the node.
+ * @visit - the function to apply to every element.
+ */
+void traverseR(Node h, void (*visit)(Item)) {
   if (h == NULL)
     return;
 
-  sortR(h->l, visit);
+  traverseR(h->l, visit);
   visit(h->item);
-  sortR(h->r, visit);
+  traverseR(h->r, visit);
 }
 
+/**
+ * traverseTree - traverses a tree and calls a function to every
+ * element.
+ * @node - a node.
+ * @visit - the function to call to each element.
+ */
+void traverseTree (Node head, void (*visit)(Item)) {
+  traverseR(head, visit);
+}
+
+/**
+ * freeR - frees the Node. THis is an helper function
+ * to free every node from the tree using the delete
+ * function.
+ * @node - a a node.
+ * @returns - a node.
+ */
 Node freeR (Node h) {
   if (h == NULL)
     return h;
@@ -185,40 +324,10 @@ Node freeR (Node h) {
   return deleteR(h, key(h->item));
 }
 
-void initNode (Node *head) {
-  *head = NULL;
-}
-
-int countNodes (Node h) {
-  if (h == NULL)
-    return 0;
-  else
-    return countNodes(h->r) + countNodes(h->l) + 1;
-}
-
-Item searchTree (Node h, Key v) {
-  if (h == NULL)
-    return NULL;
-  if (eq(v, key(h->item)))
-    return h->item;
-  if (less(v, key(h->item)))
-    return searchTree(h->l, v);
-  else
-    return searchTree(h->r, v);
-}
-
-void insertNode (Node *head, Item item) {
-  *head = insertR(*head, item);
-}
-
-void deleteNode (Node *head, Key k){
-  *head = deleteR(*head, k);
-}
-
-void traverseTree (Node head, void (*visit)(Item)) {
-  sortR(head, visit);
-}
-
+/**
+ * freeNode - frees the Node.
+ * @node - a pointer to a node.
+ */
 void freeNode (Node *head) {
   *head = freeR(*head);
 }
