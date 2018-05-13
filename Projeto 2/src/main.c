@@ -29,7 +29,7 @@ int main () {
         runPath(buffer, lst);
         break;
       default:
-        printf("illegal arguments\n");
+        printf("illegal command\n");
     }
   }
 

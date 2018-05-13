@@ -1,5 +1,10 @@
 #include "task.h"
 
+struct depsList {
+  Task task;
+  struct depsList* next;
+};
+
 Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount) {
   Task p;
 
@@ -11,7 +16,8 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
   p->late = ULONG_MAX;;
   p->dependencies = deps;
   p->dependenciesCount = depsCount;
-  p->dependants = NULL;
+  p->firstDependant = NULL;
+  p->lastDependant = NULL;
   p->dependantsCount = 0;
   strcpy(p->desc, desc);
   p->next = NULL;
@@ -21,7 +27,14 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
 }
 
 void freeTask (Task t) {
-  free(t->dependants);
+  struct depsList *h, *p = NULL;
+
+  for (h = t->firstDependant; h != NULL; h = h->next) {
+    free(p);
+    p = h;
+  }
+
+  free(p);
   free(t->dependencies);
   free(t->desc);
   free(t);
@@ -51,34 +64,76 @@ void printTask (Task t, bool validPath) {
 }
 
 void taskDeps (Task t) {
-  ulong i;
+  struct depsList* h;
   printf("%ld:", t->id);
 
-  for (i = 0; i < t->dependantsCount; i++) {
-    printf(" %ld", t->dependants[i]->id);
+  for (h = t->firstDependant; h != NULL; h = h->next) {
+    printf(" %ld", h->task->id);
   }
 
-  if (i == 0)
+  if (t->firstDependant == NULL)
     printf(" no dependencies");
 
   printf("\n");
 }
 
+void calculateEarlyStart (Task t) {
+  struct depsList* dp;
+  Task p;
+
+  for (dp = t->firstDependant; dp != NULL; dp = dp->next) {
+    p = dp->task;
+
+    if (t->early + t->duration > p->early)
+      p->early = t->early + t->duration;
+  }
+}
+
+void calculateLateStart (Task t, ulong duration) {
+  ulong i;
+  Task p;
+
+  if (t->dependantsCount == 0)
+    t->late = duration - t->duration;
+
+  for (i = 0; i < t->dependenciesCount; i++) {
+    p = t->dependencies[i];
+
+    if (t->late - p->duration < p->late)
+      p->late = t->late - p->duration;
+  }
+}
+
 void addDependant (Task t, Task dependant) {
+  struct depsList *dep = malloc(sizeof(struct depsList));
+  dep->task = dependant;
+  dep->next = NULL;
+
+  if (t->dependantsCount == 0)
+    t->firstDependant = dep;
+  else
+    t->lastDependant->next = dep;
+
+  t->lastDependant = dep;
   t->dependantsCount++;
-  t->dependants = realloc(t->dependants, sizeof(Task) * t->dependantsCount);
-  t->dependants[t->dependantsCount - 1] = dependant;
 }
 
 void removeDependant (Task t, Task dependant) {
-  ulong i = 0;
+  struct depsList *h, *p;
 
-  while (t->dependants[i] != NULL && t->dependants[i] != dependant)
-    i++;
+  p = t->firstDependant;
+  for (h = p; h != NULL && h->task != dependant; h = h->next)
+    p = h;
 
-  for (i = i + 1; i < t->dependantsCount; i++)
-    t->dependants[i-1] = t->dependants[i];
+  if (h == t->firstDependant)
+    t->firstDependant = h->next; 
 
+  if (h == t->lastDependant)
+    t->lastDependant = p;
+
+  if (p != NULL)
+    p->next = h->next;
+
+  free(h);
   t->dependantsCount--;
-  t->dependants = realloc(t->dependants, sizeof(Task) * t->dependantsCount);
 }

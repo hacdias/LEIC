@@ -80,44 +80,19 @@ void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
       printTask(t, lst->validPath);
 }
 
-ulong calculateEarlyStart (TaskList lst) {
-  ulong i, duration = 0;
-  Task p, t;
+void tasksPath (TaskList lst) {
+  Task t;
+  ulong duration = 0;
 
   for (t = lst->first; t != NULL; t = t->next) {
-    for (i = 0; i < t->dependantsCount; i++) {
-      p = t->dependants[i];
-
-      if (t->early + t->duration > p->early)
-        p->early = t->early + t->duration;
-    }
-
+    calculateEarlyStart(t);
     duration = max(duration, t->early+t->duration);
   }
 
-  return duration;
-}
-
-void calculateLateStart (TaskList lst, ulong duration) {
-  ulong i;
-  Task p, t;
-
   for (t = lst->last; t != NULL; t = t->prev) {
-    if (t->dependantsCount == 0)
-      t->late = duration - t->duration;
-
-    for (i = 0; i < t->dependenciesCount; i++) {
-      p = t->dependencies[i];
-
-      if (t->late - p->duration < p->late)
-        p->late = t->late - p->duration;
-    }
+    calculateLateStart(t, duration);
   }
-}
 
-void tasksPath (TaskList lst) {
-  ulong duration = calculateEarlyStart(lst);
-  calculateLateStart(lst, duration);
   lst->validPath = true;
   printTasks(lst, 0, true);
   printf("project duration = %lu\n", duration);

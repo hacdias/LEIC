@@ -132,6 +132,9 @@ Node maxNode (Node h) {
 }
 
 Node deleteR(Node h, Key k) {
+  Node aux;
+  Item x;
+
   if (h == NULL)
     return h;
   else if (less(k, key(h->item)))
@@ -140,16 +143,13 @@ Node deleteR(Node h, Key k) {
     h->r = deleteR(h->r,k);
   else {
     if (h->l !=NULL && h->r !=NULL) {
-      Node aux = maxNode(h->l);
-      {
-        Item x;
-        x = h->item;
-        h->item = aux->item;
-        aux->item = x;
-      }
+      aux = maxNode(h->l);
+      x = h->item;
+      h->item = aux->item;
+      aux->item = x;
       h->l= deleteR(h->l, key(aux->item));
     } else {
-      Node aux=h;
+      aux=h;
       if (h->l == NULL && h->r == NULL)
         h = NULL;
       else if (h->l == NULL)

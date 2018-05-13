@@ -14,8 +14,11 @@
 #define Item Task
 #define Key ulong
 #define MAX_DESC 7998
+#define NULLitem NULL
 
 typedef struct task* Task;
+
+struct depsList;
 
 struct task {
   ulong id;
@@ -23,8 +26,9 @@ struct task {
   ulong duration;
   ulong early, late;
   ulong dependenciesCount, dependantsCount;
-  Task *dependencies, *dependants;
+  Task *dependencies;
   Task next, prev;
+  struct depsList *firstDependant, *lastDependant;
 };
 
 Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
@@ -34,5 +38,7 @@ void taskDeps (Task t);
 void resetTime (Task t);
 void addDependant (Task t, Task dependant);
 void removeDependant (Task t, Task dependant);
+void calculateEarlyStart (Task t);
+void calculateLateStart (Task t, ulong duration);
 
 #endif
