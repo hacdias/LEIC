@@ -118,7 +118,6 @@ void calculateLateStart (TaskList lst, ulong duration) {
 void tasksPath (TaskList lst) {
   ulong duration = calculateEarlyStart(lst);
   calculateLateStart(lst, duration);
-
   lst->validPath = true;
   printTasks(lst, 0, true);
   printf("project duration = %lu\n", duration);

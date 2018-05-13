@@ -19,11 +19,11 @@ typedef struct task* Task;
 
 struct task {
   ulong id;
+  char *desc;
   ulong duration;
   ulong early, late;
   ulong dependenciesCount, dependantsCount;
   Task *dependencies, *dependants;
-  char *desc;
   Task next, prev;
 };
 

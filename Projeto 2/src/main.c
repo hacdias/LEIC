@@ -4,9 +4,12 @@
 #include "task_list.h"
 
 int main () {
-  char* buffer = NULL;
+  char* buffer;
   Command cmd;
-  TaskList lst = newTaskList();
+  TaskList lst;
+  
+  initBuffer(&buffer);
+  lst = newTaskList();
 
   while ((cmd = getCommand(&buffer)) != EXIT) {
     switch(cmd) {
@@ -30,7 +33,7 @@ int main () {
     }
   }
 
-  free(buffer);
+  freeBuffer(&buffer);
   freeAll(lst); 
   return 0;
 }

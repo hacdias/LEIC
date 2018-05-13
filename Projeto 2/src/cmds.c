@@ -1,5 +1,11 @@
 #include "cmds.h"
 
+/**
+ * chop - removes the first n characters from a string
+ * and the blank spaces afterwards.
+ * @str - the string.
+ * @n - the number of characters to chop.
+ */
 void chop (char *str, int n) {
   int len;
 
@@ -7,11 +13,18 @@ void chop (char *str, int n) {
   if (n > len)
     return;
 
-  for (n++; str[n] == ' ' && n < len; n++);
+  for (n++; (str[n] == ' ' || str[n] == '\t') && n < len; n++);
   memmove(str, str+n, len - n + 1);
 }
 
-int scanUlong (char *str, ulong *lu, int *n) {
+/**
+ * scanUlong - scans an unsigned long from a string.
+ * @str - the input string.
+ * @lu - the place to save the number.
+ * @n - the number of read characters. Can be NULL.
+ * @returns - true if the read was successful. False otherwise.
+ */
+bool scanUlong (char *str, ulong *lu, int *n) {
   int i, l;
 
   for (i = 0; str[i] == ' '; i++);
@@ -19,19 +32,22 @@ int scanUlong (char *str, ulong *lu, int *n) {
   for (; isdigit(str[i]); i++);
 
   if (i == l)
-    return 0;
+    return false;
 
-  if (n == NULL) {
-    if (sscanf(str, "%lu", lu) != 1)
-        return 0;
-  } else {
-    if (sscanf(str, "%lu%n", lu, n) != 1)
-      return 0;
-  }
+  if (n == NULL)
+    i = sscanf(str, "%lu", lu);
+  else
+    i = sscanf(str, "%lu%n", lu, n);
 
-  return 1;
+  return (i == 1);
 }
 
+/**
+ * getline - reads a line from a stream until a newline character
+ * is reached or the end of the file is reached.
+ * @f - the stream.
+ * @returns - the pointer to a string with the line.
+ */
 char * getline (FILE *f) {
   size_t size = 0;
   size_t len = 0;
@@ -46,11 +62,33 @@ char * getline (FILE *f) {
     last = len - 1;
   } while (!feof(f) && buf[last] != '\n');
 
+  buf = realloc(buf, strlen(buf) + 1);
   return buf;
 }
 
-Command getCommand (char **buffer) {
+/**
+ * initBuffer - initializes a buffer.
+ * @buffer - the pointer to a buffer.
+ */
+void initBuffer (char **buffer) {
+  *buffer = NULL;
+}
+
+/**
+ * freeBuffer - frees a buffer.
+ * @buffer - the pointer to a buffer.
+ */
+void freeBuffer (char **buffer) {
   free(*buffer);
+}
+
+/**
+ * getCommand - gets the command to run from a buffer.
+ * @buffer - the pointer to a buffer.
+ * @returns - the command to run.
+ */
+Command getCommand (char **buffer) {
+  freeBuffer(buffer);
   *buffer = getline(stdin);
 
   if (strstr(*buffer, "add") == *buffer) {
@@ -75,6 +113,9 @@ Command getCommand (char **buffer) {
   return -1;
 }
 
+/**
+ * illegalArg - prints the illegal arguments message.
+ */
 void illegalArg () {
   printf("illegal arguments\n");
 }
