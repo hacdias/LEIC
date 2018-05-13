@@ -5,27 +5,43 @@ struct depsList {
   struct depsList* next;
 };
 
+/**
+ * newTask - allocates the memory for a new task and sets the default values
+ * for each field and fills all the other fields wiht the given information.
+ * @id - the task id.
+ * @duration - the task duration.
+ * @desc - the task description.
+ * @deps - the task dependencies.
+ * @depsCount - the number of dependencies.
+ * @returns - a task.
+ */
 Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount) {
-  Task p;
+  Task p = malloc(sizeof(struct task));
 
-  p = malloc(sizeof(struct task));
+  /* given info */
   p->id = id;
   p->duration = duration;
   p->desc = malloc(sizeof(char) * (strlen(desc)+1));
-  p->early = 0;
-  p->late = ULONG_MAX;;
   p->dependencies = deps;
   p->dependenciesCount = depsCount;
+  strcpy(p->desc, desc);
+
+  /* defaults */
+  p->early = 0;
+  p->late = ULONG_MAX;;
   p->firstDependant = NULL;
   p->lastDependant = NULL;
   p->dependantsCount = 0;
-  strcpy(p->desc, desc);
   p->next = NULL;
   p->prev = NULL;
 
   return p;
 }
 
+/**
+ * freeTask - frees a task.
+ * @t - a task.
+ */
 void freeTask (Task t) {
   struct depsList *h, *p = NULL;
 
@@ -40,11 +56,32 @@ void freeTask (Task t) {
   free(t);
 }
 
+/**
+ * resetTime - resets the early and late starts of a single task.
+ * @t - a task.
+ */
 void resetTime (Task t) {
   t->early = 0;
   t->late = ULONG_MAX;
 }
 
+/**
+ * printTask - prints a task. If the validPath is set to false
+ * it will have the following format: 
+ * 
+ *  <id> "<description>" <duration> [dependencies...]
+ * 
+ * otherwise, if validPath is true:
+ * 
+ *  <id> "<description>" <duration> [<earlyStart> <lateStart>] [dependencies...]
+ * 
+ * also, if the early start is the same as the late start:
+ * 
+ *  <id> "<description>" <duration> [<earlyStart> CRITICAL] [dependencies...]
+ * 
+ * @t - the task.
+ * @validPath - indicates if the early and late start values are correct.
+ */
 void printTask (Task t, bool validPath) {
   ulong i;
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
@@ -63,6 +100,11 @@ void printTask (Task t, bool validPath) {
   printf("\n");
 }
 
+/**
+ * taskDeps - prints the task dependants in the format:
+ *  <id>: [no dependencies|dependants...]
+ * @t - a task.
+ */
 void taskDeps (Task t) {
   struct depsList* h;
   printf("%ld:", t->id);
@@ -77,6 +119,11 @@ void taskDeps (Task t) {
   printf("\n");
 }
 
+/**
+ * calculateEarlyStart - calculates the early start
+ * of a task.
+ * @t - a task.
+ */
 void calculateEarlyStart (Task t) {
   struct depsList* dp;
   Task p;
@@ -89,6 +136,12 @@ void calculateEarlyStart (Task t) {
   }
 }
 
+/**
+ * calculateLateStart - calculates the late start
+ * of a task.
+ * @t - a task.
+ * @duration - the project duration.
+ */
 void calculateLateStart (Task t, ulong duration) {
   ulong i;
   Task p;
@@ -104,6 +157,11 @@ void calculateLateStart (Task t, ulong duration) {
   }
 }
 
+/**
+ * addDependant - adds a dependant to a task.
+ * @t - a task.
+ * @dependant - the task that depends on @t.
+ */
 void addDependant (Task t, Task dependant) {
   struct depsList *dep = malloc(sizeof(struct depsList));
   dep->task = dependant;
@@ -118,6 +176,11 @@ void addDependant (Task t, Task dependant) {
   t->dependantsCount++;
 }
 
+/**
+ * removeDependant - removes a dependant from a task.
+ * @t - a task.
+ * @dependant - the task that depends on @t.
+ */
 void removeDependant (Task t, Task dependant) {
   struct depsList *h, *p;
 

@@ -183,7 +183,7 @@ void runAdd (char *cmd, TaskList lst) {
     return;
   }
 
-  maxTasks = lst->count;
+  maxTasks = tasksCount(lst);
   deps = malloc(sizeof(Task) * maxTasks);
   depsCount = 0;
 
