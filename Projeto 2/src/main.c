@@ -1,3 +1,7 @@
+/**
+ * Project Planner
+ * Student: ist189455, Henrique Dias
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "cmds.h"
