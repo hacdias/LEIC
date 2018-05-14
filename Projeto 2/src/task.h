@@ -28,7 +28,7 @@ struct task {
   ulong dependenciesCount, dependantsCount;
   Task *dependencies;
   Task next, prev;
-  struct depsList *firstDependant, *lastDependant;
+  struct depsList *dependants;
 };
 
 /**

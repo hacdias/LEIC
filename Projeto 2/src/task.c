@@ -29,8 +29,7 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
   /* defaults */
   p->early = 0;
   p->late = ULONG_MAX;;
-  p->firstDependant = NULL;
-  p->lastDependant = NULL;
+  p->dependants = NULL;
   p->dependantsCount = 0;
   p->next = NULL;
   p->prev = NULL;
@@ -45,7 +44,7 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
 void freeTask (Task t) {
   struct depsList *h, *p = NULL;
 
-  for (h = t->firstDependant; h != NULL; h = h->next) {
+  for (h = t->dependants; h != NULL; h = h->next) {
     free(p);
     p = h;
   }
@@ -106,16 +105,24 @@ void printTask (Task t, bool validPath) {
  * @t - a task.
  */
 void taskDeps (Task t) {
+  ulong *ids = malloc(sizeof(ulong) * t->dependantsCount);
   struct depsList* h;
+  ulong i;
   printf("%ld:", t->id);
 
-  for (h = t->firstDependant; h != NULL; h = h->next) {
-    printf(" %ld", h->task->id);
+  i = t->dependantsCount - 1;
+  for (h = t->dependants; h != NULL; h = h->next) {
+    ids[i] = h->task->id;
+    i--;
   }
 
-  if (t->firstDependant == NULL)
+  for (i = 0; i < t->dependantsCount; i++)
+    printf(" %ld", ids[i]);
+
+  if (t->dependantsCount == 0)
     printf(" no dependencies");
 
+  free(ids);
   printf("\n");
 }
 
@@ -128,7 +135,7 @@ void calculateEarlyStart (Task t) {
   struct depsList* dp;
   Task p;
 
-  for (dp = t->firstDependant; dp != NULL; dp = dp->next) {
+  for (dp = t->dependants; dp != NULL; dp = dp->next) {
     p = dp->task;
 
     if (t->early + t->duration > p->early)
@@ -167,12 +174,10 @@ void addDependant (Task t, Task dependant) {
   dep->task = dependant;
   dep->next = NULL;
 
-  if (t->dependantsCount == 0)
-    t->firstDependant = dep;
-  else
-    t->lastDependant->next = dep;
+  if (t->dependantsCount)
+    dep->next = t->dependants;
 
-  t->lastDependant = dep;
+  t->dependants = dep;
   t->dependantsCount++;
 }
 
@@ -184,15 +189,12 @@ void addDependant (Task t, Task dependant) {
 void removeDependant (Task t, Task dependant) {
   struct depsList *h, *p;
 
-  p = t->firstDependant;
+  p = t->dependants;
   for (h = p; h != NULL && h->task != dependant; h = h->next)
     p = h;
 
-  if (h == t->firstDependant)
-    t->firstDependant = h->next; 
-
-  if (h == t->lastDependant)
-    t->lastDependant = p;
+  if (h == t->dependants)
+    t->dependants = h->next; 
 
   if (p != NULL)
     p->next = h->next;
