@@ -105,22 +105,23 @@ void printTask (Task t, bool validPath) {
  * @t - a task.
  */
 void taskDeps (Task t) {
-  ulong *ids = malloc(sizeof(ulong) * t->dependantsCount);
-  struct depsList* h;
-  ulong i;
+  ulong i, *ids;
+  struct depsList *h;
+
   printf("%ld:", t->id);
-
-  i = t->dependantsCount - 1;
-  for (h = t->dependants; h != NULL; h = h->next) {
-    ids[i] = h->task->id;
-    i--;
-  }
-
-  for (i = 0; i < t->dependantsCount; i++)
-    printf(" %ld", ids[i]);
-
+  
   if (t->dependantsCount == 0)
     printf(" no dependencies");
+
+  ids = malloc(sizeof(ulong) * t->dependantsCount);
+  i = t->dependantsCount - 1;
+
+  for (h = t->dependants; h != NULL; h = h->next)
+    ids[i--] = h->task->id;
+
+  
+  for (i = 0; i < t->dependantsCount; i++)
+    printf(" %ld", ids[i]);
 
   free(ids);
   printf("\n");
