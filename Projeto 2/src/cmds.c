@@ -39,6 +39,9 @@ bool scanUlong (char *str, ulong *lu, int *n) {
   else
     i = sscanf(str, "%lu%n", lu, n);
 
+  if (*lu == 0)
+    return false;
+
   return (i == 1);
 }
 

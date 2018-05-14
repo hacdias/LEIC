@@ -66,18 +66,18 @@ void resetTime (Task t) {
 
 /**
  * printTask - prints a task. If the validPath is set to false
- * it will have the following format: 
- * 
+ * it will have the following format:
+ *
  *  <id> "<description>" <duration> [dependencies...]
- * 
+ *
  * otherwise, if validPath is true:
- * 
+ *
  *  <id> "<description>" <duration> [<earlyStart> <lateStart>] [dependencies...]
- * 
+ *
  * also, if the early start is the same as the late start:
- * 
+ *
  *  <id> "<description>" <duration> [<earlyStart> CRITICAL] [dependencies...]
- * 
+ *
  * @t - the task.
  * @validPath - indicates if the early and late start values are correct.
  */
@@ -109,7 +109,7 @@ void taskDeps (Task t) {
   struct depsList *h;
 
   printf("%ld:", t->id);
-  
+
   if (t->dependantsCount == 0)
     printf(" no dependencies");
 
@@ -119,7 +119,7 @@ void taskDeps (Task t) {
   for (h = t->dependants; h != NULL; h = h->next)
     ids[i--] = h->task->id;
 
-  
+
   for (i = 0; i < t->dependantsCount; i++)
     printf(" %ld", ids[i]);
 
@@ -195,7 +195,7 @@ void removeDependant (Task t, Task dependant) {
     p = h;
 
   if (h == t->dependants)
-    t->dependants = h->next; 
+    t->dependants = h->next;
 
   if (p != NULL)
     p->next = h->next;
