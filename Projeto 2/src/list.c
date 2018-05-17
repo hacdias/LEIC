@@ -1,15 +1,26 @@
 #include "list.h"
 
+/**
+ * newDLL - creates a new Double Linked List (DLL).
+ * @compare - the comparison function between elements.
+ * @free - the function to free each element.
+ * @returns - a new DDL.
+ */
 DLL newDLL (int (*compare)(const void*, const void*), void (*free)(void *a)) {
   DLL lst = malloc(sizeof(struct dll));
   lst->compare = compare;
   lst->free = free;
   lst->count = 0;
   lst->head = NULL;
-  lst->last = NULL;
+  lst->tail = NULL;
   return lst;
 }
 
+/**
+ * newElement - creates a new DLL element.
+ * @item - the pointer to the item.
+ * @returns - a DDLnode.
+ */
 DLLnode newElement (void* item) {
   DLLnode x = malloc(sizeof(struct dllnode));
   x->item = item;
@@ -18,7 +29,13 @@ DLLnode newElement (void* item) {
   return x;
 }
 
-DLLnode DLLinsertBegin (DLL lst, void* item) {
+/**
+ * insertBeginList - inserts a new item at the beginning of the list.
+ * @lst - a DDL.
+ * @item - the pointer to the item.
+ * @returns - the inserted DDLnode.
+ */
+DLLnode insertBeginList (DLL lst, void* item) {
   DLLnode x = newElement(item);
   x->next = lst->head;
 
@@ -27,39 +44,56 @@ DLLnode DLLinsertBegin (DLL lst, void* item) {
 
   lst->head = x;
 
-  if (lst->last == NULL)
-    lst->last = x;
+  if (lst->tail == NULL)
+    lst->tail = x;
 
   lst->count++;
   return x;
 }
 
-DLLnode DLLinsertEnd (DLL lst, void* item) {
+/**
+ * insertEndList - inserts a new item at the end of the list.
+ * @lst - a DDL.
+ * @item - the pointer to the item.
+ * @returns - the inserted DDLnode.
+ */
+DLLnode insertEndList (DLL lst, void* item) {
   DLLnode x = newElement(item);
 
   if (lst->head == NULL) {
     lst->head = x;
   } else {
-    lst->last->next = x;
-    x->prev = lst->last;
+    lst->tail->next = x;
+    x->prev = lst->tail;
   }
 
   lst->count++;
-  lst->last = x;
+  lst->tail = x;
   return x;
 }
 
-DLLnode DLLlookup (DLL lst, void *item) {
+/**
+ * lookupList - searches for an item.
+ * @lst - a DDL.
+ * @item - the pointer to the item.
+ * @returns - the DDLnode that corresponds to @item.
+ */
+DLLnode lookupList (DLL lst, void *item) {
   DLLnode t;
 
   for (t = lst->head; t != NULL; t = t->next)
     if (lst->compare(t, item) == 0)
       return t;
-  
+
   return NULL;
 }
 
-void DLLdelete (DLL lst, void* item) {
+/**
+ * deleteElementList - deletes an ite from a list.
+ * @lst - a DDL.
+ * @item - the pointer to the item.
+ */
+void deleteElementList (DLL lst, void* item) {
   DLLnode t, prev;
 
   for (t = lst->head, prev = NULL; t != NULL; prev = t, t = t->next) {
@@ -73,40 +107,54 @@ void DLLdelete (DLL lst, void* item) {
       if (t == lst->head)
         lst->head = t->next;
 
-      if (t == lst->last)
-        lst->last = prev;
+      if (t == lst->tail)
+        lst->tail = prev;
 
       lst->count--;
-      lst->free(t);
+      lst->free(t->item);
+      free(t);
       return;
     }
   }
 }
 
-void DLLvisit (DLL lst, void (*visit)(const void *)) {
+/**
+ * visitList - visits the list from the head to the tail.
+ * @lst - a DDL.
+ * @visit - the function to apply to every element.
+ */
+void visitList (DLL lst, void (*visit)(const void *)) {
   DLLnode n;
 
   for (n = lst->head; n != NULL; n = n->next)
     visit(n->item);
 }
 
-void DLLvisitInverse (DLL lst, void (*visit)(const void *)) {
+/**
+ * visitInverseList - visits the list from the tail to the head.
+ * @lst - a DDL.
+ * @visit - the function to apply to every element.
+ */
+void visitInverseList (DLL lst, void (*visit)(const void *)) {
   DLLnode n;
 
-  for (n = lst->last; n != NULL; n = n->prev)
+  for (n = lst->tail; n != NULL; n = n->prev)
     visit(n->item);
 }
 
-void DLLfree (DLL *lst) {
-  /* DLLnode h, p = NULL;
+/**
+ * freeList - frees the list.
+ * @lst - a DDL.
+ */
+void freeList (DLL lst) {
+  DLLnode n, p;
 
-  for (h = (*lst)->head; h != NULL; h = h->next) {
-    /*(*lst)->free(p->item);
+  for (n = lst->head; n != NULL; n = n->next)
+    lst->free(n->item);
+
+  for (n = lst->head, p = NULL; n != NULL; p = n, n = n->next)
     free(p);
-    p = h;
-  }
 
-  (*lst)->free(p->item);
   free(p);
-  free(*lst); */
-} 
+  free(lst);
+}

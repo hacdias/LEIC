@@ -193,7 +193,7 @@ void runAdd (char *cmd, TaskList lst) {
   while (*p != '\n') {
     if (scanUlong(p, &tmp, &n) != 1) {
       illegalArg();
-      free(deps);
+      freeList(deps);
       return;
     }
 
@@ -201,11 +201,11 @@ void runAdd (char *cmd, TaskList lst) {
 
     if (d == NULL) {
       printf("no such task\n");
-      free(deps);
+      freeList(deps);
       return;
     }
 
-    DLLinsertEnd(deps, d);
+    insertEndList(deps, d);
     p += n;
   }
 

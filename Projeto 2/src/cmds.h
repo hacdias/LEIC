@@ -5,7 +5,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "task_list.h"
+#include "task.h"
+#include "utils.h"
 
 #define BUFFER_SIZE 100
 

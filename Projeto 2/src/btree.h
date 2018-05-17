@@ -4,55 +4,72 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "task.h"
+typedef struct leaf* Leaf;
+typedef struct btree* BTree;
 
-typedef struct node* Node;
+typedef int (*BTreeCompFn)(void*, void*);
+typedef void* (*BTreeKeyFn)(void *);
+typedef void (*BTreeFreeFn)(void *);
+
+struct btree {
+  BTreeCompFn compare;
+  BTreeKeyFn key;
+  BTreeFreeFn free;
+  Leaf head;
+};
 
 /**
- * initNode - initializes a node.
- * @node - a pointer to a node.
+ * newBTree - creates a new binary tree
+ * @compare - the comparison function between element' keys.
+ * @key - the function to get the key.
+ * @free - the function to free to each element.
+ * @returns - a binary tree.
  */
-void initNode (Node* node);
+BTree newBTree (BTreeCompFn, BTreeKeyFn, BTreeFreeFn);
 
 /**
- * countNodes - counts the number of nodes.
+ * countLeafs - counts the number of leafs recursively
+ * calling itself for each left and right node.
  * @node - a node.
+ * @returns - the leafs count.
  */
-int countNodes (Node node);
+int countLeafs (BTree);
 
 /**
- * searchTree - searches the node tree to find a certain node.
- * @node - a node.
- * @key - the key to search for.
+ * searchTree - looks up on the tree the element
+ * identifiable by the key.
+ * @t - the binary tree.
+ * @v - the key to search for.
+ * @returns - the pointer to the element.
  */
-Item searchTree (Node node, Key key);
+void* searchTree (BTree, void* key);
 
 /**
- * insertNode - inserts an item in the tree.
- * @node - the pointer to a node.
+ * insertLeaf - inserts an item in the tree.
+ * @t - the binary tree.
  * @item - the item.
  */
-void insertNode (Node* node, Item item);
+void insertLeaf (BTree, void* item);
 
 /**
- * deleteNode - deletes an element from a tree.
- * @node - the pointer to a node.
- * @key - key of the element to delete.
+ * deleteLeaf - removes an element from the tree.
+ * @t - the binary tree.
+ * @v - the key.
  */
-void deleteNode (Node* node, Key key);
+void deleteLeaf (BTree, void* key);
 
 /**
- * traverseTree - trverses a tree and calls a function to every
+ * traverseTree - traverses a tree and calls a function to every
  * element.
  * @node - a node.
  * @visit - the function to call to each element.
  */
-void traverseTree (Node node, void (*visit)(Item));
+void traverseTree (BTree, void (*visit)(void*));
 
 /**
- * freeNode - frees the Node.
- * @node - a pointer to a node.
+ * freeTree - frees an entire tree.
+ * @b - a pointer to a BTree.
  */
-void freeNode (Node* node);
+void freeTree (BTree);
 
 #endif

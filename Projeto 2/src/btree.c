@@ -1,20 +1,36 @@
 #include "btree.h"
 
-struct node {
-  Item item;
-  Node l, r;
+struct leaf {
+  void * item;
+  Leaf l, r;
   int height;
 };
 
 /**
- * newNode - creates a new node based on an Item.
- * @item - the item the node contains.
- * @l - the left node.
- * @r - the right node.
- * @returns - the head of the node.
+ * newBTree - creates a new binary tree
+ * @compare - the comparison function between element' keys.
+ * @key - the function to get the key.
+ * @free - the function to free to each element.
+ * @returns - a binary tree.
  */
-Node newNode (Item item, Node l, Node r) {
-  Node x = malloc(sizeof(struct node));
+BTree newBTree (BTreeCompFn compare, BTreeKeyFn key, BTreeFreeFn free) {
+  BTree b = malloc(sizeof(struct btree));
+  b->compare = compare;
+  b->free = free;
+  b->key = key;
+  b->head = NULL;
+  return b;
+}
+
+/**
+ * newLeaf - creates a new leaf based on an item.
+ * @item - the item the leaf contains.
+ * @l - the left leaf.
+ * @r - the right leaf.
+ * @returns - the head of the leaf.
+ */
+Leaf newLeaf (void* item, Leaf l, Leaf r) {
+  Leaf x = malloc(sizeof(struct leaf));
 
   x->item = item;
   x->l = l;
@@ -25,11 +41,11 @@ Node newNode (Item item, Node l, Node r) {
 }
 
 /**
- * height - returns the height of a node.
- * @h - a node.
+ * height - returns the height of a leaf.
+ * @h - a leaf.
  * @returns - the height.
  */
-int height (Node h) {
+int height (Leaf h) {
   if (h == NULL)
     return 0;
 
@@ -37,24 +53,24 @@ int height (Node h) {
 }
 
 /**
- * rotL - rotates a node to the left.
- * @h - a node
- * @returns - a node.
+ * rotL - rotates a leaf to the left.
+ * @h - a leaf
+ * @returns - a leaf.
  */
-Node rotL (Node h) {
-  Node x = h->r;
+Leaf rotL (Leaf h) {
+  Leaf x = h->r;
   h->r = x->l;
   x->l = h;
   return x;
 }
 
 /**
- * rotR - rotates a node to the right.
- * @h - a node
- * @returns - a node.
+ * rotR - rotates a leaf to the right.
+ * @h - a leaf
+ * @returns - a leaf.
  */
-Node rotR (Node h) {
-  Node x;
+Leaf rotR (Leaf h) {
+  Leaf x;
   int heightLeft, heightRight;
 
   x = h->l;
@@ -81,11 +97,11 @@ Node rotR (Node h) {
 }
 
 /**
- * rotLR - rotates a node to the left and right.
- * @h - a node
- * @returns - a node.
+ * rotLR - rotates a leaf to the left and right.
+ * @h - a leaf
+ * @returns - a leaf.
  */
-Node rotLR (Node h) {
+Leaf rotLR (Leaf h) {
   if (h == NULL)
     return h;
 
@@ -94,11 +110,11 @@ Node rotLR (Node h) {
 }
 
 /**
- * rotRL - rotates a node to the right and left.
- * @h - a node
- * @returns - a node.
+ * rotRL - rotates a leaf to the right and left.
+ * @h - a leaf
+ * @returns - a leaf.
  */
-Node rotRL (Node h) {
+Leaf rotRL (Leaf h) {
   if (h == NULL)
     return h;
 
@@ -108,11 +124,11 @@ Node rotRL (Node h) {
 
 /**
  * balanceFactor - calculates the balance factor using
- * the height of the child nodes.
- * @h - a node
+ * the height of the child leafs.
+ * @h - a leafs.
  * @returns - the balance factor.
  */
-int balanceFactor (Node h) {
+int balanceFactor (Leaf h) {
   if (h == NULL)
     return 0;
 
@@ -121,10 +137,10 @@ int balanceFactor (Node h) {
 
 /**
  * AVLbalance - balances the tree.
- * @h - a node.
- * @returns - a node.
+ * @h - a leaf.
+ * @returns - a leaf.
  */
-Node AVLbalance (Node h) {
+Leaf AVLbalance (Leaf h) {
   int balance, heightLeft, heightRight;
 
   if (h == NULL)
@@ -156,116 +172,143 @@ Node AVLbalance (Node h) {
 }
 
 /**
- * maxNode - gets the max node of a tree.
- * @h - a node.
- * @returns - a node.
+ * maxNode - gets the max leaf of a tree.
+ * @h - a leaf.
+ * @returns - a leaf.
  */
-Node maxNode (Node h) {
+Leaf maxNode (Leaf h) {
   if (h == NULL || h->r == NULL)
     return h;
   else
     return maxNode(h->r);
 }
 
-/**
- * initNode - initializes a node by assigning it to NULL.
- * @node - a pointer to a node.
- */
-void initNode (Node *head) {
-  *head = NULL;
-}
 
 /**
- * countNodes - counts the number of nodes recursively
- * calling itself for each left and right node.
- * @node - a node.
+ * countLeafsAux - counts the nuber of leafs in a tree
+ * recursively.
+ * @l - the root leaf.
+ * @returns - the leaf count.
  */
-int countNodes (Node h) {
-  if (h == NULL)
+int countLeafsAux (Leaf l) {
+  if (l == NULL)
     return 0;
   else
-    return countNodes(h->r) + countNodes(h->l) + 1;
+    return countLeafsAux(l->r) + countLeafsAux(l->l) + 1;
 }
 
 /**
- * searchTree - searches the node tree recursively to find a certain node.
+ * countLeafs - counts the number of leafs recursively
+ * calling itself for each left and right node.
  * @node - a node.
- * @key - the key to search for.
+ * @returns - the leaf count.
  */
-Item searchTree (Node h, Key v) {
+int countLeafs (BTree b) {
+  return countLeafsAux(b->head);
+}
+
+/**
+ * searchR - looks up on the tree the element
+ * identifiable by the key, recursively.
+ * @b - the binary tree.
+ * @h - the head where we're searching.
+ * @v - the key to search for.
+ * @returns - the pointer to the element.
+ */
+void* searchR (BTree b, Leaf h, void* v) {
   if (h == NULL)
     return NULL;
-  if (eq(v, key(h->item)))
-    return h->item;
-  if (less(v, key(h->item)))
-    return searchTree(h->l, v);
-  else
-    return searchTree(h->r, v);
+
+  switch (b->compare(v, b->key(h->item))) {
+    case -1:
+      return searchR(b, h->l, v);
+    case 0:
+      return h->item;
+    default:
+      return searchR(b, h->r, v);
+  }
 }
 
 /**
- * insertR - inserts an item in the tree recursively
- * and then balances the tree.
- * @node - the pointer to a node.
- * @item - the item.
- * @returns - a node.
+ * searchTree - looks up on the tree the element
+ * identifiable by the key.
+ * @t - the binary tree.
+ * @v - the key to search for.
+ * @returns - the pointer to the element.
  */
-Node insertR (Node h, Item item) {
+void* searchTree (BTree t, void* v) {
+  return searchR(t, t->head, v);
+}
+
+/**
+ * insertR - inserts an item in the tree.
+ * @t - the binary tree.
+ * @h - the head leaf.
+ * @item - the item.
+ * @returns - the new head leaf.
+ */
+Leaf insertR (BTree t, Leaf h, void* item) {
   if (h == NULL)
-    return newNode(item, NULL, NULL);
-  if (less(key(item), key(h->item)))
-    h->l = insertR(h->l, item);
+    return newLeaf(item, NULL, NULL);
+  if (t->compare(t->key(item), t->key(h->item)) == -1)
+    h->l = insertR(t, h->l, item);
   else
-    h->r = insertR(h->r, item);
+    h->r = insertR(t, h->r, item);
 
   h = AVLbalance(h);
   return h;
 }
 
 /**
- * insertNode - inserts an item in the tree.
- * @node - the pointer to a node.
+ * insertLeaf - inserts an item in the tree.
+ * @t - the binary tree.
  * @item - the item.
  */
-void insertNode (Node *head, Item item) {
-  *head = insertR(*head, item);
+void insertLeaf (BTree t, void* item) {
+  t->head = insertR(t, t->head, item);
 }
 
 /**
- * deleteR - deletes an element from a tree recursively.
- * @node - the pointer to a node.
- * @key - key of the element to delete.
- * @returns - a node.
+ * deleteLeaf - removes an element from the tree,
+ * recursively.
+ * @t - the binary tree.
+ * @h - the head leaf.
+ * @v - the key.
+ * @returns - the new head leaf.
  */
-Node deleteR(Node h, Key k) {
-  Node aux;
-  Item x;
+Leaf deleteR (BTree t, Leaf h, void* k) {
+  Leaf aux;
+  void* x;
 
   if (h == NULL)
     return h;
-  else if (less(k, key(h->item)))
-    h->l = deleteR(h->l,k);
-  else if (less(key(h->item), k))
-    h->r = deleteR(h->r,k);
-  else {
-    if (h->l !=NULL && h->r !=NULL) {
-      aux = maxNode(h->l);
-      x = h->item;
-      h->item = aux->item;
-      aux->item = x;
-      h->l= deleteR(h->l, key(aux->item));
-    } else {
-      aux=h;
-      if (h->l == NULL && h->r == NULL)
-        h = NULL;
-      else if (h->l == NULL)
-        h = h->r;
-      else
-        h = h->l;
 
-      deleteItem(aux->item);
-      free(aux);
-    }
+  switch (t->compare(k, t->key(h->item))) {
+    case -1:
+      h->l = deleteR(t, h->l, k);
+      break;
+    case 1:
+      h->r = deleteR(t, h->r, k);
+      break;
+    default:
+      if (h->l !=NULL && h->r !=NULL) {
+        aux = maxNode(h->l);
+        x = h->item;
+        h->item = aux->item;
+        aux->item = x;
+        h->l= deleteR(t, h->l, t->key(aux->item));
+      } else {
+        aux=h;
+        if (h->l == NULL && h->r == NULL)
+          h = NULL;
+        else if (h->l == NULL)
+          h = h->r;
+        else
+          h = h->l;
+
+        t->free(aux->item);
+        free(aux);
+      }
   }
 
   h = AVLbalance(h);
@@ -273,12 +316,12 @@ Node deleteR(Node h, Key k) {
 }
 
 /**
- * deleteNode - deletes an element from a tree.
- * @node - the pointer to a node.
- * @key - key of the element to delete.
+ * deleteLeaf - removes an element from the tree.
+ * @t - the binary tree.
+ * @v - the key.
  */
-void deleteNode (Node *head, Key k){
-  *head = deleteR(*head, k);
+void deleteLeaf (BTree t, void* v) {
+  t->head = deleteR(t, t->head, v);
 }
 
 /**
@@ -288,7 +331,7 @@ void deleteNode (Node *head, Key k){
  * @h - the head of the node.
  * @visit - the function to apply to every element.
  */
-void traverseR(Node h, void (*visit)(Item)) {
+void traverseR( Leaf h, void (*visit)(void *)) {
   if (h == NULL)
     return;
 
@@ -303,31 +346,32 @@ void traverseR(Node h, void (*visit)(Item)) {
  * @node - a node.
  * @visit - the function to call to each element.
  */
-void traverseTree (Node head, void (*visit)(Item)) {
-  traverseR(head, visit);
+void traverseTree (BTree t, void (*visit)(void*)) {
+  traverseR(t->head, visit);
 }
 
 /**
- * freeR - frees the Node. THis is an helper function
+ * freeR - frees a leaf. THis is an helper function
  * to free every node from the tree using the delete
  * function.
  * @node - a a node.
  * @returns - a node.
  */
-Node freeR (Node h) {
+Leaf freeR (BTree t, Leaf h) {
   if (h == NULL)
     return h;
 
-  h->l = freeR(h->l);
-  h->r = freeR(h->r);
+  h->l = freeR(t, h->l);
+  h->r = freeR(t, h->r);
 
-  return deleteR(h, key(h->item));
+  return deleteR(t, h, t->key(h->item));
 }
 
 /**
- * freeNode - frees the Node.
- * @node - a pointer to a node.
+ * freeTree - frees an entire tree.
+ * @b - a pointer to a BTree.
  */
-void freeNode (Node *head) {
-  *head = freeR(*head);
+void freeTree (BTree b) {
+  b->head = freeR(b, b->head);
+  free(b);
 }

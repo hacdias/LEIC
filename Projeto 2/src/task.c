@@ -1,5 +1,11 @@
 #include "task.h"
 
+struct taskList {
+  bool validPath;
+  BTree tree;
+  DLL dll;
+};
+
 int compareTasks (const void *a, const void *b) {
   Task t1 = (Task)a;
   Task t2 = (Task)b;
@@ -12,16 +18,6 @@ int compareTasks (const void *a, const void *b) {
     return 1;
 }
 
-/**
- * newTask - allocates the memory for a new task and sets the default values
- * for each field and fills all the other fields wiht the given information.
- * @id - the task id.
- * @duration - the task duration.
- * @desc - the task description.
- * @deps - the task dependencies.
- * @depsCount - the number of dependencies.
- * @returns - a task.
- */
 Task newTask (ulong id, ulong duration, char *desc, DLL deps) {
   Task p = malloc(sizeof(struct task));
 
@@ -40,48 +36,11 @@ Task newTask (ulong id, ulong duration, char *desc, DLL deps) {
   return p;
 }
 
-/**
- * freeTask - frees a task.
- * @t - a task.
- */
-void freeTask (void *a) {
-  Task t = (Task)a;
-  DLLfree(&t->dependants);
-  DLLfree(&t->dependencies);
-  free(t->desc);
-  free(t);
-}
-
-/**
- * resetTime - resets the early and late starts of a single task.
- * @t - a task.
- */
-void resetTime (Task t) {
-  t->early = 0;
-  t->late = ULONG_MAX;
-}
 
 void print (const void *a) {
   printf(" %ld", ((Task)a)->id);
 }
 
-/**
- * printTask - prints a task. If the validPath is set to false
- * it will have the following format:
- *
- *  <id> "<description>" <duration> [dependencies...]
- *
- * otherwise, if validPath is true:
- *
- *  <id> "<description>" <duration> [<earlyStart> <lateStart>] [dependencies...]
- *
- * also, if the early start is the same as the late start:
- *
- *  <id> "<description>" <duration> [<earlyStart> CRITICAL] [dependencies...]
- *
- * @t - the task.
- * @validPath - indicates if the early and late start values are correct.
- */
 void printTask (Task t, bool validPath) {
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
 
@@ -93,30 +52,20 @@ void printTask (Task t, bool validPath) {
     }
   }
 
-  DLLvisit(t->dependencies, print);
+  visitList(t->dependencies, print);
   printf("\n");
 }
 
-/**
- * taskDeps - prints the task dependants in the format:
- *  <id>: [no dependencies|dependants...]
- * @t - a task.
- */
 void taskDeps (Task t) {
   printf("%ld:", t->id);
 
   if (t->dependants->count == 0)
     printf(" no dependencies");
 
-  DLLvisitInverse(t->dependants, print);
+  visitInverseList(t->dependants, print);
   printf("\n");
 }
 
-/**
- * calculateEarlyStart - calculates the early start
- * of a task.
- * @t - a task.
- */
 void calculateEarlyStart (Task t) {
   DLLnode dp;
   Task p;
@@ -129,12 +78,6 @@ void calculateEarlyStart (Task t) {
   }
 }
 
-/**
- * calculateLateStart - calculates the late start
- * of a task.
- * @t - a task.
- * @duration - the project duration.
- */
 void calculateLateStart (Task t, ulong duration) {
   DLLnode n;
   Task p;
@@ -150,20 +93,130 @@ void calculateLateStart (Task t, ulong duration) {
   }
 }
 
-/**
- * addDependant - adds a dependant to a task.
- * @t - a task.
- * @dependant - the task that depends on @t.
- */
 void addDependant (Task t, Task dependant) {
-  DLLinsertBegin(t->dependants, dependant);
+  insertBeginList(t->dependants, dependant);
 }
 
-/**
- * removeDependant - removes a dependant from a task.
- * @t - a task.
- * @dependant - the task that depends on @t.
- */
 void removeDependant (Task t, Task dependant) {
-  DLLdelete(t->dependants, dependant);
+  deleteElementList(t->dependants, dependant);
+}
+
+
+void* key (void *a) {
+  return &(((Task)(((DLLnode)a)->item))->id);
+}
+
+int compFns(void* a, void* b) {
+  ulong* k1 = (ulong*)a;
+  ulong* k2 = (ulong*)b;
+
+  if (*k1 < *k2)
+    return -1;
+  else if (*k1 == *k2)
+    return 0;
+  else
+    return 1;
+}
+
+void freeTask (void *a) {
+  Task t = (Task)a;
+  freeList(t->dependencies);
+  freeList(t->dependants);
+  free(t->desc);
+  free(t);
+}
+
+void freeAll (TaskList lst) {
+  freeTree(lst->tree);
+  freeList(lst->dll);
+  free(lst);
+}
+
+TaskList newTaskList () {
+  TaskList lst = malloc(sizeof(struct taskList));
+
+  lst->validPath = false;
+  lst->dll = newDLL(compareTasks, freeTask);
+  lst->tree = newBTree(compFns, key, null);
+
+  return lst;
+}
+
+void resetTime (const void *t) {
+  ((Task)t)->early = 0;
+  ((Task)t)->late = ULONG_MAX;
+}
+
+void resetTimes (TaskList lst) {
+  lst->validPath = false;
+  visitList(lst->dll, resetTime);
+}
+
+void insertTask (TaskList lst, Task t) {
+  DLLnode n;
+
+  for (n = t->dependencies->head; n != NULL; n = n->next)
+    addDependant((Task)n->item, t);
+
+  insertLeaf(lst->tree, insertEndList(lst->dll, t));
+
+  if (lst->validPath)
+    resetTimes(lst);
+}
+
+
+
+Task lookupTask (TaskList lst, ulong id) {
+  DLLnode n = (DLLnode)searchTree(lst->tree, &id);
+
+  if (n == NULL)
+    return NULL;
+  else
+    return (Task)n->item;
+}
+
+void deleteTask (TaskList lst, Task t) {
+  DLLnode n;
+
+  for (n = t->dependencies->head; n != NULL; n = n->next)
+    removeDependant((Task)n->item, t);
+
+  deleteLeaf(lst->tree, &t->id);
+  deleteElementList(lst->dll, t);
+
+  if (lst->validPath)
+    resetTimes(lst);
+}
+
+void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
+  DLLnode n;
+  Task t;
+
+  for (n = lst->dll->head; n != NULL; n = n->next) {
+    t = (Task)n->item;
+    if (t->duration >= duration && (!onlyCritical || t->early == t->late))
+      printTask(t, lst->validPath);
+  }
+}
+
+
+void tasksPath (TaskList lst) {
+  DLLnode n;
+  Task t;
+  ulong duration = 0;
+
+  for (n = lst->dll->head; n != NULL; n = n->next) {
+    t = (Task)n->item;
+    calculateEarlyStart(t);
+    duration = max(duration, t->early+t->duration);
+  }
+
+  for (n = lst->dll->tail; n != NULL; n = n->prev) {
+    t = (Task)n->item;
+    calculateLateStart(t, duration);
+  }
+
+  lst->validPath = true;
+  printTasks(lst, 0, true);
+  printf("project duration = %lu\n", duration);
 }
