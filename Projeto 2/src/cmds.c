@@ -131,8 +131,7 @@ void illegalArg () {
  * @lst - the task list.
  */
 void runAdd (char *cmd, TaskList lst) {
-  Task d;
-  DLL deps;
+  Task d, t;
   char *desc, *p;
   int n;
   ulong id, duration, tmp;
@@ -187,13 +186,13 @@ void runAdd (char *cmd, TaskList lst) {
     return;
   }
 
-  deps = newDLL(compareTasks, null);
+  t = newTask(id, duration, desc);
 
   /* reads the dependencies */
   while (*p != '\n') {
     if (scanUlong(p, &tmp, &n) != 1) {
       illegalArg();
-      freeList(deps);
+      freeTask(t);
       return;
     }
 
@@ -201,16 +200,15 @@ void runAdd (char *cmd, TaskList lst) {
 
     if (d == NULL) {
       printf("no such task\n");
-      freeList(deps);
+      freeTask(t);
       return;
     }
 
-    insertEndList(deps, d);
+    addDependency(t, d);
     p += n;
   }
 
-  d = newTask(id, duration, desc, deps);
-  insertTask(lst, d);
+  insertTask(lst, t);
 }
 
 /**
