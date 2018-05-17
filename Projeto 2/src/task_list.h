@@ -54,11 +54,4 @@ void freeAll (TaskList lst);
  */
 void tasksPath (TaskList lst);
 
-/**
- * tasksCount - the number of tasks on a list.
- * @lst - a task list.
- * @returns - the number of tasks.
- */
-ulong tasksCount (TaskList lst);
-
 #endif

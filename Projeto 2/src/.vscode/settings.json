@@ -4,6 +4,8 @@
         "type_traits": "c",
         "hashtable.h": "c",
         "limits": "c",
-        "istream": "c"
+        "istream": "c",
+        "stdlib.h": "c",
+        "cstdlib": "c"
     }
 }

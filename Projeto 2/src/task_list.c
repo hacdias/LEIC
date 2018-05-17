@@ -2,9 +2,8 @@
 
 struct taskList {
   Node head;
-  ulong count;
-  Task first, last;
   bool validPath;
+  DLL dll;
 };
 
 /**
@@ -18,9 +17,7 @@ TaskList newTaskList () {
 
   initNode(&lst->head);
   lst->validPath = false;
-  lst->count = 0;
-  lst->first = NULL;
-  lst->last = NULL;
+  lst->dll = newDLL(compareTasks, null);
 
   return lst;
 }
@@ -41,22 +38,13 @@ void resetTimes (TaskList lst) {
  * @t - a task.
  */
 void insertTask (TaskList lst, Task t) {
-  ulong i;
+  DLLnode n;
 
-  for (i = 0; i < t->dependenciesCount; i++)
-    addDependant(t->dependencies[i], t);
+  for (n = t->dependencies->head; n != NULL; n = n->next)
+    addDependant((Task)n->item, t);
 
-  if (lst->first == NULL) {
-    lst->first = t;
-    lst->last = t;
-  } else {
-    t->prev = lst->last;
-    lst->last->next = t;
-    lst->last = t;
-  }
-
+  DLLinsertEnd(lst->dll, t);
   insertNode(&lst->head, t);
-  lst->count++;
 
   if (lst->validPath)
     resetTimes(lst);
@@ -89,23 +77,12 @@ Task lookupTask (TaskList lst, ulong id) {
  * @task - the task to add.
  */
 void deleteTask (TaskList lst, Task t) {
-  ulong i;
+  DLLnode n;
 
-  for (i = 0; i < t->dependenciesCount; i++)
-    removeDependant(t->dependencies[i], t);
+  for (n = t->dependencies->head; n != NULL; n = n->next)
+    removeDependant((Task)n->item, t);
 
-  if (lst->first == t)
-    lst->first = t->next;
-
-  if (t->prev != NULL)
-    t->prev->next = t->next;
-
-  if (t->next != NULL)
-    t->next->prev = t->prev;
-
-  if (lst->last == t)
-    lst->last = t->prev;
-
+  DLLdelete(lst->dll, t);
   deleteNode(&lst->head, t->id);
 
   if (lst->validPath)
@@ -119,11 +96,14 @@ void deleteTask (TaskList lst, Task t) {
  * @onlyCritical - only prints the critical tasks.
  */
 void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
+  DLLnode n;
   Task t;
 
-  for (t = lst->first; t != NULL; t = t->next)
+  for (n = lst->dll->head; n != NULL; n = n->next) {
+    t = (Task)n->item;
     if (t->duration >= duration && (!onlyCritical || t->early == t->late))
       printTask(t, lst->validPath);
+  }
 }
 
 /**
@@ -131,28 +111,22 @@ void printTasks (TaskList lst, ulong duration, bool onlyCritical) {
  * @lst - a task list.
  */
 void tasksPath (TaskList lst) {
+  DLLnode n;
   Task t;
   ulong duration = 0;
 
-  for (t = lst->first; t != NULL; t = t->next) {
+  for (n = lst->dll->head; n != NULL; n = n->next) {
+    t = (Task)n->item;
     calculateEarlyStart(t);
     duration = max(duration, t->early+t->duration);
   }
 
-  for (t = lst->last; t != NULL; t = t->prev) {
+  for (n = lst->dll->last; n != NULL; n = n->prev) {
+    t = (Task)n->item;
     calculateLateStart(t, duration);
   }
 
   lst->validPath = true;
   printTasks(lst, 0, true);
   printf("project duration = %lu\n", duration);
-}
-
-/**
- * tasksCount - the number of tasks on a list.
- * @lst - a task list.
- * @returns - the number of tasks.
- */
-ulong tasksCount (TaskList lst) {
-  return lst->count;
 }

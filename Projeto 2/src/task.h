@@ -6,6 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include "utils.h"
+#include "list.h"
 
 #define key(a) (a != NULL ? a->id : 0)
 #define less(a,b) ((a) < (b))
@@ -25,11 +26,10 @@ struct task {
   char *desc;
   ulong duration;
   ulong early, late;
-  ulong dependenciesCount, dependantsCount;
-  Task *dependencies;
-  Task next, prev;
-  struct depsList *dependants;
+  DLL dependencies, dependants;
 };
+
+int compareTasks (const void *a, const void *b);
 
 /**
  * newTask - creates a new task from some info.
@@ -40,13 +40,13 @@ struct task {
  * @depsCount - the number of dependencies.
  * @returns - a task.
  */
-Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount);
+Task newTask (ulong id, ulong duration, char *desc, DLL deps);
 
 /**
  * freeTask - frees a task.
  * @t - a task.
  */
-void freeTask (Task t);
+void freeTask (void *);
 
 /**
  * printTask - prints a task.

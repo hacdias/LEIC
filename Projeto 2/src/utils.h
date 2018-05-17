@@ -11,4 +11,6 @@ typedef enum {
   true = 1
 } bool;
 
+void null (void *);
+
 #endif

@@ -1,9 +1,16 @@
 #include "task.h"
 
-struct depsList {
-  Task task;
-  struct depsList* next;
-};
+int compareTasks (const void *a, const void *b) {
+  Task t1 = (Task)a;
+  Task t2 = (Task)b;
+
+  if (t1->id < t2->id)
+    return -1;
+  else if (t1->id == t2->id)
+    return 0;
+  else
+    return 1;
+}
 
 /**
  * newTask - allocates the memory for a new task and sets the default values
@@ -15,7 +22,7 @@ struct depsList {
  * @depsCount - the number of dependencies.
  * @returns - a task.
  */
-Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount) {
+Task newTask (ulong id, ulong duration, char *desc, DLL deps) {
   Task p = malloc(sizeof(struct task));
 
   /* given info */
@@ -23,16 +30,12 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
   p->duration = duration;
   p->desc = malloc(sizeof(char) * (strlen(desc)+1));
   p->dependencies = deps;
-  p->dependenciesCount = depsCount;
   strcpy(p->desc, desc);
 
   /* defaults */
   p->early = 0;
   p->late = ULONG_MAX;;
-  p->dependants = NULL;
-  p->dependantsCount = 0;
-  p->next = NULL;
-  p->prev = NULL;
+  p->dependants = newDLL(compareTasks, null);
 
   return p;
 }
@@ -41,16 +44,10 @@ Task newTask (ulong id, ulong duration, char *desc, Task *deps, ulong depsCount)
  * freeTask - frees a task.
  * @t - a task.
  */
-void freeTask (Task t) {
-  struct depsList *h, *p = NULL;
-
-  for (h = t->dependants; h != NULL; h = h->next) {
-    free(p);
-    p = h;
-  }
-
-  free(p);
-  free(t->dependencies);
+void freeTask (void *a) {
+  Task t = (Task)a;
+  DLLfree(&t->dependants);
+  DLLfree(&t->dependencies);
   free(t->desc);
   free(t);
 }
@@ -62,6 +59,10 @@ void freeTask (Task t) {
 void resetTime (Task t) {
   t->early = 0;
   t->late = ULONG_MAX;
+}
+
+void print (const void *a) {
+  printf(" %ld", ((Task)a)->id);
 }
 
 /**
@@ -82,7 +83,6 @@ void resetTime (Task t) {
  * @validPath - indicates if the early and late start values are correct.
  */
 void printTask (Task t, bool validPath) {
-  ulong i;
   printf("%ld \"%s\" %ld", t->id, t->desc, t->duration);
 
   if (validPath) {
@@ -93,9 +93,7 @@ void printTask (Task t, bool validPath) {
     }
   }
 
-  for (i = 0; i < t->dependenciesCount; i++)
-    printf(" %ld", t->dependencies[i]->id);
-
+  DLLvisit(t->dependencies, print);
   printf("\n");
 }
 
@@ -105,25 +103,12 @@ void printTask (Task t, bool validPath) {
  * @t - a task.
  */
 void taskDeps (Task t) {
-  ulong i, *ids;
-  struct depsList *h;
-
   printf("%ld:", t->id);
 
-  if (t->dependantsCount == 0)
+  if (t->dependants->count == 0)
     printf(" no dependencies");
 
-  ids = malloc(sizeof(ulong) * t->dependantsCount);
-  i = t->dependantsCount - 1;
-
-  for (h = t->dependants; h != NULL; h = h->next)
-    ids[i--] = h->task->id;
-
-
-  for (i = 0; i < t->dependantsCount; i++)
-    printf(" %ld", ids[i]);
-
-  free(ids);
+  DLLvisitInverse(t->dependants, print);
   printf("\n");
 }
 
@@ -133,11 +118,11 @@ void taskDeps (Task t) {
  * @t - a task.
  */
 void calculateEarlyStart (Task t) {
-  struct depsList* dp;
+  DLLnode dp;
   Task p;
 
-  for (dp = t->dependants; dp != NULL; dp = dp->next) {
-    p = dp->task;
+  for (dp = t->dependants->head; dp != NULL; dp = dp->next) {
+    p = (Task)dp->item;
 
     if (t->early + t->duration > p->early)
       p->early = t->early + t->duration;
@@ -151,14 +136,14 @@ void calculateEarlyStart (Task t) {
  * @duration - the project duration.
  */
 void calculateLateStart (Task t, ulong duration) {
-  ulong i;
+  DLLnode n;
   Task p;
 
-  if (t->dependantsCount == 0)
+  if (t->dependants->count == 0)
     t->late = duration - t->duration;
 
-  for (i = 0; i < t->dependenciesCount; i++) {
-    p = t->dependencies[i];
+  for (n = t->dependencies->head; n != NULL; n = n->next) {
+    p = (Task)n->item;
 
     if (t->late - p->duration < p->late)
       p->late = t->late - p->duration;
@@ -171,15 +156,7 @@ void calculateLateStart (Task t, ulong duration) {
  * @dependant - the task that depends on @t.
  */
 void addDependant (Task t, Task dependant) {
-  struct depsList *dep = malloc(sizeof(struct depsList));
-  dep->task = dependant;
-  dep->next = NULL;
-
-  if (t->dependantsCount)
-    dep->next = t->dependants;
-
-  t->dependants = dep;
-  t->dependantsCount++;
+  DLLinsertBegin(t->dependants, dependant);
 }
 
 /**
@@ -188,18 +165,5 @@ void addDependant (Task t, Task dependant) {
  * @dependant - the task that depends on @t.
  */
 void removeDependant (Task t, Task dependant) {
-  struct depsList *h, *p;
-
-  p = t->dependants;
-  for (h = p; h != NULL && h->task != dependant; h = h->next)
-    p = h;
-
-  if (h == t->dependants)
-    t->dependants = h->next;
-
-  if (p != NULL)
-    p->next = h->next;
-
-  free(h);
-  t->dependantsCount--;
+  DLLdelete(t->dependants, dependant);
 }

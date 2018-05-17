@@ -131,10 +131,11 @@ void illegalArg () {
  * @lst - the task list.
  */
 void runAdd (char *cmd, TaskList lst) {
-  Task d, *deps;
+  Task d;
+  DLL deps;
   char *desc, *p;
   int n;
-  ulong id, duration, depsCount, maxTasks, tmp;
+  ulong id, duration, tmp;
 
   /* reads the id */
   if (scanUlong(cmd, &id, &n) != 1) {
@@ -186,9 +187,7 @@ void runAdd (char *cmd, TaskList lst) {
     return;
   }
 
-  maxTasks = tasksCount(lst);
-  deps = malloc(sizeof(Task) * maxTasks);
-  depsCount = 0;
+  deps = newDLL(compareTasks, null);
 
   /* reads the dependencies */
   while (*p != '\n') {
@@ -206,14 +205,11 @@ void runAdd (char *cmd, TaskList lst) {
       return;
     }
 
-    deps[depsCount++] = d;
+    DLLinsertEnd(deps, d);
     p += n;
   }
 
-  if (depsCount < maxTasks)
-    deps = realloc(deps, sizeof(Task) * depsCount);
-
-  d = newTask(id, duration, desc, deps, depsCount);
+  d = newTask(id, duration, desc, deps);
   insertTask(lst, d);
 }
 
@@ -283,7 +279,7 @@ void runRemove (char *cmd, TaskList lst) {
     return;
   }
 
-  if (t->dependantsCount) {
+  if (t->dependants->count) {
     printf("task with dependencies\n");
     return;
   }
