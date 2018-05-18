@@ -239,7 +239,6 @@ void* getTaskID (void *a) {
   return &(((Task)(((DLLnode)a)->item))->id);
 }
 
-
 /**
  * newTaskList - creates a new task list.
  * @returns - a task list.

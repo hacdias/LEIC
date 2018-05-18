@@ -183,7 +183,6 @@ Leaf maxNode (Leaf h) {
     return maxNode(h->r);
 }
 
-
 /**
  * countLeafsAux - counts the nuber of leafs in a tree
  * recursively.
