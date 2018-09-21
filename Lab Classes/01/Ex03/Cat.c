@@ -14,8 +14,13 @@ Cat newCat(const char name[16], int age, int weight, int purrLevel, int fluffine
   Cat c = malloc(sizeof(struct cat));
   if (c != NULL) {
     c->animal = newAnimal(name, age, weight);
-    c->_purrLevel = purrLevel;
-    c->_fluffiness = fluffiness;
+    if (c->animal == NULL) {
+      free(c);
+      c = NULL;
+    } else {
+      c->_purrLevel = purrLevel;
+      c->_fluffiness = fluffiness;
+    }
   }
   return c;
 }
