@@ -230,9 +230,18 @@ void grid_addPath_Ptr (grid_t* gridPtr, vector_t* pointVectorPtr){
  * =============================================================================
  */
 void grid_print (grid_t* gridPtr){
-    // TODO implementar esta funcao
-    // Sugestão: usem as opções de formatação do output do printf para impor espaço fixo
-    // entre os elementos da grelha. Por exemplo: printf("%4li", valor-a-imprimir);
+    int x, y, z;
+
+    for (z = 0; z < gridPtr->depth; z++) {
+        printf("[z = %d]\n", z);
+        for (x = 0; x < gridPtr->width; x++) {
+            for (y = 0; y < gridPtr->height; y++) {
+                printf("%4li ", grid_getPoint(gridPtr, x, y, z));
+            }
+            printf("\n");
+        }
+    }
+
 }
 
 

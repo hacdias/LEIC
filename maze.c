@@ -131,7 +131,11 @@ static void addToGrid (grid_t* gridPtr, vector_t* vectorPtr, char* type){
     long n = vector_getSize(vectorPtr);
     for (i = 0; i < n; i++) {
         coordinate_t* coordinatePtr = (coordinate_t*)vector_at(vectorPtr, i);
-        // TODO validar ponto
+
+        if (!grid_isPointValid(gridPtr, coordinatePtr->x, coordinatePtr->y, coordinatePtr->z)) {
+            printf("Invalid point\n");
+            exit(1);
+        }
     }
     grid_addPath(gridPtr, vectorPtr);
 }
