@@ -114,10 +114,15 @@ static void setDefaultParams (){
  * =============================================================================
  */
 static void parseArgs (long argc, char* const argv[]){
-    long i;
     long opt;
+    long i;
 
     opterr = 0;
+
+    if (argc < 2) {
+        printf("Please provide a filename.\n");
+        exit(1);
+    }
 
     setDefaultParams();
 
@@ -139,6 +144,8 @@ static void parseArgs (long argc, char* const argv[]){
                 break;
         }
     }
+
+    global_inputFile = argv[optind++];
 
     for (i = optind; i < argc; i++) {
         fprintf(stderr, "Non-option argument: %s\n", argv[i]);
@@ -163,7 +170,20 @@ int main(int argc, char** argv){
     maze_t* mazePtr = maze_alloc();
     assert(mazePtr);
 
-    long numPathToRoute = maze_read(mazePtr);
+    printf("%s\n", global_inputFile);
+    
+
+    FILE * fp;
+    fp = fopen(global_inputFile, "r");
+
+    if (fp == NULL) {
+        printf("Error while reading file.\n");
+        exit(1);
+    }
+
+
+
+    long numPathToRoute = maze_read(mazePtr, fp);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],

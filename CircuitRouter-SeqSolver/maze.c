@@ -150,7 +150,7 @@ static void addToGrid (grid_t* gridPtr, vector_t* vectorPtr, char* type){
  * =============================================================================
  */
 
-long maze_read (maze_t* mazePtr){
+long maze_read (maze_t* mazePtr, FILE *stream){
     
     /*
      * Parse input from stdin
@@ -165,7 +165,7 @@ long maze_read (maze_t* mazePtr){
     vector_t* srcVectorPtr = mazePtr->srcVectorPtr;
     vector_t* dstVectorPtr = mazePtr->dstVectorPtr;
     
-    while (fgets(line, sizeof(line), stdin)) {
+    while (fgets(line, sizeof(line), stream)) {
         
         char code;
         long x1, y1, z1;
