@@ -52,7 +52,6 @@
 
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include "coordinate.h"
 #include "grid.h"
@@ -187,8 +186,6 @@ static bool_t doExpansion (router_t* routerPtr, grid_t* myGridPtr, queue_t* queu
 
     } /* iterate over work queue */
 
-    printf("Expanded maze:\n");
-    grid_print(myGridPtr);
     return isPathFound;
 }
 
@@ -287,8 +284,6 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
         }
     }
 
-    printf("Traced back maze:\n");
-    grid_print(myGridPtr);
     return pointVectorPtr;
 }
 
