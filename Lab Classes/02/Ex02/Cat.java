@@ -74,8 +74,8 @@ public class Cat {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Dog) {
-      Dog d = (Dog)obj;
+    if (obj instanceof Cat) {
+      Cat d = (Cat)obj;
       return _energy == d.getEnergy() &&
         _name.equals(d.getName());
     }
@@ -84,7 +84,7 @@ public class Cat {
   }
 
   @Override
-  public String toString() {
+  public Cat toString() {
     return "Dog " + _name + " with " + _energy + " energy.";
   }
 }
