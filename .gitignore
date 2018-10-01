@@ -1,3 +1,6 @@
 *.o
 .vscode
-CircuitRouter-SeqSolver
+*.res
+*.old
+/CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
+CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
