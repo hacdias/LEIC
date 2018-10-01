@@ -60,6 +60,8 @@
 #include "router.h"
 #include "lib/timer.h"
 #include "lib/types.h"
+#include "string.h"
+#include "unistd.h"
 
 enum param_types {
     PARAM_BENDCOST = (unsigned char)'b',
@@ -75,7 +77,6 @@ enum param_defaults {
     PARAM_DEFAULT_ZCOST    = 2,
 };
 
-bool_t global_doPrint = FALSE;
 char* global_inputFile = NULL;
 long global_params[256]; /* 256 = ascii limit */
 
@@ -134,9 +135,6 @@ static void parseArgs (long argc, char* const argv[]){
             case 'z':
                 global_params[(unsigned char)opt] = atol(optarg);
                 break;
-            case 'p':
-                global_doPrint = TRUE;
-                break;
             case '?':
             case 'h':
             default:
@@ -157,6 +155,19 @@ static void parseArgs (long argc, char* const argv[]){
     }
 }
 
+FILE* get_output_file () {
+    char* file_name = strdup(global_inputFile);
+    strcat(file_name, ".res");
+
+    if (access(file_name, F_OK) != -1) {
+        char *new_name = strdup(file_name);
+        strcat(new_name, ".old");
+        remove(new_name);
+        rename(file_name, new_name);
+    }
+
+    return fopen(file_name, "w");
+}
 
 /* =============================================================================
  * main
@@ -170,20 +181,15 @@ int main(int argc, char** argv){
     maze_t* mazePtr = maze_alloc();
     assert(mazePtr);
 
-    printf("%s\n", global_inputFile);
-    
+    FILE * fpin = fopen(global_inputFile, "r");
+    FILE * fpout = get_output_file();
 
-    FILE * fp;
-    fp = fopen(global_inputFile, "r");
-
-    if (fp == NULL) {
+    if (fpin == NULL || fpout == NULL) {
         printf("Error while reading file.\n");
         exit(1);
     }
 
-
-
-    long numPathToRoute = maze_read(mazePtr, fp);
+    long numPathToRoute = maze_read(mazePtr, fpin);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
@@ -216,7 +222,7 @@ int main(int argc, char** argv){
      * Check solution and clean up
      */
     assert(numPathRouted <= numPathToRoute);
-    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint);
+    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, fpout);
     assert(status == TRUE);
     puts("Verification passed.");
 
@@ -235,7 +241,8 @@ int main(int argc, char** argv){
     }
     list_free(pathVectorListPtr);
 
-
+    fclose(fpin);
+    fclose(fpout);
     exit(0);
 }
 
