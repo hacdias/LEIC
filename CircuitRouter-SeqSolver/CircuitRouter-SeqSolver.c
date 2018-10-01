@@ -189,7 +189,7 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    long numPathToRoute = maze_read(mazePtr, fpin);
+    long numPathToRoute = maze_read(mazePtr, fpin, fpout);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
@@ -214,8 +214,8 @@ int main(int argc, char** argv){
         vector_t* pathVectorPtr = (vector_t*)list_iter_next(&it, pathVectorListPtr);
         numPathRouted += vector_getSize(pathVectorPtr);
 	}
-    printf("Paths routed    = %li\n", numPathRouted);
-    printf("Elapsed time    = %f seconds\n", TIMER_DIFF_SECONDS(startTime, stopTime));
+    fprintf(fpout, "Paths routed    = %li\n", numPathRouted);
+    fprintf(fpout, "Elapsed time    = %f seconds\n", TIMER_DIFF_SECONDS(startTime, stopTime));
 
 
     /*
@@ -224,7 +224,7 @@ int main(int argc, char** argv){
     assert(numPathRouted <= numPathToRoute);
     bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, fpout);
     assert(status == TRUE);
-    puts("Verification passed.");
+    fputs("Verification passed.", fpout);
 
     maze_free(mazePtr);
     router_free(routerPtr);

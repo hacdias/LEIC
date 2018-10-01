@@ -150,7 +150,7 @@ static void addToGrid (grid_t* gridPtr, vector_t* vectorPtr, char* type){
  * =============================================================================
  */
 
-long maze_read (maze_t* mazePtr, FILE *stream){
+long maze_read (maze_t* mazePtr, FILE *fpin, FILE *fpout){
     
     /*
      * Parse input from stdin
@@ -165,7 +165,7 @@ long maze_read (maze_t* mazePtr, FILE *stream){
     vector_t* srcVectorPtr = mazePtr->srcVectorPtr;
     vector_t* dstVectorPtr = mazePtr->dstVectorPtr;
     
-    while (fgets(line, sizeof(line), stream)) {
+    while (fgets(line, sizeof(line), fpin)) {
         
         char code;
         long x1, y1, z1;
@@ -248,8 +248,8 @@ long maze_read (maze_t* mazePtr, FILE *stream){
     addToGrid(gridPtr, wallVectorPtr, "wall");
     addToGrid(gridPtr, srcVectorPtr,  "source");
     addToGrid(gridPtr, dstVectorPtr,  "destination");
-    printf("Maze dimensions = %li x %li x %li\n", width, height, depth);
-    printf("Paths to route  = %li\n", list_getSize(workListPtr));
+    fprintf(fpout, "Maze dimensions = %li x %li x %li\n", width, height, depth);
+    fprintf(fpout, "Paths to route  = %li\n", list_getSize(workListPtr));
     
     /*
      * Initialize work queue
