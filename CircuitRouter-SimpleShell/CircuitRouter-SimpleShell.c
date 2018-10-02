@@ -22,7 +22,7 @@ int getMaxChildren (int argc, char **argv) {
 typedef struct pinfo {
   pid_t pid;
   int state;
-}* pinfo_t;
+} pinfo_t;
 
 int main (int argc, char** argv) {
   char **argVector = malloc(sizeof(char) * 256 * 3);
