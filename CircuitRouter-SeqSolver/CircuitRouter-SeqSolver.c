@@ -182,10 +182,14 @@ int main(int argc, char** argv){
     assert(mazePtr);
 
     FILE * fpin = fopen(global_inputFile, "r");
-    FILE * fpout = get_output_file();
-
-    if (fpin == NULL || fpout == NULL) {
+    if (fpin == NULL) {
         printf("Error while reading file.\n");
+        exit(1);
+    }
+
+    FILE * fpout = get_output_file();
+    if (fpout == NULL) {
+        printf("Error while writing file.\n");
         exit(1);
     }
 
