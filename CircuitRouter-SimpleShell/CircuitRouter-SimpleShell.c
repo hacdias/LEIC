@@ -37,7 +37,8 @@ int main (int argc, char** argv) {
 
     if (args == 2 && !strcmp(argVector[0], "run")) {
       if (maxChildren && children == maxChildren) {
-        wait(NULL);
+        pid = wait(&state);
+        printf("CHILD EXITED (PID=%d; return %s)\n", pid, estado ? "NOK" : "OK");
         children--;
       }
 
