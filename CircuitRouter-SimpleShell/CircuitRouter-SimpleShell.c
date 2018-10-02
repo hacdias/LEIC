@@ -20,7 +20,7 @@ int main (int argc, char** argv) {
   char **argVector = malloc(sizeof(char) * 256 * 3);
   char *buffer = malloc(sizeof(char) * 256);
   int args = 0;
-  int pid, estado;
+  int pid, state;
   int actual_children = 0;
 
   while ((args = readLineArguments(argVector, 3, buffer, 256)) != -1) {
@@ -36,13 +36,13 @@ int main (int argc, char** argv) {
       } else {
         // MAIN PROCESS
         if (actual_children == maxChildren && maxChildren != -1) {
-          pid = wait(&estado);
+          pid = wait(&state);
           actual_children--;
         }      
       }
     } else if ((args == 1 && !strcmp(argVector[0], "exit"))) {
-      while (actual_children > 0 && (pid = wait(&estado))) {
-        printf("CHILD EXITED (PID=%i; return %s)\n", pid, estado ? "NOK" : "OK");
+      while (actual_children > 0 && (pid = wait(&state))) {
+        printf("CHILD EXITED (PID=%i; return %s)\n", pid, state ? "NOK" : "OK");
         actual_children--;
       }
       printf("END.\n");
