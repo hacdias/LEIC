@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "../lib/commandlinereader.h"
 
@@ -22,17 +23,20 @@ int main (int argc, char** argv) {
   printf("%d\n", maxChildren);
 
   while ((args = readLineArguments(argVector, 3, buffer, 256)) != -1) {
-    switch (args) {
-      case 2:
-        execl(BINARY, BINARY, argVector[1], (char*)NULL);
+    
+    if (args == 2 && !strcmp(argVector[0], "run")) {
 
-        /* code */
-        break;
-      case 1:
-        printf("exit");
-        break;
-      default:
-        printf("CHUPA. NAo existes\n");
+      execl(BINARY, BINARY, argVector[1], (char*)NULL);
+      /* code */
+
+    }
+
+    else if ((args == 1 && !strcmp(argVector[0], "exit"))) {
+      printf("exit\n");
+    }
+
+    else {
+      printf("Invalid Command\n");
     }
   }
 
