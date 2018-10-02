@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include "../lib/commandlinereader.h"
 
@@ -19,23 +20,35 @@ int main (int argc, char** argv) {
   char **argVector = malloc(sizeof(char) * 256 * 3);
   char *buffer = malloc(sizeof(char) * 256);
   int args = 0;
-
-  printf("%d\n", maxChildren);
+  int pid, estado;
+  int actual_children = 0;
 
   while ((args = readLineArguments(argVector, 3, buffer, 256)) != -1) {
-    
     if (args == 2 && !strcmp(argVector[0], "run")) {
 
-      execl(BINARY, BINARY, argVector[1], (char*)NULL);
-      /* code */
+      pid = fork();
+      actual_children ++;
 
-    }
+      if (pid == 0) {
+        execl(BINARY, BINARY, argVector[1], (char*)NULL);
+        /* code */
+        exit(0);
+      } else {
+        // MAIN PROCESS
+        if (actual_children == maxChildren && maxChildren != -1) {
+          pid = wait(&estado);
+          actual_children--;
+        }      
+      }
+    } else if ((args == 1 && !strcmp(argVector[0], "exit"))) {
+      while (actual_children > 0 && (pid = wait(&estado))) {
+        printf("CHILD EXITED (PID=%i; return %s)\n", pid, estado ? "NOK" : "OK");
+        actual_children--;
+      }
+      printf("END.\n");
+      exit(0);
 
-    else if ((args == 1 && !strcmp(argVector[0], "exit"))) {
-      printf("exit\n");
-    }
-
-    else {
+    } else {
       printf("Invalid Command\n");
     }
   }
