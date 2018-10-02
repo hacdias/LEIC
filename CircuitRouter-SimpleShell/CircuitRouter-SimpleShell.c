@@ -34,15 +34,17 @@ int main (int argc, char** argv) {
         /* code */
         exit(0);
       } else {
+        printf("CHILD BEGAN (PID=%d)\n", pid);
         // MAIN PROCESS
         if (actual_children == maxChildren && maxChildren != -1) {
           pid = wait(&estado);
+          printf("CHILD EXITED (PID=%d; return %s)\n", pid, estado ? "NOK" : "OK");
           actual_children--;
         }      
       }
     } else if ((args == 1 && !strcmp(argVector[0], "exit"))) {
       while (actual_children > 0 && (pid = wait(&estado))) {
-        printf("CHILD EXITED (PID=%i; return %s)\n", pid, estado ? "NOK" : "OK");
+        printf("CHILD EXITED (PID=%d; return %s)\n", pid, estado ? "NOK" : "OK");
         actual_children--;
       }
       printf("END.\n");
