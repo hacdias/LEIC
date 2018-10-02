@@ -30,7 +30,6 @@ int main (int argc, char** argv) {
   int maxChildren = getMaxChildren(argc, argv);
   int children = 0, state, args;
   pid_t pid;
-  list_t list = list_alloc(NULL);
 
   while (TRUE) {
     args = readLineArguments(argVector, 3, buffer, 256);
@@ -38,7 +37,7 @@ int main (int argc, char** argv) {
     if (args == 2 && !strcmp(argVector[0], "run")) {
       if (maxChildren && children == maxChildren) {
         pid = wait(&state);
-        printf("CHILD EXITED (PID=%d; return %s)\n", pid, estado ? "NOK" : "OK");
+        printf("CHILD EXITED (PID=%d; return %s)\n", pid, state ? "NOK" : "OK");
         children--;
       }
 
