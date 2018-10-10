@@ -11,16 +11,6 @@
 
 #define BINARY "../CircuitRouter-SeqSolver/CircuitRouter-SeqSolver"
 
-// Function desgined to return the number of MaxChildren from input
-int getMaxChildren (int argc, char **argv) {
-  if (argc == 1) {
-    return 0;
-  }
-
-  return atoi(argv[1]);
-}
-
-// Struct where information about a process can be stored
 typedef struct pinfo {
   pid_t pid;
   int state;
@@ -37,7 +27,7 @@ pinfo_t* makepinfo (pid_t pid, int state) {
 int main (int argc, char** argv) {
   char **argVector = malloc(sizeof(char) * 256 * 3);
   char *buffer = malloc(sizeof(char) * 256);
-  int maxChildren = getMaxChildren(argc, argv);
+  int maxChildren = argc == 1 ? 0 : atoi(argv[1]);
   int children = 0, state, args;
   pid_t pid;
   // Inicialization of a list to store pid numbers and exit state

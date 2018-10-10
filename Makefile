@@ -1,7 +1,7 @@
 all:
-	cd CircuitRouter-SeqSolver && $(MAKE)
-	cd CircuitRouter-SimpleShell && $(MAKE)
+	(cd CircuitRouter-SeqSolver; make $(MFLAGS) all)
+	(cd CircuitRouter-SimpleShell; make $(MFLAGS) all)
 
 clean:
-	cd CircuitRouter-SeqSolver && $(MAKE) clean
-	cd CircuitRouter-SimpleShell && $(MAKE) clean
+	(cd CircuitRouter-SeqSolver; make $(MFLAGS) clean)
+	(cd CircuitRouter-SimpleShell; make $(MFLAGS) clean)
