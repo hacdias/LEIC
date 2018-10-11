@@ -24,8 +24,22 @@ pinfo_t* makepinfo (pid_t pid, int state) {
   return p;
 }
 
+void free_everything (char** argVector, char* buffer, list_t* list) {
+  free(argVector);
+  free(buffer);
+
+  list_iter_t it;
+  list_iter_reset(&it, list);
+
+  while (list_iter_hasNext(&it, list)) {
+    free((pinfo_t*)list_iter_next(&it, list));
+  }
+
+  list_free(list);
+}
+
 int main (int argc, char** argv) {
-  char **argVector = malloc(sizeof(char) * 256 * 4);
+  char **argVector = malloc(sizeof(char) * 256 * 3);
   char *buffer = malloc(sizeof(char) * 256);
   int maxChildren = argc == 1 ? 0 : atoi(argv[1]);
   int children = 0, state, args;
@@ -34,7 +48,7 @@ int main (int argc, char** argv) {
   list_t* list = list_alloc(NULL);
 
   while (TRUE) {
-    args = readLineArguments(argVector, 4, buffer, 256);
+    args = readLineArguments(argVector, 3, buffer, 256);
     
     // User wishes to run SeqSolver
     if (args == 2 && !strcmp(argVector[0], "run")) {
@@ -52,6 +66,7 @@ int main (int argc, char** argv) {
       // Child process
       if (pid == (pid_t)0) {
         execl(BINARY, BINARY, argVector[1], (char*)NULL);
+        free_everything(argVector, buffer, list);
         return 0;
       // Parent process (Main process)
       } else if (maxChildren) {
@@ -75,9 +90,7 @@ int main (int argc, char** argv) {
       }
 
       printf("END.\n");
-      list_free(list);
-      free(buffer);
-      free(argVector);
+      free_everything(argVector, buffer, list);
       return 0;
     } else {
       printf("Invalid Command\n");

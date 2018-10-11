@@ -156,9 +156,9 @@ static void parseArgs (long argc, char* const argv[]){
 }
 
 char *dumpPlusSuffix (const char *s) {
-    char *d = malloc (strlen (s) + 5);   // Space for length + dot suffix + NULL
+    char *d = malloc(strlen(s) + 5);   // Space for length + dot suffix + NULL
     if (d == NULL) return NULL;
-    strcpy (d,s);
+    strcpy(d,s);
     return d;
 }
 
