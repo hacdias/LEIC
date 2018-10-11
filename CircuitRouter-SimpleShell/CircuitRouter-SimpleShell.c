@@ -76,9 +76,14 @@ int main (int argc, char** argv) {
 
       printf("END.\n");
       list_free(list);
+      free(buffer);
+      free(argVector);
       return 0;
     } else {
       printf("Invalid Command\n");
+      list_free(list);
+      free(buffer);
+      free(argVector);
       return 1;
     }
   }
