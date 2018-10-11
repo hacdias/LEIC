@@ -155,18 +155,36 @@ static void parseArgs (long argc, char* const argv[]){
     }
 }
 
+char *dumpPlusSuffix (const char *s) {
+    char *d = malloc (strlen (s) + 5);   // Space for length + dot suffix + NULL
+    if (d == NULL) return NULL;
+    strcpy (d,s);
+    return d;
+}
+
 FILE* get_output_file () {
-    char* file_name = strdup(global_inputFile);
+    char* file_name = dumpPlusSuffix(global_inputFile);
+    if (file_name == NULL) {
+        return NULL;
+    }
+
     strcat(file_name, ".res");
 
     if (access(file_name, F_OK) != -1) {
-        char *new_name = strdup(file_name);
+        char *new_name = dumpPlusSuffix(file_name);
+        if (new_name == NULL) {
+            return NULL;
+        }
+
         strcat(new_name, ".old");
         remove(new_name);
         rename(file_name, new_name);
+        free(new_name);
     }
 
-    return fopen(file_name, "w");
+    FILE* fp = fopen(file_name, "w");
+    free(file_name);
+    return fp;
 }
 
 /* =============================================================================
