@@ -25,7 +25,7 @@ pinfo_t* makepinfo (pid_t pid, int state) {
 }
 
 int main (int argc, char** argv) {
-  char **argVector = malloc(sizeof(char) * 256 * 3);
+  char **argVector = malloc(sizeof(char) * 256 * 4);
   char *buffer = malloc(sizeof(char) * 256);
   int maxChildren = argc == 1 ? 0 : atoi(argv[1]);
   int children = 0, state, args;
@@ -34,7 +34,7 @@ int main (int argc, char** argv) {
   list_t* list = list_alloc(NULL);
 
   while (TRUE) {
-    args = readLineArguments(argVector, 3, buffer, 256);
+    args = readLineArguments(argVector, 4, buffer, 256);
     
     // User wishes to run SeqSolver
     if (args == 2 && !strcmp(argVector[0], "run")) {
@@ -81,10 +81,6 @@ int main (int argc, char** argv) {
       return 0;
     } else {
       printf("Invalid Command\n");
-      list_free(list);
-      free(buffer);
-      free(argVector);
-      return 1;
     }
   }
 
