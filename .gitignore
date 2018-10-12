@@ -1,6 +1,7 @@
 *.o
 .vscode
 *.res
+*.txt
 *.old
 /CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
 CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
