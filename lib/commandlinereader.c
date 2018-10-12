@@ -43,7 +43,10 @@ int readLineArguments(char **argVector, int vectorSize, char *buffer, int buffer
   token = strtok(buffer, s);
 
   /* walk through other tokens */
-  while( numTokens < vectorSize-1 && token != NULL ) {
+  while( numTokens < vectorSize && token != NULL ) {
+    /* return error if there are more tokens than expected */
+    if (numTokens == vectorSize-1) return -1;
+
     argVector[numTokens] = token;
     numTokens ++;
 
