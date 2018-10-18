@@ -1,4 +1,6 @@
-public class Bird extends Animal {
+package energy;
+
+public class Bird extends AnimalPrey {
   Bird () {
     super(20, 5);
   }
@@ -10,16 +12,6 @@ public class Bird extends Animal {
 
     increaseEnergy(-2);
     return true;
-  }
-
-  public void escaped () {
-    increaseEnergy(5);
-  }
-
-  public int drain () {
-    int energy = getEnergy();
-    setEnergy(0);
-    return energy;
   }
 
   @Override

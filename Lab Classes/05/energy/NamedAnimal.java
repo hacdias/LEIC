@@ -1,4 +1,6 @@
-public class NamedAnimal extends Animal {
+package energy;
+
+public abstract class NamedAnimal extends Animal implements Predator {
   private String _name;
   private int _catchRate;
   
@@ -22,21 +24,23 @@ public class NamedAnimal extends Animal {
     _name = name;
   }
 
-  public boolean caughtRat (Rat r) {
+  @Override
+  public boolean caught (Prey p) {
     run();
-    r.run();
+    p.run();
 
     if ((int) _catchRate * Math.random() == 0) {
       return true;
     }
 
-    r.escaped();
+    p.escaped();
     return false;
   }
 
-  public void eatRat (Rat r) {
-    if (caughtRat(r)) {
-      increaseEnergy(r.drain());
+  @Override
+  public void eat (Prey p) {
+    if (caught(p)) {
+      increaseEnergy(p.drain());
     }
   }
 

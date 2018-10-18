@@ -1,3 +1,5 @@
+package energy;
+
 public class Cat extends NamedAnimal {
   Cat (String name) {
     super(500, 25, 5, name);

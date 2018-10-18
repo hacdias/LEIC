@@ -1,4 +1,6 @@
-public class Animal {
+package energy;
+
+public abstract class Animal {
   private final int _baseEnergy;
   private final int _runEnergy;
   private int _energy;

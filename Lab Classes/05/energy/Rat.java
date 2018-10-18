@@ -1,16 +1,8 @@
-public class Rat extends Animal {
+package energy;
+
+public class Rat extends AnimalPrey {
   Rat () {
     super(50, 2);
-  }
-
-  public void escaped () {
-    increaseEnergy(5);
-  }
-
-  public int drain () {
-    int energy = getEnergy();
-    setEnergy(0);
-    return energy;
   }
 
   @Override
