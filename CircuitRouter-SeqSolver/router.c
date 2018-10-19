@@ -314,13 +314,11 @@ void router_solve (void* argPtr){
     while (1) {
 
         pair_t* coordinatePairPtr;
+
         if (queue_isEmpty(workQueuePtr)) {
-            coordinatePairPtr = NULL;
+            break;
         } else {
             coordinatePairPtr = (pair_t*)queue_pop(workQueuePtr);
-        }
-        if (coordinatePairPtr == NULL) {
-            break;
         }
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
