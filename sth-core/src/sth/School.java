@@ -1,7 +1,6 @@
 package sth;
 
-//FIXME import other classes if needed
-
+import java.util.HashMap;
 import sth.exceptions.BadEntryException;
 import sth.exceptions.InvalidCourseSelectionException;
 import sth.exceptions.NoSuchPersonIdException;
@@ -16,7 +15,19 @@ public class School implements Serializable {
 
   //FIXME define object fields (attributes and, possibly, associations)
 
-  //FIXME implement constructors if needed
+  private String _name;
+  private HashMap<Integer, Administrative> _administratives;
+  private HashMap<Integer, Student> _students;
+  private HashMap<Integer, Professor> _professors;
+  private HashMap<String, Course> _courses;
+
+  School(String name) {
+    _name = name;
+    _administratives = new HashMap<Integer, Administrative>();
+    _students = new HashMap<Integer, Students>();
+    _professors = new HashMap<Integer, Professor>();
+    _courses = new HashMap<Integer, Course>();
+  }
   
   /**
    * @param filename
