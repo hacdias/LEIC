@@ -19,6 +19,7 @@ public class School implements Serializable {
   private HashMap<Integer, Administrative> _administratives;
   private HashMap<Integer, Student> _students;
   private HashMap<Integer, Professor> _professors;
+
   private HashMap<String, Course> _courses;
 
   School(String name) {
