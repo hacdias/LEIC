@@ -287,12 +287,13 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
     return pointVectorPtr;
 }
 
-
 /* =============================================================================
  * router_solve
  * =============================================================================
  */
-void router_solve (void* argPtr){
+void * router_solve (void* argPtr){
+
+    printf("OI\n");
 
     router_solve_arg_t* routerArgPtr = (router_solve_arg_t*)argPtr;
     router_t* routerPtr = routerArgPtr->routerPtr;
@@ -315,12 +316,9 @@ void router_solve (void* argPtr){
 
         pair_t* coordinatePairPtr;
         if (queue_isEmpty(workQueuePtr)) {
-            coordinatePairPtr = NULL;
+            break;
         } else {
             coordinatePairPtr = (pair_t*)queue_pop(workQueuePtr); // 1. competir para extrair
-        }
-        if (coordinatePairPtr == NULL) {
-            break;
         }
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
@@ -357,6 +355,8 @@ void router_solve (void* argPtr){
 
     grid_free(myGridPtr);
     queue_free(myExpansionQueuePtr);
+
+    return NULL;
 }
 
 

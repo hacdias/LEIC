@@ -54,7 +54,7 @@
 #ifndef ROUTER_H
 #define ROUTER_H 1
 
-
+#include <semaphore.h>
 #include "grid.h"
 #include "maze.h"
 #include "lib/vector.h"
@@ -70,6 +70,8 @@ typedef struct router_solve_arg {
     router_t* routerPtr;
     maze_t* mazePtr;
     list_t* pathVectorListPtr;
+    sem_t workQueueSem;
+    sem_t pathVectorListSem;
 } router_solve_arg_t;
 
 
@@ -91,7 +93,7 @@ void router_free (router_t* routerPtr);
  * router_solve
  * =============================================================================
  */
-void router_solve (void* argPtr);
+void * router_solve (void* argPtr);
 
 
 #endif /* ROUTER_H */

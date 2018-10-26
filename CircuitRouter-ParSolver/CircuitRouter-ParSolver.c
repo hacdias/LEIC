@@ -54,6 +54,7 @@
 #include <assert.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include "lib/list.h"
 #include "maze.h"
@@ -68,6 +69,7 @@ enum param_types {
     PARAM_XCOST    = (unsigned char)'x',
     PARAM_YCOST    = (unsigned char)'y',
     PARAM_ZCOST    = (unsigned char)'z',
+    PARAM_TASKS    = (unsigned char)'t'
 };
 
 enum param_defaults {
@@ -75,6 +77,7 @@ enum param_defaults {
     PARAM_DEFAULT_XCOST    = 1,
     PARAM_DEFAULT_YCOST    = 1,
     PARAM_DEFAULT_ZCOST    = 2,
+    PARAM_DEFAULT_TASK     = -1
 };
 
 char* global_inputFile = NULL;
@@ -89,10 +92,10 @@ static void displayUsage (const char* appName){
     printf("Usage: %s [options]\n", appName);
     puts("\nOptions:                            (defaults)\n");
     printf("    b <INT>    [b]end cost          (%i)\n", PARAM_DEFAULT_BENDCOST);
-    printf("    p          [p]rint routed maze  (false)\n");
     printf("    x <UINT>   [x] movement cost    (%i)\n", PARAM_DEFAULT_XCOST);
     printf("    y <UINT>   [y] movement cost    (%i)\n", PARAM_DEFAULT_YCOST);
     printf("    z <UINT>   [z] movement cost    (%i)\n", PARAM_DEFAULT_ZCOST);
+    printf("    t <UINT>   [t]asks              (%i)\n", PARAM_DEFAULT_TASK);
     printf("    h          [h]elp message       (false)\n");
     exit(1);
 }
@@ -107,6 +110,7 @@ static void setDefaultParams (){
     global_params[PARAM_XCOST]    = PARAM_DEFAULT_XCOST;
     global_params[PARAM_YCOST]    = PARAM_DEFAULT_YCOST;
     global_params[PARAM_ZCOST]    = PARAM_DEFAULT_ZCOST;
+    global_params[PARAM_TASKS]    = PARAM_DEFAULT_TASK;
 }
 
 
@@ -127,12 +131,13 @@ static void parseArgs (long argc, char* const argv[]){
 
     setDefaultParams();
 
-    while ((opt = getopt(argc, argv, "hb:px:y:z:")) != -1) {
+    while ((opt = getopt(argc, argv, "hb:t:x:y:z:")) != -1) {
         switch (opt) {
             case 'b':
             case 'x':
             case 'y':
             case 'z':
+            case 't':
                 global_params[(unsigned char)opt] = atol(optarg);
                 break;
             case '?':
@@ -147,6 +152,11 @@ static void parseArgs (long argc, char* const argv[]){
 
     for (i = optind; i < argc; i++) {
         fprintf(stderr, "Non-option argument: %s\n", argv[i]);
+        opterr++;
+    }
+
+    if (global_params[PARAM_TASKS] == PARAM_DEFAULT_TASK) {
+        fprintf(stderr, "You must set the number of tasks.\n");
         opterr++;
     }
 
@@ -220,14 +230,31 @@ int main(int argc, char** argv){
     list_t* pathVectorListPtr = list_alloc(NULL);
     assert(pathVectorListPtr);
 
-    router_solve_arg_t routerArg = {routerPtr, mazePtr, pathVectorListPtr};
+    router_solve_arg_t routerArg = {
+        routerPtr,
+        mazePtr,
+        pathVectorListPtr
+    };
+
+    sem_init(&routerArg.workQueueSem, 0, global_params[PARAM_TASKS]);
+    sem_init(&routerArg.pathVectorListSem, 0, global_params[PARAM_TASKS]);
+
     TIMER_T startTime;
     TIMER_READ(startTime);
 
-    router_solve((void *)&routerArg);
+    pthread_t threads[global_params[PARAM_TASKS]];
+
+    for (int i = 0; i < global_params[PARAM_TASKS]; i++)
+        pthread_create(&threads[i], NULL, router_solve, &routerArg); 
+
+    for (int i = 0; i < global_params[PARAM_TASKS]; i++)
+        pthread_join(threads[i], NULL); 
 
     TIMER_T stopTime;
     TIMER_READ(stopTime);
+
+    sem_destroy(&routerArg.workQueueSem);
+    sem_destroy(&routerArg.pathVectorListSem); 
 
     long numPathRouted = 0;
     list_iter_t it;
