@@ -20,26 +20,21 @@ public class Table implements Comparable<Table>, Iterable {
     }
   }
 
-  private static class It implements Iterator {
+  private class It implements Iterator {
     private int _curr = 0;
-    private Table _table;
-
-    It (Table t) {
-      _table = t;
-    }
 
     public boolean hasNext () {
-      return _curr < _table.getLength();
+      return _curr < getLength();
     }
 
     public int next () {
       _curr++;
-      return _table.getPos(_curr);
+      return getPos(_curr);
     }
   }
 
   public Iterator getIterator () {
-    return new It(this);
+    return new It();
   }
 
   Table (int c) {
