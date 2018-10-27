@@ -236,8 +236,8 @@ int main(int argc, char** argv){
         pathVectorListPtr
     };
 
-    sem_init(&routerArg.workQueueSem, 0, global_params[PARAM_TASKS]);
-    sem_init(&routerArg.pathVectorListSem, 0, global_params[PARAM_TASKS]);
+    sem_init(&routerArg.workQueueSem, 0, 1);
+    sem_init(&routerArg.pathVectorListSem, 0, 1);
 
     TIMER_T startTime;
     TIMER_READ(startTime);
@@ -248,7 +248,7 @@ int main(int argc, char** argv){
         pthread_create(&threads[i], NULL, router_solve, &routerArg); 
 
     for (int i = 0; i < global_params[PARAM_TASKS]; i++)
-        pthread_join(threads[i], NULL); 
+        pthread_join(threads[i], NULL);
 
     TIMER_T stopTime;
     TIMER_READ(stopTime);
@@ -265,7 +265,6 @@ int main(int argc, char** argv){
 	}
     fprintf(fpout, "Paths routed    = %li\n", numPathRouted);
     fprintf(fpout, "Elapsed time    = %f seconds\n", TIMER_DIFF_SECONDS(startTime, stopTime));
-
 
     /*
      * Check solution and clean up

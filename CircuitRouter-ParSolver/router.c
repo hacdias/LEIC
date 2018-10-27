@@ -291,9 +291,7 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
  * router_solve
  * =============================================================================
  */
-void * router_solve (void* argPtr){
-
-    printf("OI\n");
+void *router_solve (void* argPtr){
 
     router_solve_arg_t* routerArgPtr = (router_solve_arg_t*)argPtr;
     router_t* routerPtr = routerArgPtr->routerPtr;
@@ -314,12 +312,17 @@ void * router_solve (void* argPtr){
      */
     while (1) {
 
+        sem_wait(&routerArgPtr->workQueueSem);
+
         pair_t* coordinatePairPtr;
         if (queue_isEmpty(workQueuePtr)) {
+            sem_post(&routerArgPtr->workQueueSem);
             break;
         } else {
-            coordinatePairPtr = (pair_t*)queue_pop(workQueuePtr); // 1. competir para extrair
+            coordinatePairPtr = (pair_t*)queue_pop(workQueuePtr);
         }
+
+        sem_post(&routerArgPtr->workQueueSem);
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
@@ -347,11 +350,14 @@ void * router_solve (void* argPtr){
 
     }
 
+
     /*
      * Add my paths to global list
      */
+    sem_wait(&routerArgPtr->pathVectorListSem);
     list_t* pathVectorListPtr = routerArgPtr->pathVectorListPtr;
     list_insert(pathVectorListPtr, (void*)myPathVectorPtr);
+    sem_post(&routerArgPtr->pathVectorListSem);
 
     grid_free(myGridPtr);
     queue_free(myExpansionQueuePtr);
