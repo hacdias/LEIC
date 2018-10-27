@@ -3,5 +3,6 @@
 *.res
 *.txt
 *.old
+/CircuitRouter-ParSolver/CircuitRouter-ParSolver
 /CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
-CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
+/CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
