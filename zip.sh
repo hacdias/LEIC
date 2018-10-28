@@ -1,3 +1,4 @@
 #!/bin/bash
 
-zip proj.zip **/*.c **/*.h **/Makefile
+rm proj.zip
+zip proj.zip **/*.c **/*.h **/Makefile Makefile
