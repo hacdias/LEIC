@@ -234,7 +234,7 @@ void grid_print (grid_t* gridPtr, FILE *fp){
     long height = gridPtr->height;
     long depth  = gridPtr->depth;
     long z;
-
+    // CHECK: if this is the right format for the output
     for (z = 0; z < depth; z++) {
         fprintf(fp, "[z = %li]\n", z);
         long x;
@@ -243,7 +243,7 @@ void grid_print (grid_t* gridPtr, FILE *fp){
             for (y = 0; y < height; y++) {
                 fprintf(fp, "%4li", *grid_getPointRef(gridPtr, x, y, z));
             }
-            fputs("", fp);
+            fputs("\n", fp);
         }
         fputs("", fp);
     }

@@ -89,7 +89,6 @@ static void displayUsage (const char* appName){
     printf("Usage: %s [options]\n", appName);
     puts("\nOptions:                            (defaults)\n");
     printf("    b <INT>    [b]end cost          (%i)\n", PARAM_DEFAULT_BENDCOST);
-    printf("    p          [p]rint routed maze  (false)\n");
     printf("    x <UINT>   [x] movement cost    (%i)\n", PARAM_DEFAULT_XCOST);
     printf("    y <UINT>   [y] movement cost    (%i)\n", PARAM_DEFAULT_YCOST);
     printf("    z <UINT>   [z] movement cost    (%i)\n", PARAM_DEFAULT_ZCOST);
@@ -177,8 +176,11 @@ FILE* get_output_file () {
         }
 
         strcat(new_name, ".old");
+        // CHECK: we need remove this way so that if it exists removes, else ignores existence
         remove(new_name);
-        rename(file_name, new_name);
+        if (rename(file_name, new_name) == -1) {
+            return NULL;
+        }
         free(new_name);
     }
 
