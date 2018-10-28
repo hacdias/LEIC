@@ -296,8 +296,6 @@ void *router_solve (void* argPtr){
     router_solve_arg_t* routerArgPtr = (router_solve_arg_t*)argPtr;
     router_t* routerPtr = routerArgPtr->routerPtr;
     maze_t* mazePtr = routerArgPtr->mazePtr;
-    vector_t* myPathVectorPtr = vector_alloc(1);
-    assert(myPathVectorPtr);
 
     queue_t* workQueuePtr = mazePtr->workQueuePtr;
     grid_t* gridPtr = mazePtr->gridPtr;
@@ -344,20 +342,29 @@ void *router_solve (void* argPtr){
         }
 
         if (success) {
+            vector_t* myPathVectorPtr = vector_alloc(1);
+            assert(myPathVectorPtr);
             bool_t status = vector_pushBack(myPathVectorPtr,(void*)pointVectorPtr);
             assert(status);
+
+            /*
+            * Add my paths to global list
+            */
+            sem_wait(&routerArgPtr->pathVectorListSem);
+    
+            list_t* pathVectorListPtr = routerArgPtr->pathVectorListPtr;
+            list_insert(pathVectorListPtr, (void*)myPathVectorPtr);
+
+            bool_t check = maze_checkPaths(mazePtr, pathVectorListPtr, NULL, FALSE);
+
+            if (check != TRUE) {
+                list_remove(pathVectorListPtr, (void*)myPathVectorPtr);
+            }
+
+            sem_post(&routerArgPtr->pathVectorListSem);
         }
 
     }
-
-
-    /*
-     * Add my paths to global list
-     */
-    sem_wait(&routerArgPtr->pathVectorListSem);
-    list_t* pathVectorListPtr = routerArgPtr->pathVectorListPtr;
-    list_insert(pathVectorListPtr, (void*)myPathVectorPtr);
-    sem_post(&routerArgPtr->pathVectorListSem);
 
     grid_free(myGridPtr);
     queue_free(myExpansionQueuePtr);
