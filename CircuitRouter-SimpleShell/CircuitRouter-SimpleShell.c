@@ -39,20 +39,19 @@ void free_everything (char** argVector, char* buffer, list_t* list) {
 }
 
 int main (int argc, char** argv) {
-  char **argVector = malloc(sizeof(char*) * 3);
-  char *buffer = malloc(sizeof(char) * 256);
-  int maxChildren = argc == 1 ? 0 : atoi(argv[1]); // CHECK: check args a mais
-  int children = 0, state, args;
-  pid_t pid;
-  // Inicialization of a list to store pid numbers and exit state
-  list_t* list = list_alloc(NULL);
-
   if (argc > 2) {
     printf("Please only provide the maximum of processes allowed\n");
     return 1;
   }
 
-  // CHECK: EOF
+  char **argVector = malloc(sizeof(char*) * 3);
+  char *buffer = malloc(sizeof(char) * 256);
+  int maxChildren = argc == 1 ? 0 : atoi(argv[1]);
+  int children = 0, state, args;
+  pid_t pid;
+  // Inicialization of a list to store pid numbers and exit state
+  list_t* list = list_alloc(NULL);
+
   while (TRUE) {
     args = readLineArguments(argVector, 3, buffer, 256);
     
@@ -80,10 +79,9 @@ int main (int argc, char** argv) {
     // User wishes to exit program
     } else if (args < 0 || (args == 1 && !strcmp(argVector[0], "exit"))) {
       // Wait for processes still running
-      // CHECK: use counter e ver erro
-      while (children > 0) {
+      // TODO: wifexited
+      while (children--) {
         pid = wait(&state);
-        children--;
         // Insert information about the process that finished in list
         list_insert(list, makepinfo(pid, state));
       }

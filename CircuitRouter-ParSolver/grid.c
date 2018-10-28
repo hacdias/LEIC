@@ -243,9 +243,9 @@ void grid_print (grid_t* gridPtr, FILE *fp){
             for (y = 0; y < height; y++) {
                 fprintf(fp, "%4li", *grid_getPointRef(gridPtr, x, y, z));
             }
-            fputs("", fp);
+            fputs("\n", fp);
         }
-        fputs("", fp);
+        fputs("\n", fp);
     }
 }
 

@@ -176,11 +176,13 @@ FILE* get_output_file () {
         }
 
         strcat(new_name, ".old");
-        // CHECK: we need remove this way so that if it exists removes, else ignores existence
-        remove(new_name);
+        // ASK: check if file exists and then remove
+        remove(new_name)
+
         if (rename(file_name, new_name) == -1) {
             return NULL;
         }
+
         free(new_name);
     }
 
