@@ -3,6 +3,7 @@
 *.res
 *.txt
 *.old
+*.speedups.csv
 *.zip
 /CircuitRouter-ParSolver/CircuitRouter-ParSolver
 /CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
