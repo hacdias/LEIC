@@ -3,6 +3,7 @@
 *.res
 *.txt
 *.old
+*.zip
 /CircuitRouter-ParSolver/CircuitRouter-ParSolver
 /CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
 /CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
