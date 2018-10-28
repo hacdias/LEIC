@@ -1,6 +1,8 @@
 package sth;
 
 import java.util.HashMap;
+import java.io.Serializable;
+import java.io.IOException;
 import sth.exceptions.BadEntryException;
 import sth.exceptions.InvalidCourseSelectionException;
 import sth.exceptions.NoSuchPersonIdException;
@@ -25,9 +27,9 @@ public class School implements Serializable {
   School(String name) {
     _name = name;
     _administratives = new HashMap<Integer, Administrative>();
-    _students = new HashMap<Integer, Students>();
+    _students = new HashMap<Integer, Student>();
     _professors = new HashMap<Integer, Professor>();
-    _courses = new HashMap<Integer, Course>();
+    _courses = new HashMap<String, Course>();
   }
   
   /**

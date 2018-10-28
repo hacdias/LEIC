@@ -5,12 +5,12 @@ import java.util.HashSet;
 public class Student extends Person {
   private final int MAX_DISCIPLINES = 6;
   private Course _course;
-  private HashSet<Disicpline> _disciplines;
+  private HashSet<Discipline> _disciplines;
 
   Student(Course course, String name, String phoneNumber, int id) {
     super(name, phoneNumber, id);
     _course = course;
-    _disciplines = new HashSet<Disicpline>();
+    _disciplines = new HashSet<Discipline>();
   }
 
   /**

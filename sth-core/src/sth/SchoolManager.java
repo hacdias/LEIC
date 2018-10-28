@@ -1,5 +1,6 @@
 package sth;
 
+import java.io.IOException;
 import sth.exceptions.BadEntryException;
 import sth.exceptions.ImportFileException;
 import sth.exceptions.NoSuchPersonIdException;
@@ -10,6 +11,8 @@ import sth.exceptions.NoSuchPersonIdException;
  * The façade class.
  */
 public class SchoolManager {
+
+  private School _school;
 
   //FIXME add object attributes if needed
 
@@ -41,6 +44,7 @@ public class SchoolManager {
    */
   public boolean hasAdministrative() {
     //FIXME implement predicate
+    return false;
   }
 
   /**
@@ -48,6 +52,7 @@ public class SchoolManager {
    */
   public boolean hasProfessor() {
     //FIXME implement predicate
+    return false;
   }
 
   /**
@@ -55,6 +60,7 @@ public class SchoolManager {
    */
   public boolean hasStudent() {
     //FIXME implement predicate
+    return false;
   }
 
   /**
@@ -62,6 +68,7 @@ public class SchoolManager {
    */
   public boolean hasRepresentative() {
     //FIXME implement predicate
+    return false;
   }
 
   //FIXME implement other methods (in general, one for each command in sth-app)
