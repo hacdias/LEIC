@@ -248,7 +248,7 @@ int main(int argc, char** argv){
      * Check solution and clean up
      */
     assert(numPathRouted <= numPathToRoute);
-    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, fpout);
+    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, fpout, TRUE);
     assert(status == TRUE);
     fputs("Verification passed.", fpout);
 

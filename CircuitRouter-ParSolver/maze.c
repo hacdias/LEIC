@@ -270,7 +270,7 @@ long maze_read (maze_t* mazePtr, FILE *fpin, FILE *fpout){
  * maze_checkPaths
  * =============================================================================
  */
-bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE* fp){
+bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE* fp, bool_t doPrintPaths){
     grid_t* gridPtr = mazePtr->gridPtr;
     long width  = gridPtr->width;
     long height = gridPtr->height;
