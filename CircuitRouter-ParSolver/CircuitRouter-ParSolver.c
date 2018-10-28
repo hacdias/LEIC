@@ -188,7 +188,7 @@ FILE* get_output_file () {
 
         strcat(new_name, ".old");
         // ASK: check if file exists and then remove
-        remove(new_name)
+        remove(new_name);
 
         if (rename(file_name, new_name) == -1) {
             return NULL;

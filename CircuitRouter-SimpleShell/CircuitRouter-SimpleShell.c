@@ -92,7 +92,8 @@ int main (int argc, char** argv) {
       // Iterate over the list and print information about the processes
       while (list_iter_hasNext(&it, list)) {
         pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, list);
-        printf("CHILD EXITED (PID=%i; return %s)\n", pinfo->pid, pinfo->state ? "NOK" : "OK");
+        printf("CHILD EXITED (PID=%i; return %s)\n", pinfo->pid,
+          WIFEXITED(pinfo->state) && WEXITSTATUS(pinfo->state) == 0 ? "OK" : "NOK");
       }
 
       printf("END.\n");
