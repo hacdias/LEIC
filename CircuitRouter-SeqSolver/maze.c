@@ -359,8 +359,11 @@ bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, FILE* fp, bo
         } /* iteratate over pathVector */
     } /* iterate over pathVectorList */
 
-    fputs("\nRouted Maze:", fp);
-    grid_print(testGridPtr, fp);
+    if (doPrintPaths == TRUE) {
+        fputs("\nRouted Maze:", fp);
+        grid_print(testGridPtr, fp);
+    }
+
     grid_free(testGridPtr);
 
     return TRUE;

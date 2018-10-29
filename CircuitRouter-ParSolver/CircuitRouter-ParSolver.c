@@ -241,8 +241,9 @@ int main(int argc, char** argv){
         pathVectorListPtr
     };
 
-    sem_init(&routerArg.workQueueSem, 0, 1);
-    sem_init(&routerArg.pathVectorListSem, 0, 1);
+    // TODO: ver err
+    pthread_mutex_init(&routerArg.workQueueLock, NULL);
+    pthread_mutex_init(&routerArg.pathVectorListLock, NULL);
 
     TIMER_T startTime;
     TIMER_READ(startTime);
@@ -258,8 +259,8 @@ int main(int argc, char** argv){
     TIMER_T stopTime;
     TIMER_READ(stopTime);
 
-    sem_destroy(&routerArg.workQueueSem);
-    sem_destroy(&routerArg.pathVectorListSem); 
+    pthread_mutex_destroy(&routerArg.workQueueLock);
+    pthread_mutex_destroy(&routerArg.pathVectorListLock); 
 
     long numPathRouted = 0;
     list_iter_t it;
