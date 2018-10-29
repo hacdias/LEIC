@@ -1,8 +1,9 @@
 package sth;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
-public class Student extends Person {
+public class Student extends Person implements Serializable {
   private final int MAX_DISCIPLINES = 6;
   private Course _course;
   private HashSet<Discipline> _disciplines;

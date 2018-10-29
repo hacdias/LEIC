@@ -1,9 +1,11 @@
 package sth;
 
+import java.io.Serializable;
+import java.lang.Comparable;
 import java.util.HashMap;
 import java.util.ArrayList;
 
-public class Course {
+public class Course implements Serializable, Comparable<Course> {
   private String _name;
   private final int MAX_REPRESENTATIVES = 7;
   private HashMap<Integer, Student> _students;
@@ -21,6 +23,8 @@ public class Course {
     return _name;
   }
 
-
-
+  @Override
+  public int compareTo(Course o) {
+    return _name.compareTo(o.getName());
+  }
 }

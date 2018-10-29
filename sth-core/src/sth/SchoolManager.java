@@ -17,6 +17,10 @@ public class SchoolManager {
   //FIXME add object attributes if needed
 
   //FIXME implement constructors if needed
+
+  public SchoolManager() {
+    _school = new School();
+  }
   
   /**
    * @param datafile
@@ -36,7 +40,7 @@ public class SchoolManager {
    * @throws NoSuchPersonIdException
    */
   public void login(int id) throws NoSuchPersonIdException {
-    //FIXME implement method
+    _school.login(id);
   }
 
   /**

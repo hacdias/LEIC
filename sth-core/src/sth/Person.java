@@ -1,12 +1,17 @@
 package sth;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.lang.Comparable;
 
-public abstract class Person {
+public abstract class Person implements Comparable<Person>, Serializable {
   private ArrayList<Notification> _notifications;
   private String _name;
   private String _phoneNumber;
   private int _id;
+
+  public static final Comparator<Person> NAME_COMPARATOR = new NameComparator();
 
   Person(String name, String phoneNumber, int id) {
     _name = name;
@@ -37,5 +42,17 @@ public abstract class Person {
 
   public void setPhoneNumber(String phoneNumber) {
     _phoneNumber = phoneNumber;
+  }
+
+  @Override
+  public int compareTo(Person p) {
+    return getId() - p.getId();
+  }
+
+  private static class NameComparator implements Comparator<Person> {
+    @Override
+    public int compare(Person p1, Person p2) {
+      return p1.getName().compareTo(p2.getName());
+    }
   }
 }

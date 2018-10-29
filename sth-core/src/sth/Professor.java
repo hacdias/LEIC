@@ -1,8 +1,9 @@
 package sth;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
-public class Professor extends Person {
+public class Professor extends Person implements Serializable {
   private HashSet<Discipline> _disciplines;
 
   Professor(String name, String phoneNumber, int id) {

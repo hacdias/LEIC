@@ -1,5 +1,6 @@
 package sth;
 
+import java.util.TreeMap;
 import java.util.HashMap;
 import java.io.Serializable;
 import java.io.IOException;
@@ -17,15 +18,16 @@ public class School implements Serializable {
 
   //FIXME define object fields (attributes and, possibly, associations)
 
-  private String _name;
+  private TreeMap<Integer, Person> _people;
   private HashMap<Integer, Administrative> _administratives;
   private HashMap<Integer, Student> _students;
   private HashMap<Integer, Professor> _professors;
-
   private HashMap<String, Course> _courses;
 
-  School(String name) {
-    _name = name;
+  transient private int _sessionId;
+
+  School() {
+    _people = new TreeMap<Integer, People>();
     _administratives = new HashMap<Integer, Administrative>();
     _students = new HashMap<Integer, Student>();
     _professors = new HashMap<Integer, Professor>();
@@ -39,6 +41,16 @@ public class School implements Serializable {
    */
   void importFile(String filename) throws IOException, BadEntryException {
     //FIXME implement text file reader
+  }
+
+  public void login(int id) throws NoSuchPersonIdException {
+    if (!_students.containsKey(id)
+      && !_professors.containsKey(id)
+      && !_administratives.containsKey(id)) {
+      throw new NoSuchPersonIdException(id);
+    }
+
+    _sessionId = id;
   }
   
   //FIXME implement other methods
