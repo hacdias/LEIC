@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.lang.Comparable;
 
 public abstract class Person implements Comparable<Person>, Serializable {
+  private static final long serialVersionUID = 201810051538L;
+  
   private ArrayList<Notification> _notifications;
   private String _name;
   private String _phoneNumber;

@@ -1,6 +1,10 @@
 package sth;
 
-public class Notification {
+import java.io.Serializable;
+
+public class Notification implements Serializable {
+  private static final long serialVersionUID = 201810051538L;
+  
   private Person _sender;
   private String _message;
 

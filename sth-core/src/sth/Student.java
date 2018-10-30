@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 
 public class Student extends Person implements Serializable {
+  private static final long serialVersionUID = 201810051538L;
+
   private final int MAX_DISCIPLINES = 6;
   private Course _course;
   private HashSet<Discipline> _disciplines;
@@ -28,7 +30,7 @@ public class Student extends Person implements Serializable {
     return true;
   }
 
-  public void unenrollDiscipline(Discipline d) {
-    _disciplines.remove(d);
+  public boolean unenrollDiscipline(Discipline d) {
+    return _disciplines.remove(d);
   }
 }
