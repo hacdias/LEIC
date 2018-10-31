@@ -1,36 +1,50 @@
 package sth;
 
+import sth.exceptions.MaximumDisciplinesExceededException;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 public class Student extends Person implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 
   private final int MAX_DISCIPLINES = 6;
   private Course _course;
-  private HashSet<Discipline> _disciplines;
+  private TreeSet<Discipline> _disciplines;
 
-  Student(Course course, String name, String phoneNumber, int id) {
-    super(name, phoneNumber, id);
-    _course = course;
-    _disciplines = new HashSet<Discipline>();
+  Student(int id,  String phoneNumber, String name) {
+    super(id, phoneNumber, name);
+    _disciplines = new TreeSet<Discipline>();
   }
 
-  /**
-   * @param d is the discipline.
-   * @return false if the limit of disciplines was exceeded and true otherwise.
-   */
-  public boolean enrollDiscipline(Discipline d) {
+  public void setCourse(Course c) {
+    _course = c;
+  }
+
+  public Course getCourse() {
+    return _course;
+  }
+
+  public void addDiscipline(Discipline d) throws MaximumDisciplinesExceededException {
     // It shouldn't exceed though.
-    if (_disciplines.size() >= MAX_DISCIPLINES) {
-      return false;
-    }
+    if (_disciplines.size() >= MAX_DISCIPLINES)
+      throw new MaximumDisciplinesExceededException(getName());
 
     _disciplines.add(d);
-    return true;
   }
 
-  public boolean unenrollDiscipline(Discipline d) {
-    return _disciplines.remove(d);
+  public void removeDiscipline(Discipline d) {
+    _disciplines.remove(d);
+  }
+
+  @Override
+  public String toString() {
+    String me = _course.isRepresentative(this) ? "DELEGADO" : "ALUNO";
+    me += "|" + super.toString();
+
+    for (Discipline d : _disciplines) {
+      me += "\n" + d.toString();
+    }
+
+    return me;
   }
 }

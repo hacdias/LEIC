@@ -8,18 +8,18 @@ import java.lang.Comparable;
 public abstract class Person implements Comparable<Person>, Serializable {
   private static final long serialVersionUID = 201810051538L;
   
-  private ArrayList<Notification> _notifications;
-  private String _name;
+  final private String _name;
+  final private int _id;
+  private ArrayList<String> _notifications;
   private String _phoneNumber;
-  private int _id;
 
   public static final Comparator<Person> NAME_COMPARATOR = new NameComparator();
 
-  Person(String name, String phoneNumber, int id) {
+  Person(int id,  String phoneNumber, String name) {
     _name = name;
     _phoneNumber = phoneNumber;
     _id = id;
-    _notifications = new ArrayList<Notification>();
+    _notifications = new ArrayList<String>();
   }
 
   public String getName() {
@@ -28,6 +28,10 @@ public abstract class Person implements Comparable<Person>, Serializable {
 
   public String getPhoneNumber() {
     return _phoneNumber;
+  }
+  
+  public void setPhoneNumber(String phoneNumber) {
+    _phoneNumber = phoneNumber;
   }
 
   public int getId() {
@@ -38,12 +42,13 @@ public abstract class Person implements Comparable<Person>, Serializable {
     _notifications.clear();
   }
 
-  public void notify(Notification n) {
+  public void notify(String n) {
     _notifications.add(n);
   }
 
-  public void setPhoneNumber(String phoneNumber) {
-    _phoneNumber = phoneNumber;
+  @Override
+  public String toString() {
+    return _id + "|" + _phoneNumber + "|" + _name;
   }
 
   @Override

@@ -27,13 +27,13 @@ public class DoOpen extends Command<SchoolManager> {
   /** @see pt.tecnico.po.ui.Command#execute() */
   @Override
   public final void execute() {
-    try {
+    /* try {
       //FIXME implement command
     } catch (FileNotFoundException fnfe) {
       _display.popup(Message.fileNotFound());
     } catch (ClassNotFoundException | IOException e) {
       e.printStackTrace();
-    }
+    } */
   }
 
 }

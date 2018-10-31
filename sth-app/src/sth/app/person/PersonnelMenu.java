@@ -6,7 +6,6 @@ import sth.SchoolManager;
 
 /** 4.2. Personnel menu. */
 public class PersonnelMenu extends Menu {
-
   /**
    * @param receiver
    */
@@ -18,5 +17,4 @@ public class PersonnelMenu extends Menu {
         new DoSearchPerson(receiver), //4.2.4
     });
   }
-
 }

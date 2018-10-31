@@ -3,7 +3,7 @@ package sth;
 import java.io.Serializable;
 
 public class SurveyState implements Serializable {
-  private static final long serialVersionUID = 201810051538L;
+  /* private static final long serialVersionUID = 201810051538L;
 
   private final int STATE_CREATED = 0;
   private final int STATE_OPEN = 1;
@@ -39,6 +39,6 @@ public class SurveyState implements Serializable {
   }
   public boolean setFinalized() {
     return _state = STATE_FINALIZED;
-  }
+  } */
   
 }

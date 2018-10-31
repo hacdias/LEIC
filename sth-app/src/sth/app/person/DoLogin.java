@@ -11,7 +11,6 @@ import sth.exceptions.NoSuchPersonIdException;
  * 4.2.1. Show person.
  */
 public class DoLogin extends Command<SchoolManager> {
-
   /** Login identifier. */
   Input<Integer> _login;
 
@@ -33,5 +32,4 @@ public class DoLogin extends Command<SchoolManager> {
       throw new NoSuchPersonException(_login.value());
     }
   }
-
 }

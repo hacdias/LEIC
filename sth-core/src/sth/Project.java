@@ -17,7 +17,7 @@ public class Project implements Serializable {
     _description = description;
     _open = true;
     _submissions = new ArrayList<Submission>();
-    _survey = Survey();
+    _survey = new Survey();
   }
 
   public boolean addSubmission(Submission s) {

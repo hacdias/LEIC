@@ -47,34 +47,44 @@ public class SchoolManager {
    * @return true when the currently logged in person is an administrative
    */
   public boolean hasAdministrative() {
-    //FIXME implement predicate
-    return false;
+    return _school.hasAdministrative();
   }
 
   /**
    * @return true when the currently logged in person is a professor
    */
   public boolean hasProfessor() {
-    //FIXME implement predicate
-    return false;
+    return _school.hasProfessor();
   }
 
   /**
    * @return true when the currently logged in person is a student
    */
   public boolean hasStudent() {
-    //FIXME implement predicate
-    return false;
+    return _school.hasStudent();
   }
 
   /**
    * @return true when the currently logged in person is a representative
    */
   public boolean hasRepresentative() {
-    //FIXME implement predicate
-    return false;
+    return _school.hasRepresentative();
   }
 
-  //FIXME implement other methods (in general, one for each command in sth-app)
+  public void doChangePhoneNumber(String phoneNumber) {
+    _school.doChangePhoneNumber(phoneNumber);
+  }
+
+  public String getPerson() {
+    return _school.getPerson();
+  }
+
+  public String getPeople() {
+    return _school.getPeople();
+  }
+
+  public String searchPerson (String name) {
+    return _school.searchPerson(name);
+  }
   
 }

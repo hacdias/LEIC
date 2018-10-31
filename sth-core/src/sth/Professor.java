@@ -1,16 +1,16 @@
 package sth;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 public class Professor extends Person implements Serializable {
   private static final long serialVersionUID = 201810051538L;
   
-  private HashSet<Discipline> _disciplines;
+  private TreeSet<Discipline> _disciplines;
 
-  Professor(String name, String phoneNumber, int id) {
-    super(name, phoneNumber, id);
-    _disciplines = new HashSet<Discipline>();
+  Professor(int id,  String phoneNumber, String name) {
+    super(id, phoneNumber, name);
+    _disciplines = new TreeSet<Discipline>(Discipline.COURSE_COMPARATOR);
   }
 
   public boolean addDiscipline(Discipline d) {
@@ -21,4 +21,16 @@ public class Professor extends Person implements Serializable {
   public boolean removeDiscipline(Discipline d) {
     return _disciplines.remove(d);
   }
+
+  @Override
+  public String toString() {
+    String me = "DOCENTE|" + super.toString();
+
+    for (Discipline d : _disciplines) {
+      me += "\n" + d.toString();
+    }
+
+    return me;
+  }
+
 }
