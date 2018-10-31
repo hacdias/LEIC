@@ -22,6 +22,6 @@ public class DoSearchPerson extends Command<SchoolManager> {
   @Override
   public final void execute() {
     _form.parse();
-    System.out.println(_receiver.searchPerson(_name.value()));
+    _display.popup(_receiver.searchPerson(_name.value()));
   }
 }

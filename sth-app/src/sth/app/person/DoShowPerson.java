@@ -17,6 +17,6 @@ public class DoShowPerson extends Command<SchoolManager> {
   /** @see pt.tecnico.po.ui.Command#execute() */
   @Override
   public final void execute() {
-    System.out.println(_receiver.getPerson());
+    _display.popup(_receiver.getPerson());
   }
 }

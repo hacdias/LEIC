@@ -23,7 +23,7 @@ public class DoChangePhoneNumber extends Command<SchoolManager> {
   public final void execute() {
     _form.parse();
     _receiver.doChangePhoneNumber(_phoneNumber.value());
-    System.out.println(_receiver.getPerson());
+    _display.popup(_receiver.getPerson());
   }
 
 }
