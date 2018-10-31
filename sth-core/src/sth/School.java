@@ -21,6 +21,7 @@ import sth.exceptions.NoSuchPersonIdException;
 public class School implements Serializable {
   /** Serial number for serialization. */
   private static final long serialVersionUID = 201810051538L;
+  private int _nextId = 100000;
 
   private TreeMap<Integer, Person> _people;
   private TreeSet<Person> _peopleByName;
@@ -99,6 +100,9 @@ public class School implements Serializable {
 
     _people.put(id, p);
     _peopleByName.add(p);
+
+    _nextId = Math.max(_nextId, id + 1);
+
     return id;
   }
 
