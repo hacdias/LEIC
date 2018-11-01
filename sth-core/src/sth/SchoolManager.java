@@ -21,6 +21,7 @@ import sth.exceptions.NoSuchProjectNameException;
 public class SchoolManager {
   private School _school;
   private String _dumpFileName = "";
+  // TODO: use this on save
   private boolean _changed = false;
 
   public SchoolManager() {
