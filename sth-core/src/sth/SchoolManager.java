@@ -2,8 +2,11 @@ package sth;
 
 import java.io.IOException;
 import sth.exceptions.BadEntryException;
+import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.ImportFileException;
+import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchPersonIdException;
+import sth.exceptions.NoSuchProjectNameException;
 
 //FIXME import other classes if needed
 
@@ -83,8 +86,20 @@ public class SchoolManager {
     return _school.getPeople();
   }
 
-  public String searchPerson (String name) {
+  public String searchPerson(String name) {
     return _school.searchPerson(name);
+  }
+
+  public String doShowDisciplineStudents(String name) throws NoSuchDisciplineNameException {
+    return _school.doShowDisciplineStudents(name);
+  }
+
+  public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+    _school.createProject(discipline, proj_name);
+  }
+
+  public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+    _school.closeProject(discipline, proj_name);
   }
   
 }

@@ -11,7 +11,10 @@ import java.io.IOException;
 import sth.exceptions.MaximumDisciplinesExceededException;
 import sth.exceptions.MaximumRepresentativesExceeded;
 import sth.exceptions.MaximumStudentsExceededException;
+import sth.exceptions.NoSuchDisciplineNameException;
+import sth.exceptions.NoSuchProjectNameException;
 import sth.exceptions.BadEntryException;
+import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.InvalidCourseSelectionException;
 import sth.exceptions.NoSuchPersonIdException;
 
@@ -219,5 +222,27 @@ public class School implements Serializable {
     }
 
     return s.trim();
+  }
+
+  public String doShowDisciplineStudents(String name) throws NoSuchDisciplineNameException {
+    Professor p = _professors.get(_session.getId());
+    Discipline d = p.teachesDiscipline(name);
+
+    return d.getStudents();
+  }
+
+  public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+    Professor p = _professors.get(_session.getId());
+    Discipline d = p.teachesDiscipline(discipline);
+
+    d.addProject(new Project(proj_name));
+  }
+
+  public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+    Professor p = _professors.get(_session.getId());
+    Discipline d = p.teachesDiscipline(discipline);
+
+    Project proj = d.getProject(proj_name);
+    proj.close();
   }
 }
