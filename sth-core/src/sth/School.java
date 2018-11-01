@@ -196,6 +196,10 @@ public class School implements Serializable {
     return _session.toString();
   }
 
+  public int getSessionId () {
+    return _session.getId();
+  }
+
   public String getPeople () {
     String people = "";
     Set<Integer> ids = _people.keySet();

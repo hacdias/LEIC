@@ -6,26 +6,33 @@ import pt.tecnico.po.ui.Command;
 import pt.tecnico.po.ui.Input;
 import sth.SchoolManager;
 
-//FIXME import other classes if needed
-
 /**
  * 4.1.1. Save to file under current name (if unnamed, query for name).
  */
 public class DoSave extends Command<SchoolManager> {
-  //FIXME add input fields if needed
+  Input<String> _filename;
 
   /**
    * @param receiver
    */
   public DoSave(SchoolManager receiver) {
     super(Label.SAVE, receiver);
-    //FIXME initialize input fields if needed
+    _filename = _form.addStringInput(Message.openFile());
   }
 
   /** @see pt.tecnico.po.ui.Command#execute() */
   @Override
   public final void execute() {
-    //FIXME implement command
+    if (!_receiver.hasDumpFileName()) {
+      _form.parse();
+      _receiver.setDumpFileName(_filename.value());
+    }
+
+    try {
+      _receiver.save();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

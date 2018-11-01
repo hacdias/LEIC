@@ -1,6 +1,13 @@
 package sth;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import sth.exceptions.BadEntryException;
 import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.ImportFileException;
@@ -8,18 +15,13 @@ import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchPersonIdException;
 import sth.exceptions.NoSuchProjectNameException;
 
-//FIXME import other classes if needed
-
 /**
  * The façade class.
  */
 public class SchoolManager {
-
   private School _school;
-
-  //FIXME add object attributes if needed
-
-  //FIXME implement constructors if needed
+  private String _dumpFileName = "";
+  private boolean _changed = false;
 
   public SchoolManager() {
     _school = new School();
@@ -100,6 +102,36 @@ public class SchoolManager {
 
   public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     _school.closeProject(discipline, proj_name);
+  public boolean hasDumpFileName () {
+    return !_dumpFileName.equals("");
+  }
+
+  public void setDumpFileName (String name) {
+    _dumpFileName = name;
   }
   
+  public void open () throws IOException, ClassNotFoundException {
+    int id = _school.getSessionId();
+    BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
+    ObjectInputStream in = new ObjectInputStream(buff);
+
+    _school = (School)in.readObject();
+
+    try {
+      _school.login(id);
+    } catch (NoSuchPersonIdException e) {
+      // TODO: find a better way to handle login!
+      throw new IOException();
+    } finally {
+      in.close();
+    }    
+  }
+
+  public void save () throws IOException {
+    BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));
+    ObjectOutputStream out = new ObjectOutputStream(buff);
+
+    out.writeObject(_school);
+    out.close();
+  }
 }
