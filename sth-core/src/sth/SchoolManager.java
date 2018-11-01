@@ -102,6 +102,8 @@ public class SchoolManager {
 
   public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     _school.closeProject(discipline, proj_name);
+  }
+
   public boolean hasDumpFileName () {
     return !_dumpFileName.equals("");
   }
