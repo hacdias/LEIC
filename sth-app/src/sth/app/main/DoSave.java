@@ -17,7 +17,7 @@ public class DoSave extends Command<SchoolManager> {
    */
   public DoSave(SchoolManager receiver) {
     super(Label.SAVE, receiver);
-    _filename = _form.addStringInput(Message.openFile());
+    _filename = _form.addStringInput(Message.newSaveAs());
   }
 
   /** @see pt.tecnico.po.ui.Command#execute() */
