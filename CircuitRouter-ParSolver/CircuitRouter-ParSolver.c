@@ -241,9 +241,9 @@ int main(int argc, char** argv){
         pathVectorListPtr
     };
 
-    // TODO: ver err
-    pthread_mutex_init(&routerArg.workQueueLock, NULL);
-    pthread_mutex_init(&routerArg.pathVectorListLock, NULL);
+    assert(pthread_mutex_init(&routerArg.workQueueLock, NULL) == 0);
+    assert(pthread_mutex_init(&routerArg.pathVectorListLock, NULL) == 0);
+    assert(pthread_mutex_init(&routerArg.gridLock, NULL) == 0);
 
     TIMER_T startTime;
     TIMER_READ(startTime);
@@ -259,8 +259,9 @@ int main(int argc, char** argv){
     TIMER_T stopTime;
     TIMER_READ(stopTime);
 
-    pthread_mutex_destroy(&routerArg.workQueueLock);
-    pthread_mutex_destroy(&routerArg.pathVectorListLock); 
+    assert(pthread_mutex_destroy(&routerArg.workQueueLock) == 0);
+    assert(pthread_mutex_destroy(&routerArg.pathVectorListLock) == 0);
+    assert(pthread_mutex_destroy(&routerArg.gridLock) == 0);
 
     long numPathRouted = 0;
     list_iter_t it;

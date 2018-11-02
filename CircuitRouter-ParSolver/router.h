@@ -72,6 +72,7 @@ typedef struct router_solve_arg {
     list_t* pathVectorListPtr;
     pthread_mutex_t workQueueLock;
     pthread_mutex_t pathVectorListLock;
+    pthread_mutex_t gridLock;
 } router_solve_arg_t;
 
 
