@@ -288,11 +288,11 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
     return pointVectorPtr;
 }
 
-bool_t isPathEmpty (grid_t* gridPtr, vector_t *pointVectorPtr) {
+bool_t isPathEmpty (vector_t *pointVectorPtr) {
     long size = vector_getSize(pointVectorPtr);
 
-    for (long i = 0; i < size; i++) {
-        if ( *(long*)vector_at(pointVectorPtr, i) == GRID_POINT_FULL) return FALSE;
+    for (long i = 1; i < (size-1); i++) {
+        if ((*(long*)vector_at(pointVectorPtr, i)) != GRID_POINT_EMPTY) return FALSE;
     }
 
     return TRUE;
@@ -335,7 +335,7 @@ void *router_solve (void* argPtr){
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
-        pair_free(coordinatePairPtr);
+        
         vector_t* pointVectorPtr = NULL;
         bool_t success = FALSE;
 
@@ -345,11 +345,18 @@ void *router_solve (void* argPtr){
             pointVectorPtr = doTraceback(gridPtr, myGridPtr, dstPtr, bendCost);
             if (pointVectorPtr) {
                 pthread_mutex_lock(&routerArgPtr->gridLock);
-                if (isPathEmpty(gridPtr, pointVectorPtr) == TRUE) {
+                if (isPathEmpty(pointVectorPtr) == TRUE) {
                     grid_addPath_Ptr(gridPtr, pointVectorPtr);
+                    pthread_mutex_unlock(&routerArgPtr->gridLock);
                     success = TRUE;
+                    pair_free(coordinatePairPtr);
+                } else {
+                    pthread_mutex_unlock(&routerArgPtr->gridLock);
+
+                    pthread_mutex_lock(&routerArgPtr->workQueueLock);
+                    queue_push(workQueuePtr, (void*)coordinatePairPtr);
+                    pthread_mutex_unlock(&routerArgPtr->workQueueLock);
                 }
-                pthread_mutex_unlock(&routerArgPtr->gridLock);
             }
         }
 
