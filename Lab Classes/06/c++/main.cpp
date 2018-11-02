@@ -6,7 +6,7 @@ class Beneficiary {
   int _helpLevel;
 public:
   Beneficiary (int level): _helpLevel(level) {}
-  virtual ~Beneficiary () {}
+  virtual         ~Beneficiary () {}
   virtual void    help (double amount) = 0;
   virtual double  help () = 0;
   int             helpLevel() const { return _helpLevel; }
