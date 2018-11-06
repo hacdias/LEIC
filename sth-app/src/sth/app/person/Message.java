@@ -3,6 +3,7 @@ package sth.app.person;
 /** Messages for menu interactions. */
 @SuppressWarnings("nls")
 public final class Message {
+
   /**
    * @return prompt for login identifier
    */
@@ -35,4 +36,5 @@ public final class Message {
   private Message() {
     // EMPTY
   }
+
 }

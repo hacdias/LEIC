@@ -3,6 +3,7 @@ package sth.app.person;
 /** 4.2. Menu entries for the personnel menu. */
 @SuppressWarnings("nls")
 public interface Label {
+
   /** 4.2. Menu title. */
   String TITLE = "Portal Pessoal";
 
@@ -20,4 +21,5 @@ public interface Label {
 
   /** To use for loggin in. */
   String LOGIN = "Identificador: ";
+
 }
