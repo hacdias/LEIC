@@ -1,7 +1,7 @@
 *.o
 .vscode
 *.res
-*.txt
+inputs/*.txt
 *.old
 *.speedups.csv
 *.zip
