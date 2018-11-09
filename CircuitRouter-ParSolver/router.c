@@ -85,6 +85,36 @@ point_t MOVE_NEGX = {-1,  0,  0,  0, MOMENTUM_NEGX};
 point_t MOVE_NEGY = { 0, -1,  0,  0, MOMENTUM_NEGY};
 point_t MOVE_NEGZ = { 0,  0, -1,  0, MOMENTUM_NEGZ};
 
+pthread_mutex_t* locks;
+
+void init_locks (grid_t* gridPtr) {
+    long dim = gridPtr->width * gridPtr->height * gridPtr->depth;
+    locks = malloc(sizeof(pthread_mutex_t) * dim);
+
+    for (long i = 0; i < dim; i++)
+        assert(pthread_mutex_init(&locks[i], NULL) == 0);
+}
+
+void destroy_locks (grid_t* gridPtr) {
+    // The locks aren't destroyed because the proccess will
+    // end immediately after this, thus releasing the resources.
+    free(locks);
+}
+
+long lock_position (grid_t* gridPtr, long x, long y, long z) {
+    return (gridPtr->height*z+y)*gridPtr->width + x;
+}
+
+void unlock_pointVector (grid_t* gridPtr, vector_t* pointVectorPtr){
+    long i, x, y, z;
+    long n = vector_getSize(pointVectorPtr);
+
+    for (i = 1; i < n; i++) {
+        long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
+        grid_getPointIndices(gridPtr, gridPointPtr, &x, &y, &z);
+        assert(pthread_mutex_unlock(&locks[lock_position(gridPtr, x, y, z)]) == 0);
+    }
+}
 
 /* =============================================================================
  * router_alloc
@@ -209,6 +239,14 @@ static void traceToNeighbor (grid_t* myGridPtr, point_t* currPtr, point_t* moveP
             b = bendCost;
         }
         if ((value + b) <= nextPtr->value) { /* '=' favors neighbors over current */
+            if (pthread_mutex_trylock(&locks[lock_position(myGridPtr, x, y, z)]) != 0) {
+                return;
+            }
+
+            if (currPtr->x != nextPtr->x || currPtr->y != nextPtr->y || currPtr->z != nextPtr->z) {
+                assert(pthread_mutex_unlock(&locks[lock_position(myGridPtr, nextPtr->x, nextPtr->y, nextPtr->z)]) == 0);
+            }
+
             nextPtr->x = x;
             nextPtr->y = y;
             nextPtr->z = z;
@@ -278,6 +316,8 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
                 (curr.y == next.y) &&
                 (curr.z == next.z))
             {
+                // TODO: we should unlock them and add backoffs
+                unlock_pointVector(gridPtr, pointVectorPtr);
                 vector_free(pointVectorPtr);
                 return NULL; /* cannot find path */
             }
@@ -286,16 +326,6 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
     }
 
     return pointVectorPtr;
-}
-
-bool_t isPathEmpty (vector_t *pointVectorPtr) {
-    long size = vector_getSize(pointVectorPtr);
-
-    for (long i = 1; i < (size-1); i++) {
-        if ((*(long*)vector_at(pointVectorPtr, i)) != GRID_POINT_EMPTY) return FALSE;
-    }
-
-    return TRUE;
 }
 
 /* =============================================================================
@@ -335,28 +365,18 @@ void *router_solve (void* argPtr){
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
-        
+        pair_free(coordinatePairPtr);
+
         vector_t* pointVectorPtr = NULL;
         bool_t success = FALSE;
 
         grid_copy(myGridPtr, gridPtr);
-        
+
         if (doExpansion(routerPtr, myGridPtr, myExpansionQueuePtr, srcPtr, dstPtr)) {
             pointVectorPtr = doTraceback(gridPtr, myGridPtr, dstPtr, bendCost);
             if (pointVectorPtr) {
-                assert(pthread_mutex_lock(&routerArgPtr->gridLock) == 0);
-                if (isPathEmpty(pointVectorPtr) == TRUE) {
-                    grid_addPath_Ptr(gridPtr, pointVectorPtr);
-                    assert(pthread_mutex_unlock(&routerArgPtr->gridLock) == 0);
-                    success = TRUE;
-                    pair_free(coordinatePairPtr);
-                } else {
-                    assert(pthread_mutex_unlock(&routerArgPtr->gridLock) == 0);
-
-                    assert(pthread_mutex_lock(&routerArgPtr->workQueueLock) == 0);
-                    queue_push(workQueuePtr, (void*)coordinatePairPtr);
-                    assert(pthread_mutex_unlock(&routerArgPtr->workQueueLock) == 0);
-                }
+                grid_addPath_Ptr(gridPtr, pointVectorPtr);
+                success = TRUE;
             }
         }
 

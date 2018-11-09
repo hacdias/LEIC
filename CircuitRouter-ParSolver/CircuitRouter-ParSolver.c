@@ -230,7 +230,7 @@ int main(int argc, char** argv){
 
     assert(pthread_mutex_init(&routerArg.workQueueLock, NULL) == 0);
     assert(pthread_mutex_init(&routerArg.pathVectorListLock, NULL) == 0);
-    assert(pthread_mutex_init(&routerArg.gridLock, NULL) == 0);
+    init_locks(mazePtr->gridPtr);
 
     TIMER_T startTime;
     TIMER_READ(startTime);
@@ -246,9 +246,9 @@ int main(int argc, char** argv){
     TIMER_T stopTime;
     TIMER_READ(stopTime);
 
+    destroy_locks(mazePtr->gridPtr);
     assert(pthread_mutex_destroy(&routerArg.workQueueLock) == 0);
     assert(pthread_mutex_destroy(&routerArg.pathVectorListLock) == 0);
-    assert(pthread_mutex_destroy(&routerArg.gridLock) == 0);
 
     long numPathRouted = 0;
     list_iter_t it;

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 usage () {
     echo -e "usage: $(basename "$0") numTasks inputFile"
     echo -e "\narguments:"
