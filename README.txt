@@ -1,9 +1,10 @@
 ## Estrutura da Diretoria
 
-| CircuitRouter-ParSolver - implementação paralela do algoritmo de Lee
-| CircuitRouter-SeqSolver - implementação sequencial do algoritmo de Lee
-| lib                     - recursos utilizados
-| results                 - resultados do speed-up
+| CircuitRouter-ParSolver   - implementação paralela do algoritmo de Lee
+| CircuitRouter-SeqSolver   - implementação sequencial do algoritmo de Lee
+| CircuitRouter-SimpleShell - implementação da shell
+| lib                       - recursos utilizados
+| results                   - resultados do speed-up
 
 ## Execução
 
@@ -15,7 +16,7 @@ make
 ./CircuitRouter-ParSolver/CircuitRouter-ParSolver filename -t tasksNumber
 
 # Executar o doTests
-./doTest.sh filename tasksNumber
+./doTest.sh tasksNumber filename
 ```
 
 ## CPU Info
