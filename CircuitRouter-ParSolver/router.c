@@ -53,6 +53,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <time.h>
 #include "coordinate.h"
 #include "grid.h"
 #include "lib/queue.h"
@@ -240,7 +241,12 @@ static void traceToNeighbor (grid_t* myGridPtr, point_t* currPtr, point_t* moveP
         }
         if ((value + b) <= nextPtr->value) { /* '=' favors neighbors over current */
             if (pthread_mutex_trylock(&locks[lock_position(myGridPtr, x, y, z)]) != 0) {
-                return;
+                // sleeps for a bit to try again
+                nanosleep((const struct timespec[]){{0, 1000L}}, NULL);
+
+                if (pthread_mutex_trylock(&locks[lock_position(myGridPtr, x, y, z)]) != 0) {
+                    return;
+                }
             }
 
             if (currPtr->x != nextPtr->x || currPtr->y != nextPtr->y || currPtr->z != nextPtr->z) {
@@ -316,7 +322,6 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
                 (curr.y == next.y) &&
                 (curr.z == next.z))
             {
-                // TODO: we should unlock them and add backoffs
                 unlock_pointVector(gridPtr, pointVectorPtr);
                 vector_free(pointVectorPtr);
                 return NULL; /* cannot find path */
