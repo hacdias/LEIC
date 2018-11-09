@@ -92,8 +92,17 @@ void init_locks (grid_t* gridPtr) {
     long dim = gridPtr->width * gridPtr->height * gridPtr->depth;
     locks = malloc(sizeof(pthread_mutex_t) * dim);
 
-    for (long i = 0; i < dim; i++)
-        assert(pthread_mutex_init(&locks[i], NULL) == 0);
+    if (locks == NULL) {
+        fprintf(stderr, "couldnt alloc memmory\n");
+        exit(1);
+    }
+
+    for (long i = 0; i < dim; i++) {
+        if (pthread_mutex_init(&locks[i], NULL) != 0) {
+            fprintf(stderr, "couldnt init lock\n");
+            exit(1);
+        }
+    }
 }
 
 void destroy_locks (grid_t* gridPtr) {
@@ -113,7 +122,10 @@ void unlock_pointVector (grid_t* gridPtr, vector_t* pointVectorPtr){
     for (i = 1; i < n; i++) {
         long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
         grid_getPointIndices(gridPtr, gridPointPtr, &x, &y, &z);
-        assert(pthread_mutex_unlock(&locks[lock_position(gridPtr, x, y, z)]) == 0);
+        if (pthread_mutex_unlock(&locks[lock_position(gridPtr, x, y, z)]) != 0) {
+            fprintf(stderr, "couldnt unlock mutex\n");
+            exit(1);
+        }
     }
 }
 
@@ -250,7 +262,10 @@ static void traceToNeighbor (grid_t* myGridPtr, point_t* currPtr, point_t* moveP
             }
 
             if (currPtr->x != nextPtr->x || currPtr->y != nextPtr->y || currPtr->z != nextPtr->z) {
-                assert(pthread_mutex_unlock(&locks[lock_position(myGridPtr, nextPtr->x, nextPtr->y, nextPtr->z)]) == 0);
+                if (pthread_mutex_unlock(&locks[lock_position(myGridPtr, nextPtr->x, nextPtr->y, nextPtr->z)]) != 0) {
+                    fprintf(stderr, "couldnt unlock mutex\n");
+                    exit(1);
+                }
             }
 
             nextPtr->x = x;
@@ -356,17 +371,26 @@ void *router_solve (void* argPtr){
      * 'expansion' and 'traceback' phase for each source/destination pair.
      */
     while (1) {
-        assert(pthread_mutex_lock(&routerArgPtr->workQueueLock) == 0);
+        if (pthread_mutex_lock(&routerArgPtr->workQueueLock) != 0) {
+            fprintf(stderr, "couldnt lock mutex\n");
+            exit(1);
+        }
 
         pair_t* coordinatePairPtr;
         if (queue_isEmpty(workQueuePtr)) {
-            assert(pthread_mutex_unlock(&routerArgPtr->workQueueLock) == 0);
+            if (pthread_mutex_unlock(&routerArgPtr->workQueueLock) != 0) {
+                fprintf(stderr, "couldnt unlock mutex\n");
+                exit(1);
+            }
             break;
         } else {
             coordinatePairPtr = (pair_t*)queue_pop(workQueuePtr);
         }
 
-        assert(pthread_mutex_unlock(&routerArgPtr->workQueueLock) == 0);
+        if (pthread_mutex_unlock(&routerArgPtr->workQueueLock) != 0) {
+            fprintf(stderr, "couldnt unlock mutex\n");
+            exit(1);
+        }
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
@@ -391,10 +415,16 @@ void *router_solve (void* argPtr){
         }
     }
 
-    assert(pthread_mutex_lock(&routerArgPtr->pathVectorListLock) == 0);
+    if (pthread_mutex_lock(&routerArgPtr->pathVectorListLock) != 0) {
+        fprintf(stderr, "couldnt lock path vector pointer mutex\n");
+        exit(1);
+    }
     list_t* pathVectorListPtr = routerArgPtr->pathVectorListPtr;
     list_insert(pathVectorListPtr, (void*)myPathVectorPtr);
-    assert(pthread_mutex_unlock(&routerArgPtr->pathVectorListLock) == 0);
+    if (pthread_mutex_unlock(&routerArgPtr->pathVectorListLock) != 0) {
+        fprintf(stderr, "couldnt unlock path vector pointer mutex\n");
+        exit(1);
+    }
 
     grid_free(myGridPtr);
     queue_free(myExpansionQueuePtr);

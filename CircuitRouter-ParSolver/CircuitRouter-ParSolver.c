@@ -203,13 +203,13 @@ int main(int argc, char** argv){
 
     FILE * fpin = fopen(global_inputFile, "r");
     if (fpin == NULL) {
-        printf("Error while reading file.\n");
+        fprintf(stderr, "Error while reading file.\n");
         exit(1);
     }
 
     FILE * fpout = get_output_file();
     if (fpout == NULL) {
-        printf("Error while writing file.\n");
+        fprintf(stderr, "Error while writing file.\n");
         exit(1);
     }
 
@@ -228,8 +228,16 @@ int main(int argc, char** argv){
         pathVectorListPtr
     };
 
-    assert(pthread_mutex_init(&routerArg.workQueueLock, NULL) == 0);
-    assert(pthread_mutex_init(&routerArg.pathVectorListLock, NULL) == 0);
+    if (pthread_mutex_init(&routerArg.workQueueLock, NULL) != 0) {
+        fprintf(stderr, "couldn't init work queue lock\n");
+        exit(1);
+    }
+
+     if (pthread_mutex_init(&routerArg.pathVectorListLock, NULL) != 0) {
+        fprintf(stderr, "couldn't init path vector list lock\n");
+        exit(1);
+    }
+
     init_locks(mazePtr->gridPtr);
 
     TIMER_T startTime;
@@ -237,18 +245,34 @@ int main(int argc, char** argv){
 
     pthread_t threads[global_params[PARAM_TASKS]];
 
-    for (int i = 0; i < global_params[PARAM_TASKS]; i++)
-        pthread_create(&threads[i], NULL, router_solve, &routerArg); 
+    for (int i = 0; i < global_params[PARAM_TASKS]; i++) {
+        if (pthread_create(&threads[i], NULL, router_solve, &routerArg) != 0) {
+            fprintf(stderr, "couldn't create threads\n");
+            exit(1);
+        }
+    }
 
-    for (int i = 0; i < global_params[PARAM_TASKS]; i++)
-        pthread_join(threads[i], NULL);
+    for (int i = 0; i < global_params[PARAM_TASKS]; i++) {
+        if (pthread_join(threads[i], NULL) != 0) {
+            fprintf(stderr, "couldn't join threads\n");
+            exit(1);
+        }
+    }
 
     TIMER_T stopTime;
     TIMER_READ(stopTime);
 
     destroy_locks(mazePtr->gridPtr);
-    assert(pthread_mutex_destroy(&routerArg.workQueueLock) == 0);
-    assert(pthread_mutex_destroy(&routerArg.pathVectorListLock) == 0);
+
+    if (pthread_mutex_destroy(&routerArg.workQueueLock) != 0) {
+        fprintf(stderr, "couldn't destroy work queue lock\n");
+        exit(1);
+    }
+    
+    if (pthread_mutex_destroy(&routerArg.pathVectorListLock) != 0) {
+        fprintf(stderr, "couldn't destroy path vector list lock\n");
+        exit(1);
+    }
 
     long numPathRouted = 0;
     list_iter_t it;
