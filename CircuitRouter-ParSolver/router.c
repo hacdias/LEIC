@@ -56,6 +56,7 @@
 #include <time.h>
 #include "coordinate.h"
 #include "grid.h"
+#include <math.h>
 #include "lib/queue.h"
 #include "router.h"
 #include "lib/vector.h"
@@ -113,20 +114,6 @@ void destroy_locks (grid_t* gridPtr) {
 
 long lock_position (grid_t* gridPtr, long x, long y, long z) {
     return (gridPtr->height*z+y)*gridPtr->width + x;
-}
-
-void unlock_pointVector (grid_t* gridPtr, vector_t* pointVectorPtr){
-    long i, x, y, z;
-    long n = vector_getSize(pointVectorPtr);
-
-    for (i = 1; i < n; i++) {
-        long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
-        grid_getPointIndices(gridPtr, gridPointPtr, &x, &y, &z);
-        if (pthread_mutex_unlock(&locks[lock_position(gridPtr, x, y, z)]) != 0) {
-            fprintf(stderr, "couldnt unlock mutex\n");
-            exit(1);
-        }
-    }
 }
 
 /* =============================================================================
@@ -252,22 +239,6 @@ static void traceToNeighbor (grid_t* myGridPtr, point_t* currPtr, point_t* moveP
             b = bendCost;
         }
         if ((value + b) <= nextPtr->value) { /* '=' favors neighbors over current */
-            if (pthread_mutex_trylock(&locks[lock_position(myGridPtr, x, y, z)]) != 0) {
-                // sleeps for a bit to try again
-                nanosleep((const struct timespec[]){{0, 1000L}}, NULL);
-
-                if (pthread_mutex_trylock(&locks[lock_position(myGridPtr, x, y, z)]) != 0) {
-                    return;
-                }
-            }
-
-            if (currPtr->x != nextPtr->x || currPtr->y != nextPtr->y || currPtr->z != nextPtr->z) {
-                if (pthread_mutex_unlock(&locks[lock_position(myGridPtr, nextPtr->x, nextPtr->y, nextPtr->z)]) != 0) {
-                    fprintf(stderr, "couldnt unlock mutex\n");
-                    exit(1);
-                }
-            }
-
             nextPtr->x = x;
             nextPtr->y = y;
             nextPtr->z = z;
@@ -337,7 +308,6 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
                 (curr.y == next.y) &&
                 (curr.z == next.z))
             {
-                unlock_pointVector(gridPtr, pointVectorPtr);
                 vector_free(pointVectorPtr);
                 return NULL; /* cannot find path */
             }
@@ -346,6 +316,47 @@ static vector_t* doTraceback (grid_t* gridPtr, grid_t* myGridPtr, coordinate_t* 
     }
 
     return pointVectorPtr;
+}
+
+long double K = 100L;
+
+bool_t tryToLock (grid_t* gridPtr, vector_t* pointVectorPtr){
+    long i, x, y, z;
+    long n = vector_getSize(pointVectorPtr);
+    long attempts = 0;
+
+    for (i = 1; i < (n-1); i++) {
+        long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
+
+        grid_getPointIndices(gridPtr, gridPointPtr, &x, &y, &z);
+        pthread_mutex_t* lock = &locks[lock_position(gridPtr, x, y, z)];
+
+        if (pthread_mutex_trylock(lock) != 0) {
+            if (attempts == 3) {
+                break;
+            }
+
+            long max = K*pow(2, attempts);
+            long time = rand() % (max + 1);
+            attempts++;
+            nanosleep((const struct timespec[]){{0, time}}, NULL);
+            i -= 1;
+        }
+    }
+
+    if (i != n-1) {
+        for (int j = i - 1; j > 0; j--) {
+            long* gridPointPtr = (long*)vector_at(pointVectorPtr, j);
+
+            grid_getPointIndices(gridPtr, gridPointPtr, &x, &y, &z);
+            pthread_mutex_t* lock = &locks[lock_position(gridPtr, x, y, z)];
+            pthread_mutex_unlock(lock);
+        }
+
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 /* =============================================================================
@@ -394,7 +405,6 @@ void *router_solve (void* argPtr){
 
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
-        pair_free(coordinatePairPtr);
 
         vector_t* pointVectorPtr = NULL;
         bool_t success = FALSE;
@@ -404,8 +414,25 @@ void *router_solve (void* argPtr){
         if (doExpansion(routerPtr, myGridPtr, myExpansionQueuePtr, srcPtr, dstPtr)) {
             pointVectorPtr = doTraceback(gridPtr, myGridPtr, dstPtr, bendCost);
             if (pointVectorPtr) {
-                grid_addPath_Ptr(gridPtr, pointVectorPtr);
-                success = TRUE;
+                if (tryToLock(gridPtr, pointVectorPtr) == TRUE) {
+                    grid_addPath_Ptr(gridPtr, pointVectorPtr);
+                    success = TRUE;
+                    pair_free(coordinatePairPtr);
+                } else {
+                    if (pthread_mutex_lock(&routerArgPtr->workQueueLock) != 0) {
+                        fprintf(stderr, "couldnt lock mutex\n");
+                        exit(1);
+                    }
+
+                    queue_push(workQueuePtr, (void*)coordinatePairPtr);
+
+                    if (pthread_mutex_unlock(&routerArgPtr->workQueueLock) != 0) {
+                        fprintf(stderr, "couldnt unlock mutex\n");
+                        exit(1);
+                    }
+                }
+            } else {
+                pair_free(coordinatePairPtr);
             }
         }
 
