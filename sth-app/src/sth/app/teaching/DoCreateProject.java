@@ -9,8 +9,6 @@ import sth.exceptions.DuplicateProjectNameException;
 import sth.app.exceptions.NoSuchDisciplineException;
 import sth.exceptions.NoSuchDisciplineNameException;
 
-//FIXME import other classes if needed
-
 /**
  * 4.3.1. Create project.
  */

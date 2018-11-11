@@ -73,7 +73,6 @@ public class School implements Serializable {
 
     reader.close();
 
-    //FIXME implement text file reader
   }
 
   private int registerPerson(String[] fields) throws BadEntryException {
@@ -81,8 +80,14 @@ public class School implements Serializable {
       throw new BadEntryException("TIPO|identificador|telefone|nome");
     }
 
-    int id = Integer.parseInt(fields[1]);
+    int id;
     Person p;
+
+    try {
+      id = Integer.parseInt(fields[1]);
+    } catch (NumberFormatException e) {
+      throw new BadEntryException("identificador deve ser um número");
+    }
 
     if (fields[0].equals("ALUNO") || fields[0].equals("DELEGADO")) {
       Student a = new Student(id, fields[2], fields[3]);
@@ -97,8 +102,7 @@ public class School implements Serializable {
       _administratives.put(id, a);
       p = a;
     } else {
-      // TODO: dizer tipo errado?
-      throw new BadEntryException("TIPO|identificador|telefone|nome");
+      throw new BadEntryException("TIPO|identificador|telefone|nome: TIPO inválido");
     }
 
     _people.put(id, p);
@@ -147,14 +151,11 @@ public class School implements Serializable {
         s.addDiscipline(d);
       }
     } catch (MaximumStudentsExceededException e) {
-      // TODO: see this ↓
-      throw new BadEntryException("TODO: not working");
+      throw new BadEntryException("Disciplina " + e.getDiscipline() + " atingiu capacidade de " + e.getMaximumStudents());
     } catch (MaximumRepresentativesExceeded e) {
-      // TODO: see this ↓
-      throw new BadEntryException("TODO: not working");
+      throw new BadEntryException("Curso " + e.getCourse() + " atingiu capacidade máxima de delegados");
     } catch (MaximumDisciplinesExceededException e) {
-      // TODO: see this ↓
-      throw new BadEntryException("TODO: not working");
+      throw new BadEntryException("Aluno " + e.getId() + " capacidade máxima de disciplinas inscritas");
     }
   }
 

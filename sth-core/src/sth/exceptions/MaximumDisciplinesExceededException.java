@@ -4,13 +4,13 @@ public class MaximumDisciplinesExceededException extends Exception {
   /** Serial number for serialization. */
   private static final long serialVersionUID = 201809021324L;
 
-  private String _student;
+  private int _id;
 
-  public MaximumDisciplinesExceededException(String student) {
-    _student = student;
+  public MaximumDisciplinesExceededException(int id) {
+    _id = id;
   }
 
-  public String getStudent() {
-    return _student;
+  public int getId() {
+    return _id;
   }
 }

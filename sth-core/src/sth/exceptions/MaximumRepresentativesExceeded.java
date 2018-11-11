@@ -4,13 +4,13 @@ public class MaximumRepresentativesExceeded extends Exception {
   /** Serial number for serialization. */
   private static final long serialVersionUID = 201809021324L;
 
-  private String _name;
+  private String _course;
 
   public MaximumRepresentativesExceeded(String course) {
-    _name = course;
+    _course = course;
   }
 
-  public String getStudent() {
-    return _name;
+  public String getCourse() {
+    return _course;
   }
 }

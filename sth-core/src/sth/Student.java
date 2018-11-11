@@ -27,7 +27,7 @@ public class Student extends Person {
   public void addDiscipline(Discipline d) throws MaximumDisciplinesExceededException {
     // It shouldn't exceed though.
     if (_disciplines.size() >= MAX_DISCIPLINES)
-      throw new MaximumDisciplinesExceededException(getName());
+      throw new MaximumDisciplinesExceededException(getId());
 
     _disciplines.add(d);
   }

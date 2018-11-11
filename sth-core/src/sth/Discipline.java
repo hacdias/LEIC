@@ -107,7 +107,6 @@ public class Discipline implements Serializable, Comparable<Discipline> {
     return "* " + _course.getName() + " - " + _name;
   }
 
-  // TODO: COURSE COMPARATOR; SERIALIZABLE?
   private static class CourseComparator implements Serializable, Comparator<Discipline> {
     private static final long serialVersionUID = 201810051538L;
   

@@ -7,14 +7,14 @@ public class Project implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 
   private String _name;
-  /* TODO: get description
-  private String _description; */
+  private String _description;
   private boolean _open;
   private ArrayList<Submission> _submissions;
   private Survey _survey;
 
   public Project(String name) {
     _name = name;
+    _description = "";
     _open = true;
     _submissions = new ArrayList<Submission>();
     _survey = new Survey();
@@ -22,6 +22,10 @@ public class Project implements Serializable {
 
   public String getName() {
     return _name;
+  }
+
+  public String getDescription() {
+    return _description;
   }
 
   public void addSubmission(Submission s) {
