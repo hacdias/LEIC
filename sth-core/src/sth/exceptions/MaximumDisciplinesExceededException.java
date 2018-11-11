@@ -1,7 +1,6 @@
 package sth.exceptions;
 
 public class MaximumDisciplinesExceededException extends Exception {
-  /** Serial number for serialization. */
   private static final long serialVersionUID = 201809021324L;
 
   private int _id;

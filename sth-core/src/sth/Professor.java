@@ -7,7 +7,7 @@ import sth.exceptions.NoSuchDisciplineNameException;
 
 public class Professor extends Person {
   private static final long serialVersionUID = 201810051538L;
-  
+
   private TreeSet<Discipline> _disciplines;
 
   Professor(int id,  String phoneNumber, String name) {
@@ -26,7 +26,7 @@ public class Professor extends Person {
 
   public Discipline teachesDiscipline(String name) throws NoSuchDisciplineNameException {
     for (Discipline d : _disciplines) {
-      if (name.equals(d.getName())) 
+      if (name.equals(d.getName()))
         return d;
     }
 
@@ -43,5 +43,4 @@ public class Professor extends Person {
 
     return me;
   }
-
 }

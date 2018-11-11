@@ -72,7 +72,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
       if (proj.getName().equals(name))
         return proj;
     }
-    
+
     throw new NoSuchProjectNameException(name);
   }
 
@@ -109,7 +109,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
 
   private static class CourseComparator implements Serializable, Comparator<Discipline> {
     private static final long serialVersionUID = 201810051538L;
-  
+
     @Override
     public int compare(Discipline d1, Discipline d2) {
       int v = d1.getCourse().compareTo(d2.getCourse());

@@ -7,7 +7,7 @@ import java.lang.Comparable;
 
 public abstract class Person implements Serializable, Comparable<Person> {
   private static final long serialVersionUID = 201810051538L;
-  
+
   final private String _name;
   final private int _id;
   private ArrayList<String> _notifications;
@@ -29,7 +29,7 @@ public abstract class Person implements Serializable, Comparable<Person> {
   public String getPhoneNumber() {
     return _phoneNumber;
   }
-  
+
   public void setPhoneNumber(String phoneNumber) {
     _phoneNumber = phoneNumber;
   }
@@ -58,7 +58,7 @@ public abstract class Person implements Serializable, Comparable<Person> {
 
   private static class NameComparator implements Comparator<Person>, Serializable {
     private static final long serialVersionUID = 201810051538L;
-    
+
     @Override
     public int compare(Person p1, Person p2) {
       return p1.getName().compareTo(p2.getName());

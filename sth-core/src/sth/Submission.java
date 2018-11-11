@@ -20,5 +20,4 @@ public class Submission implements Serializable {
   public String getValue() {
     return _value;
   }
-
 }

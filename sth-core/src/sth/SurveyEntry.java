@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class SurveyEntry implements Serializable {
   private static final long serialVersionUID = 201810051538L;
-  
+
   private double _spentHours;
   private String _comment;
 

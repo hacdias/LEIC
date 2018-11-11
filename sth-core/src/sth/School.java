@@ -44,7 +44,7 @@ public class School implements Serializable {
     _professors = new HashMap<Integer, Professor>();
     _courses = new HashMap<String, Course>();
   }
-  
+
   /**
    * @param filename
    * @throws BadEntryException
@@ -107,7 +107,6 @@ public class School implements Serializable {
 
     _people.put(id, p);
     _peopleByName.add(p);
-
     _nextId = Math.max(_nextId, id + 1);
 
     return id;
@@ -128,18 +127,18 @@ public class School implements Serializable {
         c = new Course(courseName);
         _courses.put(courseName, c);
       }
-      
+
       if (type.equals("DELEGADO")) {
         c.addRepresentative(_students.get(id));
       }
-  
+
       d = c.getDiscipline(disciplineName);
       if (d == null) {
         d = new Discipline(disciplineName, c);
       }
-  
+
       c.addDiscipline(d);
-      
+
       if (type.equals("DOCENTE")) {
         Professor p = _professors.get(id);
         p.addDiscipline(d);
@@ -166,29 +165,28 @@ public class School implements Serializable {
       throw new NoSuchPersonIdException(id);
     }
   }
-  
+
   public boolean hasAdministrative () {
     return _administratives.get(_session.getId()) != null;
   }
-  
+
   public boolean hasStudent () {
     return _students.get(_session.getId()) != null;
   }
-  
+
   public boolean hasProfessor () {
     return _professors.get(_session.getId()) != null;
   }
-  
+
   public boolean hasRepresentative () {
     if (!hasStudent()) {
       return false;
     }
-    
-    // TODO: ask teacher: (Student)_session
+
     Student s = _students.get(_session.getId());
     return s.getCourse().isRepresentative(s);
   }
-  
+
   public void doChangePhoneNumber(String phoneNumber) {
     _session.setPhoneNumber(phoneNumber);
   }

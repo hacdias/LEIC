@@ -20,12 +20,15 @@ public class Survey implements Serializable {
   public void cancel() {
     // TODO: Intrepertation of States
   }
+
   public void open() {
     // TODO: Intrepertation of States
   }
+
   public void close() {
     // TODO: Intrepertation of States
   }
+
   public void finalize() {
     // TODO: Intrepertation of States
   }
@@ -38,7 +41,7 @@ public class Survey implements Serializable {
   public void submitEntry() {
     // TODO: Intrepertation of States
   }
-  
+
   public ArrayList<SurveyEntry> getResults() {
     return _entries;
   }

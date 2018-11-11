@@ -12,12 +12,12 @@ public class Course implements Serializable, Comparable<Course> {
   private String _name;
   private final int MAX_REPRESENTATIVES = 7;
   private HashMap<String, Discipline> _disciplines;
-  private HashSet<Student> _representatives;
+  private HashSet<Person> _representatives;
 
   Course (String name) {
     _name = name;
     _disciplines = new HashMap<String, Discipline>();
-    _representatives = new HashSet<Student>();
+    _representatives = new HashSet<Person>();
   }
 
   public String getName() {
@@ -36,18 +36,18 @@ public class Course implements Serializable, Comparable<Course> {
     _disciplines.remove(d.getName());
   }
 
-  public void addRepresentative(Student r) throws MaximumRepresentativesExceeded {
+  public void addRepresentative(Person r) throws MaximumRepresentativesExceeded {
     if (_representatives.size() >= MAX_REPRESENTATIVES)
       throw new MaximumRepresentativesExceeded(_name);
-    
+
     _representatives.add(r);
   }
 
-  public boolean isRepresentative(Student r) {
+  public boolean isRepresentative(Person r) {
     return _representatives.contains(r);
   }
 
-  public void removeRepresentative(Student r) {
+  public void removeRepresentative(Person r) {
     _representatives.remove(r);
   }
 

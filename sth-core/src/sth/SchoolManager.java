@@ -26,7 +26,7 @@ public class SchoolManager {
   public SchoolManager() {
     _school = new School();
   }
-  
+
   /**
    * @param datafile
    * @throws ImportFileException
@@ -115,7 +115,7 @@ public class SchoolManager {
   public void setDumpFileName (String name) {
     _dumpFileName = name;
   }
-  
+
   public void open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
@@ -128,14 +128,16 @@ public class SchoolManager {
   }
 
   public void save () throws IOException {
-    if (_changed) {
-      BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));
-      ObjectOutputStream out = new ObjectOutputStream(buff);
-
-      out.writeObject(_school);
-      out.close();
-
-      _changed = false;
+    if (!_changed) {
+      return;
     }
+
+    BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));
+    ObjectOutputStream out = new ObjectOutputStream(buff);
+
+    out.writeObject(_school);
+    out.close();
+
+    _changed = false;
   }
 }
