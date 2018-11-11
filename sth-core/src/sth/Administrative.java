@@ -2,7 +2,7 @@ package sth;
 
 import java.io.Serializable;
 
-public class Administrative extends Person implements Serializable {
+public class Administrative extends Person {
   private static final long serialVersionUID = 201810051538L;
   
   Administrative(int id,  String phoneNumber, String name) {

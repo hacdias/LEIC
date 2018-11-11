@@ -4,7 +4,7 @@ import sth.exceptions.MaximumDisciplinesExceededException;
 import java.io.Serializable;
 import java.util.TreeSet;
 
-public class Student extends Person implements Serializable {
+public class Student extends Person {
   private static final long serialVersionUID = 201810051538L;
 
   private final int MAX_DISCIPLINES = 6;

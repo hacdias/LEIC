@@ -5,7 +5,7 @@ import java.util.TreeSet;
 
 import sth.exceptions.NoSuchDisciplineNameException;
 
-public class Professor extends Person implements Serializable {
+public class Professor extends Person {
   private static final long serialVersionUID = 201810051538L;
   
   private TreeSet<Discipline> _disciplines;
