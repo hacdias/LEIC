@@ -46,6 +46,7 @@ public class SchoolManager {
    * @throws NoSuchPersonIdException
    */
   public void login(int id) throws NoSuchPersonIdException {
+    _changed = true;
     _school.login(id);
   }
 
@@ -78,6 +79,7 @@ public class SchoolManager {
   }
 
   public void doChangePhoneNumber(String phoneNumber) {
+    _changed = true;
     _school.doChangePhoneNumber(phoneNumber);
   }
 
@@ -98,10 +100,12 @@ public class SchoolManager {
   }
 
   public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+    _changed = true;
     _school.createProject(discipline, proj_name);
   }
 
   public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+    _changed = true;
     _school.closeProject(discipline, proj_name);
   }
 
@@ -113,28 +117,26 @@ public class SchoolManager {
     _dumpFileName = name;
   }
   
-  public void open () throws IOException, ClassNotFoundException {
+  public void open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
     ObjectInputStream in = new ObjectInputStream(buff);
 
     _school = (School)in.readObject();
 
-    try {
-      _school.login(id);
-    } catch (NoSuchPersonIdException e) {
-      // TODO: find a better way to handle login!
-      throw new IOException();
-    } finally {
-      in.close();
-    }    
+    _school.login(id);
+    in.close();
   }
 
   public void save () throws IOException {
-    BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));
-    ObjectOutputStream out = new ObjectOutputStream(buff);
+    if (_changed) {
+      BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));
+      ObjectOutputStream out = new ObjectOutputStream(buff);
 
-    out.writeObject(_school);
-    out.close();
+      out.writeObject(_school);
+      out.close();
+
+      _changed = false;
+    }
   }
 }

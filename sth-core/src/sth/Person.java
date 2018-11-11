@@ -56,7 +56,9 @@ public abstract class Person implements Serializable, Comparable<Person> {
     return getId() - p.getId();
   }
 
-  private static class NameComparator implements Comparator<Person> {
+  private static class NameComparator implements Comparator<Person>, Serializable {
+    private static final long serialVersionUID = 201810051538L;
+    
     @Override
     public int compare(Person p1, Person p2) {
       return p1.getName().compareTo(p2.getName());
