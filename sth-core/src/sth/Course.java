@@ -3,6 +3,9 @@ package sth;
 import sth.exceptions.MaximumRepresentativesExceeded;
 import java.io.Serializable;
 import java.lang.Comparable;
+import java.util.Comparator;
+import java.text.Collator;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -53,6 +56,7 @@ public class Course implements Serializable, Comparable<Course> {
 
   @Override
   public int compareTo(Course o) {
-    return _name.compareTo(o.getName());
+    Collator comp = Collator.getInstance(Locale.getDefault());
+    return comp.compare(_name, o.getName());
   }
 }

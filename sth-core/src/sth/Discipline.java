@@ -8,6 +8,8 @@ import sth.exceptions.NoSuchProjectNameException;
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.util.Comparator;
+import java.text.Collator;
+import java.util.Locale;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -99,6 +101,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
 
   @Override
   public int compareTo(Discipline d) {
+    Collator comp = Collator.getInstance(Locale.getDefault());
     return _name.compareTo(d.getName());
   }
 
