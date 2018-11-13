@@ -98,14 +98,14 @@ public class SchoolManager {
     return _school.doShowDisciplineStudents(name);
   }
 
-  public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+  public void createProject(String discipline, String projName) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
     _changed = true;
-    _school.createProject(discipline, proj_name);
+    _school.createProject(discipline, projName);
   }
 
-  public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+  public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     _changed = true;
-    _school.closeProject(discipline, proj_name);
+    _school.closeProject(discipline, projName);
   }
 
   public boolean hasDumpFileName () {

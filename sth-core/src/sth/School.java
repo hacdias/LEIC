@@ -55,7 +55,7 @@ public class School implements Serializable {
   }
 
   /**
-   * Takes a string (name of the file) and iniciliazes School, Courses, 
+   * Takes a string (name of the file) and iniciliazes School, Courses,
    * Disciplines and all other Objects from a state saved previously in a file.
    * @param filename name/path to file to import
    * @throws BadEntryException
@@ -203,7 +203,7 @@ public class School implements Serializable {
   public boolean hasAdministrative () {
     return _administratives.get(_session.getId()) != null;
   }
-  
+
   /**
    * Checks if user currently logged in is student
    * @return boolean
@@ -211,7 +211,7 @@ public class School implements Serializable {
   public boolean hasStudent () {
     return _students.get(_session.getId()) != null;
   }
-  
+
   /**
    * Checks if user currently logged in is professor
    * @return boolean
@@ -219,7 +219,7 @@ public class School implements Serializable {
   public boolean hasProfessor () {
     return _professors.get(_session.getId()) != null;
   }
-  
+
   /**
    * Checks if user currently logged in is a representative
    * @return boolean
@@ -232,7 +232,7 @@ public class School implements Serializable {
     Student s = _students.get(_session.getId());
     return s.getCourse().isRepresentative(s);
   }
-  
+
   /**
    * Changes the phone number of the person logged in
    * @param phoneNumber string with the new phoneNumber
@@ -240,7 +240,7 @@ public class School implements Serializable {
   public void doChangePhoneNumber(String phoneNumber) {
     _session.setPhoneNumber(phoneNumber);
   }
-  
+
   /**
    * Gets string of information about the user (Person) logged in
    * @return String with the information about the Person logged in
@@ -248,7 +248,7 @@ public class School implements Serializable {
   public String getPerson() {
     return _session.toString();
   }
-  
+
   /**
    * Gets the ID of the user (Person) logged in
    * @return int ID of the Person logged in
@@ -309,31 +309,31 @@ public class School implements Serializable {
   }
 
   /**
-   * Creates a new Project in the discipline with proj_name as its name
+   * Creates a new Project in the discipline with <code>projName</code> as its name
    * @param discipline name of the discipline of the project
-   * @param proj_name name of the project to create
+   * @param projName name of the project to create
    * @throws NoSuchDisciplineNameException
    * @throws NoSuchProjectNameException
    */
-  public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+  public void createProject(String discipline, String projName) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
 
-    d.addProject(new Project(proj_name));
+    d.addProject(new Project(projName));
   }
 
   /**
-   * Closes a Project in the discipline that has proj_name as its name
+   * Closes a Project in the discipline that has <code>projName</code> as its name
    * @param discipline name of the discipline of the project
-   * @param proj_name name of the project to close
+   * @param projName name of the project to close
    * @throws NoSuchDisciplineNameException
    * @throws NoSuchProjectNameException
    */
-  public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+  public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
 
-    Project proj = d.getProject(proj_name);
+    Project proj = d.getProject(projName);
     proj.close();
   }
 }
