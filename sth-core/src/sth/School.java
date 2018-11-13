@@ -19,8 +19,14 @@ import sth.exceptions.InvalidCourseSelectionException;
 import sth.exceptions.NoSuchPersonIdException;
 
 /**
- * School implementation.
- */
+* <h1> School </h1>
+* Implementation of the class School
+* <p>
+*
+* @author  Henrique Dias (ist189455) & Rodrigo Sousa (ist189535)
+* @version 1.0
+* @since   2018-11-13
+*/
 public class School implements Serializable {
   /** Serial number for serialization. */
   private static final long serialVersionUID = 201810051538L;
@@ -36,6 +42,9 @@ public class School implements Serializable {
 
   transient private Person _session;
 
+  /**
+   * Constructor of the class School
+   */
   School() {
     _people = new TreeMap<Integer, Person>();
     _peopleByName = new TreeSet<Person>(Person.NAME_COMPARATOR);
@@ -46,7 +55,9 @@ public class School implements Serializable {
   }
 
   /**
-   * @param filename
+   * Takes a string (name of the file) and iniciliazes School, Courses, 
+   * Disciplines and all other Objects from a state saved previously in a file.
+   * @param filename name/path to file to import
    * @throws BadEntryException
    * @throws IOException
    */
@@ -75,6 +86,12 @@ public class School implements Serializable {
 
   }
 
+  /**
+   * Registers a Person in School accordingly (type based choice)
+   * @param fields array of strings with the following struct " {TIPO, identificador, telefone, nome} "
+   * @return int ID of the Person registered
+   * @throws BadEntryException
+   */
   private int registerPerson(String[] fields) throws BadEntryException {
     if (fields.length != 4) {
       throw new BadEntryException("TIPO|identificador|telefone|nome");
@@ -112,6 +129,14 @@ public class School implements Serializable {
     return id;
   }
 
+  /**
+   * Registers a Course and Discipline in School accordingly (type based choice)
+   * as well as the student in this Course/Discipline
+   * @param id the id of the student that must be associated
+   * @param type the type of person that is associated
+   * @param fields array of strins with the following struct "# Nome do curso|Nome da disciplina"
+   * @throws BadEntryException
+   */
   private void registerCourseAndDiscipline(int id, String type, String[] fields) throws BadEntryException {
     if (fields.length != 2) {
       throw new BadEntryException("# Nome do curso|Nome da disciplina");
@@ -158,6 +183,11 @@ public class School implements Serializable {
     }
   }
 
+  /**
+   * Logs in a Person in the system according to its ID
+   * @param id the id of the student that is logging in
+   * @throws NoSuchPersonIdException
+   */
   public void login(int id) throws NoSuchPersonIdException {
     _session = _people.get(id);
 
@@ -166,18 +196,34 @@ public class School implements Serializable {
     }
   }
 
+  /**
+   * Checks if user currently logged in is administrative
+   * @return boolean
+   */
   public boolean hasAdministrative () {
     return _administratives.get(_session.getId()) != null;
   }
-
+  
+  /**
+   * Checks if user currently logged in is student
+   * @return boolean
+   */
   public boolean hasStudent () {
     return _students.get(_session.getId()) != null;
   }
-
+  
+  /**
+   * Checks if user currently logged in is professor
+   * @return boolean
+   */
   public boolean hasProfessor () {
     return _professors.get(_session.getId()) != null;
   }
-
+  
+  /**
+   * Checks if user currently logged in is a representative
+   * @return boolean
+   */
   public boolean hasRepresentative () {
     if (!hasStudent()) {
       return false;
@@ -186,19 +232,35 @@ public class School implements Serializable {
     Student s = _students.get(_session.getId());
     return s.getCourse().isRepresentative(s);
   }
-
+  
+  /**
+   * Changes the phone number of the person logged in
+   * @param phoneNumber string with the new phoneNumber
+   */
   public void doChangePhoneNumber(String phoneNumber) {
     _session.setPhoneNumber(phoneNumber);
   }
-
+  
+  /**
+   * Gets string of information about the user (Person) logged in
+   * @return String with the information about the Person logged in
+   */
   public String getPerson() {
     return _session.toString();
   }
-
+  
+  /**
+   * Gets the ID of the user (Person) logged in
+   * @return int ID of the Person logged in
+   */
   public int getSessionId () {
     return _session.getId();
   }
 
+  /**
+   * Gets string of information about every Person registered in School
+   * @return String
+   */
   public String getPeople () {
     String people = "";
     Set<Integer> ids = _people.keySet();
@@ -210,6 +272,12 @@ public class School implements Serializable {
     return people.trim();
   }
 
+  /**
+   * Searches for a specific name registered in School and return a string
+   * with all the people that match the criteria
+   * @param name name that is gonna be searched
+   * @return String
+   */
   public String searchPerson(String name) {
     name = name.trim();
 
@@ -227,6 +295,12 @@ public class School implements Serializable {
     return s.trim();
   }
 
+  /**
+   * Returns a string with the information of all the students enrolled in the discipline
+   * @param name name of the discipline
+   * @return String
+   * @throws NoSuchDisciplineNameException
+   */
   public String doShowDisciplineStudents(String name) throws NoSuchDisciplineNameException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(name);
@@ -234,6 +308,13 @@ public class School implements Serializable {
     return d.getStudents();
   }
 
+  /**
+   * Creates a new Project in the discipline with proj_name as its name
+   * @param discipline name of the discipline of the project
+   * @param proj_name name of the project to create
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   */
   public void createProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
@@ -241,6 +322,13 @@ public class School implements Serializable {
     d.addProject(new Project(proj_name));
   }
 
+  /**
+   * Closes a Project in the discipline that has proj_name as its name
+   * @param discipline name of the discipline of the project
+   * @param proj_name name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   */
   public void closeProject(String discipline, String proj_name) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
