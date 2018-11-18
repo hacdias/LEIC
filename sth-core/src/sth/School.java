@@ -4,10 +4,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.io.Serializable;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import sth.exceptions.BadTypeException;
 import sth.exceptions.MaximumDisciplinesExceededException;
 import sth.exceptions.MaximumRepresentativesExceeded;
 import sth.exceptions.MaximumStudentsExceededException;
@@ -62,69 +65,153 @@ public class School implements Serializable {
    * @throws IOException
    */
   void importFile(String filename) throws IOException, BadEntryException {
-    // TODO: cleanup and remake
     BufferedReader reader = new BufferedReader(new FileReader(filename));
+
     String line;
+    String person;
+    LinkedList<String> data;
 
-    String lastType = "";
-    int lastId = 0;
-
-    while ((line = reader.readLine()) != null) {
-      String[] fields = line.split("\\|");
-
-      if (fields[0].startsWith("#")) {
-        registerCourseAndDiscipline(lastId, lastType, fields);
-      } else {
-        lastType = fields[0];
-        lastId = registerPerson(fields);
+    try {
+      if ((line = reader.readLine()) == null) {
+        // file is empty, nothing to import
+        return;
       }
+
+      person = line;
+      data = new LinkedList<String>();
+
+      while ((line = reader.readLine()) != null) {
+        if (line.startsWith("#")) {
+          data.add(line);
+        } else {
+          registerData(person, data);
+          data = new LinkedList<String>();
+          person = line;
+        }
+      }
+
+      // registers last person
+      registerData(person, data);
+    } finally {
+      reader.close();
     }
-
-    reader.close();
-
   }
 
   /**
-   * Registers a Person in School accordingly (type based choice)
-   * @param fields array of strings with the following struct " {TIPO, identificador, telefone, nome} "
-   * @return int ID of the Person registered
+   * Registers a chunk of data containing the person info and their relations with courses and disciplines.
+   * @param person a line containing a person. Must be of type "TIPO|identificador|telefone|nome".
+   * @param data a list of strings containing the relations with courses and disciplines. Must be of type "# Nome do curso|Nome da disciplina".
    * @throws BadEntryException
    */
-  private int registerPerson(String[] fields) throws BadEntryException {
-    if (fields.length != 4) {
+  private void registerData(String person, List<String> data) throws BadEntryException {
+    String[] personFields = person.split("\\|");
+
+    if (personFields.length != 4) {
       throw new BadEntryException("TIPO|identificador|telefone|nome");
     }
 
     int id;
-    Person p;
 
     try {
-      id = Integer.parseInt(fields[1]);
+      id = Integer.parseInt(personFields[1]);
     } catch (NumberFormatException e) {
       throw new BadEntryException("identificador deve ser um número");
     }
 
-    if (fields[0].equals("ALUNO") || fields[0].equals("DELEGADO")) {
-      Student a = new Student(id, fields[2], fields[3]);
-      _students.put(id, a);
-      p = a;
-    } else if (fields[0].equals("DOCENTE")) {
-      Professor prof = new Professor(id, fields[2], fields[3]);
+    try {
+      registerPerson(personFields[0], id, personFields[2], personFields[3]);
+    } catch (BadTypeException e) {
+      throw new BadEntryException("Bad type: " + e.getType());
+    }
+
+    if (personFields[0].equals("FUNCIONÁRIO")) {
+      return;
+    }
+
+    Boolean   isRepresentative = personFields[0].equals("DELEGADO");
+    Student   stud = null;
+    Professor prof = null;
+
+    if (isRepresentative || personFields[0].equals("ALUNO")) {
+      stud = _students.get(id);
+    } else {
+      prof = _professors.get(id);
+    }
+
+    for (String raw : data) {
+      String[] line = raw.split("\\|");
+      line[0] = line[0].substring(2);
+
+      if (line.length != 2) {
+        throw new BadEntryException("# Nome do curso|Nome da disciplina");
+      }
+
+      Course cour = _courses.get(line[0]);
+      if (cour == null) {
+        cour = new Course(line[0]);
+        _courses.put(line[0], cour);
+      }
+
+      try {
+        if (isRepresentative) {
+          cour.addRepresentative(stud);
+          isRepresentative = false;
+        }
+
+        Discipline disc = cour.getDiscipline(line[1]);
+        if (disc == null) {
+          disc = new Discipline(line[1], cour);
+          cour.addDiscipline(disc);
+        }
+
+        if (stud != null) {
+          stud.setCourse(cour);
+          disc.addStudent(stud);
+          stud.addDiscipline(disc);
+        } else if (prof != null) {
+          prof.addDiscipline(disc);
+          disc.addProfessor(prof);
+        }
+      } catch (MaximumStudentsExceededException e) {
+        throw new BadEntryException("Disciplina atingiu capacidade máxima de inscritos", e);
+      } catch (MaximumRepresentativesExceeded e) {
+        throw new BadEntryException("Curso atingiu capacidade máxima de delegados", e);
+      } catch (MaximumDisciplinesExceededException e) {
+        throw new BadEntryException("Aluno atingiu capacidade máxima de inscrições", e);
+      }
+    }
+  }
+
+  /**
+   * Registers a Person in School accordingly (type based choice)
+   * @param type type of person to create (must be ALUNO, DELEGADO, FUNCIONÁRIO or DOCENTE)
+   * @param id person id
+   * @param phoneNumber user's phone number
+   * @param name user's name
+   * @throws BadEntryException
+   */
+  private void registerPerson(String type, int id, String phoneNumber, String name) throws BadTypeException {
+    Person p;
+
+    if (type.equals("ALUNO") || type.equals("DELEGADO")) {
+      Student st = new Student(id, phoneNumber, name);
+      _students.put(id, st);
+      p = st;
+    } else if (type.equals("DOCENTE")) {
+      Professor prof = new Professor(id, phoneNumber, name);
       _professors.put(id, prof);
       p = prof;
-    } else if (fields[0].equals("FUNCIONÁRIO")) {
-      Administrative a = new Administrative(id, fields[2], fields[3]);
+    } else if (type.equals("FUNCIONÁRIO")) {
+      Administrative a = new Administrative(id, phoneNumber, name);
       _administratives.put(id, a);
       p = a;
     } else {
-      throw new BadEntryException("TIPO|identificador|telefone|nome: TIPO inválido");
+      throw new BadTypeException(type);
     }
 
     _people.put(id, p);
     _peopleByName.add(p);
     _nextId = Math.max(_nextId, id + 1);
-
-    return id;
   }
 
   /**
@@ -134,43 +221,12 @@ public class School implements Serializable {
    * @param type the type of person that is associated
    * @param fields array of strins with the following struct "# Nome do curso|Nome da disciplina"
    * @throws BadEntryException
-   */
+
   private void registerCourseAndDiscipline(int id, String type, String[] fields) throws BadEntryException {
-    if (fields.length != 2) {
-      throw new BadEntryException("# Nome do curso|Nome da disciplina");
-    }
 
-    String courseName = fields[0].substring(2);
-    String disciplineName = fields[1];
-    Course c = _courses.get(courseName);
-    Discipline d;
-    
     try {
-      if (c == null) {
-        c = new Course(courseName);
-        _courses.put(courseName, c);
-      }
-      
-      if (type.equals("DELEGADO")) {
-        c.addRepresentative(_students.get(id));
-      }
 
-      d = c.getDiscipline(disciplineName);
-      if (d == null) {
-        d = new Discipline(disciplineName, c);
-        c.addDiscipline(d);
-      }
 
-      if (type.equals("DOCENTE")) {
-        Professor p = _professors.get(id);
-        p.addDiscipline(d);
-        d.addProfessor(p);
-      } else if (type.equals("ALUNO") || type.equals("DELEGADO")) {
-        Student s = _students.get(id);
-        s.setCourse(c);
-        d.addStudent(s);
-        s.addDiscipline(d);
-      }
     } catch (MaximumStudentsExceededException e) {
       throw new BadEntryException("Disciplina " + e.getDiscipline() + " atingiu capacidade de " + e.getMaximumStudents());
     } catch (MaximumRepresentativesExceeded e) {
@@ -178,7 +234,7 @@ public class School implements Serializable {
     } catch (MaximumDisciplinesExceededException e) {
       throw new BadEntryException("Aluno " + e.getId() + " capacidade máxima de disciplinas inscritas");
     }
-  }
+  }  */
 
   /**
    * Logs in a Person in the system according to its ID

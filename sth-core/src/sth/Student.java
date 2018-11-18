@@ -11,7 +11,7 @@ public class Student extends Person {
   private Course _course;
   private TreeSet<Discipline> _disciplines;
 
-  Student(int id,  String phoneNumber, String name) {
+  Student(int id, String phoneNumber, String name) {
     super(id, phoneNumber, name);
     _disciplines = new TreeSet<Discipline>();
   }
