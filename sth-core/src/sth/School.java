@@ -62,6 +62,7 @@ public class School implements Serializable {
    * @throws IOException
    */
   void importFile(String filename) throws IOException, BadEntryException {
+    // TODO: cleanup and remake
     BufferedReader reader = new BufferedReader(new FileReader(filename));
     String line;
 
