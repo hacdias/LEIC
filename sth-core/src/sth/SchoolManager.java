@@ -118,13 +118,21 @@ public class SchoolManager {
 
   public void open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
+    School backup = _school;
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
     ObjectInputStream in = new ObjectInputStream(buff);
 
-    _school = (School)in.readObject();
+    try {
+      _school = (School)in.readObject();
+      _school.login(id);
+    } catch (NoSuchPersonIdException e) {
+      _school = backup;
+      _school.login(id);
+      throw e;
+    } finally {
+      in.close();
+    }
 
-    _school.login(id);
-    in.close();
   }
 
   public void save () throws IOException {
