@@ -70,15 +70,12 @@ public class School implements Serializable {
 
     while ((line = reader.readLine()) != null) {
       String[] fields = line.split("\\|");
-      try {
-        if (fields[0].startsWith("#")) {
-          registerCourseAndDiscipline(lastId, lastType, fields);
-        } else {
-          lastType = fields[0];
-          lastId = registerPerson(fields);
-        }
-      } catch (BadEntryException e) {
 
+      if (fields[0].startsWith("#")) {
+        registerCourseAndDiscipline(lastId, lastType, fields);
+      } else {
+        lastType = fields[0];
+        lastId = registerPerson(fields);
       }
     }
 
@@ -146,13 +143,13 @@ public class School implements Serializable {
     String disciplineName = fields[1];
     Course c = _courses.get(courseName);
     Discipline d;
-
+    
     try {
       if (c == null) {
         c = new Course(courseName);
         _courses.put(courseName, c);
       }
-
+      
       if (type.equals("DELEGADO")) {
         c.addRepresentative(_students.get(id));
       }
@@ -160,9 +157,8 @@ public class School implements Serializable {
       d = c.getDiscipline(disciplineName);
       if (d == null) {
         d = new Discipline(disciplineName, c);
+        c.addDiscipline(d);
       }
-
-      c.addDiscipline(d);
 
       if (type.equals("DOCENTE")) {
         Professor p = _professors.get(id);
