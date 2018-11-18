@@ -40,10 +40,12 @@ public class Course implements Serializable, Comparable<Course> {
   }
 
   public void addRepresentative(Person r) throws MaximumRepresentativesExceeded {
-    if (_representatives.size() >= MAX_REPRESENTATIVES)
-      throw new MaximumRepresentativesExceeded(_name);
+    if (!_representatives.contains(r)) {
+      if (_representatives.size() >= MAX_REPRESENTATIVES)
+        throw new MaximumRepresentativesExceeded(_name);
 
-    _representatives.add(r);
+      _representatives.add(r);
+    }
   }
 
   public boolean isRepresentative(Person r) {
