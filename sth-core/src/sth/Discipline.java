@@ -102,7 +102,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   @Override
   public int compareTo(Discipline d) {
     Collator comp = Collator.getInstance(Locale.getDefault());
-    return _name.compareTo(d.getName());
+    return comp.compare(_name, d.getName());
   }
 
   @Override
