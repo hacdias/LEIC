@@ -8,3 +8,5 @@ inputs/*.txt
 /CircuitRouter-ParSolver/CircuitRouter-ParSolver
 /CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
 /CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
+/CircuitRouter-AdvShell/CircuitRouter-AdvShell
+/CircuitRouter-Client/CircuitRouter-Client

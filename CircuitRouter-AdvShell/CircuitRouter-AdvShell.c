@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include <unistd.h>
 #include "../lib/list.h"
 #include "../lib/types.h"
@@ -38,10 +41,41 @@ void free_everything (char** argVector, char* buffer, list_t* list) {
   list_free(list);
 }
 
+int makePipe (char *name) {
+  unlink(name);
+  
+  if (mkfifo(name, 0777) < 0) {
+    printf("%d\n", errno);
+    return -1;
+  }
+  
+  return open(name, O_RDONLY);
+}
+
+char* getPipeName (const char* s) {
+  char* name = malloc(strlen(s) + 6);
+  if (name == NULL) return NULL;
+  strcpy(name, s);
+  if (strcat(name, ".pipe") == NULL) return NULL;
+  return name;
+}
+
 int main (int argc, char** argv) {
   if (argc > 2) {
     printf("Please only provide the maximum of processes allowed\n");
     return 1;
+  }
+
+  char* pipeName = getPipeName(argv[0]);
+  if (pipeName == NULL) {
+    printf("could not create pipe name\n");
+    return 1;
+  }
+
+  int pipe = makePipe(pipeName);
+  if (pipe < 0) {
+    printf("could not open pipe\n");
+    return -1;
   }
 
   char **argVector = malloc(sizeof(char*) * 3);
