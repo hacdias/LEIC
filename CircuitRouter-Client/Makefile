@@ -1,21 +1,19 @@
 # Makefile, versao 1
 # Sistemas Operativos, DEI/IST/ULisboa 2018-19
 
-SOURCES = CircuitRouter-AdvShell.c
-SOURCES+= ../lib/list.o
+SOURCES = CircuitRouter-Client.c
 OBJS = $(SOURCES:%.c=%.o)
 CC   = gcc
 CFLAGS =-Wall -std=gnu99 -I../
 LDFLAGS=-lm
-TARGET = CircuitRouter-AdvShell
+TARGET = CircuitRouter-Client
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $(TARGET) $(LDFLAGS) 
 
-CircuitRouter-AdvShell.o: CircuitRouter-AdvShell.c ../lib/list.h
-../lib/list.o: ../lib/list.c ../lib/list.h
+CircuitRouter-Client.o: CircuitRouter-Client.c
 
 $(OBJS):
 	$(CC) $(CFLAGS) -c -o $@ $<
