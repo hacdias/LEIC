@@ -3,10 +3,12 @@
 #include <string.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <signal.h>
 #include <errno.h>
 #include <unistd.h>
 #include "../lib/list.h"
@@ -15,8 +17,13 @@
 #define BUFF_SIZE 1000
 #define BINARY "../CircuitRouter-SeqSolver/CircuitRouter-SeqSolver"
 
+list_t* pinfoList;
+int children = 0;
+
 typedef struct pinfo {
-  pid_t pid;
+  pid_t   pid;
+  time_t  start;
+  time_t  end;
   int state;
 } pinfo_t;
 
@@ -25,6 +32,7 @@ pinfo_t* makepinfo (pid_t pid, int state) {
   pinfo_t* p = malloc(sizeof(pinfo_t));
   p->pid = pid;
   p->state = state;
+  p->start = time(NULL);
   return p;
 }
 
@@ -44,16 +52,15 @@ void free_everything (char** argVector, char* buffer, list_t* list) {
 
 int makePipe (char *name) {
   unlink(name);
-  
+
   if (mkfifo(name, 0777) < 0) {
     return -1;
   }
-  
-  return open(name, O_RDONLY|O_NONBLOCK);
+
+  return open(name, O_RDWR|O_NONBLOCK);
 }
 
-int readLineArguments(char **argVector, int vectorSize, char *buffer)
-{
+int readLineArguments(char **argVector, int vectorSize, char *buffer) {
   int numTokens = 0;
   char *s = " \r\n\t";
 
@@ -93,7 +100,37 @@ char* getPipeName (const char* s) {
   return name;
 }
 
+void sigchildHandler () {
+  int state;
+  int pid = wait(&state);
+
+  if (pid < 0) {
+    // we aren't supposed to get here
+    perror("wait failed");
+    exit(1);
+  }
+
+  children--;
+
+  list_iter_t it;
+  list_iter_reset(&it, pinfoList);
+
+  // Iterate over the list and print information about the processes
+  while (list_iter_hasNext(&it, pinfoList)) {
+    pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
+    if (pinfo->pid == pid) {
+      pinfo->state = state;
+      pinfo->end = time(NULL);
+      break;
+    }
+  }
+
+  signal(SIGCHLD, sigchildHandler);
+}
+
 int main (int argc, char** argv) {
+  signal(SIGCHLD, sigchildHandler);
+
   if (argc > 2) {
     printf("Please only provide the maximum of processes allowed\n");
     return 1;
@@ -121,15 +158,17 @@ int main (int argc, char** argv) {
   char **argVector = malloc(sizeof(char*) * 4);
   char *buffer = malloc(sizeof(char) * BUFF_SIZE);
   int maxChildren = argc == 1 ? 0 : atoi(argv[1]);
-  int children = 0, state, args;
+  int args;
   pid_t pid;
-  // Inicialization of a list to store pid numbers and exit state
-  list_t* list = list_alloc(NULL);
+
+  pinfoList = list_alloc(NULL);
+
+  struct timeval timer = {0, 0};
 
   while (TRUE) {
     input = backup;
 
-    if (select(pipe+1, &input, NULL, NULL, NULL) == -1) {
+    if (select(pipe+1, &input, NULL, NULL, &timer) == -1) {
       printf("error while reading\n");
       return -1;
     }
@@ -157,51 +196,49 @@ int main (int argc, char** argv) {
     // User wishes to run SeqSolver
     if (args == 2 && !strcmp(argVector[0], "run")) {
       // Reached limit of processes available
-      if (maxChildren && children == maxChildren) {
-        // Wait until one child process finishes
-        pid = wait(&state);
-        list_insert(list, makepinfo(pid, state));
-        children--;
-      }
+      while (maxChildren && children >= maxChildren) {}
 
       // Creation of a child process
       pid = fork();
-      
+
       // Child process
       if (pid == (pid_t)0) {
-        execl(BINARY, BINARY, argVector[1], (char*)NULL);
+        if (isFromPipe) {
+          execl(BINARY, BINARY, argVector[1], outPipeName, (char*)NULL);
+        } else {
+          execl(BINARY, BINARY, argVector[1], (char*)NULL);
+        }
+
         return 1;
       // Parent process (Main process)
       } else {
         children++;
+        list_insert(pinfoList, makepinfo(pid, -1));
       }
     // User wishes to exit program
     } else if (args < 0 || (args == 1 && !isFromPipe && !strcmp(argVector[0], "exit"))) {
-      // Wait for processes still running
-      while (children--) {
-        pid = wait(&state);
-        // Insert information about the process that finished in list
-        list_insert(list, makepinfo(pid, state));
-      }
+      // wait for sigchlds...
+      while (children != 0) {}
 
       list_iter_t it;
-      list_iter_reset(&it, list);
+      list_iter_reset(&it, pinfoList);
 
       // Iterate over the list and print information about the processes
-      while (list_iter_hasNext(&it, list)) {
-        pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, list);
-        printf("CHILD EXITED (PID=%i; return %s)\n", pinfo->pid,
-          WIFEXITED(pinfo->state) && WEXITSTATUS(pinfo->state) == 0 ? "OK" : "NOK");
+      while (list_iter_hasNext(&it, pinfoList)) {
+        pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
+        printf("CHILD EXITED (PID=%i; return %s; %ld s)\n", pinfo->pid,
+          WIFEXITED(pinfo->state) && WEXITSTATUS(pinfo->state) == 0 ? "OK" : "NOK",
+          pinfo->end - pinfo->start);
       }
 
       printf("END.\n");
       close(pipe);
-      free_everything(argVector, buffer, list);
+      free_everything(argVector, buffer, pinfoList);
       return 0;
     } else if (isFromPipe) {
       int outFd = open(outPipeName, O_WRONLY);
       write(outFd, "Command not supported\n", 22);
-      // close(outFd);
+      close(outFd);
     } else {
       printf("Invalid Command\n");
     }

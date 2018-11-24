@@ -60,8 +60,9 @@
 #include "router.h"
 #include "lib/timer.h"
 #include "lib/types.h"
-#include "string.h"
-#include "unistd.h"
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 enum param_types {
     PARAM_BENDCOST = (unsigned char)'b',
@@ -77,6 +78,7 @@ enum param_defaults {
     PARAM_DEFAULT_ZCOST    = 2,
 };
 
+int pipeDescriptor = -1;
 char* global_inputFile = NULL;
 long global_params[256]; /* 256 = ascii limit */
 
@@ -144,6 +146,14 @@ static void parseArgs (long argc, char* const argv[]){
 
     global_inputFile = argv[optind++];
 
+    if (optind < argc) {
+        pipeDescriptor = open(argv[optind], O_WRONLY);
+        if (pipeDescriptor < 0) {
+            fprintf(stderr, "could not open pipe\n");
+        }
+        optind++;
+    }
+
     for (i = optind; i < argc; i++) {
         fprintf(stderr, "Non-option argument: %s\n", argv[i]);
         opterr++;
@@ -206,12 +216,14 @@ int main(int argc, char** argv){
     FILE * fpin = fopen(global_inputFile, "r");
     if (fpin == NULL) {
         printf("Error while reading file.\n");
+        if (pipeDescriptor > 0) close(pipeDescriptor);
         exit(1);
     }
 
     FILE * fpout = get_output_file();
     if (fpout == NULL) {
         printf("Error while writing file.\n");
+        if (pipeDescriptor > 0) close(pipeDescriptor);
         exit(1);
     }
 
@@ -266,6 +278,11 @@ int main(int argc, char** argv){
         vector_free(pathVectorPtr);
     }
     list_free(pathVectorListPtr);
+
+    if (pipeDescriptor >= 0) {
+        write(pipeDescriptor, "Circuit solved\n", 15);
+        close(pipeDescriptor);
+    }
 
     fclose(fpin);
     fclose(fpout);

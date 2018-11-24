@@ -15,7 +15,7 @@ int makePipe (const char* name) {
     return -1;
   }
   
-  return open(name, O_RDONLY|O_NONBLOCK);
+  return open(name, O_RDWR|O_NONBLOCK);
 }
 
 char* getPipeName () {
@@ -56,14 +56,14 @@ int main (int argc, char** argv) {
   for (;;) {
     input = backup;
 
-    // TODO: dup not working, redirect pipe to stdout
     if (select(inPipe+1, &input, NULL, NULL, NULL) == -1) {
       printf("error while reading\n");
       return -1;
     }
 
     if (FD_ISSET(inPipe, &input)) {
-      read(inPipe, buffer, BUFF_SIZE);
+      int n = read(inPipe, buffer, BUFF_SIZE);
+      buffer[n] = '\0';
       printf("%s", buffer);
     } else {
       sprintf(buffer, "%s ", inPipeName);
