@@ -103,6 +103,9 @@ char* getPipeName (const char* s) {
 void sigchildHandler () {
   int state;
   int pid = wait(&state);
+  TIMER_T time_noted;
+  
+  TIMER_READ(time_noted);
 
   if (pid < 0) {
     // we aren't supposed to get here
@@ -120,7 +123,7 @@ void sigchildHandler () {
     pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
     if (pinfo->pid == pid) {
       pinfo->state = state;
-      TIMER_READ(pinfo->end);
+      pinfo->end = time_noted;
       break;
     }
   }
