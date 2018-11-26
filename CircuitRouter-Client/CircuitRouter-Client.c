@@ -20,7 +20,7 @@ int makePipe (const char* name) {
 
 char* getPipeName () {
   char* buff = malloc(sizeof(char) * 30);
-  sprintf(buff, "/tmp/SO%d.pipe", rand() % 1000 +1);
+  sprintf(buff, "/tmp/Client%d.pipe", getpid());
   buff = realloc(buff, strlen(buff) + 1);
   return buff;
 }
