@@ -3,7 +3,6 @@
 #include <string.h>
 #include <limits.h>
 #include <fcntl.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/stat.h>
@@ -13,6 +12,7 @@
 #include <unistd.h>
 #include "../lib/list.h"
 #include "../lib/types.h"
+#include "../lib/timer.h"
 
 #define BUFF_SIZE 1000
 #define BINARY "../CircuitRouter-SeqSolver/CircuitRouter-SeqSolver"
@@ -22,8 +22,8 @@ int children = 0;
 
 typedef struct pinfo {
   pid_t   pid;
-  time_t  start;
-  time_t  end;
+  TIMER_T start;
+  TIMER_T end;
   int state;
 } pinfo_t;
 
@@ -32,7 +32,7 @@ pinfo_t* makepinfo (pid_t pid, int state) {
   pinfo_t* p = malloc(sizeof(pinfo_t));
   p->pid = pid;
   p->state = state;
-  p->start = time(NULL);
+  TIMER_READ(p->start);
   return p;
 }
 
@@ -120,7 +120,7 @@ void sigchildHandler () {
     pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
     if (pinfo->pid == pid) {
       pinfo->state = state;
-      pinfo->end = time(NULL);
+      TIMER_READ(pinfo->end);
       break;
     }
   }
@@ -226,9 +226,9 @@ int main (int argc, char** argv) {
       // Iterate over the list and print information about the processes
       while (list_iter_hasNext(&it, pinfoList)) {
         pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
-        printf("CHILD EXITED (PID=%i; return %s; %ld s)\n", pinfo->pid,
+        printf("CHILD EXITED (PID=%i; return %s; %d s)\n", pinfo->pid,
           WIFEXITED(pinfo->state) && WEXITSTATUS(pinfo->state) == 0 ? "OK" : "NOK",
-          pinfo->end - pinfo->start);
+          (int) TIMER_DIFF_SECONDS(pinfo->start, pinfo->end));
       }
 
       printf("END.\n");
