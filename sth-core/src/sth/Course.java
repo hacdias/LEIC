@@ -1,6 +1,7 @@
 package sth;
 
 import sth.exceptions.MaximumRepresentativesExceeded;
+import sth.exceptions.NoSuchDisciplineNameException;
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.util.Comparator;
@@ -27,8 +28,13 @@ public class Course implements Serializable, Comparable<Course> {
     return _name;
   }
 
-  public Discipline getDiscipline(String name) {
-    return _disciplines.get(name);
+  public Discipline getDiscipline(String name) throws NoSuchDisciplineNameException {
+    Discipline d = _disciplines.get(name);
+    if (d == null) {
+      throw new NoSuchDisciplineNameException(name);
+    }
+
+    return d;
   }
 
   public void addDiscipline(Discipline d) {

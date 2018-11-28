@@ -1,46 +1,34 @@
 package sth;
-
 import java.io.Serializable;
 
-public class SurveyState implements Serializable {
+import sth.exceptions.NonEmptySurveyProjectException;
+import sth.exceptions.SurveyFinishedProjectException;
+import sth.exceptions.OpeningSurveyProjectException;
+import sth.exceptions.ClosingSurveyProjectException;
+import sth.exceptions.FinishingSurveyProjectException;
+
+// ASK: Above exceptions dont have attributes since we cant acess those attributes where we are currently
+// (at least easily withut pointing more stuff to each other)
+
+public abstract class SurveyState implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 
-  /*
+  private Survey _survey;
 
-  private final int STATE_CREATED = 0;
-  private final int STATE_OPEN = 1;
-  private final int STATE_CLOSED = 2;
-  private final int STATE_FINALIZED = 3;
-  private int _state;
-
-  public SurveyState() {
-    _state = 0;
+  public SurveyState(Survey survey) {
+    _survey = survey;
   }
 
-  public boolean isCreated() {
-    return _state == STATE_CREATED;
-  }
-  public boolean isOpen() {
-    return _state == STATE_OPEN;
-  }
-  public boolean isClosed() {
-    return _state == STATE_CLOSED;
-  }
-  public boolean isFinalized() {
-    return _state == STATE_FINALIZED;
-  }
+  public abstract void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException;
+  public abstract void open() throws OpeningSurveyProjectException;
+  public abstract void close() throws ClosingSurveyProjectException;
+  public abstract void finalize() throws FinishingSurveyProjectException;
 
-  public boolean setCreated() {
-    return _state = STATE_CREATED;
+  public Survey getSurvey() {
+    return _survey;
   }
-  public boolean seOpen() {
-    return _state = STATE_OPEN;
+  public void setState(SurveyState new_state) {
+    getSurvey().setState(new_state);
   }
-  public boolean setClosed() {
-    return _state = STATE_CLOSED;
-  }
-  public boolean setFinalized() {
-    return _state = STATE_FINALIZED;
-  } */
 
 }

@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import sth.exceptions.BadTypeException;
 import sth.exceptions.MaximumDisciplinesExceededException;
 import sth.exceptions.MaximumRepresentativesExceeded;
@@ -20,6 +21,13 @@ import sth.exceptions.BadEntryException;
 import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.InvalidCourseSelectionException;
 import sth.exceptions.NoSuchPersonIdException;
+import sth.exceptions.DuplicateSurveyProjectException;
+import sth.exceptions.NoSurveyProjectException;
+import sth.exceptions.NonEmptySurveyProjectException;
+import sth.exceptions.SurveyFinishedProjectException;
+import sth.exceptions.OpeningSurveyProjectException;
+import sth.exceptions.ClosingSurveyProjectException;
+import sth.exceptions.FinishingSurveyProjectException;
 
 /**
 * <h1> School </h1>
@@ -158,8 +166,10 @@ public class School implements Serializable {
           isRepresentative = false;
         }
 
-        Discipline disc = cour.getDiscipline(line[1]);
-        if (disc == null) {
+        Discipline disc;
+        try {
+          disc = cour.getDiscipline(line[1]);
+        } catch (NoSuchDisciplineNameException e) {
           disc = new Discipline(line[1], cour);
           cour.addDiscipline(disc);
         }
@@ -388,5 +398,102 @@ public class School implements Serializable {
 
     Project proj = d.getProject(projName);
     proj.close();
+  }
+
+  /**
+   * Creates the survey of a Project in the discipline that has <code>projName</code> as its name
+   * @param discipline name of the discipline of the project
+   * @param projName name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws DuplicateSurveyProjectException
+   */
+  public void createSurvey(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+
+    p.createSurvey();
+  }
+
+  /**
+   * Cancels the survey of a Project in the discipline that has <code>projName</code> as its name
+   * @param discipline name of the discipline of the project
+   * @param projName name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   * @throws NonEmptySurveyProjectException
+   * @throws SurveyFinishedProjectException
+   */
+  public void cancelSurvey(String discipline, String projName) 
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, NonEmptySurveyProjectException, SurveyFinishedProjectException {
+    
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+    Survey survey = p.getSurvey();
+
+    survey.cancel();
+  }
+
+  /**
+   * Opens the survey of a Project in the discipline that has <code>projName</code> as its name
+   * @param discipline name of the discipline of the project
+   * @param projName name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   * @throws OpeningSurveyProjectException
+   */
+  public void openSurvey(String discipline, String projName) 
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, OpeningSurveyProjectException {
+    
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+    Survey survey = p.getSurvey();
+
+    survey.open();
+  }
+
+  /**
+   * Closes the survey of a Project in the discipline that has <code>projName</code> as its name
+   * @param discipline name of the discipline of the project
+   * @param projName name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   * @throws ClosingSurveyProjectException
+   */
+  public void closeSurvey(String discipline, String projName) 
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, ClosingSurveyProjectException {
+    
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+    Survey survey = p.getSurvey();
+
+    survey.close();
+  }
+
+  /**
+   * Finalizes the survey of a Project in the discipline that has <code>projName</code> as its name
+   * @param discipline name of the discipline of the project
+   * @param projName name of the project to close
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   * @throws FinishingSurveyProjectException
+   */
+  public void finishSurvey(String discipline, String projName) 
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, FinishingSurveyProjectException {
+    
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+    Survey survey = p.getSurvey();
+
+    survey.finalize();
   }
 }

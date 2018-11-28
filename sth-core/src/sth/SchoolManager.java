@@ -14,6 +14,13 @@ import sth.exceptions.ImportFileException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchPersonIdException;
 import sth.exceptions.NoSuchProjectNameException;
+import sth.exceptions.DuplicateSurveyProjectException;
+import sth.exceptions.NoSurveyProjectException;
+import sth.exceptions.NonEmptySurveyProjectException;
+import sth.exceptions.SurveyFinishedProjectException;
+import sth.exceptions.OpeningSurveyProjectException;
+import sth.exceptions.ClosingSurveyProjectException;
+import sth.exceptions.FinishingSurveyProjectException;
 
 /**
  * The façade class.
@@ -45,8 +52,8 @@ public class SchoolManager {
    * @throws NoSuchPersonIdException
    */
   public void login(int id) throws NoSuchPersonIdException {
-    _changed = true;
     _school.login(id);
+    _changed = true;
   }
 
   /**
@@ -78,8 +85,8 @@ public class SchoolManager {
   }
 
   public void doChangePhoneNumber(String phoneNumber) {
-    _changed = true;
     _school.doChangePhoneNumber(phoneNumber);
+    _changed = true;
   }
 
   public String getPerson() {
@@ -99,13 +106,46 @@ public class SchoolManager {
   }
 
   public void createProject(String discipline, String projName) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
-    _changed = true;
     _school.createProject(discipline, projName);
+    _changed = true;
   }
 
   public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
-    _changed = true;
     _school.closeProject(discipline, projName);
+    _changed = true;
+  }
+
+  public void createSurvey(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
+    _school.createSurvey(discipline, projName);
+    _changed = true;
+  }
+
+  public void cancelSurvey(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, NonEmptySurveyProjectException, SurveyFinishedProjectException {
+
+    _school.cancelSurvey(discipline, projName);
+    _changed = true;
+  }
+
+  public void openSurvey(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, OpeningSurveyProjectException {
+
+    _school.openSurvey(discipline, projName);
+    _changed = true;
+  }
+
+  public void closeSurvey(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, ClosingSurveyProjectException {
+
+    _school.closeSurvey(discipline, projName);
+    _changed = true;
+  }
+
+  public void finishSurvey(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, FinishingSurveyProjectException {
+
+    _school.finishSurvey(discipline, projName);
+    _changed = true;
   }
 
   public boolean hasDumpFileName () {
