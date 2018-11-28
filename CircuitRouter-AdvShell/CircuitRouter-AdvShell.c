@@ -100,39 +100,42 @@ char* getPipeName (const char* s) {
   return name;
 }
 
-void sigchildHandler () {
+void sigchildHandler (int signal) {
   int state;
-  int pid = wait(&state);
+  int pid;
   TIMER_T time_noted;
   
-  TIMER_READ(time_noted);
+  while ((pid = waitpid(-1, &state, WNOHANG)) > 0) {
+    TIMER_READ(time_noted);
 
-  if (pid < 0) {
-    // we aren't supposed to get here
-    perror("wait failed");
-    exit(1);
-  }
+    children--;
+    list_iter_t it;
+    list_iter_reset(&it, pinfoList);
 
-  children--;
-
-  list_iter_t it;
-  list_iter_reset(&it, pinfoList);
-
-  // Iterate over the list and print information about the processes
-  while (list_iter_hasNext(&it, pinfoList)) {
-    pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
-    if (pinfo->pid == pid) {
-      pinfo->state = state;
-      pinfo->end = time_noted;
-      break;
+    // Iterate over the list and print information about the processes
+    while (list_iter_hasNext(&it, pinfoList)) {
+      pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
+      if (pinfo->pid == pid) {
+        pinfo->state = state;
+        pinfo->end = time_noted;
+        break;
+      }
     }
   }
-
-  signal(SIGCHLD, sigchildHandler);
 }
 
 int main (int argc, char** argv) {
-  signal(SIGCHLD, sigchildHandler);
+  struct sigaction sa;
+
+  sa.sa_handler = &sigchildHandler;
+  // Restart the system call
+  sa.sa_flags = SA_RESTART;
+  // Block other signals during handler
+  sigfillset(&sa.sa_mask);
+  
+  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    printf("Something went wrong, couldn't handle signal\n");
+  }
 
   if (argc > 2) {
     printf("Please only provide the maximum of processes allowed\n");
@@ -199,7 +202,7 @@ int main (int argc, char** argv) {
     // User wishes to run SeqSolver
     if (args == 2 && !strcmp(argVector[0], "run")) {
       // Reached limit of processes available
-      while (maxChildren && children >= maxChildren) {}
+      while (maxChildren && children >= maxChildren) pause();
 
       // Creation of a child process
       pid = fork();
@@ -213,6 +216,7 @@ int main (int argc, char** argv) {
         }
 
         return 1;
+
       // Parent process (Main process)
       } else {
         children++;
@@ -221,7 +225,7 @@ int main (int argc, char** argv) {
     // User wishes to exit program
     } else if (args < 0 || (args == 1 && !isFromPipe && !strcmp(argVector[0], "exit"))) {
       // wait for sigchlds...
-      while (children != 0) {}
+      while (children != 0) pause();
 
       list_iter_t it;
       list_iter_reset(&it, pinfoList);
