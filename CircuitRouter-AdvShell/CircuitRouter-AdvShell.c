@@ -169,14 +169,16 @@ int main (int argc, char** argv) {
 
   pinfoList = list_alloc(NULL);
 
-  struct timeval timer = {0, 0};
-
   while (TRUE) {
     input = backup;
 
-    if (select(pipe+1, &input, NULL, NULL, &timer) == -1) {
-      printf("error while reading\n");
-      return -1;
+    if (select(pipe+1, &input, NULL, NULL, NULL) == -1) {
+      if (errno != EINTR) {
+        printf("error while reading\n");
+        return 1;
+      }
+
+      continue;
     }
 
     char* outPipeName = NULL;
@@ -188,7 +190,7 @@ int main (int argc, char** argv) {
       // EOF, forces exit
       args = -1;
     } else if (n < 0) {
-      break;
+      return 1;
     } else {
       args = readLineArguments(argVector, isFromPipe ? 4 : 3, buffer);
     }
@@ -216,7 +218,6 @@ int main (int argc, char** argv) {
         }
 
         return 1;
-
       // Parent process (Main process)
       } else {
         children++;

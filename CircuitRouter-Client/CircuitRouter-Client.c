@@ -58,7 +58,7 @@ int main (int argc, char** argv) {
 
     if (select(inPipe+1, &input, NULL, NULL, NULL) == -1) {
       printf("error while reading\n");
-      return -1;
+      return 1;
     }
 
     if (FD_ISSET(inPipe, &input)) {
@@ -69,7 +69,7 @@ int main (int argc, char** argv) {
       sprintf(buffer, "%s ", inPipeName);
     
       if (fgets(buffer + inPipeNameLength + 1, BUFF_SIZE - inPipeNameLength, stdin) == NULL) {
-        return -1;
+        return 1;
       }
 
       write(outPipe, buffer, strlen(buffer));
