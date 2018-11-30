@@ -148,8 +148,7 @@ int main (int argc, char** argv) {
     return 1;
   }
 
-  // char* pipeName = getPipeName(argv[0]);
-  char *pipeName = "/tmp/SO/a.pipe";
+  char* pipeName = getPipeName(argv[0]);
   if (pipeName == NULL) {
     perror("could not create pipe name");
     return 1;
