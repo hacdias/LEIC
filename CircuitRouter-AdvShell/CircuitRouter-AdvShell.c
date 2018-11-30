@@ -10,9 +10,9 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+#include <time.h>
 #include "../lib/list.h"
 #include "../lib/types.h"
-#include "../lib/timer.h"
 
 #define BUFF_SIZE 1000
 #define BINARY "../CircuitRouter-SeqSolver/CircuitRouter-SeqSolver"
@@ -22,8 +22,8 @@ int children = 0;
 
 typedef struct pinfo {
   pid_t   pid;
-  TIMER_T start;
-  TIMER_T end;
+  struct timespec start;
+  struct timespec end;
   int state;
 } pinfo_t;
 
@@ -32,7 +32,10 @@ pinfo_t* makepinfo (pid_t pid, int state) {
   pinfo_t* p = malloc(sizeof(pinfo_t));
   p->pid = pid;
   p->state = state;
-  TIMER_READ(p->start);
+  if (clock_gettime(CLOCK_MONOTONIC, &p->start) < 0) {
+    perror("Error happened.\n");
+    exit(errno);
+  }
   return p;
 }
 
@@ -103,10 +106,13 @@ char* getPipeName (const char* s) {
 void sigchildHandler (int signal) {
   int state;
   int pid;
-  TIMER_T time_noted;
+  struct timespec time_noted;
   
   while ((pid = waitpid(-1, &state, WNOHANG)) > 0) {
-    TIMER_READ(time_noted);
+    if (clock_gettime(CLOCK_MONOTONIC, &time_noted) < 0) {
+      perror("Error happened.");
+      exit(errno);
+    }
 
     children--;
     list_iter_t it;
@@ -129,30 +135,30 @@ int main (int argc, char** argv) {
 
   sa.sa_handler = &sigchildHandler;
   // Restart the system call
-  sa.sa_flags = SA_RESTART;
+  sa.sa_flags = SA_RESTART|SA_NOCLDSTOP;
   // Block other signals during handler
   sigfillset(&sa.sa_mask);
   
   if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    printf("Something went wrong, couldn't handle signal\n");
+    perror("Something went wrong, couldn't handle signal\n");
   }
 
   if (argc > 2) {
-    printf("Please only provide the maximum of processes allowed\n");
+    perror("Please only provide the maximum of processes allowed\n");
     return 1;
   }
 
   // char* pipeName = getPipeName(argv[0]);
   char *pipeName = "/tmp/SO/a.pipe";
   if (pipeName == NULL) {
-    printf("could not create pipe name\n");
+    perror("could not create pipe name");
     return 1;
   }
 
   int pipe = makePipe(pipeName);
   if (pipe < 0) {
-    printf("could not open pipe; errno %d\n", errno);
-    return -1;
+    perror("could not open pipe\n");
+    return errno;
   }
 
   fd_set input, backup;
@@ -174,7 +180,7 @@ int main (int argc, char** argv) {
 
     if (select(pipe+1, &input, NULL, NULL, NULL) == -1) {
       if (errno != EINTR) {
-        printf("error while reading\n");
+        perror("error while reading\n");
         return 1;
       }
 
@@ -234,9 +240,9 @@ int main (int argc, char** argv) {
       // Iterate over the list and print information about the processes
       while (list_iter_hasNext(&it, pinfoList)) {
         pinfo_t* pinfo = (pinfo_t*)list_iter_next(&it, pinfoList);
-        printf("CHILD EXITED (PID=%i; return %s; %d s)\n", pinfo->pid,
+        printf("CHILD EXITED (PID=%i; return %s; %ld s)\n", pinfo->pid,
           WIFEXITED(pinfo->state) && WEXITSTATUS(pinfo->state) == 0 ? "OK" : "NOK",
-          (int) TIMER_DIFF_SECONDS(pinfo->start, pinfo->end));
+          pinfo->end.tv_sec - pinfo->start.tv_sec);
       }
 
       printf("END.\n");
