@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class SurveyEntry implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 
-  private double _spentHours;
+  private float _spentHours;
   private String _comment;
 
-  SurveyEntry(double spentHours, String comment) {
+  SurveyEntry(float spentHours, String comment) {
     _spentHours = spentHours;
     _comment = comment;
   }

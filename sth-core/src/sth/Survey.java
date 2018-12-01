@@ -14,6 +14,7 @@ public class Survey implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 
   private Project _project;
+  // ASK: Is it bad to use ArrayList in this case?
   private ArrayList<SurveyEntry> _entries;
   private SurveyState _state;
   private HashMap<Integer, Student> _students;
@@ -34,8 +35,15 @@ public class Survey implements Serializable {
     _state = new_state;
   }
 
-  public void submitEntry() {
-    // TODO: Intrepertation of States
+  public void submitEntry(Student s, SurveyEntry entry) {
+    // ASK: Do we throw an exception if student already answered survey
+    // TODO: Only submit entry if State of Survey is open
+    if (_students.containsKey(s.getId())) {
+      // TODO: Throw exception
+    } else {
+      _students.put(s.getId(), s);
+      _entries.add(entry);
+    }
   }
 
   public Project getProject() {

@@ -17,6 +17,7 @@ import sth.exceptions.MaximumRepresentativesExceeded;
 import sth.exceptions.MaximumStudentsExceededException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchProjectNameException;
+import sth.exceptions.NoSuchProjectOpenException;
 import sth.exceptions.BadEntryException;
 import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.InvalidCourseSelectionException;
@@ -401,6 +402,44 @@ public class School implements Serializable {
   }
 
   /**
+   * Delivers a submission to a project in discipline from a student
+   * @param discipline
+   * @param projName
+   * @param submission
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSuchProjectOpenException
+   */
+  public void deliverProject(String discipline, String projName, String sub_text)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSuchProjectOpenException {
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+
+    Submission submission = new Submission(s, sub_text);
+    p.addSubmission(submission);
+  }
+
+  /**
+   * Returns a string with the information of all the students that submited a project
+   * @param discipline
+   * @param projName
+   * @return String
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   */
+  public String showProjectSubmissions(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+    
+    Professor prof = _professors.get(_session.getId());
+    Discipline d = prof.teachesDiscipline(discipline);
+    Project p = d.getProject(projName);
+
+    String header = d.getName() + " - " + p.getName() + "\n";
+    return header + p.getSubmissions();
+  }
+
+  /**
    * Creates the survey of a Project in the discipline that has <code>projName</code> as its name
    * @param discipline name of the discipline of the project
    * @param projName name of the project to close
@@ -408,7 +447,10 @@ public class School implements Serializable {
    * @throws NoSuchProjectNameException
    * @throws DuplicateSurveyProjectException
    */
-  public void createSurvey(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
+
+  public void createSurvey(String discipline, String projName) 
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
+  
     Student s = _students.get(_session.getId());
     Discipline d = s.getCourse().getDiscipline(discipline);
     Project p = d.getProject(projName);
@@ -495,5 +537,31 @@ public class School implements Serializable {
     Survey survey = p.getSurvey();
 
     survey.finalize();
+  }
+  
+   /**
+   * Answers a Survey from a specific Project
+   * @param discipline
+   * @param projName
+   * @param time
+   * @param comment
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   */
+  public void answerSurvey(String discipline, String projName, float time, String comment)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+    
+    Student s = _students.get(_session.getId());
+    Discipline d = s.getCourse().getDiscipline(discipline);
+    Project p = d.getProject(projName);
+    Survey survey = p.getSurvey();
+
+    if (! p.studentSubmited(s)) {
+      // TODO: Throw Exception or something like it
+    }
+
+    SurveyEntry entry = new SurveyEntry(time, comment);
+    survey.submitEntry(s, entry);
   }
 }

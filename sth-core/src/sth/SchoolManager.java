@@ -14,6 +14,7 @@ import sth.exceptions.ImportFileException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchPersonIdException;
 import sth.exceptions.NoSuchProjectNameException;
+import sth.exceptions.NoSuchProjectOpenException;
 import sth.exceptions.DuplicateSurveyProjectException;
 import sth.exceptions.NoSurveyProjectException;
 import sth.exceptions.NonEmptySurveyProjectException;
@@ -115,6 +116,15 @@ public class SchoolManager {
     _changed = true;
   }
 
+  public void deliverProject(String discipline, String projName, String submission) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSuchProjectOpenException {
+    _school.deliverProject(discipline, projName, submission);
+    _changed = true;
+  }
+
+  public String showProjectSubmissions(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+    return _school.showProjectSubmissions(discipline, projName);
+  }
+
   public void createSurvey(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
     _school.createSurvey(discipline, projName);
     _changed = true;
@@ -145,6 +155,11 @@ public class SchoolManager {
     throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, FinishingSurveyProjectException {
 
     _school.finishSurvey(discipline, projName);
+    _changed = true;
+  }
+
+  public void answerSurvey(String discipline, String projName, float time, String comment) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+    _school.answerSurvey(discipline, projName, time, comment);
     _changed = true;
   }
 

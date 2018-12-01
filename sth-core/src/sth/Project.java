@@ -1,7 +1,12 @@
 package sth;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.TreeSet;
+
+import sth.exceptions.DuplicateSurveyProjectException;
+import sth.exceptions.NoSurveyProjectException;
+import sth.exceptions.OpeningSurveyProjectException;
+import sth.exceptions.NoSuchProjectOpenException;
 
 import sth.exceptions.DuplicateSurveyProjectException;
 import sth.exceptions.NoSurveyProjectException;
@@ -13,14 +18,14 @@ public class Project implements Serializable {
   private String _name;
   private String _description;
   private boolean _open;
-  private ArrayList<Submission> _submissions;
+  private TreeSet<Submission> _submissions;
   private Survey _survey;
 
   public Project(String name) {
     _name = name;
     _description = "";
     _open = true;
-    _submissions = new ArrayList<Submission>();
+    _submissions = new TreeSet<Submission>();
     // ASk: Are we supposed to initialize survey? Or doesnt exist until explicit creation by representative
   }
 
@@ -36,20 +41,45 @@ public class Project implements Serializable {
     return _open;
   }
 
-  public void addSubmission(Submission s) {
-    if (_open)
-      _submissions.add(s);
+  public void addSubmission(Submission submission) throws NoSuchProjectOpenException {
+    // TODO: Test this out
+    if (_open) {
+      if (_submissions.contains(submission))
+        _submissions.remove(submission);
+
+      _submissions.add(submission);
+    } else {
+      throw new NoSuchProjectOpenException(getName());
+    }
+  }
+
+  public boolean studentSubmited(Student s) {
+    // TODO: Dont know if it is a good way to check if submited
+    for (Submission sub : _submissions) {
+      if (s.compareTo(sub.getStudent()) == 0)
+        return true;
+    }
+
+    return false;
   }
 
   public void close() {
     // ASK: This exception will never be thrown
-    // TODO: Solve problem from above
+    // TODO: Solve problem from above BLANCK CATCH IMPORTANT
     _open = false;
     if (_survey != null) {
       try {
         _survey.open();
       } catch (OpeningSurveyProjectException e) {}
     }
+  }
+
+  public String getSubmissions() {
+    String submissions = "";
+    for (Submission sub : _submissions) {
+      submissions += sub.toString() + "\n";
+    }
+    return submissions;
   }
 
   public void createSurvey() throws DuplicateSurveyProjectException {
