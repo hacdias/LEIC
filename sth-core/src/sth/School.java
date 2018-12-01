@@ -413,7 +413,7 @@ public class School implements Serializable {
   public void deliverProject(String discipline, String projName, String sub_text)
     throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSuchProjectOpenException {
     Student s = _students.get(_session.getId());
-    Discipline d = s.getCourse().getDiscipline(discipline);
+    Discipline d = s.getDiscipline(discipline);
     Project p = d.getProject(projName);
 
     Submission submission = new Submission(s, sub_text);
@@ -553,7 +553,7 @@ public class School implements Serializable {
     throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
     
     Student s = _students.get(_session.getId());
-    Discipline d = s.getCourse().getDiscipline(discipline);
+    Discipline d = s.getDiscipline(discipline);
     Project p = d.getProject(projName);
     Survey survey = p.getSurvey();
 
