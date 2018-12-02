@@ -82,6 +82,10 @@ public class Project implements Serializable {
     return submissions;
   }
 
+  public int getNumberSubmissions() {
+    return _submissions.size();
+  }
+
   public void createSurvey() throws DuplicateSurveyProjectException {
     if (_survey != null) {
       throw new DuplicateSurveyProjectException(_name);

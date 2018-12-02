@@ -32,4 +32,8 @@ public class CreatedSurveyState extends SurveyState {
   public void finalize() throws FinishingSurveyProjectException {
     throw new FinishingSurveyProjectException();
   }
+
+  public String printInfo(SurveyPrint printer) {
+    return printer.printSurveyCreated(getSurvey());
+  }
 }

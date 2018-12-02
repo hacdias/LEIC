@@ -163,6 +163,14 @@ public class SchoolManager {
     _changed = true;
   }
 
+  public String showSurveyInfo(String discipline) throws NoSuchDisciplineNameException {
+    return _school.showSurveyInfo(discipline);
+  }
+
+  public String showSurveyInfo(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+    return _school.showSurveyInfo(discipline, projName);
+  }
+
   public boolean hasDumpFileName () {
     return !_dumpFileName.equals("");
   }

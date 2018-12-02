@@ -23,6 +23,7 @@ public abstract class SurveyState implements Serializable {
   public abstract void open() throws OpeningSurveyProjectException;
   public abstract void close() throws ClosingSurveyProjectException;
   public abstract void finalize() throws FinishingSurveyProjectException;
+  public abstract String printInfo(SurveyPrint printer);
 
   public Survey getSurvey() {
     return _survey;

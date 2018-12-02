@@ -25,4 +25,8 @@ public class FinalizedSurveyState extends SurveyState {
   }
 
   public void finalize() {}
+
+  public String printInfo(SurveyPrint printer) {
+    return printer.printSurveyFinalized(getSurvey());
+  }
 }

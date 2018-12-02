@@ -564,4 +564,71 @@ public class School implements Serializable {
     SurveyEntry entry = new SurveyEntry(time, comment);
     survey.submitEntry(s, entry);
   }
+
+  /**
+   * Returns a string with the information about all the surveys about projects in discipline
+   * @param discipline
+   * @throws NoSuchDisciplineNameException
+   */
+  public String showSurveyInfo(String discipline) throws NoSuchDisciplineNameException {
+    
+    String text = "";
+    Discipline d;
+    SurveyPrint printer;
+    // ASK: Is it a problem we dont check if it is representative?
+
+    Student r = _students.get(_session.getId());
+    // ASK: According to test A-10-50 representative must show even if not enrolled
+    d = r.getCourse().getDiscipline(discipline);
+    printer = new SurveyPrintRepresentative();
+
+    for (Project proj : d.getProjects()) {
+      try {
+        Survey survey = proj.getSurvey();
+        text += d.getName() + " - " + proj.getName() + survey.printInfo(printer);
+      } catch (NoSurveyProjectException e) {
+        // TODO: Dont like this very much
+        continue;
+      }
+    }
+
+    return text;
+  }
+
+  /**
+   * Returns a string with the information about the survey about a specific project
+   * @param discipline
+   * @param projName
+   * @throws NoSuchDisciplineNameException
+   * @throws NoSuchProjectNameException
+   * @throws NoSurveyProjectException
+   */
+  public String showSurveyInfo(String discipline, String projName)
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+    
+    String text = "";
+    Discipline d;
+    SurveyPrint printer;
+
+    if (hasStudent()) {
+      Student s = _students.get(_session.getId());
+      d = s.getDiscipline(discipline);
+      printer = new SurveyPrintStudent();
+      proj = d.getProject(projName);
+      survey = proj.getSurvey();
+
+      text = d.getName() + " - " + proj.getName() + survey.printInfo(printer);
+
+    } else {
+      // ASK: Is it a problem we dont check if it is either one, if it isn't student must be professor
+      Professor p = _professors.get(_session.getId());
+      d = p.teachesDiscipline(discipline);
+      printer = new SurveyPrintProfessor();
+    }
+
+    Project proj = d.getProject(projName);
+    Survey survey = proj.getSurvey();
+
+    return d.getName() + " - " + proj.getName() + survey.printInfo(printer);
+  }
 }

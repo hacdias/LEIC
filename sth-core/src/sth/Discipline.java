@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+
 public class Discipline implements Serializable, Comparable<Discipline> {
   private static final long serialVersionUID = 201810051538L;
 
@@ -97,6 +98,11 @@ public class Discipline implements Serializable, Comparable<Discipline> {
 
   public void removeStudent(Student s) {
     _students.remove(s);
+  }
+
+  public HashSet<Project> getProjects() {
+    // TODO: Dont like this
+    return _projects;
   }
 
   @Override

@@ -21,4 +21,8 @@ public class ClosedSurveyState extends SurveyState {
   public void finalize() {
     setState(new FinalizedSurveyState(getSurvey()));
   }
+
+  public String printInfo(SurveyPrint printer) {
+    return printer.printSurveyClosed(getSurvey());
+  }
 }

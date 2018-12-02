@@ -30,6 +30,7 @@ public class Survey implements Serializable {
   public void open() throws OpeningSurveyProjectException { _state.open(); }
   public void close() throws ClosingSurveyProjectException { _state.close(); }
   public void finalize() throws FinishingSurveyProjectException { _state.finalize(); }
+  public String printInfo(SurveyPrint printer) { return _state.printInfo(printer); }
 
   public void setState(SurveyState new_state) {
     _state = new_state;
@@ -52,5 +53,35 @@ public class Survey implements Serializable {
 
   public int getNumberEntries() {
     return _entries.size();
+  }
+
+  public double getAverageTime() {
+    double average = 0;
+    for (SurveyEntry e : _entries)
+      average += e.getSpentHours();
+    
+    return average/getNumberEntries();
+  }
+
+  public double getMinimumTime() {
+    double minimum = _entries.get(0).getSpentHours();
+    for (SurveyEntry e : _entries) {
+      // TODO: Maybe not check first again?
+      if (e.getSpentHours() < minimum)
+        minimum = e.getSpentHours();
+    }
+
+    return minimum;
+  }
+
+  public double getMaximumTime() {
+    double maximum = _entries.get(0).getSpentHours();
+    for (SurveyEntry e : _entries) {
+      // TODO: Maybe not check first again?
+      if (e.getSpentHours() > maximum)
+        maximum = e.getSpentHours();
+    }
+
+    return maximum;
   }
 }
