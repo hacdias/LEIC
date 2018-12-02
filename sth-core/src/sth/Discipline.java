@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-
 public class Discipline implements Serializable, Comparable<Discipline> {
   private static final long serialVersionUID = 201810051538L;
 
@@ -104,11 +103,15 @@ public class Discipline implements Serializable, Comparable<Discipline> {
     _students.remove(s.getId());
   }
 
-  public void subscribeToSurvey (Survey survey) {
+  public void subscribeToSurvey(Survey survey) {
     for (Student s : _students.values())
       survey.attach(s);
     for (Professor p : _professors.values())
       survey.attach(p);
+
+    for (Person p : _course.getRepresentatives().values())
+      if (_students.get(p.getId()) == null)
+        survey.attach(p);
   }
 
   public HashSet<Project> getProjects() {
