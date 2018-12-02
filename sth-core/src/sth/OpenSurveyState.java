@@ -9,6 +9,9 @@ public class OpenSurveyState extends SurveyState {
 
   public OpenSurveyState(Survey survey) {
     super(survey);
+    Project p = survey.getProject();
+    Discipline d = p.getDiscipline();
+    survey.notify("Pode preencher inquérito do projecto " + p.getName() + " da disciplina " + d.getName());
   }
       
   public void cancel() throws NonEmptySurveyProjectException {

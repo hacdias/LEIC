@@ -33,7 +33,8 @@ public class DoOpen extends Command<SchoolManager> {
     }
 
     try {
-      _receiver.open();
+      String notifications = _receiver.open();
+      _display.popup(notifications);
     } catch (FileNotFoundException fnfe) {
       _display.popup(Message.fileNotFound());
     } catch (ClassNotFoundException | IOException e) {

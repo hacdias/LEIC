@@ -7,7 +7,7 @@ import java.lang.Comparable;
 import java.text.Collator;
 import java.util.Locale;
 
-public abstract class Person implements Serializable, Comparable<Person> {
+public abstract class Person implements Serializable, Observer, Comparable<Person> {
   private static final long serialVersionUID = 201810051538L;
 
   final private String _name;
@@ -40,12 +40,17 @@ public abstract class Person implements Serializable, Comparable<Person> {
     return _id;
   }
 
-  public void clearNotifications() {
+  public String getNotifications() {
+    String not = "";
+    for (String s : _notifications) {
+      not += s + "\n";
+    }
     _notifications.clear();
+    return not;
   }
 
-  public void notify(String n) {
-    _notifications.add(n);
+  public void update (String s) {
+    _notifications.add(s);
   }
 
   @Override

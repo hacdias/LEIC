@@ -179,7 +179,7 @@ public class SchoolManager {
     _dumpFileName = name;
   }
 
-  public void open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
+  public String open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
     ObjectInputStream in = new ObjectInputStream(buff);
@@ -188,6 +188,7 @@ public class SchoolManager {
       School newSchool = (School)in.readObject();
       newSchool.login(id);
       _school = newSchool;
+      return _school.getNotifications();
     } finally {
       in.close();
     }

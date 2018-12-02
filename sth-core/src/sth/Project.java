@@ -20,17 +20,23 @@ public class Project implements Serializable {
   private boolean _open;
   private TreeSet<Submission> _submissions;
   private Survey _survey;
+  private Discipline _discipline;
 
-  public Project(String name) {
+  public Project(String name, Discipline d) {
     _name = name;
     _description = "";
     _open = true;
+    _discipline = d;
     _submissions = new TreeSet<Submission>();
     // ASk: Are we supposed to initialize survey? Or doesnt exist until explicit creation by representative
   }
 
   public String getName() {
     return _name;
+  }
+
+  public Discipline getDiscipline() {
+    return _discipline;
   }
 
   public String getDescription() {
@@ -86,12 +92,13 @@ public class Project implements Serializable {
     return _submissions.size();
   }
 
-  public void createSurvey() throws DuplicateSurveyProjectException {
+  public Survey createSurvey() throws DuplicateSurveyProjectException {
     if (_survey != null) {
       throw new DuplicateSurveyProjectException(_name);
     }
     
     _survey = new Survey(this);
+    return _survey;
   }
 
   public Survey getSurvey() throws NoSurveyProjectException {

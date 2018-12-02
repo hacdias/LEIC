@@ -10,11 +10,12 @@ import sth.exceptions.OpeningSurveyProjectException;
 import sth.exceptions.ClosingSurveyProjectException;
 import sth.exceptions.FinishingSurveyProjectException;
 
-public class Survey implements Serializable {
+public class Survey implements Serializable, Observable {
   private static final long serialVersionUID = 201810051538L;
 
   private Project _project;
   // ASK: Is it bad to use ArrayList in this case?
+  private ArrayList<Observer> _observers;
   private ArrayList<SurveyEntry> _entries;
   private SurveyState _state;
   private HashMap<Integer, Student> _students;
@@ -24,6 +25,7 @@ public class Survey implements Serializable {
     _entries = new ArrayList<SurveyEntry>();
     _state = new CreatedSurveyState(this);
     _students = new HashMap<Integer, Student>();
+    _observers = new ArrayList<Observer>();
   }
 
   public void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException { _state.cancel(); }
@@ -83,5 +85,18 @@ public class Survey implements Serializable {
     }
 
     return maximum;
+  }
+
+  public void attach(Observer o) {
+    _observers.add(o);
+  }
+
+  public void detach(Observer p) {
+    // TODO:
+  }
+
+  public void notify(String s) {
+    for (Observer o : _observers)
+      o.update(s);
   }
 }

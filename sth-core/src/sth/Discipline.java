@@ -10,6 +10,7 @@ import java.lang.Comparable;
 import java.util.Comparator;
 import java.text.Collator;
 import java.util.Locale;
+import java.util.TreeMap;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -21,8 +22,8 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   private String _name;
   private int _maxStudents = 30;
   private Course _course;
-  private HashMap<Integer, Professor> _professors;
-  private TreeSet<Student> _students;
+  private TreeMap<Integer, Professor> _professors;
+  private TreeMap<Integer, Student> _students;
   private HashSet<Project> _projects;
 
   public static final Comparator<Discipline> COURSE_COMPARATOR = new CourseComparator();
@@ -30,9 +31,9 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   public Discipline(String name, Course c) {
     _name = name;
     _course = c;
-    _professors = new HashMap<Integer, Professor>();
+    _professors = new TreeMap<Integer, Professor>();
     _projects = new HashSet<Project>();
-    _students = new TreeSet<Student>();
+    _students = new TreeMap<Integer, Student>();
   }
 
   public String getName() {
@@ -80,16 +81,19 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public void addStudent(Student s) throws MaximumStudentsExceededException {
+    if (_students.get(s.getId()) != null)
+      return;
+
     if (_students.size() >= _maxStudents)
       throw new MaximumStudentsExceededException(_name, _maxStudents);
 
-    _students.add(s);
+    _students.put(s.getId(), s);
   }
 
   public String getStudents() {
     String s = "";
 
-    for (Student student : _students) {
+    for (Student student : _students.values()) {
       s += student.toString() + "\n";
     }
 
@@ -97,7 +101,14 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public void removeStudent(Student s) {
-    _students.remove(s);
+    _students.remove(s.getId());
+  }
+
+  public void subscribeToSurvey (Survey survey) {
+    for (Student s : _students.values())
+      survey.attach(s);
+    for (Professor p : _professors.values())
+      survey.attach(p);
   }
 
   public HashSet<Project> getProjects() {

@@ -383,7 +383,7 @@ public class School implements Serializable {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
 
-    d.addProject(new Project(projName));
+    d.addProject(new Project(projName, d));
   }
 
   /**
@@ -455,7 +455,7 @@ public class School implements Serializable {
     Discipline d = s.getCourse().getDiscipline(discipline);
     Project p = d.getProject(projName);
 
-    p.createSurvey();
+    d.subscribeToSurvey(p.createSurvey());
   }
 
   /**
@@ -623,6 +623,12 @@ public class School implements Serializable {
 
     Project proj = disc.getProject(projName);
     Survey survey = proj.getSurvey();
-    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer);
+    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer) + "\n";
+  }
+
+
+  // TODO:
+  public String getNotifications () {
+    return _session.getNotifications();
   }
 }
