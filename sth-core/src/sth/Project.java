@@ -28,7 +28,8 @@ public class Project implements Serializable {
     _open = true;
     _discipline = d;
     _submissions = new TreeSet<Submission>();
-    // ASk: Are we supposed to initialize survey? Or doesnt exist until explicit creation by representative
+    // ASk: Are we supposed to initialize survey? Or doesnt exist until explicit
+    // creation by representative
   }
 
   public String getName() {
@@ -76,7 +77,8 @@ public class Project implements Serializable {
     if (_survey != null) {
       try {
         _survey.open();
-      } catch (OpeningSurveyProjectException e) {}
+      } catch (OpeningSurveyProjectException e) {
+      }
     }
   }
 
@@ -96,7 +98,7 @@ public class Project implements Serializable {
     if (_survey != null) {
       throw new DuplicateSurveyProjectException(_name);
     }
-    
+
     _survey = new Survey(this);
     return _survey;
   }

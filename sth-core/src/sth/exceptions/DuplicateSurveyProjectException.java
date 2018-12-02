@@ -7,8 +7,8 @@ public class DuplicateSurveyProjectException extends Exception {
   public DuplicateSurveyProjectException(String project) {
     _project = project;
   }
-  
+
   public String getName() {
-      return _project;
+    return _project;
   }
 }

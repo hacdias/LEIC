@@ -106,59 +106,66 @@ public class SchoolManager {
     return _school.doShowDisciplineStudents(name);
   }
 
-  public void createProject(String discipline, String projName) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
+  public void createProject(String discipline, String projName)
+      throws NoSuchDisciplineNameException, DuplicateProjectNameException {
     _school.createProject(discipline, projName);
     _changed = true;
   }
 
-  public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+  public void closeProject(String discipline, String projName)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     _school.closeProject(discipline, projName);
     _changed = true;
   }
 
-  public void deliverProject(String discipline, String projName, String submission) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSuchProjectOpenException {
+  public void deliverProject(String discipline, String projName, String submission)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSuchProjectOpenException {
     _school.deliverProject(discipline, projName, submission);
     _changed = true;
   }
 
-  public String showProjectSubmissions(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+  public String showProjectSubmissions(String discipline, String projName)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     return _school.showProjectSubmissions(discipline, projName);
   }
 
-  public void createSurvey(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
+  public void createSurvey(String discipline, String projName)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, DuplicateSurveyProjectException {
     _school.createSurvey(discipline, projName);
     _changed = true;
   }
 
   public void cancelSurvey(String discipline, String projName)
-    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, NonEmptySurveyProjectException, SurveyFinishedProjectException {
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException,
+      NonEmptySurveyProjectException, SurveyFinishedProjectException {
 
     _school.cancelSurvey(discipline, projName);
     _changed = true;
   }
 
-  public void openSurvey(String discipline, String projName)
-    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, OpeningSurveyProjectException {
+  public void openSurvey(String discipline, String projName) throws NoSuchDisciplineNameException,
+      NoSuchProjectNameException, NoSurveyProjectException, OpeningSurveyProjectException {
 
     _school.openSurvey(discipline, projName);
     _changed = true;
   }
 
-  public void closeSurvey(String discipline, String projName)
-    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, ClosingSurveyProjectException {
+  public void closeSurvey(String discipline, String projName) throws NoSuchDisciplineNameException,
+      NoSuchProjectNameException, NoSurveyProjectException, ClosingSurveyProjectException {
 
     _school.closeSurvey(discipline, projName);
     _changed = true;
   }
 
-  public void finishSurvey(String discipline, String projName)
-    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, FinishingSurveyProjectException {
+  public void finishSurvey(String discipline, String projName) throws NoSuchDisciplineNameException,
+      NoSuchProjectNameException, NoSurveyProjectException, FinishingSurveyProjectException {
 
     _school.finishSurvey(discipline, projName);
     _changed = true;
   }
 
-  public void answerSurvey(String discipline, String projName, float time, String comment) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+  public void answerSurvey(String discipline, String projName, float time, String comment)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
     _school.answerSurvey(discipline, projName, time, comment);
     _changed = true;
   }
@@ -167,25 +174,26 @@ public class SchoolManager {
     return _school.showSurveyInfo(discipline);
   }
 
-  public String showSurveyInfo(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+  public String showSurveyInfo(String discipline, String projName)
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
     return _school.showSurveyInfo(discipline, projName);
   }
 
-  public boolean hasDumpFileName () {
+  public boolean hasDumpFileName() {
     return !_dumpFileName.equals("");
   }
 
-  public void setDumpFileName (String name) {
+  public void setDumpFileName(String name) {
     _dumpFileName = name;
   }
 
-  public String open () throws NoSuchPersonIdException, IOException, ClassNotFoundException {
+  public String open() throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
     ObjectInputStream in = new ObjectInputStream(buff);
 
     try {
-      School newSchool = (School)in.readObject();
+      School newSchool = (School) in.readObject();
       newSchool.login(id);
       _school = newSchool;
       return _school.getNotifications();
@@ -194,7 +202,7 @@ public class SchoolManager {
     }
   }
 
-  public void save () throws IOException {
+  public void save() throws IOException {
     if (!_changed) {
       return;
     }

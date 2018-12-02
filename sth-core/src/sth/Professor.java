@@ -10,7 +10,7 @@ public class Professor extends Person {
 
   private TreeSet<Discipline> _disciplines;
 
-  Professor(int id,  String phoneNumber, String name) {
+  Professor(int id, String phoneNumber, String name) {
     super(id, phoneNumber, name);
     _disciplines = new TreeSet<Discipline>(Discipline.COURSE_COMPARATOR);
   }

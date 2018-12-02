@@ -17,7 +17,7 @@ public abstract class Person implements Serializable, Observer, Comparable<Perso
 
   public static final Comparator<Person> NAME_COMPARATOR = new NameComparator();
 
-  Person(int id,  String phoneNumber, String name) {
+  Person(int id, String phoneNumber, String name) {
     _name = name;
     _phoneNumber = phoneNumber;
     _id = id;
@@ -49,7 +49,7 @@ public abstract class Person implements Serializable, Observer, Comparable<Perso
     return not;
   }
 
-  public void update (String s) {
+  public void update(String s) {
     _notifications.add(s);
   }
 

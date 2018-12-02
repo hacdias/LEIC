@@ -1,4 +1,5 @@
 package sth;
+
 import java.io.Serializable;
 
 import sth.exceptions.NonEmptySurveyProjectException;
@@ -20,14 +21,19 @@ public abstract class SurveyState implements Serializable {
   }
 
   public abstract void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException;
+
   public abstract void open() throws OpeningSurveyProjectException;
+
   public abstract void close() throws ClosingSurveyProjectException;
+
   public abstract void finalize() throws FinishingSurveyProjectException;
+
   public abstract String printInfo(SurveyPrint printer);
 
   public Survey getSurvey() {
     return _survey;
   }
+
   public void setState(SurveyState new_state) {
     getSurvey().setState(new_state);
   }

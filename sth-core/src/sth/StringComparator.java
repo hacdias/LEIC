@@ -14,4 +14,3 @@ public class StringComparator implements Comparator<String>, Serializable {
     return comp.compare(a, b);
   }
 }
-

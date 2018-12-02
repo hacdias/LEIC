@@ -627,7 +627,10 @@ public class School implements Serializable {
   }
 
 
-  // TODO:
+  /**
+   * Gets the current session notifications.
+   * @return the notifications
+   */
   public String getNotifications () {
     return _session.getNotifications();
   }

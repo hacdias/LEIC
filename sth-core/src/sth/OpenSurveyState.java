@@ -1,4 +1,5 @@
 package sth;
+
 import java.io.Serializable;
 
 import sth.exceptions.NonEmptySurveyProjectException;
@@ -13,16 +14,17 @@ public class OpenSurveyState extends SurveyState {
     Discipline d = p.getDiscipline();
     survey.notify("Pode preencher inquérito do projecto " + p.getName() + " da disciplina " + d.getName());
   }
-      
+
   public void cancel() throws NonEmptySurveyProjectException {
     if (getSurvey().getNumberEntries() != 0)
       throw new NonEmptySurveyProjectException();
-    
+
     Project p = getSurvey().getProject();
     p.removeSurvey();
   }
 
-  public void open() {}
+  public void open() {
+  }
 
   public void close() {
     setState(new ClosedSurveyState(getSurvey()));

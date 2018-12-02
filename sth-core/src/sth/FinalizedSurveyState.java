@@ -1,4 +1,5 @@
 package sth;
+
 import java.io.Serializable;
 
 import sth.exceptions.SurveyFinishedProjectException;
@@ -14,11 +15,11 @@ public class FinalizedSurveyState extends SurveyState {
     Discipline d = p.getDiscipline();
     survey.notify("Finalizado o inquérito do projecto " + p.getName() + " da disciplina " + d.getName());
   }
-      
+
   public void cancel() throws SurveyFinishedProjectException {
-    throw new SurveyFinishedProjectException(); 
+    throw new SurveyFinishedProjectException();
   }
-  
+
   public void open() throws OpeningSurveyProjectException {
     throw new OpeningSurveyProjectException();
   }
@@ -27,7 +28,8 @@ public class FinalizedSurveyState extends SurveyState {
     throw new ClosingSurveyProjectException();
   }
 
-  public void finalize() {}
+  public void finalize() {
+  }
 
   public String printInfo(SurveyPrint printer) {
     return printer.printSurveyFinalized(getSurvey());

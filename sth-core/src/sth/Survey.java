@@ -28,11 +28,25 @@ public class Survey implements Serializable, Observable {
     _observers = new ArrayList<Observer>();
   }
 
-  public void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException { _state.cancel(); }
-  public void open() throws OpeningSurveyProjectException { _state.open(); }
-  public void close() throws ClosingSurveyProjectException { _state.close(); }
-  public void finalize() throws FinishingSurveyProjectException { _state.finalize(); }
-  public String printInfo(SurveyPrint printer) { return _state.printInfo(printer); }
+  public void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException {
+    _state.cancel();
+  }
+
+  public void open() throws OpeningSurveyProjectException {
+    _state.open();
+  }
+
+  public void close() throws ClosingSurveyProjectException {
+    _state.close();
+  }
+
+  public void finalize() throws FinishingSurveyProjectException {
+    _state.finalize();
+  }
+
+  public String printInfo(SurveyPrint printer) {
+    return _state.printInfo(printer);
+  }
 
   public void setState(SurveyState new_state) {
     _state = new_state;
@@ -61,8 +75,8 @@ public class Survey implements Serializable, Observable {
     double average = 0;
     for (SurveyEntry e : _entries)
       average += e.getSpentHours();
-    
-    return average/getNumberEntries();
+
+    return average / getNumberEntries();
   }
 
   public double getMinimumTime() {

@@ -1,4 +1,5 @@
 package sth;
+
 import java.io.Serializable;
 
 public class ClosedSurveyState extends SurveyState {
@@ -7,7 +8,7 @@ public class ClosedSurveyState extends SurveyState {
   public ClosedSurveyState(Survey survey) {
     super(survey);
   }
-      
+
   public void cancel() {
     setState(new OpenSurveyState(getSurvey()));
   }
@@ -16,7 +17,8 @@ public class ClosedSurveyState extends SurveyState {
     setState(new OpenSurveyState(getSurvey()));
   }
 
-  public void close() {}
+  public void close() {
+  }
 
   public void finalize() {
     setState(new FinalizedSurveyState(getSurvey()));

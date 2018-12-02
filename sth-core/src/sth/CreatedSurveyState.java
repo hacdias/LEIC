@@ -1,4 +1,5 @@
 package sth;
+
 import java.io.Serializable;
 
 import sth.exceptions.OpeningSurveyProjectException;
@@ -11,7 +12,7 @@ public class CreatedSurveyState extends SurveyState {
   public CreatedSurveyState(Survey survey) {
     super(survey);
   }
-      
+
   public void cancel() {
     Project p = getSurvey().getProject();
     p.removeSurvey();
@@ -21,7 +22,7 @@ public class CreatedSurveyState extends SurveyState {
     Project p = getSurvey().getProject();
     if (p.isOpen())
       throw new OpeningSurveyProjectException();
-    
+
     setState(new OpenSurveyState(getSurvey()));
   }
 

@@ -18,7 +18,7 @@ public class Course implements Serializable, Comparable<Course> {
   private HashMap<String, Discipline> _disciplines;
   private HashMap<Integer, Person> _representatives;
 
-  Course (String name) {
+  Course(String name) {
     _name = name;
     _disciplines = new HashMap<String, Discipline>();
     _representatives = new HashMap<Integer, Person>();
@@ -58,7 +58,7 @@ public class Course implements Serializable, Comparable<Course> {
     return _representatives.get(r.getId()) != null;
   }
 
-  public HashMap<Integer, Person> getRepresentatives () {
+  public HashMap<Integer, Person> getRepresentatives() {
     return _representatives;
   }
 
