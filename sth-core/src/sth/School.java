@@ -453,7 +453,10 @@ public class School implements Serializable {
   
     Student s = _students.get(_session.getId());
     Discipline d = s.getCourse().getDiscipline(discipline);
+    // ASK: Must project be open to create a Survey?
     Project p = d.getProject(projName);
+    if (! p.isOpen())
+      throw new NoSuchProjectNameException(projName);
 
     d.subscribeToSurvey(p.createSurvey());
   }
