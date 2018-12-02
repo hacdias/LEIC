@@ -609,6 +609,8 @@ public class School implements Serializable {
     String text = "";
     Discipline d;
     SurveyPrint printer;
+    Project proj;
+    Survey survey;
 
     if (hasStudent()) {
       Student s = _students.get(_session.getId());
@@ -626,8 +628,8 @@ public class School implements Serializable {
       printer = new SurveyPrintProfessor();
     }
 
-    Project proj = d.getProject(projName);
-    Survey survey = proj.getSurvey();
+    proj = d.getProject(projName);
+    survey = proj.getSurvey();
 
     return d.getName() + " - " + proj.getName() + survey.printInfo(printer);
   }
