@@ -14,6 +14,8 @@ import java.util.TreeMap;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.Collection;
+import java.util.Collections;
 
 public class Discipline implements Serializable, Comparable<Discipline> {
   private static final long serialVersionUID = 201810051538L;
@@ -114,9 +116,9 @@ public class Discipline implements Serializable, Comparable<Discipline> {
         survey.attach(p);
   }
 
-  public HashSet<Project> getProjects() {
-    // TODO: Dont like this
-    return _projects;
+  public Collection<Project> getProjects() {
+    // ASK: Dont know if Collection is the best choice
+    return Collections.unmodifiableCollection(_projects);
   }
 
   @Override

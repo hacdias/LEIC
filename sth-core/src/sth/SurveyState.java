@@ -2,6 +2,7 @@ package sth;
 
 import java.io.Serializable;
 
+import sth.exceptions.NoSurveyProjectException;
 import sth.exceptions.NonEmptySurveyProjectException;
 import sth.exceptions.SurveyFinishedProjectException;
 import sth.exceptions.OpeningSurveyProjectException;
@@ -29,6 +30,8 @@ public abstract class SurveyState implements Serializable {
   public abstract void finalize() throws FinishingSurveyProjectException;
 
   public abstract String printInfo(SurveyPrint printer);
+
+  public abstract void submitEntry(Student s, SurveyEntry e) throws NoSurveyProjectException;
 
   public Survey getSurvey() {
     return _survey;

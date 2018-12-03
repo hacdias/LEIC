@@ -37,4 +37,13 @@ public class OpenSurveyState extends SurveyState {
   public String printInfo(SurveyPrint printer) {
     return printer.printSurveyOpen(getSurvey());
   }
+
+  public void submitEntry(Student student, SurveyEntry entry) {
+    // ASK: Do we throw an exception if student already answered survey
+    if (getSurvey().studentAlreadyAnswered(student)) {
+      
+    } else {
+      getSurvey().addEntry(student, entry);
+    }
+  }
 }

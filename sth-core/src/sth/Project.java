@@ -49,7 +49,6 @@ public class Project implements Serializable {
   }
 
   public void addSubmission(Submission submission) throws NoSuchProjectOpenException {
-    // TODO: Test this out
     if (_open) {
       if (_submissions.contains(submission))
         _submissions.remove(submission);

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import sth.exceptions.NoSurveyProjectException;
 import sth.exceptions.NonEmptySurveyProjectException;
 import sth.exceptions.SurveyFinishedProjectException;
 import sth.exceptions.OpeningSurveyProjectException;
@@ -47,20 +48,13 @@ public class Survey implements Serializable, Observable {
   public String printInfo(SurveyPrint printer) {
     return _state.printInfo(printer);
   }
+  
+  public void submitEntry(Student s, SurveyEntry entry) throws NoSurveyProjectException {
+    _state.submitEntry(s, entry);
+  }
 
   public void setState(SurveyState new_state) {
     _state = new_state;
-  }
-
-  public void submitEntry(Student s, SurveyEntry entry) {
-    // ASK: Do we throw an exception if student already answered survey
-    // TODO: Only submit entry if State of Survey is open
-    if (_students.containsKey(s.getId())) {
-      // TODO: Throw exception
-    } else {
-      _students.put(s.getId(), s);
-      _entries.add(entry);
-    }
   }
 
   public Project getProject() {
@@ -69,6 +63,15 @@ public class Survey implements Serializable, Observable {
 
   public int getNumberEntries() {
     return _entries.size();
+  }
+
+  public boolean studentAlreadyAnswered(Student s) {
+    return _students.containsKey(s.getId());
+  }
+
+  public void addEntry(Student s, SurveyEntry e) {
+    _students.put(s.getId(), s);
+    _entries.add(e);
   }
 
   public double getAverageTime() {
