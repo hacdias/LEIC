@@ -28,7 +28,7 @@ public class Project implements Serializable {
     _open = true;
     _discipline = d;
     _submissions = new TreeSet<Submission>();
-    // ASk: Are we supposed to initialize survey? Or doesnt exist until explicit
+    // ASK: Are we supposed to initialize survey? Or doesnt exist until explicit
     // creation by representative
   }
 
