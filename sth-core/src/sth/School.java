@@ -393,7 +393,7 @@ public class School implements Serializable {
    * @throws NoSuchDisciplineNameException
    * @throws NoSuchProjectNameException
    */
-  public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+  public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, OpeningSurveyProjectException {
     Professor p = _professors.get(_session.getId());
     Discipline d = p.teachesDiscipline(discipline);
 

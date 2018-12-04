@@ -8,6 +8,8 @@ import sth.app.exceptions.NoSuchDisciplineException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.app.exceptions.NoSuchProjectException;
 import sth.exceptions.NoSuchProjectNameException;
+import sth.app.exceptions.OpeningSurveyException;
+import sth.exceptions.OpeningSurveyProjectException;
 
 /**
  * 4.3.2. Close project.
@@ -35,7 +37,8 @@ public class DoCloseProject extends Command<SchoolManager> {
       throw new NoSuchDisciplineException(_discipline.value());
     } catch (NoSuchProjectNameException e) {
       throw new NoSuchProjectException(_discipline.value(), _name.value());
+    } catch (OpeningSurveyProjectException e) {
+      throw new OpeningSurveyException(_discipline.value(), _name.value());
     }
   }
-
 }

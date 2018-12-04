@@ -113,7 +113,7 @@ public class SchoolManager {
   }
 
   public void closeProject(String discipline, String projName)
-      throws NoSuchDisciplineNameException, NoSuchProjectNameException {
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, OpeningSurveyProjectException {
     _school.closeProject(discipline, projName);
     _changed = true;
   }

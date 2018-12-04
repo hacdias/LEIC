@@ -1,7 +1,7 @@
 package sth;
 
 import java.io.Serializable;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 import sth.exceptions.DuplicateSurveyProjectException;
 import sth.exceptions.NoSurveyProjectException;
@@ -18,7 +18,7 @@ public class Project implements Serializable {
   private String _name;
   private String _description;
   private boolean _open;
-  private TreeSet<Submission> _submissions;
+  private TreeMap<Integer, Submission> _submissions;
   private Survey _survey;
   private Discipline _discipline;
 
@@ -27,7 +27,7 @@ public class Project implements Serializable {
     _description = "";
     _open = true;
     _discipline = d;
-    _submissions = new TreeSet<Submission>();
+    _submissions = new TreeMap<Integer, Submission>();
     // ASK: Are we supposed to initialize survey? Or doesnt exist until explicit
     // creation by representative
   }
@@ -49,41 +49,28 @@ public class Project implements Serializable {
   }
 
   public void addSubmission(Submission submission) throws NoSuchProjectOpenException {
-    if (_open) {
-      if (_submissions.contains(submission))
-        _submissions.remove(submission);
-
-      _submissions.add(submission);
-    } else {
+    if (!_open) {
       throw new NoSuchProjectOpenException(getName());
     }
+    
+    int id = submission.getStudent().getId();
+    _submissions.put(id, submission);
   }
 
   public boolean studentSubmited(Student s) {
-    // TODO: Dont know if it is a good way to check if submited
-    for (Submission sub : _submissions) {
-      if (s.compareTo(sub.getStudent()) == 0)
-        return true;
-    }
-
-    return false;
+    return _submissions.get(s.getId()) != null;
   }
 
-  public void close() {
-    // ASK: This exception will never be thrown
-    // TODO: Solve problem from above BLANCK CATCH IMPORTANT
+  public void close() throws OpeningSurveyProjectException {
     _open = false;
     if (_survey != null) {
-      try {
-        _survey.open();
-      } catch (OpeningSurveyProjectException e) {
-      }
+      _survey.open();
     }
   }
 
   public String getSubmissions() {
     String submissions = "";
-    for (Submission sub : _submissions) {
+    for (Submission sub : _submissions.values()) {
       submissions += sub.toString() + "\n";
     }
     return submissions;
