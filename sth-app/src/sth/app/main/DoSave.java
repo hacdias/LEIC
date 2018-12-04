@@ -23,13 +23,13 @@ public class DoSave extends Command<SchoolManager> {
   /** @see pt.tecnico.po.ui.Command#execute() */
   @Override
   public final void execute() {
-    if (!_receiver.hasDumpFileName()) {
-      _form.parse();
-      _receiver.setDumpFileName(_filename.value());
-    }
-
     try {
-      _receiver.save();
+      if (!_receiver.hasDumpFileName()) {
+        _form.parse();
+        _receiver.save(_filename.value());
+      } else {
+        _receiver.save(null);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

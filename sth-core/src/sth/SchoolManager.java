@@ -183,11 +183,9 @@ public class SchoolManager {
     return !_dumpFileName.equals("");
   }
 
-  public void setDumpFileName(String name) {
-    _dumpFileName = name;
-  }
+  public String open(String filename) throws NoSuchPersonIdException, IOException, ClassNotFoundException {
+    _dumpFileName = filename;
 
-  public String open() throws NoSuchPersonIdException, IOException, ClassNotFoundException {
     int id = _school.getSessionId();
     BufferedInputStream buff = new BufferedInputStream(new FileInputStream(_dumpFileName));
     ObjectInputStream in = new ObjectInputStream(buff);
@@ -202,9 +200,13 @@ public class SchoolManager {
     }
   }
 
-  public void save() throws IOException {
+  public void save(String filename) throws IOException {
     if (!_changed) {
       return;
+    }
+
+    if (filename != null) {
+      _dumpFileName = filename;
     }
 
     BufferedOutputStream buff = new BufferedOutputStream(new FileOutputStream(_dumpFileName));

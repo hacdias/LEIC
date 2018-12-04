@@ -27,13 +27,10 @@ public class DoOpen extends Command<SchoolManager> {
   /** @see pt.tecnico.po.ui.Command#execute() */
   @Override
   public final void execute() throws DialogException {
-    if (!_receiver.hasDumpFileName()) {
-      _form.parse();
-      _receiver.setDumpFileName(_filename.value());
-    }
-
+    _form.parse();
+    
     try {
-      String notifications = _receiver.open();
+      String notifications = _receiver.open(_filename.value());
       _display.popup(notifications);
     } catch (FileNotFoundException fnfe) {
       _display.popup(Message.fileNotFound());
