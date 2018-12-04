@@ -561,7 +561,7 @@ public class School implements Serializable {
     Survey survey = p.getSurvey();
 
     if (! p.studentSubmited(s)) {
-      // TODO: Throw Exception or something like it
+      throw new NoSuchProjectNameException(projName);
     }
 
     SurveyEntry entry = new SurveyEntry(time, comment);
@@ -612,19 +612,24 @@ public class School implements Serializable {
     String text = "";
     Discipline disc;
     SurveyPrint printer;
+    Project proj;
 
     if (hasStudent()) {
       Student s = _students.get(_session.getId());
       disc = s.getDiscipline(discipline);
       printer = new SurveyPrintStudent();
+      proj = disc.getProject(projName);
+      if (! proj.studentSubmited(s))
+        throw new NoSuchProjectNameException(projName);
+
     } else {
       // ASK: Is it a problem we dont check if it is either one, if it isn't student must be professor
       Professor p = _professors.get(_session.getId());
       disc = p.teachesDiscipline(discipline);
       printer = new SurveyPrintProfessor();
+      proj = disc.getProject(projName);
     }
 
-    Project proj = disc.getProject(projName);
     Survey survey = proj.getSurvey();
     return disc.getName() + " - " + proj.getName() + survey.printInfo(printer) + "\n";
   }
