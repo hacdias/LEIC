@@ -39,10 +39,7 @@ public class OpenSurveyState extends SurveyState {
   }
 
   public void submitEntry(Student student, SurveyEntry entry) {
-    // ASK: Do we throw an exception if student already answered survey
-    if (getSurvey().studentAlreadyAnswered(student)) {
-      
-    } else {
+    if (!getSurvey().studentAlreadyAnswered(student)) {
       getSurvey().addEntry(student, entry);
     }
   }

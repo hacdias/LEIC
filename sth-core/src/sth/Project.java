@@ -28,8 +28,6 @@ public class Project implements Serializable {
     _open = true;
     _discipline = d;
     _submissions = new TreeMap<Integer, Submission>();
-    // ASK: Are we supposed to initialize survey? Or doesnt exist until explicit
-    // creation by representative
   }
 
   public String getName() {

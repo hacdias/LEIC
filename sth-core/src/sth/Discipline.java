@@ -117,7 +117,6 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public Collection<Project> getProjects() {
-    // ASK: Dont know if Collection is the best choice
     return Collections.unmodifiableCollection(_projects);
   }
 

@@ -15,11 +15,13 @@ public class Survey implements Serializable, Observable {
   private static final long serialVersionUID = 201810051538L;
 
   private Project _project;
-  // ASK: Is it bad to use ArrayList in this case?
   private ArrayList<Observer> _observers;
   private ArrayList<SurveyEntry> _entries;
   private SurveyState _state;
   private HashMap<Integer, Student> _students;
+  private double _maximumTime;
+  private double _minimumTime;
+  private double _averageTime;
 
   public Survey(Project project) {
     _project = project;
@@ -27,6 +29,9 @@ public class Survey implements Serializable, Observable {
     _state = new CreatedSurveyState(this);
     _students = new HashMap<Integer, Student>();
     _observers = new ArrayList<Observer>();
+    _maximumTime = 0;
+    _minimumTime = Double.MAX_VALUE;
+    _averageTime = 0;
   }
 
   public void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException {
@@ -48,8 +53,11 @@ public class Survey implements Serializable, Observable {
   public String printInfo(SurveyPrint printer) {
     return _state.printInfo(printer);
   }
-  
+
   public void submitEntry(Student s, SurveyEntry entry) throws NoSurveyProjectException {
+    _maximumTime = Math.max(entry.getSpentHours(), _maximumTime);
+    _minimumTime = Math.min(entry.getSpentHours(), _minimumTime);
+    _averageTime = (_averageTime * getNumberEntries() + entry.getSpentHours()) / (getNumberEntries() + 1);
     _state.submitEntry(s, entry);
   }
 
@@ -75,33 +83,15 @@ public class Survey implements Serializable, Observable {
   }
 
   public double getAverageTime() {
-    double average = 0;
-    for (SurveyEntry e : _entries)
-      average += e.getSpentHours();
-
-    return average / getNumberEntries();
+    return _averageTime;
   }
 
   public double getMinimumTime() {
-    double minimum = _entries.get(0).getSpentHours();
-    for (SurveyEntry e : _entries) {
-      // TODO: Maybe not check first again?
-      if (e.getSpentHours() < minimum)
-        minimum = e.getSpentHours();
-    }
-
-    return minimum;
+    return _minimumTime;
   }
 
   public double getMaximumTime() {
-    double maximum = _entries.get(0).getSpentHours();
-    for (SurveyEntry e : _entries) {
-      // TODO: Maybe not check first again?
-      if (e.getSpentHours() > maximum)
-        maximum = e.getSpentHours();
-    }
-
-    return maximum;
+    return _maximumTime;
   }
 
   public void attach(Observer o) {
@@ -109,7 +99,7 @@ public class Survey implements Serializable, Observable {
   }
 
   public void detach(Observer p) {
-    // TODO:
+    _observers.remove(p);
   }
 
   public void notify(String s) {

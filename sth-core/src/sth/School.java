@@ -453,7 +453,6 @@ public class School implements Serializable {
   
     Student s = _students.get(_session.getId());
     Discipline d = s.getCourse().getDiscipline(discipline);
-    // ASK: Must project be open to create a Survey?
     Project p = d.getProject(projName);
     if (! p.isOpen())
       throw new NoSuchProjectNameException(projName);
@@ -574,14 +573,10 @@ public class School implements Serializable {
    * @throws NoSuchDisciplineNameException
    */
   public String showSurveyInfo(String discipline) throws NoSuchDisciplineNameException {
-    
     String text = "";
     Discipline d;
     SurveyPrint printer;
-    // ASK: Is it a problem we dont check if it is representative?
-
     Student r = _students.get(_session.getId());
-    // ASK: According to test A-10-50 representative must show even if not enrolled
     d = r.getCourse().getDiscipline(discipline);
     printer = new SurveyPrintRepresentative();
 
@@ -590,7 +585,6 @@ public class School implements Serializable {
         Survey survey = proj.getSurvey();
         text += d.getName() + " - " + proj.getName() + survey.printInfo(printer);
       } catch (NoSurveyProjectException e) {
-        // TODO: Dont like this very much
         continue;
       }
     }
@@ -609,7 +603,6 @@ public class School implements Serializable {
   public String showSurveyInfo(String discipline, String projName)
     throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
     
-    String text = "";
     Discipline disc;
     SurveyPrint printer;
     Project proj;
@@ -621,9 +614,7 @@ public class School implements Serializable {
       proj = disc.getProject(projName);
       if (! proj.studentSubmited(s))
         throw new NoSuchProjectNameException(projName);
-
     } else {
-      // ASK: Is it a problem we dont check if it is either one, if it isn't student must be professor
       Professor p = _professors.get(_session.getId());
       disc = p.teachesDiscipline(discipline);
       printer = new SurveyPrintProfessor();
