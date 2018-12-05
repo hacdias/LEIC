@@ -53,10 +53,7 @@ public abstract class Person implements Serializable, Observer, Comparable<Perso
     _notifications.add(s);
   }
 
-  @Override
-  public String toString() {
-    return _id + "|" + _phoneNumber + "|" + _name;
-  }
+  public abstract String accept(UserDescription u);
 
   @Override
   public int compareTo(Person p) {

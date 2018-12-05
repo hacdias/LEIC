@@ -9,8 +9,7 @@ public class Administrative extends Person {
     super(id, phoneNumber, name);
   }
 
-  @Override
-  public String toString() {
-    return "FUNCIONÁRIO|" + super.toString();
+  public String accept(UserDescription u) {
+    return u.descAdministrative(this);
   }
 }

@@ -6,8 +6,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
-public class Student extends Person {
+public class Student extends Person implements WithDisciplines {
   private static final long serialVersionUID = 201810051538L;
 
   private final int MAX_DISCIPLINES = 6;
@@ -50,15 +52,11 @@ public class Student extends Person {
     _disciplines.remove(d.getName());
   }
 
-  @Override
-  public String toString() {
-    String me = _course.isRepresentative(this) ? "DELEGADO" : "ALUNO";
-    me += "|" + super.toString();
+  public Collection<Discipline> getDisciplines() {
+    return Collections.unmodifiableCollection(_disciplines.values());
+  }
 
-    for (Discipline d : _disciplines.values()) {
-      me += "\n" + d.toString();
-    }
-
-    return me;
+  public String accept(UserDescription u) {
+    return _course.isRepresentative(this) ? u.descRepresentative(this) : u.descStudent(this);
   }
 }

@@ -2,10 +2,12 @@ package sth;
 
 import java.io.Serializable;
 import java.util.TreeSet;
+import java.util.Collection;
+import java.util.Collections;
 
 import sth.exceptions.NoSuchDisciplineNameException;
 
-public class Professor extends Person {
+public class Professor extends Person implements WithDisciplines {
   private static final long serialVersionUID = 201810051538L;
 
   private TreeSet<Discipline> _disciplines;
@@ -33,14 +35,11 @@ public class Professor extends Person {
     throw new NoSuchDisciplineNameException(name);
   }
 
-  @Override
-  public String toString() {
-    String me = "DOCENTE|" + super.toString();
+  public Collection<Discipline> getDisciplines() {
+    return Collections.unmodifiableCollection(_disciplines);
+  }
 
-    for (Discipline d : _disciplines) {
-      me += "\n" + d.toString();
-    }
-
-    return me;
+  public String accept(UserDescription u) {
+    return u.descProfessor(this);
   }
 }

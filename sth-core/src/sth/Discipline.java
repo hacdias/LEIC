@@ -93,9 +93,10 @@ public class Discipline implements Serializable, Comparable<Discipline> {
 
   public String getStudents() {
     String s = "";
+    UserDescription u = new UserDescription();
 
     for (Student student : _students.values()) {
-      s += student.toString() + "\n";
+      s += student.accept(u) + "\n";
     }
 
     return s.trim();

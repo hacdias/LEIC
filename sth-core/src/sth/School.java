@@ -310,7 +310,7 @@ public class School implements Serializable {
    * @return String with the information about the Person logged in
    */
   public String getPerson() {
-    return _session.toString();
+    return _session.accept(new UserDescription());
   }
 
   /**
@@ -328,9 +328,10 @@ public class School implements Serializable {
   public String getPeople () {
     String people = "";
     Set<Integer> ids = _people.keySet();
+    UserDescription u = new UserDescription();
 
     for(Integer id : ids){
-      people += _people.get(id).toString() + "\n";
+      people += _people.get(id).accept(u)+ "\n";
     }
 
     return people.trim();
@@ -349,10 +350,11 @@ public class School implements Serializable {
       return "";
     }
 
+    UserDescription u = new UserDescription();
     String s = "";
     for (Person p : _peopleByName) {
       if (p.getName().contains(name)) {
-        s += p.toString() + "\n";
+        s += p.accept(u) + "\n";
       }
     }
 
