@@ -367,7 +367,7 @@ public class School implements Serializable {
    */
   public String doShowDisciplineStudents(String name) throws NoSuchDisciplineNameException {
     Professor p = _professors.get(_session.getId());
-    Discipline d = p.teachesDiscipline(name);
+    Discipline d = p.getDiscipline(name);
 
     return d.getStudents();
   }
@@ -381,7 +381,7 @@ public class School implements Serializable {
    */
   public void createProject(String discipline, String projName) throws NoSuchDisciplineNameException, DuplicateProjectNameException {
     Professor p = _professors.get(_session.getId());
-    Discipline d = p.teachesDiscipline(discipline);
+    Discipline d = p.getDiscipline(discipline);
 
     d.addProject(new Project(projName, d));
   }
@@ -395,7 +395,7 @@ public class School implements Serializable {
    */
   public void closeProject(String discipline, String projName) throws NoSuchDisciplineNameException, NoSuchProjectNameException, OpeningSurveyProjectException {
     Professor p = _professors.get(_session.getId());
-    Discipline d = p.teachesDiscipline(discipline);
+    Discipline d = p.getDiscipline(discipline);
 
     Project proj = d.getProject(projName);
     proj.close();
@@ -432,7 +432,7 @@ public class School implements Serializable {
     throws NoSuchDisciplineNameException, NoSuchProjectNameException {
     
     Professor prof = _professors.get(_session.getId());
-    Discipline d = prof.teachesDiscipline(discipline);
+    Discipline d = prof.getDiscipline(discipline);
     Project p = d.getProject(projName);
 
     String header = d.getName() + " - " + p.getName() + "\n";
@@ -612,11 +612,11 @@ public class School implements Serializable {
       disc = s.getDiscipline(discipline);
       printer = new SurveyPrintStudent();
       proj = disc.getProject(projName);
-      if (! proj.studentSubmited(s))
+      if (!proj.studentSubmited(s))
         throw new NoSuchProjectNameException(projName);
     } else {
       Professor p = _professors.get(_session.getId());
-      disc = p.teachesDiscipline(discipline);
+      disc = p.getDiscipline(discipline);
       printer = new SurveyPrintProfessor();
       proj = disc.getProject(projName);
     }

@@ -11,9 +11,7 @@ import java.util.Comparator;
 import java.text.Collator;
 import java.util.Locale;
 import java.util.TreeMap;
-import java.util.HashSet;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -25,7 +23,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   private Course _course;
   private TreeMap<Integer, Professor> _professors;
   private TreeMap<Integer, Student> _students;
-  private HashSet<Project> _projects;
+  private TreeMap<String, Project> _projects;
 
   public static final Comparator<Discipline> COURSE_COMPARATOR = new CourseComparator();
 
@@ -33,7 +31,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
     _name = name;
     _course = c;
     _professors = new TreeMap<Integer, Professor>();
-    _projects = new HashSet<Project>();
+    _projects = new TreeMap<String, Project>();
     _students = new TreeMap<Integer, Student>();
   }
 
@@ -61,11 +59,10 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public void addProject(Project p) throws DuplicateProjectNameException {
-    for (Project proj : _projects) {
-      if (proj.getName().equals(p.getName()))
-        throw new DuplicateProjectNameException(p.getName());
-    }
-    _projects.add(p);
+    if (_projects.get(p.getName()) != null)
+      throw new DuplicateProjectNameException(p.getName());
+
+    _projects.put(p.getName(), p); 
   }
 
   public void removeProject(Project p) {
@@ -73,12 +70,12 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public Project getProject(String name) throws NoSuchProjectNameException {
-    for (Project proj : _projects) {
-      if (proj.getName().equals(name))
-        return proj;
-    }
+    Project p = _projects.get(name);
 
-    throw new NoSuchProjectNameException(name);
+    if (p == null)
+      throw new NoSuchProjectNameException(name);
+
+    return p;
   }
 
   public void addStudent(Student s) throws MaximumStudentsExceededException {
@@ -117,7 +114,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   }
 
   public Collection<Project> getProjects() {
-    return Collections.unmodifiableCollection(_projects);
+    return Collections.unmodifiableCollection(_projects.values());
   }
 
   @Override

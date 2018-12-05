@@ -9,9 +9,6 @@ import sth.exceptions.OpeningSurveyProjectException;
 import sth.exceptions.ClosingSurveyProjectException;
 import sth.exceptions.FinishingSurveyProjectException;
 
-// ASK: Above exceptions dont have attributes since we cant acess those attributes where we are currently
-// (at least easily withut pointing more stuff to each other)
-
 public abstract class SurveyState implements Serializable {
   private static final long serialVersionUID = 201810051538L;
 

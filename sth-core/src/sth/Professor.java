@@ -24,7 +24,7 @@ public class Professor extends Person {
     return _disciplines.remove(d);
   }
 
-  public Discipline teachesDiscipline(String name) throws NoSuchDisciplineNameException {
+  public Discipline getDiscipline(String name) throws NoSuchDisciplineNameException {
     for (Discipline d : _disciplines) {
       if (name.equals(d.getName()))
         return d;

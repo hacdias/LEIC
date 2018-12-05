@@ -1,14 +1,13 @@
 package sth;
-
 import sth.exceptions.MaximumRepresentativesExceeded;
 import sth.exceptions.NoSuchDisciplineNameException;
+
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.util.Comparator;
 import java.text.Collator;
 import java.util.Locale;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Course implements Serializable, Comparable<Course> {
   private static final long serialVersionUID = 201810051538L;
