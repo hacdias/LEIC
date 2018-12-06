@@ -17,8 +17,8 @@ public class SurveyPrintProfessor implements SurveyPrint {
         Project p = s.getProject();
         SurveyStats stats = s.getStats();
 
-        String text = "\n * Numero de submissões: " + p.getNumberSubmissions() + "\n";
-        text += " * Numero de respostas: " + s.getNumberEntries() + "\n";
+        String text = "\n * Número de submissões: " + p.getNumberSubmissions() + "\n";
+        text += " * Número de respostas: " + s.getNumberEntries() + "\n";
         text += " * Tempos de resolução (horas) (mínimo, médio, máximo): ";
         text += + stats.getMin() + ", " + stats.getAvg() + ", " + stats.getMax() + "\n";
         return text;

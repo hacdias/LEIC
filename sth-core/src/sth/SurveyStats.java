@@ -1,25 +1,25 @@
 package sth;
 
 public class SurveyStats {
-  private double _avgTime;
-  private double _minTime;
-  private double _maxTime;
+  private int _avgTime;
+  private int _minTime;
+  private int _maxTime;
 
-  SurveyStats (double avg, double min, double max) {
+  SurveyStats (int avg, int min, int max) {
     _avgTime = avg;
     _maxTime = max;
     _minTime = min;
   }
 
-  public double getAvg () {
+  public int getAvg () {
     return _avgTime;
   }
 
-  public double getMin () {
+  public int getMin () {
     return _minTime;
   }
 
-  public double getMax () {
+  public int getMax () {
     return _maxTime;
   }
 }

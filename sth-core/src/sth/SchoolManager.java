@@ -165,7 +165,7 @@ public class SchoolManager {
     _changed = true;
   }
 
-  public void answerSurvey(String discipline, String projName, float time, String comment)
+  public void answerSurvey(String discipline, String projName, int time, String comment)
       throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, InvalidTimeException {
     _school.answerSurvey(discipline, projName, time, comment);
     _changed = true;

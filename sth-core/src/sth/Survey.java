@@ -77,9 +77,9 @@ public class Survey implements Serializable, Observable {
     if (_entries.size() == 0)
       return new SurveyStats(0, 0, 0);
 
-    double avg = 0;
-    double min = Double.MAX_VALUE;
-    double max = Double.MIN_VALUE;
+    int avg = 0;
+    int min = Integer.MAX_VALUE;
+    int max = Integer.MIN_VALUE;
 
     for (SurveyEntry e : _entries) {
       avg += e.getSpentHours();

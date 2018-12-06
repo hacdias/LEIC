@@ -554,7 +554,7 @@ public class School implements Serializable {
    * @throws NoSuchProjectNameException
    * @throws NoSurveyProjectException
    */
-  public void answerSurvey(String discipline, String projName, float time, String comment)
+  public void answerSurvey(String discipline, String projName, int time, String comment)
     throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, InvalidTimeException {
     
     Student s = _students.get(_session.getId());

@@ -19,7 +19,7 @@ import sth.exceptions.NoSurveyProjectException;
 public class DoAnswerSurvey extends Command<SchoolManager> {
   Input<String> _discipline;
   Input<String> _proj_name;
-  Input<Float> _time;
+  Input<Integer> _time;
   Input<String> _comment;
   
   /**
@@ -29,7 +29,7 @@ public class DoAnswerSurvey extends Command<SchoolManager> {
     super(Label.ANSWER_SURVEY, receiver);
     _discipline = _form.addStringInput(Message.requestDisciplineName());
     _proj_name = _form.addStringInput(Message.requestProjectName());
-    _time = _form.addFloatInput(Message.requestProjectHours());
+    _time = _form.addIntegerInput(Message.requestProjectHours());
     _comment = _form.addStringInput(Message.requestComment());
   }
 
