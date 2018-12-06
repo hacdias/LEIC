@@ -635,7 +635,7 @@ public class School implements Serializable {
     }
 
     Survey survey = proj.getSurvey();
-    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer) + "\n";
+    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer);
   }
 
 
