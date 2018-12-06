@@ -582,12 +582,14 @@ public class School implements Serializable {
     d = r.getCourse().getDiscipline(discipline);
     printer = new SurveyPrintRepresentative();
 
-    for (Project proj : d.getProjects()) {
-      try {
-        Survey survey = proj.getSurvey();
-        text += d.getName() + " - " + proj.getName() + survey.printInfo(printer);
-      } catch (NoSurveyProjectException e) {
-        continue;
+    if (hasRepresentative()) {
+      for (Project proj : d.getProjects()) {
+        try {
+          Survey survey = proj.getSurvey();
+          text += d.getName() + " - " + proj.getName() + survey.printInfo(printer);
+        } catch (NoSurveyProjectException e) {
+          continue;
+        }
       }
     }
 
@@ -616,11 +618,15 @@ public class School implements Serializable {
       proj = disc.getProject(projName);
       if (!proj.studentSubmited(s))
         throw new NoSuchProjectNameException(projName);
-    } else {
+      
+    } else if (hasProfessor()) {
       Professor p = _professors.get(_session.getId());
       disc = p.getDiscipline(discipline);
       printer = new SurveyPrintProfessor();
       proj = disc.getProject(projName);
+      
+    } else {
+      return "";
     }
 
     Survey survey = proj.getSurvey();

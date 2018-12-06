@@ -5,7 +5,6 @@ import sth.exceptions.NoSuchDisciplineNameException;
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.util.Comparator;
-import java.text.Collator;
 import java.util.Locale;
 import java.util.HashMap;
 
@@ -16,11 +15,13 @@ public class Course implements Serializable, Comparable<Course> {
   private final int MAX_REPRESENTATIVES = 7;
   private HashMap<String, Discipline> _disciplines;
   private HashMap<Integer, Person> _representatives;
+  private Comparator<String> _stringComparator;
 
   Course(String name) {
     _name = name;
     _disciplines = new HashMap<String, Discipline>();
     _representatives = new HashMap<Integer, Person>();
+    _stringComparator = new StringComparator();
   }
 
   public String getName() {
@@ -67,7 +68,6 @@ public class Course implements Serializable, Comparable<Course> {
 
   @Override
   public int compareTo(Course o) {
-    Collator comp = Collator.getInstance(Locale.getDefault());
-    return comp.compare(_name, o.getName());
+    return _stringComparator.compare(_name, o.getName());
   }
 }

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.lang.Comparable;
-import java.text.Collator;
 import java.util.Locale;
 
 public abstract class Person implements Serializable, Observer, Comparable<Person> {
@@ -62,11 +61,15 @@ public abstract class Person implements Serializable, Observer, Comparable<Perso
 
   private static class NameComparator implements Comparator<Person>, Serializable {
     private static final long serialVersionUID = 201810051538L;
+    private Comparator<String> _stringComparator;
+
+    NameComparator () {
+      _stringComparator = new StringComparator();
+    }
 
     @Override
     public int compare(Person p1, Person p2) {
-      Collator comp = Collator.getInstance(Locale.getDefault());
-      return comp.compare(p1.getName(), p2.getName());
+      return _stringComparator.compare(p1.getName(), p2.getName());
     }
   }
 }

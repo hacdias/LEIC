@@ -8,7 +8,6 @@ import sth.exceptions.NoSuchProjectNameException;
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.util.Comparator;
-import java.text.Collator;
 import java.util.Locale;
 import java.util.TreeMap;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
   private TreeMap<Integer, Professor> _professors;
   private TreeMap<Integer, Student> _students;
   private TreeMap<String, Project> _projects;
+  private Comparator<String> _stringComparator;
 
   public static final Comparator<Discipline> COURSE_COMPARATOR = new CourseComparator();
 
@@ -33,6 +33,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
     _professors = new TreeMap<Integer, Professor>();
     _projects = new TreeMap<String, Project>();
     _students = new TreeMap<Integer, Student>();
+    _stringComparator = new StringComparator();
   }
 
   public String getName() {
@@ -120,8 +121,7 @@ public class Discipline implements Serializable, Comparable<Discipline> {
 
   @Override
   public int compareTo(Discipline d) {
-    Collator comp = Collator.getInstance(Locale.getDefault());
-    return comp.compare(_name, d.getName());
+    return _stringComparator.compare(_name, d.getName());
   }
 
   @Override
