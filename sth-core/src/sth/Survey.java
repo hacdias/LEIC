@@ -19,9 +19,6 @@ public class Survey implements Serializable, Observable {
   private ArrayList<SurveyEntry> _entries;
   private SurveyState _state;
   private HashMap<Integer, Student> _students;
-  private double _maximumTime;
-  private double _minimumTime;
-  private double _averageTime;
 
   public Survey(Project project) {
     _project = project;
@@ -29,9 +26,6 @@ public class Survey implements Serializable, Observable {
     _state = new CreatedSurveyState(this);
     _students = new HashMap<Integer, Student>();
     _observers = new ArrayList<Observer>();
-    _maximumTime = 0;
-    _minimumTime = Double.MAX_VALUE;
-    _averageTime = 0;
   }
 
   public void cancel() throws NonEmptySurveyProjectException, SurveyFinishedProjectException {
@@ -55,9 +49,6 @@ public class Survey implements Serializable, Observable {
   }
 
   public void submitEntry(Student s, SurveyEntry entry) throws NoSurveyProjectException {
-    _maximumTime = Math.max(entry.getSpentHours(), _maximumTime);
-    _minimumTime = Math.min(entry.getSpentHours(), _minimumTime);
-    _averageTime = (_averageTime * getNumberEntries() + entry.getSpentHours()) / (getNumberEntries() + 1);
     _state.submitEntry(s, entry);
   }
 
@@ -82,16 +73,22 @@ public class Survey implements Serializable, Observable {
     _entries.add(e);
   }
 
-  public double getAverageTime() {
-    return _averageTime;
-  }
+  public SurveyStats getStats() {
+    if (_entries.size() == 0)
+      return new SurveyStats(0, 0, 0);
 
-  public double getMinimumTime() {
-    return _minimumTime;
-  }
+    double avg = 0;
+    double min = Double.MAX_VALUE;
+    double max = Double.MIN_VALUE;
 
-  public double getMaximumTime() {
-    return _maximumTime;
+    for (SurveyEntry e : _entries) {
+      avg += e.getSpentHours();
+      min = Math.min(min, e.getSpentHours());
+      max = Math.max(max, e.getSpentHours());
+    }
+
+    avg /= _entries.size();
+    return new SurveyStats(avg, min, max);
   }
 
   public void attach(Observer o) {

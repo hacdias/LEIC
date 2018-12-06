@@ -29,6 +29,7 @@ import sth.exceptions.SurveyFinishedProjectException;
 import sth.exceptions.OpeningSurveyProjectException;
 import sth.exceptions.ClosingSurveyProjectException;
 import sth.exceptions.FinishingSurveyProjectException;
+import sth.exceptions.InvalidTimeException;
 
 /**
 * <h1> School </h1>
@@ -554,7 +555,7 @@ public class School implements Serializable {
    * @throws NoSurveyProjectException
    */
   public void answerSurvey(String discipline, String projName, float time, String comment)
-    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
+    throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, InvalidTimeException {
     
     Student s = _students.get(_session.getId());
     Discipline d = s.getDiscipline(discipline);
@@ -563,6 +564,10 @@ public class School implements Serializable {
 
     if (! p.studentSubmited(s)) {
       throw new NoSuchProjectNameException(projName);
+    }
+
+    if (time < 0) {
+      throw new InvalidTimeException(time);
     }
 
     SurveyEntry entry = new SurveyEntry(time, comment);

@@ -15,11 +15,12 @@ public class SurveyPrintProfessor implements SurveyPrint {
 
     public String printSurveyFinalized(Survey s) {
         Project p = s.getProject();
+        SurveyStats stats = s.getStats();
 
         String text = "\n * Numero de submissões: " + p.getNumberSubmissions() + "\n";
         text += " * Numero de respostas: " + s.getNumberEntries() + "\n";
         text += " * Tempos de resolução (horas) (mínimo, médio, máximo): ";
-        text += +s.getMinimumTime() + ", " + s.getAverageTime() + ", " + s.getMaximumTime() + "\n";
+        text += + stats.getMin() + ", " + stats.getAvg() + ", " + stats.getMax() + "\n";
         return text;
     }
 }
