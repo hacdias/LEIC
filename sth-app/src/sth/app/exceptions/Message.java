@@ -101,10 +101,6 @@ public final class Message {
     return "Problema ao finalizar o inquérito do projecto '" + project + "' da disciplina '" + discipline + "'.";
   }
 
-  public static String negativeTime(double time) {
-    return "Tempo inválido (tem que ser maior ou igual a 0): " + time;
-  }
-
   /** Prevent instantiation. */
   private Message() {
     // EMPTY

@@ -13,6 +13,6 @@ public class NegativeTimeException extends DialogException {
   /** @see pt.tecnico.po.ui.DialogException#getMessage() */
   @Override
   public String getMessage() {
-    return Message.negativeTime(_time);
+    return "Tempo inválido (tem que ser maior ou igual a 0): " + _time;
   }
 }
