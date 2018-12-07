@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import sth.exceptions.BadEntryException;
 import sth.exceptions.DuplicateProjectNameException;
 import sth.exceptions.ImportFileException;
-import sth.exceptions.InvalidTimeException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchPersonIdException;
 import sth.exceptions.NoSuchProjectNameException;
@@ -166,7 +165,7 @@ public class SchoolManager {
   }
 
   public void answerSurvey(String discipline, String projName, int time, String comment)
-      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException, InvalidTimeException {
+      throws NoSuchDisciplineNameException, NoSuchProjectNameException, NoSurveyProjectException {
     _school.answerSurvey(discipline, projName, time, comment);
     _changed = true;
   }

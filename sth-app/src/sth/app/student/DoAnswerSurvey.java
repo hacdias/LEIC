@@ -4,11 +4,9 @@ import pt.tecnico.po.ui.Command;
 import pt.tecnico.po.ui.DialogException;
 import pt.tecnico.po.ui.Input;
 import sth.SchoolManager;
-import sth.app.exceptions.NegativeTimeException;
 import sth.app.exceptions.NoSuchDisciplineException;
 import sth.app.exceptions.NoSuchProjectException;
 import sth.app.exceptions.NoSurveyException;
-import sth.exceptions.InvalidTimeException;
 import sth.exceptions.NoSuchDisciplineNameException;
 import sth.exceptions.NoSuchProjectNameException;
 import sth.exceptions.NoSurveyProjectException;
@@ -45,8 +43,6 @@ public class DoAnswerSurvey extends Command<SchoolManager> {
       throw new NoSuchProjectException(_discipline.value(), _proj_name.value());
     } catch (NoSurveyProjectException e) {
       throw new NoSurveyException(_discipline.value(), _proj_name.value());
-    } catch (InvalidTimeException e) {
-      throw new NegativeTimeException(e.getTime());
     }
   }
 
