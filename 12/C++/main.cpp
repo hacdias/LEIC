@@ -23,10 +23,11 @@ public:
 
 class Formatted: public TextItem {
   TextItem* _textItem;
+  std::string _tag;
 public:
-  Formatted (TextItem* txt): _textItem(txt) {}
+  Formatted (TextItem* txt, std::string tag): _textItem(txt), _tag(tag) {}
   std::string render () {
-    return _textItem->render();
+    return "<" + _tag + ">" + _textItem->render() + "</" + _tag + ">";
   }
   std::string text () {
     return _textItem->text();
@@ -35,26 +36,17 @@ public:
 
 class Bold: public Formatted {
 public:
-  Bold (TextItem* txt): Formatted(txt) {}
-  std::string render () {
-    return "<b>" + Formatted::render() + "</b>";
-  }
+  Bold (TextItem* txt): Formatted(txt, "b") {}
 };
 
 class Italic: public Formatted {
 public:
-  Italic (TextItem* txt): Formatted(txt) {}
-  std::string render () {
-    return "<i>" + Formatted::render() + "</i>";
-  }
+  Italic (TextItem* txt): Formatted(txt, "i") {}
 };
 
 class Underline: public Formatted {
 public:
-  Underline (TextItem* txt): Formatted(txt) {}
-  std::string render () {
-    return "<u>" + Formatted::render() + "</u>";
-  }
+  Underline (TextItem* txt): Formatted(txt, "u") {}
 };
 
 int main () {
