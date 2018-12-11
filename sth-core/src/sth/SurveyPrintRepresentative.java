@@ -15,6 +15,6 @@ public class SurveyPrintRepresentative implements SurveyPrint {
 
     public String printSurveyFinalized(Survey s) {
         SurveyStats stats = s.getStats();
-        return " - " + s.getNumberEntries() + " respostas - " + stats.getAvg() + " horas\n";
+        return " - " + s.getNumberEntries() + " respostas - " + stats.getAvg() + " horas";
     }
 }

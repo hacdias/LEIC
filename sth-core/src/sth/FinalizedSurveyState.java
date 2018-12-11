@@ -14,7 +14,7 @@ public class FinalizedSurveyState extends SurveyState {
     super(survey);
     Project p = survey.getProject();
     Discipline d = p.getDiscipline();
-    survey.notify("Finalizado o inquérito do projecto " + p.getName() + " da disciplina " + d.getName());
+    survey.notify("Resultados do inquérito do projecto " + p.getName() + " da disciplina " + d.getName());
   }
 
   public void cancel() throws SurveyFinishedProjectException {

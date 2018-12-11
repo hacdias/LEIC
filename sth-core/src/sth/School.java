@@ -586,7 +586,7 @@ public class School implements Serializable {
       for (Project proj : d.getProjects()) {
         try {
           Survey survey = proj.getSurvey();
-          text += d.getName() + " - " + proj.getName() + survey.printInfo(printer);
+          text += d.getName() + " - " + proj.getName() + survey.printInfo(printer) + "\n";
         } catch (NoSurveyProjectException e) {
           continue;
         }
@@ -630,7 +630,7 @@ public class School implements Serializable {
     }
 
     Survey survey = proj.getSurvey();
-    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer);
+    return disc.getName() + " - " + proj.getName() + survey.printInfo(printer) + "\n";
   }
 
 

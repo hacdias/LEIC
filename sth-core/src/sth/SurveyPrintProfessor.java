@@ -20,7 +20,7 @@ public class SurveyPrintProfessor implements SurveyPrint {
         String text = "\n * Número de submissões: " + p.getNumberSubmissions() + "\n";
         text += " * Número de respostas: " + s.getNumberEntries() + "\n";
         text += " * Tempos de resolução (horas) (mínimo, médio, máximo): ";
-        text += + stats.getMin() + ", " + stats.getAvg() + ", " + stats.getMax() + "\n";
+        text += + stats.getMin() + ", " + stats.getAvg() + ", " + stats.getMax();
         return text;
     }
 }

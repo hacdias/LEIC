@@ -16,7 +16,7 @@ public class SurveyPrintStudent implements SurveyPrint {
     public String printSurveyFinalized(Survey s) {
         SurveyStats stats = s.getStats();
         String text = "\n * Número de respostas: " + s.getNumberEntries() + "\n";
-        text += " * Tempo médio (horas): " + stats.getAvg() + "\n";
+        text += " * Tempo médio (horas): " + stats.getAvg();
         return text;
     }
 }
