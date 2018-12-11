@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import sth.exceptions.NonEmptySurveyProjectException;
 import sth.exceptions.FinishingSurveyProjectException;
+import sth.exceptions.OpeningSurveyProjectException;
 
 public class OpenSurveyState extends SurveyState {
   private static final long serialVersionUID = 201810051538L;
@@ -23,7 +24,8 @@ public class OpenSurveyState extends SurveyState {
     p.removeSurvey();
   }
 
-  public void open() {
+  public void open() throws OpeningSurveyProjectException {
+    throw new OpeningSurveyProjectException();
   }
 
   public void close() {
