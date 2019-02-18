@@ -1,0 +1,29 @@
+body {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: center;
+}
+
+header {
+  background: #009de0;
+}
+
+header .background {
+  filter: blur(10px);
+}
+
+.profile {
+  border-radius: 50%;
+  height: 5em;
+  width: 5em;
+  object-fit: cover;
+  transition: .2s ease all
+}
+
+.profile:hover {
+  transform: rotate(360deg)
+}
+
+#people {
+  text-align: center;
+  margin: 0 auto
+}
