@@ -3,24 +3,32 @@ body {
   text-align: center;
 }
 
-header {
-  background: #009de0;
+a {
+  color: #009DE0;
+  transition: 0.1s ease color;
+  text-decoration: none;
 }
 
-header .background {
-  filter: blur(10px);
+a:hover {
+  color: #E91E63;
 }
 
 .profile {
-  border-radius: 50%;
+  border-radius: 0.4em;
   height: 5em;
   width: 5em;
+  object-position: center;
   object-fit: cover;
-  transition: .2s ease all
+  transition: .2s ease all;
+  cursor: pointer;
+}
+
+.profile.rotate {
+  transform: rotate(180deg)
 }
 
 .profile:hover {
-  transform: rotate(360deg)
+  filter: grayscale(1)
 }
 
 #people {
