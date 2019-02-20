@@ -35,3 +35,27 @@ a:hover {
   text-align: center;
   margin: 0 auto
 }
+
+.barranav {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  height: 100px;
+  width: 100%;
+  color: white;
+  background-color: black;
+}
+
+.mainbutton {
+  text-align: center;
+  border: none;
+  float: left;
+  font-size: 30pt;
+  color: white;
+  background-color: black;
+  height:100px;
+  padding: 10px 20px;
+}
+
+.mainbutton:hover {
+  background-color: red;
+}
