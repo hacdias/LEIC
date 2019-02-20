@@ -39,23 +39,26 @@ a:hover {
 .barranav {
   margin-top: 50px;
   margin-bottom: 50px;
-  height: 100px;
+  height: 70px;
   width: 100%;
   color: white;
   background-color: black;
 }
 
 .mainbutton {
+  transition: 0.2s;
   text-align: center;
   border: none;
+  outline: none;
   float: left;
-  font-size: 30pt;
+  font-size: 26pt;
   color: white;
   background-color: black;
-  height:100px;
-  padding: 10px 20px;
+  height: 70px;
+  padding: 10px 30px;
 }
 
 .mainbutton:hover {
+  transition: 0.2s;
   background-color: red;
 }
