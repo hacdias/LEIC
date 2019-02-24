@@ -18,6 +18,7 @@ body {
 .container {
   max-width: 35em;
   margin: 3em auto;
+  width: 90%;
 }
 
 a {
@@ -40,6 +41,7 @@ header h1 {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 100%;
 }
 
 a:hover {
@@ -153,4 +155,14 @@ a:hover {
 
 .section_toggler:checked+.section_body {
   max-height: 30em;
+}
+
+@media (max-width: 550px) {
+  #people {
+    display: block;
+  }
+
+  #people > div {
+    margin: 0 0 2em;
+  }
 }
