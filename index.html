@@ -4,88 +4,79 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IPM</title>
+  <title>IPM 18/19 - Grupo 11</title>
   <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1 style="color: #5a6ee2">Interfaces Pessoa Máquina 2018-19</h1>
-  <h2>Grupo 11 - Turno IPM20111326L06</h2>
-
-  <table id="people">
-    <tr>
-      <td width="33%">Daniel Pereira</td>
-      <td width="33%">Henrique Dias</td>
-      <td width="33%">Tiago Barroso</td>
-    </tr>
-    <tr>
-      <td>89425</td>
-      <td>89455</td>
-      <td>89549</td>
-    </tr>
-    <tr>
-      <td><img class="profile" src="imgs/daniel.jpg"></td>
-      <td><img class="profile" src="imgs/henrique.jpg"></td>
-      <td><img class="profile" src="imgs/tiago.jpg"></td>
-    </tr>
-  </table>
-
-  <div class="barranav">
-	<div>
-      <button class="mainbutton">Análise de Tarefas</button>
-	  <button class="mainbutton">Modelo Conceptual</button>
-	  <button class="mainbutton">Protótipos</button>
-	  <button class="mainbutton">Avaliação com Utilizadores</button>
-	</div>
+  <div id="page">
+    <header class="container">
+        <h1>Interfaces Pessoa Máquina 2018-19</h1>
+        <h2>Grupo 11 - Turno IPM20111326L06</h2>
+      </header>
+    
+      <div id="people" class="container">
+        <div>
+          <p class="name">Daniel Pereira</p>
+          <p class="number">89425</p>
+          <img class="profile" src="imgs/daniel.jpg">
+        </div>
+    
+        <div>
+          <p class="name">Henrique Dias</p>
+          <p class="number">89455</p>
+          <img class="profile" src="imgs/henrique.jpg">
+        </div>
+    
+        <div>
+          <p class="name">Tiago Barroso</p>
+          <p class="number">89549</p>
+          <img class="profile" src="imgs/tiago.jpg">
+        </div>
+      </div>
+    
+      <div class="nav container">
+        <label for="at" class="section_header">Análise de Tarefas</label>
+        <input type="checkbox" class="section_toggler" id="at" />
+        <div class="section_body">
+          <a class="disabled" href="questionario1.html">Questionário para análise de tarefas</a> 
+          <a class="disabled" href="questionario2.html">Questionário para análise de tarefas (melhorado)</a> 
+          <a class="disabled" href="at1.html">Análise de tarefas + Funcionalidades</a> 
+          <a class="disabled" href="at2.html">Análise de tarefas + Funcionalidades (melhorados)</a> 
+        </div>
+    
+        <label for="mc" class="section_header">Modelo Conceptual</label>
+        <input type="checkbox" class="section_toggler" id="mc" />
+        <div class="section_body">
+          <a class="disabled" href="mod-conceptual1.html">Modelo Conceptual</a> 
+          <a class="disabled" href="mod-conceptual2.html">Modelo Conceptual (melhorado)</a> 
+        </div>
+    
+        <label for="pro" class="section_header">Protótipos</label>
+        <input type="checkbox" class="section_toggler" id="pro" />
+        <div class="section_body">
+          <a class="disabled" href="pbf1.html">PBF</a> 
+          <a class="disabled" href="pbf2.html">PBF (melhorado)</a> 
+          <a class="disabled" href="protFuncional1-beta.html">Primeiro protótipo funcional</a> 
+          <a class="disabled" href="protFuncional1-completo.html">Primeiro protótipo funcional completo</a> 
+          <a class="disabled" href="protFuncional2-beta.html">Segundo protótipo funcional</a> 
+          <a class="disabled" href="protFuncional2-completo.html">Segundo protótipo funcional completo</a>
+          <a class="disabled" href="protFinal-beta.html">Protótipo Final</a> 
+          <a class="disabled" href="protFinal-completo.html">Protótipo Final completo</a>
+        </div>
+    
+        <label for="au" class="section_header">Avaliação com Utilizadores</label>
+        <input type="checkbox" class="section_toggler" id="au" />
+        <div class="section_body">
+          <a class="disabled" href="tarefas-criterios1.html">Tarefas e Critérios de usabilidade</a>
+          <a class="disabled" href="tarefas-criterios2.html">Tarefas e Critérios de usabilidade (melhorado)</a>
+          <a class="disabled" href="relatorioTestes1.html">Relatório da avaliação com utilizadores</a>
+          <a class="disabled" href="relatorioTestes2.html">Relatório da avaliação com utilizadores (melhorado)</a>
+          <a class="disabled" href="manual.html">Manual do Utilizador</a>
+        </div>
+      </div>
   </div>
-  
-  <div id="links" style="text-align: left; padding-left: 100px;">
-    <p>
 
-      <div id="at" class="section">
-        <h2 class="section">Análise de Tarefas</h2>
-        <div id="at_inner" class="inner_section">
-          <a href="questionario1.html">Questionário para análise de tarefas</a> <br />
-          <a href="questionario2.html">Questionário para análise de tarefas (melhorado)</a> <br />
-          <a href="at1.html">Análise de tarefas + Funcionalidades</a> <br />
-          <a href="at2.html">Análise de tarefas + Funcionalidades (melhorados)</a> <br />
-        </div>
-      </div>
-
-      <div id="mc" class="section">
-        <h2 class="section">Modelo Conceptual</h2>
-        <div id="mc_inner" class="inner_section">
-          <a href="mod-conceptual1.html">Modelo Conceptual</a> <br />
-          <a href="mod-conceptual2.html">Modelo Conceptual (melhorado)</a> <br />
-        </div>
-      </div>
-
-      <div id="proto" class="section">
-        <h2 class="section">Protótipos</h2>
-        <div id="proto_inner" class="inner_section">
-          <a href="pbf1.html">PBF</a> <br />
-          <a href="pbf2.html">PBF (melhorado)</a> <br />
-          <a href="protFuncional1-beta.html">Primeiro protótipo funcional</a> <br />
-          <a href="protFuncional1-completo.html">Primeiro protótipo funcional completo</a> <br />
-          <a href="protFuncional2-beta.html">Segundo protótipo funcional</a> <br />
-          <a href="protFuncional2-completo.html">Segundo protótipo funcional completo</a><br />
-          <a href="protFinal-beta.html">Protótipo Final</a> <br />
-          <a href="protFinal-completo.html">Protótipo Final completo</a><br />
-        </div>
-      </div>
-
-      <div id="au" class="section">
-        <h2 class="section">Avaliação com Utilizadores</h2>
-        <div id="au_inner" class="inner_section">
-          <a href="tarefas-criterios1.html">Tarefas e Critérios de usabilidade</a> <br />
-          <a href="tarefas-criterios2.html">Tarefas e Critérios de usabilidade (melhorado)</a> <br />
-          <a href="relatorioTestes1.html">Relatório da avaliação com utilizadores</a> <br />
-          <a href="relatorioTestes2.html">Relatório da avaliação com utilizadores (melhorado)</a>
-          <br />
-          <a href="manual.html">Manual do Utilizador</a> <br />
-        </div>
-    </p>
-  </div>
-  <script src="./app.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>
