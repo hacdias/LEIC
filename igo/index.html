@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iGo</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/fontawesome.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div id="watch">
+      <div id="status">
+        <i class="fas fa-signal"></i>
+        <span class="clock"></span>
+        <i class="fas fa-battery-three-quarters"></i>
+      </div>
+
+      <div id="screen-space">
+        <div class="screen" id="lockscreen">
+          <div class="clock"></div>
+          <span class="goto" data-to="mainmenu">
+            <i class="fas fa-4x fa-fingerprint"></i>
+          </span>
+        </div>
+
+        <div class="screen" id="mainmenu">
+          <ul>
+            <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
+            <li class="goto" data-to="places"><i class="fas fa-map-marked"></i></li>
+            <li class="goto" data-to="budget"><i class="fas fa-coins"></i></li>
+            <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
+          </ul>
+        </div>
+
+        <div class="screen" id="people" data-name="Amigos">
+          People
+        </div>
+
+        <div class="screen" id="flashlight" data-name="Lanterna">
+          Lanterna
+        </div>
+
+        <div class="screen" id="places" data-name="Locais">
+          Locais
+        </div>
+
+        <div class="screen" id="budget" data-name="Orçamentos">
+          Orçamento
+        </div>
+      </div>
+
+      <div id="backbar">
+        <span id="only-mainmenu">
+          <i class="fas fa-cog"></i>
+        </span>
+        <span id="not-mainmenu">
+          <span class="goto" data-to="--back">
+            <i class="fas fa-angle-left"></i>
+            <span id="current-screen-name"></span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

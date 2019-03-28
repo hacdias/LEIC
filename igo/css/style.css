@@ -1,0 +1,124 @@
+:root {
+  --watch-background: #2c3e50;
+  --watch-color: #2980b9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.goto {
+  cursor: pointer;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+#container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#watch {
+  width: 2.12in;
+  height: 2.12in;
+  position: relative;
+  background: var(--watch-background);
+  color: white;
+  border-radius: .3em;
+  border: 0.2em solid var(--watch-color);
+  display: flex;
+  flex-direction: column;
+}
+
+#status, #backbar {
+  display: flex;
+  padding: 0.2em;
+  align-items: center;
+  height: 2em;
+}
+
+#status > *:first-child {
+  margin-right: auto;
+}
+
+#status .clock {
+  margin-right: 0.2em;
+}
+
+#screen-space {
+  width: 100%;
+  overflow: auto;
+  height: calc(100% - 4em);
+}
+
+.screen {
+  min-height: 100%;
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+#lockscreen {
+  text-align: center;
+}
+
+#lockscreen .clock {
+  font-size: 3em;
+  margin-bottom: 0.2em;
+}
+
+#lockscreen i {
+  opacity: 0.5;
+}
+
+#mainmenu {
+  padding: .7em 1em 0;
+}
+
+#mainmenu ul {
+  padding: 0;
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+#mainmenu ul li {
+  width: 50%;
+  text-align: center;
+  font-size: 2.3em;
+  background: red;
+  padding: 0.2em;
+}
+
+#mainmenu ul li:nth-child(1) {
+  background: #3498db;
+  border-top-left-radius: 0.1em;
+}
+
+#mainmenu ul li:nth-child(2) {
+  background: #2ecc71;
+  border-top-right-radius: 0.1em;
+}
+
+#mainmenu ul li:nth-child(3) {
+  background: #f1c40f;
+  border-bottom-left-radius: 0.1em;
+}
+
+#mainmenu ul li:nth-child(4) {
+  background: #ecf0f1;
+  color: #212121;
+  border-bottom-right-radius: 0.1em;
+}
