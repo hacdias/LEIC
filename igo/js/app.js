@@ -86,6 +86,11 @@ function startup () {
   document.querySelectorAll('.goto').forEach(el => {
     el.addEventListener('click', event => {
       event.preventDefault()
+
+      if (el.dataset.needsunlock) {
+        if (!history.includes('mainmenu')) return
+      }
+
       showScreen(el.dataset.to)
     })
   })

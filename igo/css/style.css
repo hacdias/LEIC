@@ -1,5 +1,5 @@
 :root {
-  --watch-background: #2c3e50;
+  --watch-background: black;
   --watch-color: #2980b9;
 }
 
@@ -33,10 +33,22 @@ body {
   position: relative;
   background: var(--watch-background);
   color: white;
-  border-radius: .3em;
+  border-radius: 1em;
   border: 0.2em solid var(--watch-color);
   display: flex;
   flex-direction: column;
+}
+
+#mainbutton {
+  width: 0.5em;
+  height: 1.5em;
+  background: var(--watch-color);
+  position: absolute;
+  right: 1px;
+  top: 10%;
+  transform: translate(100%);
+  border-top-right-radius: 0.3em;
+  border-bottom-right-radius: 0.3em;
 }
 
 #status, #backbar {
@@ -127,7 +139,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0.5em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
 }
 
