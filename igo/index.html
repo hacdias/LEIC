@@ -30,13 +30,13 @@
           <ul>
             <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
             <li class="goto" data-to="places"><i class="fas fa-map-marked"></i></li>
-            <li class="goto" data-to="budget"><i class="fas fa-coins"></i></li>
+            <li class="goto" data-to="budget"><i class="fas fa-wallet"></i></li>
             <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
           </ul>
         </div>
 
-        <div class="screen" id="people" data-name="Amigos">
-          People
+        <div class="screen" id="people" data-name="Amigos" data-call="updatePeople">
+          <!-- Faces Go Here -->
         </div>
 
         <div class="screen" id="flashlight" data-name="Lanterna">
@@ -66,6 +66,7 @@
     </div>
   </div>
 
+  <script src="./js/data.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

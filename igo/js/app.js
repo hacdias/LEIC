@@ -34,6 +34,10 @@ function showScreen (name) {
     }
   }
 
+  if (currentScreen.dataset.call) {
+    window[currentScreen.dataset.call](currentScreen)
+  }
+
   if (name === 'lockscreen') {
     document.querySelector('#status .clock').style.opacity = 0
     document.querySelector('#backbar').style.display = 'none'
@@ -49,6 +53,30 @@ function showScreen (name) {
   } else {
     document.querySelector('#not-mainmenu').style.display = ''
     document.querySelector('#only-mainmenu').style.display = 'none'
+  }
+}
+
+function updatePeople (screen) {
+  const people = window.data.people.sort((p1, p2) => p1.distance - p2.distance)
+  screen.innerHTML = ''
+
+  for (const { name, distance, picture } of people) {
+    let el = document.createElement('div')
+    el.classList.add('person')
+    el.innerHTML = `<div>
+        <img src="assets/people/${picture}">
+      </div>
+      <div>
+        <p>${name}</p>
+        <p><i class="fas fa-ruler"></i> ${distance}m</p>
+      </div>
+    </div>`
+
+    el.addEventListener('click', () => {
+      window.alert('Não implementado: visitar ' + name)
+    })
+
+    screen.appendChild(el)
   }
 }
 
