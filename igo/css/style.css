@@ -19,6 +19,7 @@ a {
 
 body {
   font-family: sans-serif;
+  transition: 0.5s ease all;
 }
 
 #container {
@@ -38,6 +39,15 @@ body {
   border: 0.2em solid var(--watch-color);
   display: flex;
   flex-direction: column;
+  transition: 0.5s ease all;
+}
+
+body.flashlight {
+  background: #000;
+}
+
+body.flashlight #watch {
+  box-shadow: white 0 0 10em;
 }
 
 #mainbutton {

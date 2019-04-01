@@ -34,6 +34,7 @@ function showScreen (name) {
     }
   }
 
+  turnOffFlashLight()
   if (currentScreen.dataset.call) {
     window[currentScreen.dataset.call](currentScreen)
   }
@@ -54,6 +55,14 @@ function showScreen (name) {
     document.querySelector('#not-mainmenu').style.display = ''
     document.querySelector('#only-mainmenu').style.display = 'none'
   }
+}
+
+function turnOffFlashLight () {
+  document.body.classList.remove('flashlight')
+}
+
+function turnOnFlashLight (screen) {
+  document.body.classList.add('flashlight')
 }
 
 function updatePeople (screen) {
