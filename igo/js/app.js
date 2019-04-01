@@ -65,13 +65,16 @@ function turnOnFlashLight (screen) {
   document.body.classList.add('flashlight')
 }
 
+function distanceSort (a, b) {
+  return a.distance - b.distance
+}
+
 function updatePeople (screen) {
-  const people = window.data.people.sort((p1, p2) => p1.distance - p2.distance)
+  const people = window.data.people.sort(distanceSort)
   screen.innerHTML = ''
 
   for (const { name, distance, picture } of people) {
     let el = document.createElement('div')
-    el.classList.add('person')
     el.classList.add('item')
     el.innerHTML = `<div>
         <img src="assets/people/${picture}">
@@ -89,8 +92,52 @@ function updatePeople (screen) {
   }
 }
 
+const placesIcons = {
+  restaurants: 'utensils',
+  parks: 'park',
+  monuments: 'landmark',
+  markets: 'store',
+  diversions: 'chess'
+}
+
+function getPlaces (kind) {
+  if (kind === 'recommended') {
+    window.alert('Não Implementado')
+    return []
+  }
+
+  if (kind === 'favourites') {
+    window.alert('Não Implementado')
+    return []
+  }
+
+  return window.data.places[kind].sort(distanceSort).map(place => {
+    place.kind = kind
+    return place
+  })
+}
+
 function updatePlaces (screen, kind) {
-  console.log(kind)
+  const places = getPlaces(kind)
+  screen.innerHTML = ''
+
+  for (const { name, distance, kind } of places) {
+    let el = document.createElement('div')
+    el.classList.add('item')
+    el.innerHTML = `<div>
+        <i class="${kind} fas fa-${placesIcons[kind]}"></i>
+      </div>
+      <div>
+        <p>${name}</p>
+        <p><i class="fas fa-ruler"></i> ${distance}m</p>
+      </div>`
+
+    el.addEventListener('click', () => {
+      window.alert('Não implementado: place ' + name)
+    })
+
+    screen.appendChild(el)
+  }
 }
 
 function startup () {

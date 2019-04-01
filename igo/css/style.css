@@ -171,26 +171,30 @@ body.flashlight #watch {
   cursor: pointer;
 }
 
-.person > div:first-of-type {
+.item > div:first-of-type {
   margin-right: 0.5em;
 }
 
-.person img {
+.item > div:first-of-type i {
+  font-size: 1.6em;
+}
+
+.item img {
   width: 2em;
   height: 2em;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.person p {
+.item p {
   margin: 0;
 }
 
-.person p:first-of-type {
+.item > div:last-of-type p:first-of-type {
   font-size: 1.2em;
 }
 
-.person p:last-of-type {
+.item > div:last-of-type p:last-of-type {
   font-size: 0.8em;
   margin-top: 0.2em;
 }
@@ -233,22 +237,22 @@ body.flashlight #watch {
   color: #0fbcf9;
 }
 
-.favourite {
+.favourites {
   color: #fff200;
 }
 
-.restaurant {
+.restaurants {
   color: #bdc3c7;
 }
 
-.park {
+.parks {
   color: #2ecc71;
 }
 
-.monument {
+.monuments {
   color: #ffeaa7;
 }
 
-.market {
+.markets {
   color: #fc5c65;
 }

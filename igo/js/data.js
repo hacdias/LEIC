@@ -37,11 +37,27 @@ window.data = {
     }
   ],
   places: {
-    favourites: [
-
-    ],
     restaurants: [
-
+      {
+        name: "Tubarão O'Mar",
+        distance: 23,
+        rating: 4
+      },
+      {
+        name: 'Monte do Zé',
+        distance: 89,
+        rating: 2
+      },
+      {
+        name: 'Sabores do Mar',
+        distance: 55,
+        rating: 5
+      },
+      {
+        name: 'Prego no Espeto',
+        distance: 28,
+        rating: 4
+      }
     ],
     parks: [
 
