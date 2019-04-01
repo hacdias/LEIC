@@ -35,5 +35,25 @@ window.data = {
       distance: 45,
       picture: 'joaquim_fonseca.jpg'
     }
-  ]
+  ],
+  places: {
+    favourites: [
+
+    ],
+    restaurants: [
+
+    ],
+    parks: [
+
+    ],
+    monuments: [
+
+    ],
+    markets: [
+
+    ],
+    diversions: [
+
+    ]
+  }
 }

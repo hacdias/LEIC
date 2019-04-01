@@ -41,6 +41,10 @@
           <!-- Faces Go Here -->
         </div>
 
+        <div class="screen" id="places-list" data-name="Locais" data-call="updatePlaces">
+          <!-- Places Go Here -->
+        </div>
+
         <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
           <i class="fas fa-lightbulb"></i>
         </div>
@@ -50,7 +54,34 @@
         </div>
 
         <div class="screen" id="places" data-name="Locais">
-          Locais
+          <div class="item category goto" data-to="places-list" data-args="recommended">
+            <i class="recommended fas fa-certificate"></i>
+            <p>Recomendados</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="favourites">
+            <i class="favourite fas fa-star"></i>
+            <p>Favoritos</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="restaurants">
+            <i class="restaurant fas fa-utensils"></i>
+            <p>Restaurantes</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="parks">
+            <i class="park fas fa-tree"></i>
+            <p>Parques</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="monuments">
+            <i class="monument fas fa-landmark"></i>
+            <p>Monumentos</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="markets">
+            <i class="market fas fa-store"></i>
+            <p>Mercados</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="diversions">
+            <i class="fas fa-chess"></i>
+            <p>Diversões</p>
+          </div>
         </div>
 
         <div class="screen" id="budget" data-name="Orçamentos">

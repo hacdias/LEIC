@@ -14,7 +14,7 @@ function setClocks () {
 
 let history = []
 
-function showScreen (name) {
+function showScreen (name, el) {
   if (name === '--back') {
     history.pop()
     name = history[history.length - 1]
@@ -36,7 +36,7 @@ function showScreen (name) {
 
   turnOffFlashLight()
   if (currentScreen.dataset.call) {
-    window[currentScreen.dataset.call](currentScreen)
+    window[currentScreen.dataset.call](currentScreen, ...(el.dataset.args || '').trim().split(' '))
   }
 
   if (name === 'lockscreen') {
@@ -72,14 +72,14 @@ function updatePeople (screen) {
   for (const { name, distance, picture } of people) {
     let el = document.createElement('div')
     el.classList.add('person')
+    el.classList.add('item')
     el.innerHTML = `<div>
         <img src="assets/people/${picture}">
       </div>
       <div>
         <p>${name}</p>
         <p><i class="fas fa-ruler"></i> ${distance}m</p>
-      </div>
-    </div>`
+      </div>`
 
     el.addEventListener('click', () => {
       window.alert('Não implementado: visitar ' + name)
@@ -87,6 +87,10 @@ function updatePeople (screen) {
 
     screen.appendChild(el)
   }
+}
+
+function updatePlaces (screen, kind) {
+  console.log(kind)
 }
 
 function startup () {
@@ -100,7 +104,7 @@ function startup () {
         if (!history.includes('mainmenu')) return
       }
 
-      showScreen(el.dataset.to)
+      showScreen(el.dataset.to, el)
     })
   })
 
