@@ -53,9 +53,9 @@ body {
 
 #status, #backbar {
   display: flex;
-  padding: 0.2em;
+  padding: 0em 0.5em;
   align-items: center;
-  height: 2em;
+  height: 1.5em;
 }
 
 #status > *:first-child {
@@ -69,7 +69,7 @@ body {
 #screen-space {
   width: 100%;
   overflow: auto;
-  height: calc(100% - 4em);
+  height: calc(100% - 3em);
 }
 
 .screen {
