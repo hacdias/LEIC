@@ -14,12 +14,19 @@ function setClocks () {
 
 let history = []
 
+function updateScreenName (name) {
+  document.querySelector('#current-screen-name').innerHTML = name
+}
+
 function showScreen (name, el) {
+  let args = (el ? (el.dataset.args || '') : '').trim().split('#')
+
   if (name === '--back') {
     history.pop()
-    name = history[history.length - 1]
+    name = history[history.length - 1].name
+    args = history[history.length - 1].args
   } else {
-    history.push(name)
+    history.push({ name, args })
   }
 
   const screens = document.querySelectorAll('.screen')
@@ -36,7 +43,7 @@ function showScreen (name, el) {
 
   turnOffFlashLight()
   if (currentScreen.dataset.call) {
-    window[currentScreen.dataset.call](currentScreen, ...(el.dataset.args || '').trim().split(' '))
+    window[currentScreen.dataset.call](currentScreen, ...args)
   }
 
   if (name === 'lockscreen') {
@@ -45,7 +52,7 @@ function showScreen (name, el) {
   } else {
     document.querySelector('#status .clock').style.opacity = 1
     document.querySelector('#backbar').style.display = ''
-    document.querySelector('#current-screen-name').innerHTML = currentScreen.dataset.name
+    if (currentScreen.dataset.name) updateScreenName(currentScreen.dataset.name)
   }
 
   if (name === 'mainmenu') {
@@ -117,13 +124,16 @@ function getPlaces (kind) {
   })
 }
 
-function updatePlaces (screen, kind) {
+function updatePlaces (screen, kind, title) {
   const places = getPlaces(kind)
   screen.innerHTML = ''
 
-  for (const { name, distance, kind } of places) {
+  updateScreenName(title)
+
+  for (const { name, distance, rating, kind } of places) {
     let el = document.createElement('div')
     el.classList.add('item')
+    el.dataset.args = `${name}#${distance}#${rating}`
     el.innerHTML = `<div>
         <i class="${kind} fas fa-${placesIcons[kind]}"></i>
       </div>
@@ -133,11 +143,20 @@ function updatePlaces (screen, kind) {
       </div>`
 
     el.addEventListener('click', () => {
-      window.alert('Não implementado: place ' + name)
+      showScreen('place-desc', el)
     })
 
     screen.appendChild(el)
   }
+}
+
+function updatePlaceInfo (screen, name, distance, rating) {
+  updateScreenName(name)
+
+  // TODO fazer o menu c/ classificaç\ao, distancia, numero de pessoas e possibilidade de encaminhar pro GPS
+  // se for restaurante meter botao reservar.
+
+  console.log(name, distance, rating)
 }
 
 function startup () {
@@ -148,7 +167,7 @@ function startup () {
       event.preventDefault()
 
       if (el.dataset.needsunlock) {
-        if (!history.includes('mainmenu')) return
+        if (!history.find(el => el.name === 'mainmenu')) return
       }
 
       showScreen(el.dataset.to, el)
