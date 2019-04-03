@@ -159,6 +159,71 @@ function updatePlaceInfo (screen, name, distance, rating) {
   console.log(name, distance, rating)
 }
 
+function getBudgets () {
+  return window.data.budgets.sort((a, b) => {
+    if (a.active && !b.active) return 1
+    if (b.active && !a.active) return 1
+    if (a.date > b.date) return -1
+    if (b.date > a.date) return 1
+    return 0
+  })
+}
+
+function getNewBudgetEl () {
+  let el = document.createElement('div')
+  el.classList.add('item')
+  el.innerHTML = `<div>
+      <i class="recommended fas fa-plus"></i>
+    </div>
+    <div>
+      <p>Novo Orçamento</p>
+      <p></p>
+    </div>`
+
+  el.addEventListener('click', () => {
+    window.alert('Open New Budget')
+    // TODO: open budget info
+  })
+
+  return el
+}
+
+function getTextDate (date) {
+  const year = date.getFullYear()
+  const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()
+  return `${year} - ${month}`
+}
+
+function updateBudget (screen) {
+  const budgets = getBudgets()
+
+  screen.innerHTML = ''
+
+  // TODO. add current budget. if not exist do the bellow
+  screen.appendChild(getNewBudgetEl())
+
+  for (const { name, date } of budgets) {
+    let el = document.createElement('div')
+    el.classList.add('item')
+    el.innerHTML = `<div>
+        <i class="fas fa-plane"></i>
+      </div>
+      <div>
+        <p>${name}</p>
+        <p><i class="far fa-calendar-alt"></i> ${getTextDate(date)}</p>
+      </div>`
+
+    el.addEventListener('click', () => {
+      window.alert('Open Budget')
+      // TODO: open budget info
+    })
+
+    screen.appendChild(el)
+  }
+
+  console.log(budgets)
+}
+
 function startup () {
   setClocks()
 

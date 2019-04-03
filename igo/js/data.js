@@ -127,5 +127,28 @@ window.data = {
       }
     ]
   },
-  favourites: []
+  favourites: [],
+  currentBudget: null,
+  budgets: [
+    {
+      name: 'Glasgow Trip',
+      date: new Date(2019, 4),
+      budget: 2300
+    },
+    {
+      name: 'Maldivas',
+      date: new Date(2015, 3),
+      budget: 3500
+    },
+    {
+      name: 'Viagem ao Brasil',
+      date: new Date(2012, 11),
+      budget: 1200
+    },
+    {
+      name: 'Japón',
+      date: new Date(2016, 6),
+      budget: 3500
+    }
+  ]
 }
