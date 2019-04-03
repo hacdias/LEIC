@@ -109,13 +109,13 @@ const placesIcons = {
 
 function getPlaces (kind) {
   if (kind === 'recommended') {
-    window.alert('Não Implementado')
+    window.alert('Not implemented')
+    // TODO: pick random
     return []
   }
 
   if (kind === 'favourites') {
-    window.alert('Não Implementado')
-    return []
+    return window.data.favourites
   }
 
   return window.data.places[kind].sort(distanceSort).map(place => {

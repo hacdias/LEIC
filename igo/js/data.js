@@ -41,22 +41,26 @@ window.data = {
       {
         name: "Tubarão O'Mar",
         distance: 23,
-        rating: 4
+        rating: 4.5,
+        price: 25
       },
       {
         name: 'Monte do Zé',
         distance: 89,
-        rating: 2
+        rating: 2.5,
+        price: 7.5
       },
       {
         name: 'Sabores do Mar',
         distance: 55,
-        rating: 5
+        rating: 5,
+        price: 13
       },
       {
         name: 'Prego no Espeto',
         distance: 28,
-        rating: 4
+        rating: 4,
+        price: 6
       }
     ],
     parks: [
@@ -73,7 +77,7 @@ window.data = {
       {
         name: 'Jardim do Torel',
         distance: 550,
-        rating: 2
+        rating: 2.5
       },
       {
         name: 'Eduardo VII',
@@ -100,7 +104,7 @@ window.data = {
       {
         name: 'Torre de Belém',
         distance: 135,
-        rating: 3
+        rating: 3.5
       },
       {
         name: 'Padrão dos Descobrimentos',
@@ -119,8 +123,9 @@ window.data = {
       {
         name: 'Euro Fun',
         distance: 450,
-        rating: 3
+        rating: 3.5
       }
     ]
-  }
+  },
+  favourites: []
 }
