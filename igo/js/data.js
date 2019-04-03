@@ -60,16 +60,67 @@ window.data = {
       }
     ],
     parks: [
-
+      {
+        name: 'Quinta das Conchas',
+        distance: 150,
+        rating: 4
+      },
+      {
+        name: 'Bela Vista',
+        distance: 980,
+        rating: 5
+      },
+      {
+        name: 'Jardim do Torel',
+        distance: 550,
+        rating: 2
+      },
+      {
+        name: 'Eduardo VII',
+        distance: 200,
+        rating: 5
+      },
+      {
+        name: 'Arco do Cego',
+        distance: 5,
+        rating: 4
+      },
+      {
+        name: 'Gulbenkian',
+        distance: 150,
+        rating: 5
+      }
     ],
     monuments: [
-
+      {
+        name: 'Templo de Diana',
+        distance: 1350,
+        rating: 5
+      },
+      {
+        name: 'Torre de Belém',
+        distance: 135,
+        rating: 3
+      },
+      {
+        name: 'Padrão dos Descobrimentos',
+        distance: 350,
+        rating: 4
+      }
     ],
     markets: [
-
+      {
+        name: 'Mercado da Ribeira',
+        distance: 345,
+        rating: 4
+      }
     ],
     diversions: [
-
+      {
+        name: 'Euro Fun',
+        distance: 450,
+        rating: 3
+      }
     ]
   }
 }

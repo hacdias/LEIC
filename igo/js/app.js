@@ -101,7 +101,7 @@ function updatePeople (screen) {
 
 const placesIcons = {
   restaurants: 'utensils',
-  parks: 'park',
+  parks: 'tree',
   monuments: 'landmark',
   markets: 'store',
   diversions: 'chess'
