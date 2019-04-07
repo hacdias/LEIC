@@ -132,23 +132,79 @@ window.data = {
   budgets: [
     {
       name: 'Glasgow Trip',
-      date: new Date(2019, 4),
-      budget: 2300
+      date: new Date(2019, 2),
+      budget: 2300,
+      expenses: [ 
+        {
+          name: 'Restaurante A Ribeira',
+          value: 50
+        },
+        {
+          name: 'Templo de Diana',
+          value: 30
+        },
+        {
+          name: 'Bela Vista',
+          value: 2220
+        },
+      ],
     },
     {
       name: 'Maldivas',
       date: new Date(2015, 3),
-      budget: 3500
+      budget: 3500,
+      expenses: [
+        {
+          name: 'Euro Fun',
+          value: 40
+        },
+        {
+          name: 'Jardim do Torel',
+          value: 5
+        },
+        {
+          name: 'Restaurante Tubarão O\'Mar',
+          value: 80
+        },   
+      ],
     },
     {
       name: 'Viagem ao Brasil',
       date: new Date(2012, 11),
-      budget: 1200
+      budget: 1200,
+      expenses: [
+        {
+          name: 'Restaurante A Ribeira',
+          value: 50
+        },
+        {
+          name: 'Templo de Diana',
+          value: 30
+        },
+        {
+          name: 'Bela Vista',
+          value: 720
+        },      
+      ],
     },
     {
       name: 'Japón',
       date: new Date(2016, 6),
-      budget: 3500
+      budget: 3500,
+      expenses: [
+        {
+          name: 'Euro Fun',
+          value: 40
+        },
+        {
+          name: 'Jardim do Torel',
+          value: 5
+        },
+        {
+          name: 'Restaurante Tubarão O\'Mar',
+          value: 80
+        }, 
+      ],
     }
   ]
 }
