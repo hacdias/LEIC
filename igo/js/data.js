@@ -134,7 +134,7 @@ window.data = {
       name: 'Glasgow Trip',
       date: new Date(2019, 2),
       budget: 2300,
-      expenses: [ 
+      expenses: [
         {
           name: 'Restaurante A Ribeira',
           value: 50
@@ -146,8 +146,8 @@ window.data = {
         {
           name: 'Bela Vista',
           value: 2220
-        },
-      ],
+        }
+      ]
     },
     {
       name: 'Maldivas',
@@ -165,8 +165,8 @@ window.data = {
         {
           name: 'Restaurante Tubarão O\'Mar',
           value: 80
-        },   
-      ],
+        }
+      ]
     },
     {
       name: 'Viagem ao Brasil',
@@ -184,8 +184,8 @@ window.data = {
         {
           name: 'Bela Vista',
           value: 720
-        },      
-      ],
+        }
+      ]
     },
     {
       name: 'Japón',
@@ -203,8 +203,8 @@ window.data = {
         {
           name: 'Restaurante Tubarão O\'Mar',
           value: 80
-        }, 
-      ],
+        }
+      ]
     }
   ]
 }

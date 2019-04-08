@@ -1,6 +1,6 @@
 var currentBudget = window.data.currentBudget
 
-var budgets = null;
+var budgets = null
 
 function setClocks () {
   const norm = i => i < 10 ? `0${i}` : i
@@ -173,15 +173,15 @@ function getBudgets () {
   })
 }
 
-function createBudget() {
-  console.log(document.getElementById("new-budget-name").value);
-  console.log(document.getElementById("new-budget-value").value);
+function createBudget () {
+  console.log(document.getElementById('new-budget-name').value)
+  console.log(document.getElementById('new-budget-value').value)
 
   currentBudget = {
-    name: document.getElementById("new-budget-name").value,
+    name: document.getElementById('new-budget-name').value,
     date: new Date(2019, 4),
-    budget: document.getElementById("new-budget-value").value,
-    expenses: [ 
+    budget: document.getElementById('new-budget-value').value,
+    expenses: [
       {
         name: 'Restaurante A Ribeira',
         value: 50
@@ -193,18 +193,18 @@ function createBudget() {
       {
         name: 'Bela Vista',
         value: 2220
-      },
-    ],
+      }
+    ]
   }
 }
 
-function deleteBudget() {
+function deleteBudget () {
   currentBudget = null
 }
 
-function endBudget() {
-  budgets.push(currentBudget);
-  currentBudget = null;
+function endBudget () {
+  budgets.push(currentBudget)
+  currentBudget = null
 }
 
 function getNewBudgetEl () {
@@ -250,14 +250,13 @@ function getTextDate (date) {
 }
 
 function updateBudget (screen) {
-  budgets = getBudgets();
+  budgets = getBudgets()
   console.log(currentBudget)
 
   screen.innerHTML = ''
   if (currentBudget == null) {
     screen.appendChild(getNewBudgetEl())
-  }
-  else {
+  } else {
     let el = document.createElement('div')
     el.classList.add('item')
     el.dataset.args = `${currentBudget.name}`
@@ -300,7 +299,6 @@ function updateBudget (screen) {
 }
 
 function showCurrentBudget (screen, title) {
-
   const expenses = currentBudget.expenses
   console.log(expenses)
 
@@ -308,7 +306,7 @@ function showCurrentBudget (screen, title) {
 
   screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${currentBudget.budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
   spent = 0
-  
+
   screen.appendChild(getNewExpense())
   for (const { name, value } of expenses) {
     let el = document.createElement('div')
@@ -319,19 +317,18 @@ function showCurrentBudget (screen, title) {
         <p>Despesa: ${value}<i class="fas fa-euro-sign"></i></p>
       </div>`
 
-      spent += value
+    spent += value
 
-      el.addEventListener('click', () => {
-        window.alert('Go to place')
-      })
+    el.addEventListener('click', () => {
+      window.alert('Go to place')
+    })
 
-      screen.appendChild(el)
+    screen.appendChild(el)
   }
   let el = document.createElement('div')
   if (spent > currentBudget.budget) {
     el.classList.add('budget-excess')
-  }
-  else {
+  } else {
     el.classList.add('budget-normal')
   }
   el.innerHTML = `<p>Valor Total Gasto: ${spent}<i class="fas fa-euro-sign"></i><p>
@@ -340,33 +337,31 @@ function showCurrentBudget (screen, title) {
   screen.appendChild(el)
 }
 
-function getExpenses(BudgetName) {
-
-  for (const {name, expenses} of budgets) {
+function getExpenses (BudgetName) {
+  for (const { name, expenses } of budgets) {
     if (name == BudgetName) {
-      return expenses;
+      return expenses
     }
   }
 }
 
-function createExpense() {
+function createExpense () {
   currentBudget.expenses.push(
     {
-      name: document.getElementById("new-expense-name").value, 
-      value: parseInt(document.getElementById("new-expense-value").value)
+      name: document.getElementById('new-expense-name').value,
+      value: parseInt(document.getElementById('new-expense-value').value)
     }
   )
 }
 
 function showBudget (screen, title, budget) {
-
-  const expenses = getExpenses(title);
+  const expenses = getExpenses(title)
   console.log(expenses)
 
   updateScreenName(title)
 
   screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
-  spent = 0;
+  spent = 0
   for (const { name, value } of expenses) {
     let el = document.createElement('div')
     el.classList.add('expense')
@@ -378,19 +373,18 @@ function showBudget (screen, title, budget) {
         <p>Despesa: ${value}<i class="fas fa-euro-sign"></i></p>
       </div>`
 
-      spent += value
+    spent += value
 
-      el.addEventListener('click', () => {
-        window.alert('Go to place')
-      })
+    el.addEventListener('click', () => {
+      window.alert('Go to place')
+    })
 
-      screen.appendChild(el)
+    screen.appendChild(el)
   }
   let el = document.createElement('div')
   if (spent > budget) {
     el.classList.add('budget-excess')
-  }
-  else {
+  } else {
     el.classList.add('budget-normal')
   }
   el.innerHTML = `<p>Valor Total Gasto: ${spent}<i class="fas fa-euro-sign"></i><p>`
