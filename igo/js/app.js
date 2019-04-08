@@ -68,6 +68,8 @@ function showScreen (name, el) {
     document.querySelector('#not-mainmenu').style.display = ''
     document.querySelector('#only-mainmenu').style.display = 'none'
   }
+
+  document.querySelector('#screen-space').scrollTop = 0
 }
 
 function turnOffFlashLight () {
@@ -191,7 +193,7 @@ function clearBudget () {
 
 function validateNewBudget () {
   let name = document.getElementById('new-budget-name').value
-  let value = parseInt(document.getElementById('new-budget-value').value)
+  let value = Number(document.getElementById('new-budget-value').value)
 
   if (name === '' || isNaN(value)) {
     // this shouldn't happen, but we never know!
@@ -273,7 +275,7 @@ function createBudget () {
   }
 
   confirmationBox({
-    question: `Confirma a criação de um orçamento de valor ${data.value} €?`,
+    question: `Confirma a criação de um orçamento de valor ${numberWithSpaces(data.value)} €?`,
     rightHandler: () => {
       window.data.currentBudget = {
         id: uuidv4(),
@@ -366,7 +368,7 @@ function clearExpense () {
 
 function validateNewExpense () {
   let name = document.getElementById('new-expense-name').value
-  let value = parseInt(document.getElementById('new-expense-value').value)
+  let value = Number(document.getElementById('new-expense-value').value)
 
   if (name === '' || isNaN(value)) {
     // this shouldn't happen, but we never know!
@@ -394,9 +396,9 @@ function createExpense () {
   const spent = window.data.currentBudget.expenses.reduce((acc, e) => acc + e.value, 0)
   const overload = spent + data.value > window.data.currentBudget.budget
 
-  let question = `Deseja adicionar uma despesa no valor de ${data.value} €?`
+  let question = `Deseja adicionar uma despesa no valor de ${numberWithSpaces(data.value)} €?`
   if (overload) {
-    question += ` Irá exceder o orçamento definido de ${window.data.currentBudget.budget}`
+    question += ` Irá exceder o orçamento definido de ${numberWithSpaces(window.data.currentBudget.budget)} €.`
   }
 
   confirmationBox({
