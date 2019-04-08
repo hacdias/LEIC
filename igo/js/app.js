@@ -193,7 +193,7 @@ function clearBudget () {
 
 function validateNewBudget () {
   let name = document.getElementById('new-budget-name').value
-  let value = Number(document.getElementById('new-budget-value').value)
+  let value = parseFloat(document.getElementById('new-budget-value').value)
 
   if (name === '' || isNaN(value)) {
     // this shouldn't happen, but we never know!
@@ -368,10 +368,9 @@ function clearExpense () {
 
 function validateNewExpense () {
   let name = document.getElementById('new-expense-name').value
-  let value = Number(document.getElementById('new-expense-value').value)
+  let value = parseFloat(document.getElementById('new-expense-value').value)
 
   if (name === '' || isNaN(value)) {
-    // this shouldn't happen, but we never know!
     return undefined
   }
 
@@ -462,7 +461,7 @@ function showBudget (screen, id) {
 function contactless () {
   const what = window.prompt('Insira o Vendedor')
   if (!what) return
-  const howMuch = Number(window.prompt('Insira o Valor da Compra'))
+  const howMuch = parseFloat(window.prompt('Insira o Valor da Compra'))
   if (isNaN(howMuch)) return
 
   confirmationBox({
