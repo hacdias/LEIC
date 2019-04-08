@@ -485,7 +485,7 @@ button:active {
 
 #budget-bar #budget-max::after,
 #budget-bar #budget-spent::after {
-  content: "€";
+  content: " €";
 }
 
 #budget-bar #budget-max {

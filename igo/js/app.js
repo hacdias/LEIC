@@ -18,6 +18,12 @@ function updateScreenName (name) {
   document.querySelector('#current-screen-name').innerHTML = name
 }
 
+function numberWithSpaces (x) {
+  var parts = x.toString().split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return parts.join('.')
+}
+
 function showScreen (name, el) {
   let args = (el ? (el.dataset.args || '') : '').trim().split('#')
 
@@ -424,15 +430,15 @@ function showBudget (screen, id) {
     el.classList.add('expense')
     el.innerHTML = `<div>
         <p>${name}</p>
-        <p>Despesa: ${value}<i class="fas fa-euro-sign"></i></p>
+        <p>Despesa: ${numberWithSpaces(value)} €</p>
       </div>`
 
     spent += value
     expensesDiv.appendChild(el)
   }
 
-  screen.querySelector('#budget-bar #budget-spent').innerHTML = spent
-  screen.querySelector('#budget-bar #budget-max').innerHTML = budget
+  screen.querySelector('#budget-bar #budget-spent').innerHTML = numberWithSpaces(spent)
+  screen.querySelector('#budget-bar #budget-max').innerHTML = numberWithSpaces(budget)
 
   if (spent > budget) {
     screen.querySelector('#budget-bar div').classList.add('excess')
@@ -449,7 +455,7 @@ function contactless () {
   if (isNaN(howMuch)) return
 
   confirmationBox({
-    question: `Confirma a compra no valor de ${howMuch} € no ${what}?`,
+    question: `Confirma a compra no valor de ${numberWithSpaces(howMuch)} € no ${what}?`,
     rightHandler: () => {
       if (!window.data.currentBudget) {
         return
