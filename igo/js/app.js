@@ -189,7 +189,11 @@ function validateNewBudget () {
 
   if (name === '' || isNaN(value)) {
     // this shouldn't happen, but we never know!
-    return undefined
+    return
+  }
+
+  if (value <= 0) {
+    return
   }
 
   return { name, value }
@@ -201,6 +205,53 @@ function onNewBudgetChange () {
   } else {
     document.getElementById('new-budget-submit').classList.add('disabled')
   }
+}
+
+function confirmationBox ({
+  question,
+  leftMsg = 'Não',
+  rightMsg = 'Sim',
+  leftClass = '',
+  rightClass = 'ok',
+  leftHandler,
+  rightHandler,
+  anywaysHandler
+}) {
+  const overlay = document.getElementById('overlay')
+  const box = document.getElementById('confirmation-box')
+  const leftButton = box.querySelector('#left-confirm')
+  const rightButton = box.querySelector('#right-confirm')
+
+  overlay.classList.add('active')
+  box.classList.add('active')
+
+  box.querySelector('p').innerHTML = question
+  leftButton.innerHTML = leftMsg
+  rightButton.innerHTML = rightMsg
+  leftButton.className = leftClass
+  rightButton.className = rightClass
+
+  const reset = () => {
+    leftButton.removeEventListener('click', leftAction)
+    rightButton.removeEventListener('click', rightAction)
+    overlay.classList.remove('active')
+    box.classList.remove('active')
+  }
+
+  const leftAction = () => {
+    if (leftHandler) leftHandler()
+    if (anywaysHandler) anywaysHandler()
+    reset()
+  }
+
+  const rightAction = () => {
+    if (rightHandler) rightHandler()
+    if (anywaysHandler) anywaysHandler()
+    reset()
+  }
+
+  leftButton.addEventListener('click', leftAction)
+  rightButton.addEventListener('click', rightAction)
 }
 
 function createBudget () {
@@ -215,22 +266,42 @@ function createBudget () {
     return
   }
 
-  window.data.currentBudget = {
-    id: uuidv4(),
-    name: data.name,
-    budget: data.value,
-    date: new Date(),
-    expenses: []
-  }
+  confirmationBox({
+    question: `Confirma a criação de um orçamento de valor ${data.value} €?`,
+    rightHandler: () => {
+      window.data.currentBudget = {
+        id: uuidv4(),
+        name: data.name,
+        budget: data.value,
+        date: new Date(),
+        expenses: []
+      }
+
+      runAndBack(clearBudget)
+    }
+  })
 }
 
 function deleteBudget () {
-  window.data.currentBudget = null
+  confirmationBox({
+    question: `Deseja remover o orçamento atual?`,
+    rightClass: 'cancel',
+    rightHandler: () => {
+      window.data.currentBudget = null
+      runAndBack()
+    }
+  })
 }
 
 function endBudget () {
-  window.data.budgets.push(window.data.currentBudget)
-  window.data.currentBudget = null
+  confirmationBox({
+    question: `Deseja terminar a viagem atual?`,
+    rightHandler: () => {
+      window.data.budgets.push(window.data.currentBudget)
+      window.data.currentBudget = null
+      runAndBack()
+    }
+  })
 }
 
 function getTextDate (date) {
@@ -314,7 +385,13 @@ function createExpense () {
     return
   }
 
-  window.data.currentBudget.expenses.push({ ...data })
+  confirmationBox({
+    question: `Deseja adicionar uma despesa no valor de ${data.value} €?`,
+    rightHandler: () => {
+      window.data.currentBudget.expenses.push({ ...data })
+      runAndBack(clearExpense)
+    }
+  })
 }
 
 function getBudget (id) {

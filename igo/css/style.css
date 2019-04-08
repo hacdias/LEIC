@@ -499,3 +499,47 @@ button:active {
   width: calc(100% - 1em);
   margin: 0.5em;
 }
+
+#confirmation-box {
+  position: absolute;
+  top: 1em;
+  display: none;
+  flex-direction: column;
+  left: 1em;
+  background: #34495e;
+  width: calc(100% - 2em);
+  height: calc(100% - 2em);
+  color: white;
+  padding: 0.5em;
+  box-shadow: 3px 3px 0 #223242;
+  z-index: 2000;
+}
+
+#confirmation-box.active {
+  display: flex;
+}
+
+#confirmation-box p {
+  margin-top: 0;
+}
+
+#confirmation-box > div:last-of-type {
+  margin-top: auto;
+}
+
+#overlay {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.7);
+  height: calc(100% - 0.4em);
+  bottom: 0.2em;
+  left: 0.2em;
+  width: calc(100% - 0.4em);
+  border-radius: 1em;
+  pointer-events: none;
+  z-index: 1000;
+  display: none;
+}
+
+#overlay.active {
+  display: block;
+}

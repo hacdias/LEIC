@@ -125,8 +125,8 @@
           </div>
 
           <div id="budget-actions" class="only-current">
-            <button class="blue" onclick="runAndBack(endBudget)" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
-            <button class="cancel" onclick="runAndBack(deleteBudget)"><i class="fas fa-trash-alt"></i> Apagar</button>
+            <button class="blue" onclick="endBudget()" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
+            <button class="cancel" onclick="deleteBudget()"><i class="fas fa-trash-alt"></i> Apagar</button>
           </div>
         </div>
 
@@ -135,7 +135,7 @@
           <input placeholder="Valor" id="new-budget-value" type="number" oninput="onNewBudgetChange()"></input>
           <div class="flex f-50">
             <button class="cancel" type="button" onclick="runAndBack(clearBudget)">Cancelar</button>
-            <button class="ok disabled" id="new-budget-submit" type="button" onclick="runAndBack(createBudget, clearBudget)">Criar</button>
+            <button class="ok disabled" id="new-budget-submit" type="button" onclick="createBudget()">Criar</button>
           </div>
         </div>
 
@@ -144,7 +144,7 @@
           <input placeholder="Valor" id="new-expense-value" type="number" oninput="onNewExpenseChange()"></input>
           <div class="flex f-50">
             <button class="cancel" type="button" onclick="runAndBack(clearExpense)">Cancelar</button>
-            <button class="ok disabled" id="new-expense-submit" type="button" onclick="runAndBack(createExpense, clearExpense)">Criar</button>
+            <button class="ok disabled" id="new-expense-submit" type="button" onclick="createExpense()">Criar</button>
           </div>
         </div>
 
@@ -163,6 +163,17 @@
           </span>
           <span id="current-screen-name"></span>
         </span>
+      </div>
+    </div>
+
+    <div id="overlay"></div>
+
+    <div id="confirmation-box">
+      <p>Pergunta?</p>
+
+      <div class="flex f-50">
+        <button id="left-confirm" type="button">Cancelar</button>
+        <button class="ok" id="right-confirm" type="button">Sim</button>
       </div>
     </div>
 
