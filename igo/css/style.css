@@ -29,7 +29,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 #watch {
@@ -348,6 +348,7 @@ body.flashlight #watch {
   border-bottom-right-radius: 1em;
   transition: 0.2s ease transform;
   transform: translate(0, calc(100% + 0.4em));
+  display: none;
 }
 
 #keyboard.visible {
@@ -542,4 +543,20 @@ button:active {
 
 #overlay.active {
   display: block;
+}
+
+#contacless {
+  border-radius: 50%;
+  width: 4em;
+  box-shadow: 0 0 17px rgba(0, 0, 0, 0.2);
+  height: 4em;
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+}
+
+
+#contacless img {
+  width: 2em;
+
 }

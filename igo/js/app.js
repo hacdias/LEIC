@@ -442,6 +442,27 @@ function showBudget (screen, id) {
   }
 }
 
+function contactless () {
+  const what = window.prompt('Insira o Vendedor')
+  if (!what) return
+  const howMuch = Number(window.prompt('Insira o Valor da Compra'))
+  if (isNaN(howMuch)) return
+
+  confirmationBox({
+    question: `Confirma a compra no valor de ${howMuch} € no ${what}?`,
+    rightHandler: () => {
+      if (!window.data.currentBudget) {
+        return
+      }
+
+      window.data.currentBudget.expenses.push({
+        name: what,
+        value: howMuch
+      })
+    }
+  })
+}
+
 function startup () {
   setClocks()
 
