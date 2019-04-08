@@ -391,8 +391,17 @@ function createExpense () {
     return
   }
 
+  const spent = window.data.currentBudget.expenses.reduce((acc, e) => acc + e.value, 0)
+  const overload = spent + data.value > window.data.currentBudget.budget
+
+  let question = `Deseja adicionar uma despesa no valor de ${data.value} €?`
+  if (overload) {
+    question += ` Irá exceder o orçamento definido de ${window.data.currentBudget.budget}`
+  }
+
   confirmationBox({
-    question: `Deseja adicionar uma despesa no valor de ${data.value} €?`,
+    question: question,
+    rightClass: overload ? 'cancel' : 'ok',
     rightHandler: () => {
       window.data.currentBudget.expenses.push({ ...data })
       runAndBack(clearExpense)
