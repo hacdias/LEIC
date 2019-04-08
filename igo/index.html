@@ -101,38 +101,51 @@
           </div>
         </div>
 
-        <div class="screen" id="budget" data-call="updateBudget" data-name="Orçamentos">
-    
+        <div class="screen" id="budget" data-call="listBudgets" data-name="Orçamentos">
+          <button class="goto blue" data-to="create-budget" id="new-budget-button">
+            <i class="fas fa-plus"></i> Novo Orçamento
+          </button>
+
+          <div id="budget-list">
+
+          </div>
         </div>
 
-        <div class="screen" id="current-budget-desc" data-call="showCurrentBudget" data-name="">
-    
+        <div class="screen" id="budget-desc" data-call="showBudget" data-name="">
+          <div id="budget-bar">
+            <div></div>
+            <span id="budget-spent"></span>
+            <span id="budget-max"></span>
           </div>
 
-        <div class="screen" id="budget-desc" data-call="showBudget" data-name="">
-    
+          <button class="blue only-current goto" data-to="create-expense"><i class="fas fa-money-bill"></i> Nova Despesa</button>
+
+          <div id="budget-expenses">
+
+          </div>
+
+          <div id="budget-actions" class="only-current">
+            <button class="blue" onclick="runAndBack(endBudget)" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
+            <button class="cancel" onclick="runAndBack(deleteBudget)"><i class="fas fa-trash-alt"></i> Apagar</button>
+          </div>
         </div>
 
         <div class="screen" id="create-budget" data-name="Novo Orçamento">
           <input placeholder="Nome" id="new-budget-name" type="text" oninput="onNewBudgetChange()"></input>
           <input placeholder="Valor" id="new-budget-value" type="number" oninput="onNewBudgetChange()"></input>
           <div class="flex f-50">
-            <button class="cancel" type="button" onclick="cancelBudget()">Cancelar</button>
-            <button class="ok disabled" id="new-budget-submit" type="button" onclick="createBudget()">Criar</button>
+            <button class="cancel" type="button" onclick="runAndBack(clearBudget)">Cancelar</button>
+            <button class="ok disabled" id="new-budget-submit" type="button" onclick="runAndBack(createBudget, clearBudget)">Criar</button>
           </div>
         </div>
 
-        <div class="screen" id="create-expense">
+        <div class="screen" id="create-expense" data-name="Nova Despesa">
+          <input placeholder="Nome" id="new-expense-name" type="text" oninput="onNewExpenseChange()"></input>
+          <input placeholder="Valor" id="new-expense-value" type="number" oninput="onNewExpenseChange()"></input>
           <div class="flex f-50">
-            <div id="new-budget">
-              <p>Nome da Despesa</p>
-              <input id="new-expense-name" type="text"></input>
-              <p>Valor</p>
-              <input id="new-expense-value" type="number" min="1"></input><br></br>
-              <button type="button" onclick="createExpense()">Criar Despesa</button>
-            </div>
+            <button class="cancel" type="button" onclick="runAndBack(clearExpense)">Cancelar</button>
+            <button class="ok disabled" id="new-expense-submit" type="button" onclick="runAndBack(createExpense, clearExpense)">Criar</button>
           </div>
-  
         </div>
 
         <div class="screen" id="faq" data-name="FAQ">
@@ -181,6 +194,7 @@
     <div class="goto" data-to="mainmenu" data-needsunlock="true" id="mainbutton"></div>
   </div>
 
+  <script src="./js/utils.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/app.js"></script>
 </body>

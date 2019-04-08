@@ -131,6 +131,7 @@ window.data = {
   currentBudget: null,
   budgets: [
     {
+      id: uuidv4(),
       name: 'Glasgow Trip',
       date: new Date(2019, 2),
       budget: 2300,
@@ -145,11 +146,12 @@ window.data = {
         },
         {
           name: 'Bela Vista',
-          value: 2220
+          value: 22200
         }
       ]
     },
     {
+      id: uuidv4(),
       name: 'Maldivas',
       date: new Date(2015, 3),
       budget: 3500,
@@ -169,6 +171,7 @@ window.data = {
       ]
     },
     {
+      id: uuidv4(),
       name: 'Viagem ao Brasil',
       date: new Date(2012, 11),
       budget: 1200,
@@ -188,6 +191,7 @@ window.data = {
       ]
     },
     {
+      id: uuidv4(),
       name: 'Japón',
       date: new Date(2016, 6),
       budget: 3500,

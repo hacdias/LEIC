@@ -11,6 +11,10 @@ a {
   color: inherit;
 }
 
+.dn {
+  display: none !important;
+}
+
 .goto {
   cursor: pointer;
 }
@@ -166,15 +170,10 @@ body.flashlight #watch {
 .expense {
   display: flex;
   align-items: center;
-  padding: 0.5em;
+  padding: 0.5em 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  cursor: pointer;
   margin-top: 0.2em;
   overflow: auto;
-}
-
-.expense > div:first-of-type {
-  margin-right: 0.5em;
 }
 
 .budget-normal {
@@ -189,27 +188,16 @@ body.flashlight #watch {
   font-size: 1em;
 }
 
-.expense img {
-  width: 2em;
-  height: 2em;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .expense p {
   margin: 0;
 }
 
-.expense .end-budget {
-  margin-right: 5em;
-}
-
 .expense > div:last-of-type p:first-of-type {
-  font-size: 1.2em;
+  font-size: 1em;
 }
 
 .expense > div:last-of-type p:last-of-type {
-  font-size: 0.8em;
+  font-size: 0.7em;
   margin-top: 0.2em;
 }
 
@@ -315,8 +303,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
-#create-budget,
-#place-desc {
+#create-expense, #create-budget, #place-desc, #budget-desc {
   padding: 0.5em;
 }
 
@@ -386,19 +373,18 @@ body.flashlight #watch {
   background: #293a4a;
 }
 
-#create-budget.active {
+#create-expense.active, #create-budget.active {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
 }
 
-#create-budget input:first-of-type {
+#create-expense input:first-of-type, #create-budget input:first-of-type {
   margin-top: 0;
 }
 
-input[type="text"],
-input[type="number"] {
+input[type="text"], input[type="number"] {
   width: 100%;
   background: white;
   margin: 0.3em 0;
@@ -416,6 +402,9 @@ button {
   padding: 0.5em;
   border-radius: 0.3em;
   cursor: pointer;
+  margin: 0.5em 0;
+  display: block;
+  width: 100%;
 }
 
 button.ok {
@@ -428,9 +417,12 @@ button.cancel {
   background: #e74c3c;
 }
 
-button,
-button:active,
-button:focus {
+button.blue {
+  color: white;
+  background: #3498db;
+}
+
+button, button:active, button:focus {
   outline: 0;
 }
 
@@ -449,5 +441,61 @@ button:active {
 }
 
 .f-50 > * {
-   width: 48%;
+  width: 48%;
+}
+
+#budget .current {
+  color: #2ecc71;
+}
+
+#budget-bar {
+  background: white;
+  color: black;
+  position: relative;
+  text-align: right;
+  height: 1em;
+}
+
+#budget-bar,
+#budget-bar div  {
+  border-radius: 0.5em;
+}
+
+#budget-bar div {
+  background: #2ecc71;
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#budget-bar div.excess {
+  background: #e74c3c;
+  width: 100% !important;
+}
+
+#budget-bar #budget-max,
+#budget-bar #budget-spent {
+  position: absolute;
+  font-size: 0.78em;
+  top: 0.1em;
+}
+
+#budget-bar #budget-max::after,
+#budget-bar #budget-spent::after {
+  content: "€";
+}
+
+#budget-bar #budget-max {
+  right: 0.5em;
+}
+
+#budget-bar #budget-spent {
+  left: 0.5em;
+}
+
+#new-budget-button {
+  width: calc(100% - 1em);
+  margin: 0.5em;
 }

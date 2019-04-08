@@ -169,14 +169,18 @@ function getBudgets () {
   })
 }
 
-function cancelBudget () {
-  document.getElementById('new-budget-name').value = ''
-  document.getElementById('new-budget-value').value = ''
-  showScreen('budget')
+function runAndBack (...fns) {
+  for (const fn of fns) {
+    fn()
+  }
+
+  showScreen('--back')
 }
 
-function useKeyboard (event) {
-  // document.getElementById('keyboard').classList.add('visible')
+function clearBudget () {
+  document.getElementById('new-budget-name').value = ''
+  document.getElementById('new-budget-value').value = ''
+  document.getElementById('new-budget-submit').classList.add('disabled')
 }
 
 function validateNewBudget () {
@@ -212,13 +216,12 @@ function createBudget () {
   }
 
   window.data.currentBudget = {
+    id: uuidv4(),
     name: data.name,
     budget: data.value,
     date: new Date(),
     expenses: []
   }
-
-  showScreen('budget')
 }
 
 function deleteBudget () {
@@ -230,189 +233,136 @@ function endBudget () {
   window.data.currentBudget = null
 }
 
-function getNewBudgetEl () {
-  let el = document.createElement('div')
-  el.classList.add('item')
-  el.innerHTML = `<div>
-      <i class="recommended fas fa-plus"></i>
-    </div>
-    <div>
-      <p>Novo Orçamento</p>
-      <p></p>
-    </div>`
-
-  el.addEventListener('click', () => {
-    showScreen('create-budget', el)
-  })
-
-  return el
-}
-
-function getNewExpense () {
-  let el = document.createElement('div')
-  el.classList.add('item')
-  el.innerHTML = `<div>
-      <i class="recommended fas fa-plus"></i>
-    </div>
-    <div>
-      <p>Nova Despesa</p>
-      <p></p>
-    </div>`
-
-  el.addEventListener('click', () => {
-    showScreen('create-expense', el)
-  })
-
-  return el
-}
-
 function getTextDate (date) {
   const year = date.getFullYear()
   const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()
   return `${year} - ${month}`
 }
 
-function updateBudget (screen) {
+function getBudgetElement ({ id, name, date }, current = false) {
+  let el = document.createElement('div')
+  el.classList.add('item')
+  if (current) el.classList.add('current')
+  el.dataset.args = `${id}#${current}`
+  el.innerHTML = `<div>
+      <i class="fas fa-plane"></i>
+    </div>
+    <div>
+      <p>${name}</p>
+      <p><i class="far fa-calendar-alt"></i> ${getTextDate(date)}</p>
+    </div>`
+
+  el.addEventListener('click', () => {
+    showScreen('budget-desc', el)
+  })
+
+  return el
+}
+
+function listBudgets (screen) {
   let budgets = getBudgets()
   console.log(window.data.currentBudget)
 
-  screen.innerHTML = ''
-  if (window.data.currentBudget == null) {
-    screen.appendChild(getNewBudgetEl())
+  let budgetsDiv = screen.querySelector('#budget-list')
+
+  budgetsDiv.innerHTML = ''
+
+  if (window.data.currentBudget === null) {
+    document.getElementById('new-budget-button').classList.remove('dn')
   } else {
-    let el = document.createElement('div')
-    el.classList.add('item')
-    el.dataset.args = `${window.data.currentBudget.name}`
-    el.innerHTML = `<div>
-        <i class="fas fa-plane" data-to="budget-desc" data-args="${el.dataset.args}"></i>
-      </div>
-      <div>
-        <p>${window.data.currentBudget.name}</p>
-        <p><i class="far fa-calendar-alt"></i> ${getTextDate(window.data.currentBudget.date)}</p>
-        <t>ATIVO</t>
-      </div>`
-
-    el.addEventListener('click', () => {
-      showScreen('current-budget-desc', el)
-    })
-
-    screen.appendChild(el)
+    document.getElementById('new-budget-button').classList.add('dn')
+    budgetsDiv.appendChild(getBudgetElement(window.data.currentBudget, true))
   }
 
-  for (const { name, date, budget } of budgets) {
-    let el = document.createElement('div')
-    el.classList.add('item')
-    el.dataset.args = `${name}#${budget}`
-    el.innerHTML = `<div>
-        <i class="fas fa-plane" data-to="budget-desc" data-args="${name}"></i>
-      </div>
-      <div>
-        <p>${name}</p>
-        <p><i class="far fa-calendar-alt"></i> ${getTextDate(date)}</p>
-      </div>`
-
-    el.addEventListener('click', () => {
-      showScreen('budget-desc', el)
-    })
-
-    screen.appendChild(el)
+  for (const budget of budgets) {
+    budgetsDiv.appendChild(getBudgetElement(budget))
   }
 
   console.log(budgets)
 }
 
-function showCurrentBudget (screen, title) {
-  const expenses = window.data.currentBudget.expenses
-  console.log(expenses)
-
-  updateScreenName(title)
-
-  screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${window.data.currentBudget.budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
-  let spent = 0
-
-  screen.appendChild(getNewExpense())
-  for (const { name, value } of expenses) {
-    let el = document.createElement('div')
-    el.classList.add('expense')
-    el.innerHTML = `
-      <div>
-        <p>${name}</p>
-        <p>Despesa: ${value}<i class="fas fa-euro-sign"></i></p>
-      </div>`
-
-    spent += value
-
-    el.addEventListener('click', () => {
-      window.alert('Go to place')
-    })
-
-    screen.appendChild(el)
-  }
-  let el = document.createElement('div')
-  if (spent > window.data.currentBudget.budget) {
-    el.classList.add('budget-excess')
-  } else {
-    el.classList.add('budget-normal')
-  }
-  el.innerHTML = `<p>Valor Total Gasto: ${spent}<i class="fas fa-euro-sign"></i><p>
-  <button id= "end-budget" onclick="endBudget()" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
-  <button id= "delete-budget" onclick="deleteBudget()"><i class="fas fa-book-open"></i> Apagar</button>`
-  screen.appendChild(el)
+function clearExpense () {
+  document.getElementById('new-expense-name').value = ''
+  document.getElementById('new-expense-value').value = ''
+  document.getElementById('new-expense-submit').classList.add('disabled')
 }
 
-function getExpenses (BudgetName) {
-  for (const { name, expenses } of window.data.budgets) {
-    // TODO: use id instead of name, may conflict
-    if (name === BudgetName) {
-      return expenses
-    }
+function validateNewExpense () {
+  let name = document.getElementById('new-expense-name').value
+  let value = parseInt(document.getElementById('new-expense-value').value)
+
+  if (name === '' || isNaN(value)) {
+    // this shouldn't happen, but we never know!
+    return undefined
+  }
+
+  return { name, value }
+}
+
+function onNewExpenseChange () {
+  if (validateNewExpense()) {
+    document.getElementById('new-expense-submit').classList.remove('disabled')
+  } else {
+    document.getElementById('new-expense-submit').classList.add('disabled')
   }
 }
 
 function createExpense () {
-  window.data.currentBudget.expenses.push(
-    {
-      name: document.getElementById('new-expense-name').value,
-      value: parseInt(document.getElementById('new-expense-value').value)
-    }
-  )
+  let data = validateNewExpense()
+  if (!data) {
+    // shouldn't happen
+    return
+  }
+
+  window.data.currentBudget.expenses.push({ ...data })
 }
 
-function showBudget (screen, title, budget) {
-  const expenses = getExpenses(title)
-  console.log(expenses)
+function getBudget (id) {
+  if (window.data.currentBudget && window.data.currentBudget.id === id) {
+    return window.data.currentBudget
+  }
 
-  updateScreenName(title)
+  for (const budget of window.data.budgets) {
+    if (budget.id === id) return budget
+  }
+}
 
-  screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
+function showBudget (screen, id) {
+  const { name, budget, expenses } = getBudget(id)
+  const isCurrent = window.data.currentBudget && window.data.currentBudget.id === id
+
+  screen.querySelectorAll('.only-current').forEach(el => {
+    if (isCurrent) el.classList.remove('dn')
+    else el.classList.add('dn')
+  })
+
+  updateScreenName(name)
+
+  const expensesDiv = screen.querySelector('#budget-expenses')
+  expensesDiv.innerHTML = ''
+
   let spent = 0
   for (const { name, value } of expenses) {
     let el = document.createElement('div')
     el.classList.add('expense')
     el.innerHTML = `<div>
-        <i class="fas fa-euro-sign"></i>
-      </div>
-      <div>
         <p>${name}</p>
         <p>Despesa: ${value}<i class="fas fa-euro-sign"></i></p>
       </div>`
 
     spent += value
-
-    el.addEventListener('click', () => {
-      window.alert('Go to place')
-    })
-
-    screen.appendChild(el)
+    expensesDiv.appendChild(el)
   }
-  let el = document.createElement('div')
+
+  screen.querySelector('#budget-bar #budget-spent').innerHTML = spent
+  screen.querySelector('#budget-bar #budget-max').innerHTML = budget
+
   if (spent > budget) {
-    el.classList.add('budget-excess')
+    screen.querySelector('#budget-bar div').classList.add('excess')
   } else {
-    el.classList.add('budget-normal')
+    screen.querySelector('#budget-bar div').classList.remove('excess')
+    screen.querySelector('#budget-bar div').style.width = `${spent / budget * 100}%`
   }
-  el.innerHTML = `<p>Valor Total Gasto: ${spent}<i class="fas fa-euro-sign"></i><p>`
-  screen.appendChild(el)
 }
 
 function startup () {
