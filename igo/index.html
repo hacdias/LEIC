@@ -113,25 +113,22 @@
     
         </div>
 
-        <div class="screen" id="create-budget">
-          <div class="actions" >
-            <div id="new-budget">
-              <p>Nome do Orçamento</p>
-              <input id="new-budget-name" type="text" size= 16></input>
-              <p>Valor</p>
-              <input id="new-budget-value" type="integer" size= 6></input><br></br>
-              <button type="button" onclick="createBudget()">Criar Orçamento</button>
-            </div>
+        <div class="screen" id="create-budget" data-name="Novo Orçamento">
+          <input placeholder="Nome" id="new-budget-name" type="text" oninput="onNewBudgetChange()"></input>
+          <input placeholder="Valor" id="new-budget-value" type="number" oninput="onNewBudgetChange()"></input>
+          <div class="flex f-50">
+            <button class="cancel" type="button" onclick="cancelBudget()">Cancelar</button>
+            <button class="ok disabled" id="new-budget-submit" type="button" onclick="createBudget()">Criar</button>
           </div>
         </div>
 
         <div class="screen" id="create-expense">
-          <div class="actions" >
+          <div class="flex f-50">
             <div id="new-budget">
               <p>Nome da Despesa</p>
-              <input id="new-expense-name" type="text" size= 16></input>
+              <input id="new-expense-name" type="text"></input>
               <p>Valor</p>
-              <input id="new-expense-value" type="integer" size= 6></input><br></br>
+              <input id="new-expense-value" type="number" min="1"></input><br></br>
               <button type="button" onclick="createExpense()">Criar Despesa</button>
             </div>
           </div>
@@ -155,6 +152,32 @@
         </span>
       </div>
     </div>
+
+    <div id="keyboard">
+      <table>
+        <tr>
+          <td></td>
+          <td>ABC</td>
+          <td>DEF</td>
+        </tr>
+        <tr>
+          <td>GHI</td>
+          <td>JKL</td>
+          <td>MNO</td>
+        </tr>
+        <tr>
+          <td>PQRS</td>
+          <td>TUV</td>
+          <td>WXYZ</td>
+        </tr>
+        <tr>
+          <td><i class="fas fa-backspace"></i></td>
+          <td>_</td>
+          <td>↵</td>
+        </tr>
+      </table>
+    </div>
+
     <div class="goto" data-to="mainmenu" data-needsunlock="true" id="mainbutton"></div>
   </div>
 

@@ -1,7 +1,3 @@
-var currentBudget = window.data.currentBudget
-
-var budgets = null
-
 function setClocks () {
   const norm = i => i < 10 ? `0${i}` : i
   const today = new Date()
@@ -173,38 +169,65 @@ function getBudgets () {
   })
 }
 
-function createBudget () {
-  console.log(document.getElementById('new-budget-name').value)
-  console.log(document.getElementById('new-budget-value').value)
+function cancelBudget () {
+  document.getElementById('new-budget-name').value = ''
+  document.getElementById('new-budget-value').value = ''
+  showScreen('budget')
+}
 
-  currentBudget = {
-    name: document.getElementById('new-budget-name').value,
-    date: new Date(2019, 4),
-    budget: document.getElementById('new-budget-value').value,
-    expenses: [
-      {
-        name: 'Restaurante A Ribeira',
-        value: 50
-      },
-      {
-        name: 'Templo de Diana',
-        value: 30
-      },
-      {
-        name: 'Bela Vista',
-        value: 2220
-      }
-    ]
+function useKeyboard (event) {
+  // document.getElementById('keyboard').classList.add('visible')
+}
+
+function validateNewBudget () {
+  let name = document.getElementById('new-budget-name').value
+  let value = parseInt(document.getElementById('new-budget-value').value)
+
+  if (name === '' || isNaN(value)) {
+    // this shouldn't happen, but we never know!
+    return undefined
+  }
+
+  return { name, value }
+}
+
+function onNewBudgetChange () {
+  if (validateNewBudget()) {
+    document.getElementById('new-budget-submit').classList.remove('disabled')
+  } else {
+    document.getElementById('new-budget-submit').classList.add('disabled')
   }
 }
 
+function createBudget () {
+  if (window.data.currentBudget) {
+    // this shouldn't happen, but we never know!
+    return
+  }
+
+  let data = validateNewBudget()
+  if (!data) {
+    // this shouldn't happen, but we never know!
+    return
+  }
+
+  window.data.currentBudget = {
+    name: data.name,
+    budget: data.value,
+    date: new Date(),
+    expenses: []
+  }
+
+  showScreen('budget')
+}
+
 function deleteBudget () {
-  currentBudget = null
+  window.data.currentBudget = null
 }
 
 function endBudget () {
-  budgets.push(currentBudget)
-  currentBudget = null
+  window.data.budgets.push(window.data.currentBudget)
+  window.data.currentBudget = null
 }
 
 function getNewBudgetEl () {
@@ -250,22 +273,22 @@ function getTextDate (date) {
 }
 
 function updateBudget (screen) {
-  budgets = getBudgets()
-  console.log(currentBudget)
+  let budgets = getBudgets()
+  console.log(window.data.currentBudget)
 
   screen.innerHTML = ''
-  if (currentBudget == null) {
+  if (window.data.currentBudget == null) {
     screen.appendChild(getNewBudgetEl())
   } else {
     let el = document.createElement('div')
     el.classList.add('item')
-    el.dataset.args = `${currentBudget.name}`
+    el.dataset.args = `${window.data.currentBudget.name}`
     el.innerHTML = `<div>
         <i class="fas fa-plane" data-to="budget-desc" data-args="${el.dataset.args}"></i>
       </div>
       <div>
-        <p>${currentBudget.name}</p>
-        <p><i class="far fa-calendar-alt"></i> ${getTextDate(currentBudget.date)}</p>
+        <p>${window.data.currentBudget.name}</p>
+        <p><i class="far fa-calendar-alt"></i> ${getTextDate(window.data.currentBudget.date)}</p>
         <t>ATIVO</t>
       </div>`
 
@@ -299,13 +322,13 @@ function updateBudget (screen) {
 }
 
 function showCurrentBudget (screen, title) {
-  const expenses = currentBudget.expenses
+  const expenses = window.data.currentBudget.expenses
   console.log(expenses)
 
   updateScreenName(title)
 
-  screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${currentBudget.budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
-  spent = 0
+  screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${window.data.currentBudget.budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
+  let spent = 0
 
   screen.appendChild(getNewExpense())
   for (const { name, value } of expenses) {
@@ -326,7 +349,7 @@ function showCurrentBudget (screen, title) {
     screen.appendChild(el)
   }
   let el = document.createElement('div')
-  if (spent > currentBudget.budget) {
+  if (spent > window.data.currentBudget.budget) {
     el.classList.add('budget-excess')
   } else {
     el.classList.add('budget-normal')
@@ -338,15 +361,16 @@ function showCurrentBudget (screen, title) {
 }
 
 function getExpenses (BudgetName) {
-  for (const { name, expenses } of budgets) {
-    if (name == BudgetName) {
+  for (const { name, expenses } of window.data.budgets) {
+    // TODO: use id instead of name, may conflict
+    if (name === BudgetName) {
       return expenses
     }
   }
 }
 
 function createExpense () {
-  currentBudget.expenses.push(
+  window.data.currentBudget.expenses.push(
     {
       name: document.getElementById('new-expense-name').value,
       value: parseInt(document.getElementById('new-expense-value').value)
@@ -361,7 +385,7 @@ function showBudget (screen, title, budget) {
   updateScreenName(title)
 
   screen.innerHTML = `<div id=fixed><text>Valor Disponível: ${budget}<i class="fas fa-euro-sign"></i></text></div><div id= no-over>`
-  spent = 0
+  let spent = 0
   for (const { name, value } of expenses) {
     let el = document.createElement('div')
     el.classList.add('expense')

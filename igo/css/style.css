@@ -1,7 +1,5 @@
 :root {
-  --watch-background: black;
-  --watch-color: #2980b9;
-}
+  --watch-background: black; --watch-color: #2980b9; }
 
 * {
   box-sizing: border-box;
@@ -27,6 +25,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  overflow: hidden;
 }
 
 #watch {
@@ -94,6 +93,7 @@ body.flashlight #watch {
 
 .screen.active {
   display: block;
+  position: relative;
 }
 
 #lockscreen {
@@ -162,6 +162,7 @@ body.flashlight #watch {
   background: #2980b9;
   /* border-bottom-right-radius: 0.1em; */
 }
+
 .expense {
   display: flex;
   align-items: center;
@@ -183,6 +184,7 @@ body.flashlight #watch {
 .budget-excess {
   color: red;
 }
+
 .expense > div:first-of-type i {
   font-size: 1em;
 }
@@ -313,6 +315,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
+#create-budget,
 #place-desc {
   padding: 0.5em;
 }
@@ -344,4 +347,107 @@ body.flashlight #watch {
 
 #place-desc .actions button:last-of-type {
   margin-left: auto
+}
+
+#keyboard {
+  background: rgba(19, 15, 64, 0.9);
+  text-align: center;
+  position: absolute;
+  bottom: 0.2em;
+  left: 0.2em;
+  width: calc(100% - 0.4em);
+  color: white;
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+  transition: 0.2s ease transform;
+  transform: translate(0, calc(100% + 0.4em));
+}
+
+#keyboard.visible {
+  transform: translate(0);
+}
+
+#keyboard table {
+  width: 100%;
+  border-spacing: 0.4em;
+}
+
+#keyboard td {
+  padding: 0.3em;
+  background: #34495e;
+  transition: 0.2s ease background;
+  border-radius: 0.2em;
+  box-shadow: inset 0 0 17px rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  width: 33%;
+}
+
+#keyboard td:active {
+  background: #293a4a;
+}
+
+#create-budget.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+#create-budget input:first-of-type {
+  margin-top: 0;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  background: white;
+  margin: 0.3em 0;
+  color: #212121;
+  border: 0;
+  padding: 0.5em;
+  border-radius: 0.3em;
+  cursor: pointer;
+}
+
+button {
+  background: white;
+  color: #212121;
+  border: 0;
+  padding: 0.5em;
+  border-radius: 0.3em;
+  cursor: pointer;
+}
+
+button.ok {
+  color: white;
+  background: #27ae60;
+}
+
+button.cancel {
+  color: white;
+  background: #e74c3c;
+}
+
+button,
+button:active,
+button:focus {
+  outline: 0;
+}
+
+button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+button:active {
+  box-shadow: inset 0 0 17px rgba(0, 0, 0, 0.2);
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.f-50 > * {
+   width: 48%;
 }
