@@ -167,6 +167,10 @@ function updatePlaceInfo (screen, name, distance, rating) {
   console.log(name, distance, rating)
 }
 
+function onNewDestinationChange () {
+
+}
+
 function getBudgets () {
   return window.data.budgets.sort((a, b) => {
     if (a.active && !b.active) return 1

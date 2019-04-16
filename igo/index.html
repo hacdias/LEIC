@@ -33,7 +33,7 @@
         <div class="screen" id="mainmenu">
           <ul>
             <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
-            <li class="goto" data-to="gps"><i class="fas fa-location-arrow"></i></li>
+            <li class="goto" data-to="gps"><i class="fas fa-map-marked-alt"></i></li>
             <li class="goto" data-to="places"><i class="fas fa-map-pin"></i></li>
             <li class="goto" data-to="budget"><i class="fas fa-wallet"></i></li>
             <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
@@ -71,7 +71,8 @@
         </div>
 
         <div class="screen" id="gps" data-name="GPS">
-          GPS
+          <input placeholder="Insira destino" id="new-destination" type="text" oninput="onNewDestinationChange()"></input>
+          <i class="fas fa-map-marker"></i>
         </div>
 
         <div class="screen" id="places" data-name="Locais">

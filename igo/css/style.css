@@ -548,6 +548,19 @@ button:active {
   display: block;
 }
 
+#gps {
+  background-image: url(../assets/map.jpg);
+  background-size: 100% 100%;
+}
+
+#gps i {
+  position: absolute;
+  bottom: 1em;
+  left: 4.8em;
+  color: #f00;
+  z-index: 1;
+}
+
 #contacless {
   border-radius: 50%;
   width: 4em;
