@@ -558,13 +558,14 @@ button:active {
   color: #212121;
   background: white;
   border: 1px solid grey;
-  border-radius: 0.3em;
+  border-radius: 1em;
   padding: 0.3em;
   margin: 0 0.3em;
 }
 
 #gps-search input {
   padding: 0em;
+  padding-left: 0.3em;
   border-radius: 0em;
 }
 
