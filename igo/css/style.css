@@ -553,12 +553,38 @@ button:active {
   background-size: 100% 100%;
 }
 
-#gps i {
+#gps-search {
+  display: flex;
+  color: #212121;
+  background: white;
+  border: 1px solid grey;
+  border-radius: 0.3em;
+  padding: 0.3em;
+  margin: 0 0.3em;
+}
+
+#gps-search input {
+  padding: 0em;
+  border-radius: 0em;
+}
+
+#gps-search span {
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  margin: 0.3em;
+  cursor: pointer;
+}
+
+#gps-search input:focus {
+  outline: none;
+}
+
+#gps .fa-map-marker {
   position: absolute;
   bottom: 1em;
-  left: 4.8em;
+  left: 4.85em;
   color: #f00;
-  z-index: 1;
 }
 
 #contacless {

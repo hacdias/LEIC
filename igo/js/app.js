@@ -171,6 +171,10 @@ function onNewDestinationChange () {
 
 }
 
+function startGPS () {
+  
+}
+
 function getBudgets () {
   return window.data.budgets.sort((a, b) => {
     if (a.active && !b.active) return 1

@@ -71,7 +71,10 @@
         </div>
 
         <div class="screen" id="gps" data-name="GPS">
-          <input placeholder="Insira destino" id="new-destination" type="text" oninput="onNewDestinationChange()"></input>
+          <div id="gps-search">
+            <input placeholder="Insira destino" id="new-destination" type="text" oninput="onNewDestinationChange()"></input>
+            <span class="fas fa-search" onclick="startGPS()"></span>
+          </div>
           <i class="fas fa-map-marker"></i>
         </div>
 
