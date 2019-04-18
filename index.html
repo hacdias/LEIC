@@ -4,216 +4,85 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>iGo</title>
+  <title>IPM 18/19 - Grupo 11</title>
   <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/fontawesome.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <button id="contacless" onclick="contactless()">
-      <img src="assets/contacless.png">
-  </button>
+  <audio id="music" loop>
+    <source src="assets/nyan.mp3" type="audio/mpeg">
+  </audio>
 
-  <div id="container">
-    <div id="watch">
-      <div id="status">
-        <i class="fas fa-signal"></i>
-        <span class="clock"></span>
-        <i class="fas fa-battery-three-quarters"></i>
-      </div>
+  <header class="container">
+    <h1>Interfaces Pessoa Máquina 2018-19</h1>
+    <h2>Grupo 11 - Turno IPM20111326L06</h2>
+  </header>
 
-      <div id="screen-space">
-        <div class="screen" id="lockscreen">
-          <div class="clock"></div>
-          <span class="goto" data-to="mainmenu">
-            <i class="fas fa-4x fa-fingerprint"></i>
-          </span>
-        </div>
-
-        <div class="screen" id="mainmenu">
-          <ul>
-            <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
-            <li class="goto" data-to="gps"><i class="fas fa-map-marked-alt"></i></li>
-            <li class="goto" data-to="places"><i class="fas fa-map-pin"></i></li>
-            <li class="goto" data-to="budget"><i class="fas fa-wallet"></i></li>
-            <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
-            <li class="goto" data-to="faq"><i class="fas fa-question"></i></li>
-          </ul>
-        </div>
-
-        <div class="screen" id="people" data-name="Amigos" data-call="updatePeople">
-          <!-- Faces Go Here -->
-        </div>
-
-        <div class="screen" id="places-list" data-call="updatePlaces">
-          <!-- Places Go Here -->
-        </div>
-
-        <div class="screen" id="place-desc" data-call="updatePlaceInfo">
-          <p>Classificação</p>
-          <div class="rating">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-          </div>
-
-          <div class="actions">
-            <button><i class="fas fa-star"></i> Adicionar</button>
-            <button><i class="fas fa-directions"></i> Ir</button>
-          </div>
-
-        </div>
-
-        <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
-          <i class="fas fa-lightbulb"></i>
-        </div>
-
-        <div class="screen" id="gps" data-name="GPS">
-          <div id="gps-search">
-            <input placeholder="Insira destino" id="new-destination" type="text" oninput="onNewDestinationChange()"></input>
-            <span class="fas fa-search" onclick="startGPS()"></span>
-          </div>
-          <i id="current-position" class="fas fa-map-marker"></i>
-          <i id="destination" class="fas fa-map-marker"></i>
-        </div>
-
-        <div class="screen" id="places" data-name="Locais">
-          <div class="item category goto" data-to="places-list" data-args="recommended#Recomendados">
-            <i class="recommended fas fa-certificate"></i>
-            <p>Recomendados</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="favourites#Favoritos">
-            <i class="favourites fas fa-star"></i>
-            <p>Favoritos</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="restaurants#Restaurantes">
-            <i class="restaurants fas fa-utensils"></i>
-            <p>Restaurantes</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="parks#Parques">
-            <i class="parks fas fa-tree"></i>
-            <p>Parques</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="monuments#Monumentos">
-            <i class="monuments fas fa-landmark"></i>
-            <p>Monumentos</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="markets#Mercados">
-            <i class="markets fas fa-store"></i>
-            <p>Mercados</p>
-          </div>
-          <div class="item category goto" data-to="places-list" data-args="diversions#Diversões">
-            <i class="fas fa-chess"></i>
-            <p>Diversões</p>
-          </div>
-        </div>
-
-        <div class="screen" id="budget" data-call="listBudgets" data-name="Orçamentos">
-          <button class="goto blue" data-to="create-budget" id="new-budget-button">
-            <i class="fas fa-plus"></i> Novo Orçamento
-          </button>
-
-          <div id="budget-list">
-
-          </div>
-        </div>
-
-        <div class="screen" id="budget-desc" data-call="showBudget" data-name="">
-          <div id="budget-bar">
-            <div></div>
-            <span id="budget-spent"></span>
-            <span id="budget-max"></span>
-          </div>
-
-          <button class="blue only-current goto" data-to="create-expense"><i class="fas fa-money-bill"></i> Nova Despesa</button>
-
-          <div id="budget-expenses"></div>
-
-          <div id="budget-actions" class="only-current">
-            <button class="blue" onclick="endBudget()" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
-            <button class="cancel" onclick="deleteBudget()"><i class="fas fa-trash-alt"></i> Apagar</button>
-          </div>
-        </div>
-
-        <div class="screen" id="create-budget" data-name="Novo Orçamento">
-          <input placeholder="Nome" id="new-budget-name" type="text" oninput="onNewBudgetChange()"></input>
-          <input placeholder="Valor" id="new-budget-value" type="number" oninput="onNewBudgetChange()"></input>
-          <div class="flex f-50">
-            <button class="cancel" type="button" onclick="runAndBack(clearBudget)">Cancelar</button>
-            <button class="ok disabled" id="new-budget-submit" type="button" onclick="createBudget()">Criar</button>
-          </div>
-        </div>
-
-        <div class="screen" id="create-expense" data-name="Nova Despesa">
-          <input placeholder="Nome" id="new-expense-name" type="text" oninput="onNewExpenseChange()"></input>
-          <input placeholder="Valor" id="new-expense-value" type="number" oninput="onNewExpenseChange()"></input>
-          <div class="flex f-50">
-            <button class="cancel" type="button" onclick="runAndBack(clearExpense)">Cancelar</button>
-            <button class="ok disabled" id="new-expense-submit" type="button" onclick="createExpense()">Criar</button>
-          </div>
-        </div>
-
-        <div class="screen" id="faq" data-name="FAQ">
-          FAQ
-        </div>
-      </div>
-
-      <div id="backbar">
-        <span id="only-mainmenu">
-          <i class="fas fa-cog"></i>
-        </span>
-        <span id="not-mainmenu">
-          <span class="goto" data-to="--back">
-            <i class="fas fa-angle-left"></i>
-          </span>
-          <span id="current-screen-name"></span>
-        </span>
-      </div>
+  <div id="people" class="container">
+    <div>
+      <p class="name">Daniel Pereira</p>
+      <p class="number">89425</p>
+      <img class="profile" src="imgs/daniel.jpg">
     </div>
 
-    <div id="overlay"></div>
-
-    <div id="confirmation-box">
-      <p>Pergunta?</p>
-
-      <div class="flex f-50">
-        <button id="left-confirm" type="button">Cancelar</button>
-        <button class="ok" id="right-confirm" type="button">Sim</button>
-      </div>
+    <div>
+      <p class="name">Henrique Dias</p>
+      <p class="number">89455</p>
+      <img class="profile" src="imgs/henrique.jpg">
     </div>
 
-    <div id="keyboard">
-      <table>
-        <tr>
-          <td></td>
-          <td>ABC</td>
-          <td>DEF</td>
-        </tr>
-        <tr>
-          <td>GHI</td>
-          <td>JKL</td>
-          <td>MNO</td>
-        </tr>
-        <tr>
-          <td>PQRS</td>
-          <td>TUV</td>
-          <td>WXYZ</td>
-        </tr>
-        <tr>
-          <td><i class="fas fa-backspace"></i></td>
-          <td>_</td>
-          <td>↵</td>
-        </tr>
-      </table>
+    <div>
+      <p class="name">Tiago Barroso</p>
+      <p class="number">89549</p>
+      <img class="profile" src="imgs/tiago.jpg">
     </div>
-
-    <div class="goto" data-to="mainmenu" data-needsunlock="true" id="mainbutton"></div>
   </div>
 
-  <script src="./js/utils.js"></script>
-  <script src="./js/data.js"></script>
+  <div class="nav container">
+    <label for="outros" class="section_header">Outros</label>
+    <input type="checkbox" class="section_toggler" id="outros" />
+    <div class="section_body">
+      <a href="assets/esbocos.pdf">Esboços Preliminares</a>
+    </div>
+
+    <label for="at" class="section_header">Análise de Tarefas</label>
+    <input type="checkbox" class="section_toggler" id="at" />
+    <div class="section_body">
+      <a href="assets/questionario.pdf">Questionário para análise de tarefas</a>
+      <a href="assets/questionario-melhorado.pdf">Questionário para análise de tarefas (melhorado)</a>
+      <a href="assets/autfunc.pdf">Análise de tarefas + Funcionalidades</a>
+      <a href="assets/autfunc-melhorado.pdf">Análise de tarefas + Funcionalidades (melhorados)</a>
+    </div>
+
+    <label for="mc" class="section_header">Storyboard</label>
+    <input type="checkbox" class="section_toggler" id="mc" />
+    <div class="section_body">
+      <a href="assets/storyboards.pdf">Storyboard</a>
+    </div>
+
+    <label for="pro" class="section_header">Protótipos</label>
+    <input type="checkbox" class="section_toggler" id="pro" />
+    <div class="section_body">
+      <a href="assets/prototipo.pdf">PBF</a>
+      <a href="igo/index.html">Primeiro protótipo funcional</a>
+      <a class="disabled" href="protFuncional1-completo.html">Primeiro protótipo funcional completo</a>
+      <a class="disabled" href="protFuncional2-beta.html">Segundo protótipo funcional</a>
+      <a class="disabled" href="protFuncional2-completo.html">Segundo protótipo funcional completo</a>
+      <a class="disabled" href="protFinal-beta.html">Protótipo Final</a>
+      <a class="disabled" href="protFinal-completo.html">Protótipo Final completo</a>
+    </div>
+
+    <label for="au" class="section_header">Avaliação com Utilizadores</label>
+    <input type="checkbox" class="section_toggler" id="au" />
+    <div class="section_body">
+      <a class="disabled" href="tarefas-criterios1.html">Tarefas e Critérios de usabilidade</a>
+      <a class="disabled" href="tarefas-criterios2.html">Tarefas e Critérios de usabilidade (melhorado)</a>
+      <a class="disabled" href="relatorioTestes1.html">Relatório da avaliação com utilizadores</a>
+      <a class="disabled" href="relatorioTestes2.html">Relatório da avaliação com utilizadores (melhorado)</a>
+      <a class="disabled" href="manual.html">Manual do Utilizador</a>
+    </div>
+  </div>
+
   <script src="./js/app.js"></script>
 </body>
 </html>

@@ -549,7 +549,7 @@ button:active {
 }
 
 #gps {
-  background-image: url(../assets/map.jpg);
+  background-image: url(../assets/map.png);
   background-size: 100% 100%;
 }
 
@@ -581,11 +581,21 @@ button:active {
   outline: none;
 }
 
-#gps .fa-map-marker {
+#gps #current-position {
   position: absolute;
-  bottom: 1em;
-  left: 4.85em;
+  bottom: 5.3em;
+  left: 8.97em;
   color: #f00;
+  -webkit-text-stroke: 1px #000;
+}
+
+#gps #destination {
+  position: absolute;
+  bottom: 0.85em;
+  left: 4.81em;
+  color: #0AC92B;
+  -webkit-text-stroke: 1px #000;
+  opacity: 0;
 }
 
 #contacless {

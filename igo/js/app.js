@@ -172,7 +172,8 @@ function onNewDestinationChange () {
 }
 
 function startGPS () {
-  
+  document.getElementById('gps').style.backgroundImage = "url(assets/route1.png)";
+  document.getElementById('destination').style.opacity = 1;
 }
 
 function getBudgets () {
