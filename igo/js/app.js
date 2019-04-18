@@ -167,15 +167,6 @@ function updatePlaceInfo (screen, name, distance, rating) {
   console.log(name, distance, rating)
 }
 
-function onNewDestinationChange () {
-
-}
-
-function startGPS () {
-  document.getElementById('gps').style.backgroundImage = "url(assets/route1.png)";
-  document.getElementById('destination').style.opacity = 1;
-}
-
 function getBudgets () {
   return window.data.budgets.sort((a, b) => {
     if (a.active && !b.active) return 1

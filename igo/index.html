@@ -71,12 +71,21 @@
         </div>
 
         <div class="screen" id="gps" data-name="GPS">
-          <div id="gps-search">
-            <input placeholder="Insira destino" id="new-destination" type="text" oninput="onNewDestinationChange()"></input>
-            <span class="fas fa-search" onclick="startGPS()"></span>
+          <div class="gps-search">
+            <input placeholder="Insira destino" type="text"></input>
+            <span class="fas fa-search goto" data-to="gps-path"></span>
           </div>
-          <i id="current-position" class="fas fa-map-marker"></i>
-          <i id="destination" class="fas fa-map-marker"></i>
+          <i class="fas fa-map-marker current-position"></i>
+        </div>
+        
+        <div class="screen" id="gps-path" data-name="Caminho">
+          <div class="gps-search">
+            <input placeholder="Insira destino" type="text"></input>
+            <span class="fas fa-search"></span>
+          </div>
+          <i class="fas fa-map-marker current-position"></i>
+          <i class="fas fa-map-marker destination"></i>
+          <button id="start-route-button">Go</button>
         </div>
 
         <div class="screen" id="places" data-name="Locais">

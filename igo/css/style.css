@@ -553,7 +553,12 @@ button:active {
   background-size: 100% 100%;
 }
 
-#gps-search {
+#gps-path {
+  background-image: url(../assets/route1.png);
+  background-size: 100% 100%;
+}
+
+.gps-search {
   display: flex;
   color: #212121;
   background: white;
@@ -563,13 +568,13 @@ button:active {
   margin: 0 0.3em;
 }
 
-#gps-search input {
+.gps-search input {
   padding: 0em;
   padding-left: 0.3em;
   border-radius: 0em;
 }
 
-#gps-search span {
+.gps-search span {
   position: absolute;
   top: 7px;
   right: 15px;
@@ -577,25 +582,35 @@ button:active {
   cursor: pointer;
 }
 
-#gps-search input:focus {
+.gps-search input:focus {
   outline: none;
 }
 
-#gps #current-position {
+.current-position {
   position: absolute;
   bottom: 5.3em;
   left: 8.97em;
+  color: #0AC92B;
+  -webkit-text-stroke: 1px #000;
+}
+
+.destination {
+  position: absolute;
+  bottom: 0.85em;
+  left: 4.85em;
   color: #f00;
   -webkit-text-stroke: 1px #000;
 }
 
-#gps #destination {
+#start-route-button {
   position: absolute;
-  bottom: 0.85em;
-  left: 4.81em;
-  color: #0AC92B;
-  -webkit-text-stroke: 1px #000;
-  opacity: 0;
+  bottom: 0em;
+  right: 0.5em;
+  background-color: #4C4CFF;
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 20%;
 }
 
 #contacless {
