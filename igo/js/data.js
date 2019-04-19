@@ -43,28 +43,36 @@ window.data = {
         distance: 23,
         rating: 4.5,
         price: 25,
-        kind: "restaurants"
+        kind: "restaurants",
+        isReserved: false,
+        reservationTime: "00:00"
       },
       {
         name: 'Monte do Zé',
         distance: 89,
         rating: 2.5,
         price: 7.5,
-        kind: "restaurants"
+        kind: "restaurants",
+        isReserved: false,
+        reservationTime: "00:00"
       },
       {
         name: 'Sabores do Mar',
         distance: 55,
         rating: 5,
         price: 13,
-        kind: "restaurants"
+        kind: "restaurants",
+        isReserved: false,
+        reservationTime: "00:00"
       },
       {
         name: 'Prego no Espeto',
         distance: 28,
         rating: 4,
         price: 6,
-        kind: "restaurants"
+        kind: "restaurants",
+        isReserved: false,
+        reservationTime: "00:00"
       }
     ],
     parks: [

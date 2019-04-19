@@ -115,6 +115,39 @@ const placesIcons = {
   diversions: 'chess'
 }
 
+function bookRestaurant(screen, name) {
+
+  updateScreenName("Reservar") 
+
+  console.log(name)
+
+  let el = document.createElement('div')
+  el.classList.add('flex')
+  el.classList.add('f-50')
+
+  let el1 = document.createElement('button')
+  el1.classList.add('cancel')
+  el1.addEventListener('click', () => {
+    runAndBack(clearBooking)
+  })
+  el1.innerHTML = `Cancelar`
+
+  el.appendChild(el1)
+
+  let el2 = document.createElement('button')
+  el2.setAttribute('id', 'new-booking-submit')
+  el2.classList.add('ok')
+  el2.classList.add('disabled')
+  el2.addEventListener('click', () => {
+    createBooking(name)
+  })
+  el2.innerHTML = `Reservar`
+
+  el.appendChild(el2)
+  screen.appendChild(el)
+
+}
+
 function getPlaces (kind) {
   if (kind === 'recommended') {
     return window.data.recommended
@@ -195,10 +228,11 @@ function updatePlaceInfo (screen, name, distance, rating) {
   if (getPlace(name).kind == "restaurants") {
     let el = document.createElement('button')
     el.classList.add('blue')
-      el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
-      el.addEventListener('click', () => {
-        //reservar
-      })
+    el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
+    el.dataset.args = `${name}`
+    el.addEventListener('click', () => {
+      showScreen('restaurant-booking', el)
+    })
     screen.appendChild(el)  
   }
 
@@ -337,6 +371,12 @@ function clearBudget () {
   document.getElementById('new-budget-value').value = ''
   document.getElementById('new-budget-submit').classList.add('disabled')
 }
+function clearBooking () {
+  document.getElementById('new-booking-name').value = ''
+  document.getElementById('new-booking-people').value = ''
+  document.getElementById('new-booking-time').value = ''
+  document.getElementById('new-booking-submit').classList.add('disabled')
+}
 
 function validateNewBudget () {
   let name = document.getElementById('new-budget-name').value
@@ -352,6 +392,43 @@ function validateNewBudget () {
   }
 
   return { name, value }
+}
+
+function validateNewBooking () {
+  let name = document.getElementById('new-booking-name').value
+  let value = parseFloat(document.getElementById('new-booking-people').value)
+  let hours = document.getElementById('new-booking-time').value
+
+  var d = new Date();
+  var h = d.getHours();
+  var m = d.getMinutes();
+
+  nowHours = parseFloat(hours.split(":")[0])*60 + parseFloat(hours.split(":")[1])
+  console.log(nowHours)
+
+
+  if (isNaN(nowHours) || (nowHours <= h*60+m+30)) {
+    return 
+  }
+
+  if (name === '' || isNaN(value)) {
+    // this shouldn't happen, but we never know!
+    return
+  }
+
+  if ((value <= 0) || (value > 16)){
+    return
+  }
+
+  return { name, value, hours }
+}
+
+function onNewBookingChange () {
+  if (validateNewBooking()) {
+    document.getElementById('new-booking-submit').classList.remove('disabled')
+  } else {
+    document.getElementById('new-booking-submit').classList.add('disabled')
+  }
 }
 
 function onNewBudgetChange () {
@@ -407,6 +484,24 @@ function confirmationBox ({
 
   leftButton.addEventListener('click', leftAction)
   rightButton.addEventListener('click', rightAction)
+}
+
+function createBooking(name) {
+  let data = validateNewBooking()
+  if (!data) {
+    // this shouldn't happen, but we never know!
+    return
+  }
+  console.log(name)
+  confirmationBox({
+    question: `Confirma a reserva para as ${data.hours} de ${data.value} pessoas?`,
+    rightHandler: () => {
+      getPlace()
+
+      runAndBack(clearBooking)
+    }
+  })
+  
 }
 
 function createBudget () {

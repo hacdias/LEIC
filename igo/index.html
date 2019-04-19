@@ -50,7 +50,13 @@
         </div>
 
         <div class="screen" id="place-desc" data-call="updatePlaceInfo">
-          
+
+        </div>
+
+        <div class="screen" id="restaurant-booking" data-call="bookRestaurant">
+          <input placeholder="Nome da Reserva" id="new-booking-name" type="text" oninput="onNewBookingChange()"></input>
+          <input placeholder="Pessoas (16 máximo)" id="new-booking-people" min="1" max="16" type="number" oninput="onNewBookingChange()"></input>
+          <p>Horas:  <input id="new-booking-time" type="time" oninput="onNewBookingChange()"></input></p>
         </div>
 
         <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
