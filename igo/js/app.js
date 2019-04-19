@@ -155,35 +155,88 @@ function updatePlaces (screen, kind, title) {
   }
 }
 
+function getScore(screen, rating) {
+
+  var score = 0;
+  screen.innerHTML = `<p>Classificação</p>`
+
+  let el = document.createElement('div')
+  el.classList.add('rating')
+
+  while (score < rating - 0.5) {
+    el.innerHTML += `<i class="fas fa-star"></i>`
+    score++;
+  }
+  if (rating - score == 0.5) {
+    el.innerHTML += `<i class="fas fa-star-half-alt"></i>`
+    score++;
+  }
+  while (score < 5) {
+    el.innerHTML += `<i class="far fa-star"></i>`
+    score++;
+  }
+  screen.appendChild(el)
+
+}
+
 function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
 
-  screen.innerHTML = `<p>Classificação</p>
-  <div class="rating">
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star-half-alt"></i>
-    <i class="far fa-star"></i>
-    <i class="far fa-star"></i>
-  </div>`
+  getScore(screen, rating)
+  
+  let el1 = document.createElement('button')
+  el1.classList.add('blue')
+    el1.innerHTML = `<i class="fas fa-directions"></i> Ir`
+    el1.addEventListener('click', () => {
+      gotoGPS()
+    })
+  screen.appendChild(el1)  
 
-  let el = document.createElement('div')
-  el.classList.add('actions')
+  if (getPlace(name).kind == "restaurants") {
+    let el = document.createElement('button')
+    el.classList.add('blue')
+      el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
+      el.addEventListener('click', () => {
+        //reservar
+      })
+    screen.appendChild(el)  
+  }
+
+  let el = document.createElement('button')
   if (isFavourite(name)) {
-    el.innerHTML = `<button onclick="removeFavourite()"><i class="fas fa-star"></i> Remover</button>`
+    el.classList.add('cancel')
+    el.innerHTML = `<i class="fas fa-star"></i> Remover dos Favoritos`
+    el.addEventListener('click', () => {
+      removeFavourite()
+    })
   }
   else {
-    el.innerHTML = `<button onclick="addFavourite()"><i class="fas fa-star"></i> Adicionar</button>`
+    el.classList.add('blue')
+    el.innerHTML = `<i class="fas fa-star"></i> Adicionar aos Favoritos`
+    el.addEventListener('click', () => {
+      addFavourite()
+    })
   }
-  el.innerHTML += `<button><i class="fas fa-directions"></i> Ir</button>`
+  screen.appendChild(el)
 
-  screen.appendChild(el)  
   // TODO fazer o menu c/ classificaç\ao, distancia, numero de pessoas e possibilidade de encaminhar pro GPS
   // se for restaurante meter botao reservar.
 
   console.log(name, distance, rating)
 }
 
+function gotoGPS () {
+
+  let name = document.querySelector('#current-screen-name').innerHTML
+  console.log(name)
+  
+  confirmationBox({
+    question: `Deseja ir para: ` + name + `?`,
+    rightHandler: () => {
+      showScreen('gps-path')
+    }
+  })
+}
 
 function getPlace (name) {
 
