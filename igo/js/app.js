@@ -161,10 +161,107 @@ function updatePlaces (screen, kind, title) {
 function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
 
+  screen.innerHTML = `<p>Classificação</p>
+  <div class="rating">
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star-half-alt"></i>
+    <i class="far fa-star"></i>
+    <i class="far fa-star"></i>
+  </div>`
+
+  let el = document.createElement('div')
+  el.classList.add('actions')
+  if (isFavourite(name)) {
+    el.innerHTML = `<button onclick="removeFavourite()"><i class="fas fa-star"></i> Remover</button>`
+  }
+  else {
+    el.innerHTML = `<button onclick="addFavourite()"><i class="fas fa-star"></i> Adicionar</button>`
+  }
+  el.innerHTML += `<button><i class="fas fa-directions"></i> Ir</button>`
+
+  screen.appendChild(el)  
   // TODO fazer o menu c/ classificaç\ao, distancia, numero de pessoas e possibilidade de encaminhar pro GPS
   // se for restaurante meter botao reservar.
 
   console.log(name, distance, rating)
+}
+
+
+function getPlace (name) {
+
+  for (const place of window.data.places.restaurants) {
+    if (place.name == name) {
+        return place
+    }
+  }
+  for (const place of window.data.places.parks) {
+    if (place.name == name) {
+        return place
+    }
+  }
+  for (const place of window.data.places.monuments) {
+    if (place.name == name) {
+        return place
+    }
+  }
+  for (const place of window.data.places.markets) {
+    if (place.name == name) {
+        return place
+    }
+  }
+  for (const place of window.data.places.diversions) {
+    if (place.name == name) {
+        return place
+    }
+  }
+}
+
+function isFavourite (name) {
+  for (const place of window.data.favourites) {
+    if (place.name == name) {
+        return place
+    }
+  }
+}
+
+function addFavourite () {
+
+  let name = document.querySelector('#current-screen-name').innerHTML
+  console.log(name)
+  
+  confirmationBox({
+    question: `Deseja adicionar este local à sua lista de favoritos?`,
+    rightHandler: () => {
+      window.data.favourites.push(getPlace(name))
+      console.log(getPlace(name))
+      console.log(window.data.favourites)
+      runAndBack()
+    }
+  })
+}
+
+function removeFavourite () {
+
+  let name = document.querySelector('#current-screen-name').innerHTML
+  console.log(name)
+  
+  confirmationBox({
+    question: `Deseja remover este local da sua lista de favoritos?`,
+    rightClass: 'cancel',
+    rightHandler: () => {
+      var i = 0;
+      for (const place of window.data.favourites) {
+        if (place.name == name) {
+          window.data.favourites.splice(i, 1);
+        }
+        i++;
+      }
+      console.log(getPlace(name))
+      console.log(window.data.favourites)
+      runAndBack()
+    }
+  })
 }
 
 function getBudgets () {
