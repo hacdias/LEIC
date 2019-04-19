@@ -125,7 +125,6 @@ function getPlaces (kind) {
   }
 
   return window.data.places[kind].sort(distanceSort).map(place => {
-    place.kind = kind
     return place
   })
 }
@@ -581,7 +580,7 @@ function createRecommended () {
   var diversions = window.data.places.diversions
   var parks = window.data.places.parks
   var all = restaurants.concat(monuments, markets, diversions, parks)
-  console.log(restaurants)
+  
   var recommended = []
   var random = Math.floor(Math.random() * (all.length - 9)) + 3
 

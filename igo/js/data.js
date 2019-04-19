@@ -42,88 +42,103 @@ window.data = {
         name: "Tubarão O'Mar",
         distance: 23,
         rating: 4.5,
-        price: 25
+        price: 25,
+        kind: "restaurants"
       },
       {
         name: 'Monte do Zé',
         distance: 89,
         rating: 2.5,
-        price: 7.5
+        price: 7.5,
+        kind: "restaurants"
       },
       {
         name: 'Sabores do Mar',
         distance: 55,
         rating: 5,
-        price: 13
+        price: 13,
+        kind: "restaurants"
       },
       {
         name: 'Prego no Espeto',
         distance: 28,
         rating: 4,
-        price: 6
+        price: 6,
+        kind: "restaurants"
       }
     ],
     parks: [
       {
         name: 'Quinta das Conchas',
         distance: 150,
-        rating: 4
+        rating: 4,
+        kind: "parks"
       },
       {
         name: 'Bela Vista',
         distance: 980,
-        rating: 5
+        rating: 5,
+        kind: "parks"
       },
       {
         name: 'Jardim do Torel',
         distance: 550,
-        rating: 2.5
+        rating: 2.5,
+        kind: "parks"
       },
       {
         name: 'Eduardo VII',
         distance: 200,
-        rating: 5
+        rating: 5,
+        kind: "parks"
       },
       {
         name: 'Arco do Cego',
         distance: 5,
-        rating: 4
+        rating: 4,
+        kind: "parks"
       },
       {
         name: 'Gulbenkian',
         distance: 150,
-        rating: 5
+        rating: 5,
+        kind: "parks"
       }
     ],
     monuments: [
       {
         name: 'Templo de Diana',
         distance: 1350,
-        rating: 5
+        rating: 5,
+        kind: "monuments"
       },
       {
         name: 'Torre de Belém',
         distance: 135,
-        rating: 3.5
+        rating: 3.5,
+        kind: "monuments"
       },
       {
         name: 'Padrão dos Descobrimentos',
         distance: 350,
-        rating: 4
+        rating: 4,
+        kind: "monuments"
       }
     ],
     markets: [
       {
         name: 'Mercado da Ribeira',
         distance: 345,
-        rating: 4
+        rating: 4,
+        kind: "markets"
       }
     ],
     diversions: [
       {
         name: 'Euro Fun',
         distance: 450,
-        rating: 3.5
+        rating: 3.5,
+        kind: "diversions"
       }
     ]
   },
