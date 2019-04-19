@@ -128,6 +128,7 @@ window.data = {
     ]
   },
   favourites: [],
+  recommended: [],
   currentBudget: null,
   budgets: [
     {

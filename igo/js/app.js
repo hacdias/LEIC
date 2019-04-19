@@ -117,9 +117,7 @@ const placesIcons = {
 
 function getPlaces (kind) {
   if (kind === 'recommended') {
-    window.alert('Not implemented')
-    // TODO: pick random
-    return []
+    return window.data.recommended
   }
 
   if (kind === 'favourites') {
@@ -576,8 +574,32 @@ function contactless () {
   })
 }
 
+function createRecommended () {
+  var restaurants = window.data.places.restaurants
+  var monuments = window.data.places.monuments
+  var markets = window.data.places.markets
+  var diversions = window.data.places.diversions
+  var parks = window.data.places.parks
+  var all = restaurants.concat(monuments, markets, diversions, parks)
+  console.log(restaurants)
+  var recommended = []
+  var random = Math.floor(Math.random() * (all.length - 9)) + 3
+
+  i = 0
+  while (i < random) {
+    var n = Math.floor(Math.random() * all.length)
+    recommended.push(all[n])
+    all.splice(n, 1)
+    i++;
+  }
+
+  window.data.recommended = recommended
+  console.log(recommended)
+}
+
 function startup () {
   setClocks()
+  createRecommended()
 
   document.querySelectorAll('.goto').forEach(el => {
     el.addEventListener('click', event => {
