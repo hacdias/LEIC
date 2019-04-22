@@ -43,36 +43,36 @@ window.data = {
         distance: 23,
         rating: 4.5,
         price: 25,
-        kind: "restaurants",
+        kind: 'restaurants',
         isReserved: false,
-        reservationTime: "00:00"
+        reservationTime: '00:00'
       },
       {
         name: 'Monte do Zé',
         distance: 89,
         rating: 2.5,
         price: 7.5,
-        kind: "restaurants",
+        kind: 'restaurants',
         isReserved: false,
-        reservationTime: "00:00"
+        reservationTime: '00:00'
       },
       {
         name: 'Sabores do Mar',
         distance: 55,
         rating: 5,
         price: 13,
-        kind: "restaurants",
+        kind: 'restaurants',
         isReserved: false,
-        reservationTime: "00:00"
+        reservationTime: '00:00'
       },
       {
         name: 'Prego no Espeto',
         distance: 28,
         rating: 4,
         price: 6,
-        kind: "restaurants",
+        kind: 'restaurants',
         isReserved: false,
-        reservationTime: "00:00"
+        reservationTime: '00:00'
       }
     ],
     parks: [
@@ -80,37 +80,37 @@ window.data = {
         name: 'Quinta das Conchas',
         distance: 150,
         rating: 4,
-        kind: "parks"
+        kind: 'parks'
       },
       {
         name: 'Bela Vista',
         distance: 980,
         rating: 5,
-        kind: "parks"
+        kind: 'parks'
       },
       {
         name: 'Jardim do Torel',
         distance: 550,
         rating: 2.5,
-        kind: "parks"
+        kind: 'parks'
       },
       {
         name: 'Eduardo VII',
         distance: 200,
         rating: 5,
-        kind: "parks"
+        kind: 'parks'
       },
       {
         name: 'Arco do Cego',
         distance: 5,
         rating: 4,
-        kind: "parks"
+        kind: 'parks'
       },
       {
         name: 'Gulbenkian',
         distance: 150,
         rating: 5,
-        kind: "parks"
+        kind: 'parks'
       }
     ],
     monuments: [
@@ -118,19 +118,19 @@ window.data = {
         name: 'Templo de Diana',
         distance: 1350,
         rating: 5,
-        kind: "monuments"
+        kind: 'monuments'
       },
       {
         name: 'Torre de Belém',
         distance: 135,
         rating: 3.5,
-        kind: "monuments"
+        kind: 'monuments'
       },
       {
         name: 'Notre Dame',
         distance: 350,
         rating: 4,
-        kind: "monuments"
+        kind: 'monuments'
       }
     ],
     markets: [
@@ -138,7 +138,7 @@ window.data = {
         name: 'Mercado da Ribeira',
         distance: 345,
         rating: 4,
-        kind: "markets"
+        kind: 'markets'
       }
     ],
     diversions: [
@@ -146,7 +146,7 @@ window.data = {
         name: 'Euro Fun',
         distance: 450,
         rating: 3.5,
-        kind: "diversions"
+        kind: 'diversions'
       }
     ]
   },

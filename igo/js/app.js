@@ -115,9 +115,8 @@ const placesIcons = {
   diversions: 'chess'
 }
 
-function bookRestaurant(screen, name) {
-
-  updateScreenName("Reservar") 
+function bookRestaurant (screen, name) {
+  updateScreenName('Reservar')
   screen.innerHTML = `<input placeholder="Nome da Reserva" id="new-booking-name" type="text" oninput="onNewBookingChange()"></input>
   <input placeholder="Pessoas (16 máximo)" id="new-booking-people" min="1" max="16" type="number" oninput="onNewBookingChange()"></input>
   <p>Horas:  <input id="new-booking-time" type="time" oninput="onNewBookingChange()"></input></p>`
@@ -148,7 +147,6 @@ function bookRestaurant(screen, name) {
 
   el.appendChild(el2)
   screen.appendChild(el)
-
 }
 
 function getPlaces (kind) {
@@ -194,9 +192,8 @@ function updatePlaces (screen, kind, title) {
   }
 }
 
-function getScore(screen, rating) {
-
-  var score = 0;
+function getScore (screen, rating) {
+  var score = 0
   screen.innerHTML = `<p>Classificação</p>`
 
   let el = document.createElement('div')
@@ -204,25 +201,23 @@ function getScore(screen, rating) {
 
   while (score < rating - 0.5) {
     el.innerHTML += `<i class="fas fa-star"></i>`
-    score++;
+    score++
   }
   if (rating - score == 0.5) {
     el.innerHTML += `<i class="fas fa-star-half-alt"></i>`
-    score++;
+    score++
   }
   while (score < 5) {
     el.innerHTML += `<i class="far fa-star"></i>`
-    score++;
+    score++
   }
   screen.appendChild(el)
-
 }
 
 function removeReservation (place) {
-
   let name = document.querySelector('#current-screen-name').innerHTML
   console.log(name)
-  
+
   confirmationBox({
     question: `Deseja cancelar a sua reserva?`,
     rightClass: 'cancel',
@@ -237,18 +232,18 @@ function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
 
   getScore(screen, rating)
-  
+
   let el1 = document.createElement('button')
   el1.classList.add('blue')
   el1.innerHTML = `<i class="fas fa-directions"></i> Ir`
   el1.addEventListener('click', () => {
     gotoGPS()
   })
-  screen.appendChild(el1)  
+  screen.appendChild(el1)
 
   var place = getPlace(name)
 
-  if (place.kind == "restaurants" && !place.isReserved) {
+  if (place.kind == 'restaurants' && !place.isReserved) {
     let el = document.createElement('button')
     el.classList.add('blue')
     el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
@@ -256,9 +251,8 @@ function updatePlaceInfo (screen, name, distance, rating) {
     el.addEventListener('click', () => {
       showScreen('restaurant-booking', el)
     })
-    screen.appendChild(el)  
-  }
-  else if (place.kind == "restaurants" && place.isReserved) {
+    screen.appendChild(el)
+  } else if (place.kind == 'restaurants' && place.isReserved) {
     let el = document.createElement('button')
     el.classList.add('cancel')
     el.innerHTML = `<i class="fas fa-book-open"></i> Cancelar Reserva`
@@ -266,7 +260,7 @@ function updatePlaceInfo (screen, name, distance, rating) {
     el.addEventListener('click', () => {
       removeReservation(place)
     })
-    screen.appendChild(el)  
+    screen.appendChild(el)
   }
 
   let el = document.createElement('button')
@@ -276,8 +270,7 @@ function updatePlaceInfo (screen, name, distance, rating) {
     el.addEventListener('click', () => {
       removeFavourite()
     })
-  }
-  else {
+  } else {
     el.classList.add('blue')
     el.innerHTML = `<i class="fas fa-star"></i> Adicionar aos Favoritos`
     el.addEventListener('click', () => {
@@ -293,10 +286,9 @@ function updatePlaceInfo (screen, name, distance, rating) {
 }
 
 function gotoGPS () {
-
   let name = document.querySelector('#current-screen-name').innerHTML
   console.log(name)
-  
+
   confirmationBox({
     question: `Deseja ir para: ` + name + `?`,
     rightHandler: () => {
@@ -306,30 +298,29 @@ function gotoGPS () {
 }
 
 function getPlace (name) {
-
   for (const place of window.data.places.restaurants) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
   for (const place of window.data.places.parks) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
   for (const place of window.data.places.monuments) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
   for (const place of window.data.places.markets) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
   for (const place of window.data.places.diversions) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
 }
@@ -337,16 +328,15 @@ function getPlace (name) {
 function isFavourite (name) {
   for (const place of window.data.favourites) {
     if (place.name == name) {
-        return place
+      return place
     }
   }
 }
 
 function addFavourite () {
-
   let name = document.querySelector('#current-screen-name').innerHTML
   console.log(name)
-  
+
   confirmationBox({
     question: `Deseja adicionar este local à sua lista de favoritos?`,
     rightHandler: () => {
@@ -359,20 +349,19 @@ function addFavourite () {
 }
 
 function removeFavourite () {
-
   let name = document.querySelector('#current-screen-name').innerHTML
   console.log(name)
-  
+
   confirmationBox({
     question: `Deseja remover este local da sua lista de favoritos?`,
     rightClass: 'cancel',
     rightHandler: () => {
-      var i = 0;
+      var i = 0
       for (const place of window.data.favourites) {
         if (place.name == name) {
-          window.data.favourites.splice(i, 1);
+          window.data.favourites.splice(i, 1)
         }
-        i++;
+        i++
       }
       console.log(getPlace(name))
       console.log(window.data.favourites)
@@ -432,16 +421,15 @@ function validateNewBooking () {
   let value = parseFloat(document.getElementById('new-booking-people').value)
   let hours = document.getElementById('new-booking-time').value
 
-  var d = new Date();
-  var h = d.getHours();
-  var m = d.getMinutes();
+  var d = new Date()
+  var h = d.getHours()
+  var m = d.getMinutes()
 
-  nowHours = parseFloat(hours.split(":")[0])*60 + parseFloat(hours.split(":")[1])
+  nowHours = parseFloat(hours.split(':')[0]) * 60 + parseFloat(hours.split(':')[1])
   console.log(nowHours)
 
-
-  if (isNaN(nowHours) || (nowHours <= h*60+m+30)) {
-    return 
+  if (isNaN(nowHours) || (nowHours <= h * 60 + m + 30)) {
+    return
   }
 
   if (name === '' || isNaN(value)) {
@@ -449,7 +437,7 @@ function validateNewBooking () {
     return
   }
 
-  if ((value <= 0) || (value > 16)){
+  if ((value <= 0) || (value > 16)) {
     return
   }
 
@@ -519,7 +507,7 @@ function confirmationBox ({
   rightButton.addEventListener('click', rightAction)
 }
 
-function createBooking(name) {
+function createBooking (name) {
   let data = validateNewBooking()
   if (!data) {
     // this shouldn't happen, but we never know!
@@ -538,7 +526,6 @@ function createBooking(name) {
       runAndBack(clearBooking)
     }
   })
-  
 }
 
 function createBudget () {
@@ -765,7 +752,7 @@ function createRecommended () {
   var diversions = window.data.places.diversions
   var parks = window.data.places.parks
   var all = restaurants.concat(monuments, markets, diversions, parks)
-  
+
   var recommended = []
   var random = Math.floor(Math.random() * (all.length - 9)) + 3
 
@@ -774,7 +761,7 @@ function createRecommended () {
     var n = Math.floor(Math.random() * all.length)
     recommended.push(all[n])
     all.splice(n, 1)
-    i++;
+    i++
   }
 
   window.data.recommended = recommended
