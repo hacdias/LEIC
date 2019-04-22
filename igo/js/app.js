@@ -198,7 +198,9 @@ function updatePlaces (screen, kind, title) {
 
 function getScore (screen, rating) {
   var score = 0
-  screen.innerHTML = `<p>Classificação</p>`
+
+  let container = document.createElement('div')
+  container.innerHTML = `<p>Classificação</p>`
 
   let el = document.createElement('div')
   el.classList.add('rating')
@@ -215,7 +217,9 @@ function getScore (screen, rating) {
     el.innerHTML += `<i class="far fa-star"></i>`
     score++
   }
-  screen.appendChild(el)
+
+  container.appendChild(el)
+  screen.appendChild(container)
 }
 
 function removeReservation (place) {
@@ -234,6 +238,7 @@ function removeReservation (place) {
 
 function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
+  screen.innerHTML = ''
 
   getScore(screen, rating)
 
