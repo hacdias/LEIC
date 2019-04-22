@@ -190,6 +190,10 @@ function updatePlaces (screen, kind, title) {
 
     screen.appendChild(el)
   }
+
+  if (places.length === 0) {
+    screen.innerHTML = `<p>Não há locais nesta categoria.</p>`
+  }
 }
 
 function getScore (screen, rating) {
