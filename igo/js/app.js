@@ -645,8 +645,8 @@ function validateNewExpense () {
   let name = document.getElementById('new-expense-name').value
   let value = parseFloat(document.getElementById('new-expense-value').value)
 
-  if (name === '' || isNaN(value)) {
-    return undefined
+  if (name === '' || isNaN(value) || value <= 0) {
+    return
   }
 
   return { name, value }
@@ -791,6 +791,20 @@ function startup () {
 
       showScreen(el.dataset.to, el)
     })
+  })
+
+  document.getElementById('gps-input').addEventListener('keyup', event => {
+    const value = event.currentTarget.value.toLowerCase()
+
+    console.warn('CUCU')
+
+    for (const key in window.data.places) {
+      for (const { name } of window.data.places[key]) {
+        if (name.toLowerCase().includes(value)) {
+          console.log(name)
+        }
+      }
+    }
   })
 
   showScreen('lockscreen')
