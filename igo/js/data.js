@@ -127,7 +127,7 @@ window.data = {
         kind: "monuments"
       },
       {
-        name: 'Padrão dos Descobrimentos',
+        name: 'Notre Dame',
         distance: 350,
         rating: 4,
         kind: "monuments"

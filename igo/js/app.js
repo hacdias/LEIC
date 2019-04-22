@@ -118,6 +118,9 @@ const placesIcons = {
 function bookRestaurant(screen, name) {
 
   updateScreenName("Reservar") 
+  screen.innerHTML = `<input placeholder="Nome da Reserva" id="new-booking-name" type="text" oninput="onNewBookingChange()"></input>
+  <input placeholder="Pessoas (16 máximo)" id="new-booking-people" min="1" max="16" type="number" oninput="onNewBookingChange()"></input>
+  <p>Horas:  <input id="new-booking-time" type="time" oninput="onNewBookingChange()"></input></p>`
 
   console.log(name)
 
@@ -168,9 +171,12 @@ function updatePlaces (screen, kind, title) {
 
   updateScreenName(title)
 
-  for (const { name, distance, rating, kind } of places) {
+  for (const { name, distance, rating, kind, isReserved } of places) {
     let el = document.createElement('div')
     el.classList.add('item')
+    if (isReserved) {
+      el.classList.add('current')
+    }
     el.dataset.args = `${name}#${distance}#${rating}`
     el.innerHTML = `<div>
         <i class="${kind} fas fa-${placesIcons[kind]}"></i>
@@ -212,6 +218,21 @@ function getScore(screen, rating) {
 
 }
 
+function removeReservation (place) {
+
+  let name = document.querySelector('#current-screen-name').innerHTML
+  console.log(name)
+  
+  confirmationBox({
+    question: `Deseja cancelar a sua reserva?`,
+    rightClass: 'cancel',
+    rightHandler: () => {
+      place.isReserved = false
+      runAndBack()
+    }
+  })
+}
+
 function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
 
@@ -219,19 +240,31 @@ function updatePlaceInfo (screen, name, distance, rating) {
   
   let el1 = document.createElement('button')
   el1.classList.add('blue')
-    el1.innerHTML = `<i class="fas fa-directions"></i> Ir`
-    el1.addEventListener('click', () => {
-      gotoGPS()
-    })
+  el1.innerHTML = `<i class="fas fa-directions"></i> Ir`
+  el1.addEventListener('click', () => {
+    gotoGPS()
+  })
   screen.appendChild(el1)  
 
-  if (getPlace(name).kind == "restaurants") {
+  var place = getPlace(name)
+
+  if (place.kind == "restaurants" && !place.isReserved) {
     let el = document.createElement('button')
     el.classList.add('blue')
     el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
     el.dataset.args = `${name}`
     el.addEventListener('click', () => {
       showScreen('restaurant-booking', el)
+    })
+    screen.appendChild(el)  
+  }
+  else if (place.kind == "restaurants" && place.isReserved) {
+    let el = document.createElement('button')
+    el.classList.add('cancel')
+    el.innerHTML = `<i class="fas fa-book-open"></i> Cancelar Reserva`
+    el.dataset.args = `${name}`
+    el.addEventListener('click', () => {
+      removeReservation(place)
     })
     screen.appendChild(el)  
   }
@@ -496,7 +529,11 @@ function createBooking(name) {
   confirmationBox({
     question: `Confirma a reserva para as ${data.hours} de ${data.value} pessoas?`,
     rightHandler: () => {
-      getPlace()
+      var place = getPlace(name)
+      place.isReserved = true
+      place.reservationTime = data.hours
+
+      console.log(getPlace(name))
 
       runAndBack(clearBooking)
     }
