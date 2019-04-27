@@ -116,7 +116,7 @@ const placesIcons = {
 }
 
 function newPicker (screen, selector, title, format) {
-  new Picker(screen.querySelector(selector), {
+  return new Picker(screen.querySelector(selector), {
     container: document.querySelector('#watch'),
     text: {
       title: title,
@@ -188,13 +188,13 @@ function updatePlaces (screen, kind, title) {
 
   updateScreenName(title)
 
-  for (const { name, distance, rating, kind, isReserved } of places) {
+  for (const { name, distance, rating, kind, isReserved, map } of places) {
     let el = document.createElement('div')
     el.classList.add('item')
     if (isReserved) {
       el.classList.add('current')
     }
-    el.dataset.args = `${name}#${distance}#${rating}`
+    el.dataset.args = `${name}#${distance}#${rating}#${map}`
     el.innerHTML = `<div>
         <i class="${kind} fas fa-${placesIcons[kind]}"></i>
       </div>
@@ -261,7 +261,7 @@ function canBeBooked (type) {
     type === 'monuments'
 }
 
-function updatePlaceInfo (screen, name, distance, rating) {
+function updatePlaceInfo (screen, name, distance, rating, map) {
   updateScreenName(name)
   screen.innerHTML = ''
 
@@ -269,9 +269,10 @@ function updatePlaceInfo (screen, name, distance, rating) {
 
   let el1 = document.createElement('button')
   el1.classList.add('blue')
+  el1.dataset.args = `${name}#${distance}#${map}`
   el1.innerHTML = `<i class="fas fa-directions"></i> Ir`
   el1.addEventListener('click', () => {
-    gotoGPS()
+    gotoGPS(el1)
   })
   screen.appendChild(el1)
 
@@ -319,14 +320,14 @@ function updatePlaceInfo (screen, name, distance, rating) {
   console.log(name, distance, rating)
 }
 
-function gotoGPS () {
+function gotoGPS (el) {
   let name = document.querySelector('#current-screen-name').innerHTML
   console.log(name)
 
   confirmationBox({
     question: `Deseja ir para: ` + name + `?`,
     rightHandler: () => {
-      showScreen('gps-path')
+      showScreen('gps-path', el)
     }
   })
 }
@@ -796,6 +797,12 @@ function createRecommended () {
   console.log(recommended)
 }
 
+// TODO: change
+function showGpsPath (screen, name, distance, map) {
+  screen.style.backgroundImage = `url(./assets/maps/${map}.png)`
+  console.log(screen, name, distance, map)
+}
+
 function startup () {
   setClocks()
   createRecommended()
@@ -814,13 +821,19 @@ function startup () {
 
   document.getElementById('gps-input').addEventListener('keyup', event => {
     const value = event.currentTarget.value.toLowerCase()
-
-    console.warn('CUCU')
+    let res = document.querySelector('.gps-results')
+    res.innerHTML = ''
 
     for (const key in window.data.places) {
-      for (const { name } of window.data.places[key]) {
+      for (const { name, distance, map } of window.data.places[key]) {
         if (name.toLowerCase().includes(value)) {
-          console.log(name)
+          let li = document.createElement('li')
+          li.dataset.args = `${name}#${distance}#${map}`
+          li.innerHTML = name
+          li.addEventListener('click', () => {
+            showScreen('gps-path', li)
+          })
+          res.appendChild(li)
         }
       }
     }

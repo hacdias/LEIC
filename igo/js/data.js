@@ -236,3 +236,9 @@ window.data = {
     }
   ]
 }
+
+for (const key in window.data.places) {
+  for (let i = 0; i < window.data.places[key].length; i++) {
+    window.data.places[key][i].map = Math.floor(Math.random() * 17) + 1
+  }
+}

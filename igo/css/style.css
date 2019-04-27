@@ -768,3 +768,15 @@ button:active {
 .picker-fixed .picker-footer {
   display: flex;
 }
+
+.gps-results {margin: 0.5em 0 0;padding: 0;list-style: none;background: white;color: black;border-radius: 0.3em;box-shadow: 0px 0px 4px #0000006e;height: 5.7em;overflow: auto;}
+
+.gps-results li {
+  padding: 0.5em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.gps-results li:hover {
+  background: rgba(0, 0, 0, 0.05)
+}
