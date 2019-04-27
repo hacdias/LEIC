@@ -32,7 +32,8 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
     /* overflow: hidden;
-     */;
+     */
+  ;
 }
 
 #watch {
@@ -157,20 +158,23 @@ body.flashlight #watch {
 #mainmenu ul li:nth-child(4) {
   background: #f1c40f;
     /* border-bottom-left-radius: 0.1em;
-     */;
+     */
+  ;
 }
 
 #mainmenu ul li:nth-child(5) {
   background: #ecf0f1;
   color: #212121;
     /* border-bottom-right-radius: 0.1em;
-     */;
+     */
+  ;
 }
 
 #mainmenu ul li:nth-child(6) {
   background: #2980b9;
     /* border-bottom-right-radius: 0.1em;
-     */;
+     */
+  ;
 }
 
 .expense {
@@ -413,7 +417,7 @@ input[type=time] {
   padding: 0.5em;
   border-radius: 0.3em;
   cursor: pointer;
-  align-self:center;
+  align-self: center;
 }
 
 button {
@@ -548,14 +552,19 @@ button:active {
 #overlay {
   position: absolute;
   background: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 1000;
+  display: none;
+}
+
+.picker,
+#overlay {
   height: calc(100% - 0.4em);
   bottom: 0.2em;
   left: 0.2em;
   width: calc(100% - 0.4em);
-  border-radius: 1em;
-  pointer-events: none;
-  z-index: 1000;
-  display: none;
+  top: 0.2em;
+  border-radius: .8em;
 }
 
 #overlay.active {
@@ -668,4 +677,94 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.picker-dialog {
+  background: #34495e;
+  color: white;
+  border: 0;
+}
+
+.picker-header {
+  padding: 0.5em;
+  border: 0;
+}
+
+.picker-cancel, .picker-confirm {
+  margin: 0.5em;
+  padding: 0.5em;
+  width: 50%;
+}
+
+.picker-cancel {
+  background: #e74c3c;
+  color: white;
+  margin-right: 0.25em;
+}
+
+.picker-cancel:hover,
+.picker-cancel:focus,
+.picker-cancel:active {
+  background: #e74c3c;
+  box-shadow: inset 0 0 17px rgba(0, 0, 0, 0.2);
+}
+
+.picker-confirm {
+  background: #27ae60;
+  color: white;
+  margin-left: 0.25em;
+}
+
+.picker-confirm:hover,
+.picker-confirm:focus,
+.picker-confirm:active {
+  background: #27ae60;
+  box-shadow: inset 0 0 17px rgba(0, 0, 0, 0.2);
+}
+
+.picker-close {
+  margin: 0;
+  height: 2rem;
+  width: 2rem;
+}
+
+#restaurant-booking > div:first-of-type {
+  display: flex;
+  justify-content: space-between;
+}
+
+#restaurant-booking > div:first-of-type > input {
+  margin-bottom: 0;
+  width: 38%;
+}
+
+#restaurant-booking > div:first-of-type > input:first-of-type {
+  width: 58%;
+}
+
+.picker-cell__body:before {
+  background-image: linear-gradient(0deg,hsla(0,0%,100%,0),#060a0e);
+  top: 0;
+}
+
+.picker-cell__body:after {
+  background-image: linear-gradient(180deg,hsla(0,0%,100%,0),#060a0e);
+  bottom: 0;
+}
+
+.picker-cell+.picker-cell {
+  border-left: 1px solid rgba(0,0,0,0.5);
+}
+
+.picker-picked {
+  color: white;
+}
+
+.picker-footer {
+  border: 0;
+  justify-content: space-between;
+}
+
+.picker-fixed .picker-footer {
+  display: flex;
 }

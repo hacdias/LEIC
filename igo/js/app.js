@@ -115,13 +115,32 @@ const placesIcons = {
   diversions: 'chess'
 }
 
+function newPicker (screen, selector, title, format) {
+  new Picker(screen.querySelector(selector), {
+    container: document.querySelector('#watch'),
+    text: {
+      title: title,
+      cancel: 'Cancelar',
+      confirm: 'OK'
+    },
+    format: format,
+    rows: 3
+  })
+}
+
 function bookRestaurant (screen, name) {
-  updateScreenName('Reservar')
-  screen.innerHTML = `<input placeholder="Nome da Reserva" id="new-booking-name" type="text" oninput="onNewBookingChange()"></input>
-  <input placeholder="Pessoas (16 máximo)" id="new-booking-people" min="1" max="16" type="number" oninput="onNewBookingChange()"></input>
-  <p>Horas:  <input id="new-booking-time" type="time" oninput="onNewBookingChange()"></input></p>`
+  screen.innerHTML = `
+  <input placeholder="Pessoas (12 máx)" type="text" id="new-booking-people" onchange="onNewBookingChange()"></input>
+  <div>
+    <input id="new-booking-date" placeholder="Data" type="text" onchange="onNewBookingChange()"></input>
+    <input id="new-booking-time" placeholder="Horas" type="text" onchange="onNewBookingChange()"></input>
+  </div>`
 
   console.log(name)
+
+  newPicker(screen, '#new-booking-people', 'Pessoas', 'MM')
+  newPicker(screen, '#new-booking-date', 'Data', 'YYYY-MM-DD')
+  newPicker(screen, '#new-booking-time', 'Hora', 'HH:mm')
 
   let el = document.createElement('div')
   el.classList.add('flex')
@@ -236,6 +255,12 @@ function removeReservation (place) {
   })
 }
 
+function canBeBooked (type) {
+  return type === 'restaurants' ||
+    type === 'diversions' ||
+    type === 'monuments'
+}
+
 function updatePlaceInfo (screen, name, distance, rating) {
   updateScreenName(name)
   screen.innerHTML = ''
@@ -252,7 +277,7 @@ function updatePlaceInfo (screen, name, distance, rating) {
 
   var place = getPlace(name)
 
-  if (place.kind == 'restaurants' && !place.isReserved) {
+  if (canBeBooked(place.kind) && !place.isReserved) {
     let el = document.createElement('button')
     el.classList.add('blue')
     el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
@@ -261,7 +286,7 @@ function updatePlaceInfo (screen, name, distance, rating) {
       showScreen('restaurant-booking', el)
     })
     screen.appendChild(el)
-  } else if (place.kind == 'restaurants' && place.isReserved) {
+  } else if (canBeBooked(place.kind) && place.isReserved) {
     let el = document.createElement('button')
     el.classList.add('cancel')
     el.innerHTML = `<i class="fas fa-book-open"></i> Cancelar Reserva`
@@ -403,9 +428,9 @@ function clearBudget () {
   document.getElementById('new-budget-submit').classList.add('disabled')
 }
 function clearBooking () {
-  document.getElementById('new-booking-name').value = ''
   document.getElementById('new-booking-people').value = ''
   document.getElementById('new-booking-time').value = ''
+  document.getElementById('new-booking-date').value = ''
   document.getElementById('new-booking-submit').classList.add('disabled')
 }
 
@@ -426,31 +451,25 @@ function validateNewBudget () {
 }
 
 function validateNewBooking () {
-  let name = document.getElementById('new-booking-name').value
-  let value = parseFloat(document.getElementById('new-booking-people').value)
+  let people = document.getElementById('new-booking-people').value
   let hours = document.getElementById('new-booking-time').value
+  let date = document.getElementById('new-booking-date').value
+  let time = `${date} ${hours}`
 
-  var d = new Date()
-  var h = d.getHours()
-  var m = d.getMinutes()
-
-  nowHours = parseFloat(hours.split(':')[0]) * 60 + parseFloat(hours.split(':')[1])
-  console.log(nowHours)
-
-  if (isNaN(nowHours) || (nowHours <= h * 60 + m + 30)) {
+  if (people <= 0 || people > 16 || !hours || !date) {
     return
   }
 
-  if (name === '' || isNaN(value)) {
-    // this shouldn't happen, but we never know!
+  let bookingTime = new Date(time)
+
+  if (bookingTime < new Date(new Date().getTime() + 30 * 60000)) {
     return
   }
 
-  if ((value <= 0) || (value > 16)) {
-    return
+  return {
+    people,
+    time
   }
-
-  return { name, value, hours }
 }
 
 function onNewBookingChange () {
@@ -524,11 +543,11 @@ function createBooking (name) {
   }
   console.log(name)
   confirmationBox({
-    question: `Confirma a reserva para as ${data.hours} de ${data.value} pessoas?`,
+    question: `Confirma a reserva para as ${data.time} de ${data.people} pessoas?`,
     rightHandler: () => {
       var place = getPlace(name)
       place.isReserved = true
-      place.reservationTime = data.hours
+      place.reservationTime = data.time
 
       console.log(getPlace(name))
 
