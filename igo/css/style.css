@@ -293,6 +293,13 @@ body.flashlight #watch {
   color: #0fbcf9;
 }
 
+.green {
+  color: green;
+}
+.reservations {
+  color: rgb(255, 255, 255);
+}
+
 .favourites {
   color: #fff200;
 }

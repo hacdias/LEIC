@@ -112,7 +112,8 @@ const placesIcons = {
   parks: 'tree',
   monuments: 'landmark',
   markets: 'store',
-  diversions: 'chess'
+  diversions: 'chess',
+  reservations: 'book'  
 }
 
 function newPicker (screen, selector, title, format) {
@@ -177,31 +178,47 @@ function getPlaces (kind) {
     return window.data.favourites
   }
 
+  if (kind === 'reservations') {
+    return window.data.reservations
+  }
+
   return window.data.places[kind].sort(distanceSort).map(place => {
     return place
   })
 }
 
-function updatePlaces (screen, kind, title) {
-  const places = getPlaces(kind)
+function updatePlaces (screen, skind, title) {
+  const places = getPlaces(skind)
   screen.innerHTML = ''
 
   updateScreenName(title)
 
-  for (const { name, distance, rating, kind, isReserved, map } of places) {
+  for (const { name, distance, rating, kind, isReserved, map, reservationPeople, reservationTime } of places) {
     let el = document.createElement('div')
     el.classList.add('item')
     if (isReserved) {
       el.classList.add('current')
     }
     el.dataset.args = `${name}#${distance}#${rating}#${map}`
+
     el.innerHTML = `<div>
         <i class="${kind} fas fa-${placesIcons[kind]}"></i>
-      </div>
+      </div>`
+
+    if (skind === 'reservations') {
+      el.innerHTML += `
+      <div>
+        <p>${name}</p>
+        <p><i class="fas fa-book"></i> ${reservationTime} </p>
+      </div>`
+    }
+    else {
+      el.innerHTML += `
       <div>
         <p>${name}</p>
         <p><i class="fas fa-ruler"></i> ${distance}m</p>
       </div>`
+    }
 
     el.addEventListener('click', () => {
       showScreen('place-desc', el)
@@ -242,7 +259,7 @@ function getScore (screen, rating) {
 }
 
 function removeReservation (place) {
-  let name = document.querySelector('#current-screen-name').innerHTML
+  let name = place.name
   console.log(name)
 
   confirmationBox({
@@ -250,6 +267,13 @@ function removeReservation (place) {
     rightClass: 'cancel',
     rightHandler: () => {
       place.isReserved = false
+      var i = 0
+      for (const place of window.data.reservations) {
+        if (place.name == name) {
+          window.data.reservations.splice(i, 1)
+        }
+        i++
+      }
       runAndBack()
     }
   })
@@ -544,13 +568,16 @@ function createBooking (name) {
   }
   console.log(name)
   confirmationBox({
-    question: `Confirma a reserva para as ${data.time} de ${data.people} pessoas?`,
+    question: `Confirma a reserva para ${data.people} pessoas, na data:\n ${data.time} ?`,
     rightHandler: () => {
       var place = getPlace(name)
       place.isReserved = true
+      place.reservationPeople = data.people
       place.reservationTime = data.time
+      window.data.reservations.push(place)
 
       console.log(getPlace(name))
+      console.log(window.data.reservations)
 
       runAndBack(clearBooking)
     }

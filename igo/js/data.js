@@ -45,7 +45,8 @@ window.data = {
         price: 25,
         kind: 'restaurants',
         isReserved: false,
-        reservationTime: '00:00'
+        reservationTime: '00:00',
+        reservationPeople: 0
       },
       {
         name: 'Monte do Zé',
@@ -54,7 +55,8 @@ window.data = {
         price: 7.5,
         kind: 'restaurants',
         isReserved: false,
-        reservationTime: '00:00'
+        reservationTime: '00:00',
+        reservationPeople: 0
       },
       {
         name: 'Sabores do Mar',
@@ -63,7 +65,8 @@ window.data = {
         price: 13,
         kind: 'restaurants',
         isReserved: false,
-        reservationTime: '00:00'
+        reservationTime: '00:00',
+        reservationPeople: 0
       },
       {
         name: 'Prego no Espeto',
@@ -72,7 +75,8 @@ window.data = {
         price: 6,
         kind: 'restaurants',
         isReserved: false,
-        reservationTime: '00:00'
+        reservationTime: '00:00',
+        reservationPeople: 0
       }
     ],
     parks: [
@@ -118,19 +122,28 @@ window.data = {
         name: 'Templo de Diana',
         distance: 1350,
         rating: 5,
-        kind: 'monuments'
+        kind: 'monuments',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
       },
       {
         name: 'Torre de Belém',
         distance: 135,
         rating: 3.5,
-        kind: 'monuments'
+        kind: 'monuments',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
       },
       {
         name: 'Notre Dame',
         distance: 350,
         rating: 4,
-        kind: 'monuments'
+        kind: 'monuments',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
       }
     ],
     markets: [
@@ -146,12 +159,16 @@ window.data = {
         name: 'Euro Fun',
         distance: 450,
         rating: 3.5,
-        kind: 'diversions'
+        kind: 'diversions',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
       }
     ]
   },
   favourites: [],
   recommended: [],
+  reservations: [],
   currentBudget: null,
   budgets: [
     {
@@ -240,6 +257,6 @@ window.data = {
 
 for (const key in window.data.places) {
   for (let i = 0; i < window.data.places[key].length; i++) {
-    window.data.places[key][i].map = Math.floor(Math.random() * 17) + 1
+    window.data.places[key][i].map = Math.floor(Math.random() * 16) + 1
   }
 }
