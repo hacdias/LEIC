@@ -803,6 +803,19 @@ function showGpsPath (screen, name, distance, map) {
   console.log(screen, name, distance, map)
 }
 
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+function startGpsAnimation () {
+  /*
+  screen.style.backgroundImage = `url(./assets/maps/${map}.png)`
+  
+  sleep(2000).then(() => {
+    screen.style.backgroundImage = `url(./assets/route1.png)`
+  })*/
+}
+
 function startup () {
   setClocks()
   createRecommended()

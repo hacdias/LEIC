@@ -612,10 +612,15 @@ button:active {
   z-index: 1;
 }
 
+#gpsGo {
+  background-image: url(../assets/maps/1.png);
+  background-size: 100% 100%;
+}
+
 .destination {
   position: absolute;
-  bottom: 0.85em;
-  left: 4.85em;
+  top: 1.67em;
+  left: 2.37em;
   color: #f00;
   -webkit-text-stroke: 1px #000;
 }

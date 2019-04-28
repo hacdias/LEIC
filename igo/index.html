@@ -72,8 +72,12 @@
         </div>
         
         <div class="screen" data-call="showGpsPath" id="gps-path" data-name="Percurso">
-          <button id="start-route-button">Ir</button>
+          <button id="start-route-button" class="goto" data-to="gpsGo">Ir</button>
         </div>
+				
+				<div class="screen" id="gpsGo" data-name="Percurso">
+					<i class="destination fas fa-map-marker"></i>
+				</div>
 
         <div class="screen" id="places" data-name="Locais">
           <div class="item category goto" data-to="places-list" data-args="recommended#Recomendados">

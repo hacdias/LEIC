@@ -234,7 +234,8 @@ window.data = {
         }
       ]
     }
-  ]
+  ],
+  marker_positions: [[[1.67, 2.37], [5.65, 3.87], [7.80, 4.87]], ]
 }
 
 for (const key in window.data.places) {
