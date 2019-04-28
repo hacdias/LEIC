@@ -443,7 +443,6 @@ function runAndBack (...fns) {
   for (const fn of fns) {
     fn()
   }
-
   showScreen('--back')
 }
 
@@ -826,21 +825,46 @@ function createRecommended () {
 
 // TODO: change
 function showGpsPath (screen, name, distance, map) {
+
+  screen.innerHTML = ""
+
   screen.style.backgroundImage = `url(./assets/maps/${map}.png)`
   console.log(screen, name, distance, map)
+
+  let el = document.createElement('button')
+  el.classList.add('goto')
+  el.setAttribute('id', 'start-route-button')
+  el.dataset.args = `${name}#${distance}#${map}`
+  el.innerHTML = `Começar`
+
+  el.addEventListener('click', () => {
+    startGpsAnimation(screen, name, distance, map, 0)
+  })
+  screen.appendChild(el)
+
 }
 
-const sleep = (milliseconds) => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
+function startGpsAnimation (screen, name, distance, map, i) {
 
-function startGpsAnimation () {
-  /*
-  screen.style.backgroundImage = `url(./assets/maps/${map}.png)`
+  screen.innerHTML = ""
   
-  sleep(2000).then(() => {
-    screen.style.backgroundImage = `url(./assets/route1.png)`
-  })*/
+  screen.style.backgroundImage = `url(./assets/maps/${map}-${i}.png)`
+  i++
+  console.log(i)
+  if (i <= 10) {
+    setTimeout(function() {startGpsAnimation(screen, name, distance, map, i)}, 1000)
+  }
+  else {
+    let el = document.createElement('button')
+    el.classList.add('goto')
+    el.setAttribute('id', 'end-route-button')
+    el.innerHTML = `Concluir`
+
+    el.addEventListener('click', () => {
+      runAndBack()
+    })
+    screen.appendChild(el)
+  }
 }
 
 function startup () {
