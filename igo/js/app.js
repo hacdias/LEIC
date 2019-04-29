@@ -113,7 +113,7 @@ const placesIcons = {
   monuments: 'landmark',
   markets: 'store',
   diversions: 'chess',
-  reservations: 'book'  
+  reservations: 'book'
 }
 
 function newPicker (screen, selector, title, format) {
@@ -838,33 +838,39 @@ function showGpsPath (screen, name, distance, map) {
   el.innerHTML = `Começar`
 
   el.addEventListener('click', () => {
-    startGpsAnimation(screen, name, distance, map, 0)
+    startGpsAnimation(screen, map)
   })
   screen.appendChild(el)
-
 }
 
-function startGpsAnimation (screen, name, distance, map, i) {
+function startGpsAnimation (screen, map) {
+  screen.innerHTML = ''
+  let i = 0
 
-  screen.innerHTML = ""
-  
-  screen.style.backgroundImage = `url(./assets/maps/${map}-${i}.png)`
-  i++
-  console.log(i)
-  if (i <= 10) {
-    setTimeout(function() {startGpsAnimation(screen, name, distance, map, i)}, 1000)
-  }
-  else {
-    let el = document.createElement('button')
-    el.classList.add('goto')
-    el.setAttribute('id', 'end-route-button')
-    el.innerHTML = `Concluir`
+  const update = () => {
+    if (i < 10) {
+      screen.style.backgroundImage = `url(./assets/maps/${map}-${++i}.png)`
+    } else {
+      let el = document.createElement('button')
+      el.classList.add('goto')
+      el.setAttribute('id', 'end-route-button')
+      el.innerHTML = `Concluir`
 
-    el.addEventListener('click', () => {
-      runAndBack()
-    })
-    screen.appendChild(el)
+      el.addEventListener('click', () => {
+        runAndBack()
+      })
+      screen.appendChild(el)
+    }
   }
+
+  const interval = setInterval(update, 1000)
+
+  const stop = () => {
+    clearInterval(interval)
+    document.querySelector('[data-to=--back]').removeEventListener('click', stop)
+  }
+
+  document.querySelector('[data-to=--back]').addEventListener('click', stop)
 }
 
 function startup () {
