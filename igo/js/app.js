@@ -873,7 +873,23 @@ function startGpsAnimation (screen, map) {
   document.querySelector('[data-to=--back]').addEventListener('click', stop)
 }
 
+let images = []
+function preload () {
+  for (let i = 1; i < 16; i++) {
+    let m = new Image()
+    m.src = `./assets/maps/${i}.png`
+    images.push(m)
+
+    for (let j = 0; j <= 10; j++) {
+      let p = new Image()
+      p.src = `./assets/maps/${i}-${j}.png`
+      images.push(p)
+    }
+  }
+}
+
 function startup () {
+  preload()
   setClocks()
   createRecommended()
 
