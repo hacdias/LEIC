@@ -3,37 +3,79 @@ window.data = {
     {
       name: 'Maria João',
       distance: 100,
-      picture: 'maria_joao.png'
+      picture: 'maria_joao.png',
+      phone: '+351 946 765 435',
+      lastSeen: 14, // minutos
+      messages: []
     },
     {
       name: 'Manuel Jesus',
       distance: 135,
-      picture: 'manuel_jesus.png'
+      picture: 'manuel_jesus.png',
+      phone: '+351 945 345 234',
+      lastSeen: 13, // minutos,
+      messages: [],
+      calls: [{
+        time: new Date(),
+        incoming: false,
+        missed: false,
+        duration: 23 // minutes
+      }]
     },
     {
       name: 'Tiago Barroso',
       distance: 15,
-      picture: 'tiago_barroso.jpg'
+      picture: 'tiago_barroso.jpg',
+      phone: '+351 946 234 346',
+      lastSeen: 12, // minutos,
+      messages: [{
+        from: true,
+        message: 'Alô. Já chegaste?'
+      },
+      {
+        message: 'Estou quase'
+      }],
+      calls: []
     },
     {
       name: 'Isabel Soares',
       distance: 25,
-      picture: 'isabel_soares.jpg'
+      picture: 'isabel_soares.jpg',
+      phone: '+351 956 765 338',
+      lastSeen: 74, // minutos,
+      messages: [],
+      calls: []
     },
     {
       name: 'Ana Silva',
       distance: 4,
-      picture: 'ana_silva.jpg'
+      picture: 'ana_silva.jpg',
+      phone: '+351 276 345 897',
+      lastSeen: 589, // minutos,
+      messages: [],
+      calls: [{
+        time: new Date(),
+        incoming: true,
+        missed: true
+      }]
     },
     {
       name: 'Avó Celeste',
       distance: 32,
-      picture: 'avo_celeste.jpg'
+      picture: 'avo_celeste.jpg',
+      phone: '+351 933 453 876',
+      lastSeen: 239, // minutos,
+      messages: [],
+      calls: []
     },
     {
       name: 'Primo Joaquim',
       distance: 45,
-      picture: 'joaquim_fonseca.jpg'
+      picture: 'joaquim_fonseca.jpg',
+      phone: '+351 946 765 435',
+      lastSeen: 234,
+      messages: [],
+      calls: []
     }
   ],
   places: {
@@ -261,8 +303,7 @@ window.data = {
         }
       ]
     }
-  ],
-  marker_positions: [[[1.67, 2.37], [5.65, 3.87], [7.80, 4.87]], ]
+  ]
 }
 
 for (const key in window.data.places) {
