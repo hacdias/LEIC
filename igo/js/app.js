@@ -129,7 +129,7 @@ function newPicker (screen, selector, title, format) {
   })
 }
 
-function bookRestaurant (screen, name) {
+function bookRestaurant (screen, name, price) {
   screen.innerHTML = `
   <input placeholder="Pessoas (12 máx)" type="text" id="new-booking-people" onchange="onNewBookingChange()"></input>
   <div>
@@ -161,7 +161,7 @@ function bookRestaurant (screen, name) {
   el2.classList.add('ok')
   el2.classList.add('disabled')
   el2.addEventListener('click', () => {
-    createBooking(name)
+    createBooking(name, price)
   })
   el2.innerHTML = `Reservar`
 
@@ -193,13 +193,13 @@ function updatePlaces (screen, skind, title) {
 
   updateScreenName(title)
 
-  for (const { name, distance, rating, kind, isReserved, map, reservationPeople, reservationTime } of places) {
+  for (const { name, distance, rating, kind, price = 0, isReserved, map, reservationTime } of places) {
     let el = document.createElement('div')
     el.classList.add('item')
     if (isReserved) {
       el.classList.add('current')
     }
-    el.dataset.args = `${name}#${distance}#${rating}#${map}`
+    el.dataset.args = `${name}#${distance}#${rating}#${map}#${price}`
 
     el.innerHTML = `<div>
         <i class="${kind} fas fa-${placesIcons[kind]}"></i>
@@ -211,8 +211,7 @@ function updatePlaces (screen, skind, title) {
         <p>${name}</p>
         <p><i class="fas fa-book"></i> ${reservationTime} </p>
       </div>`
-    }
-    else {
+    } else {
       el.innerHTML += `
       <div>
         <p>${name}</p>
@@ -285,11 +284,15 @@ function canBeBooked (type) {
     type === 'monuments'
 }
 
-function updatePlaceInfo (screen, name, distance, rating, map) {
+function updatePlaceInfo (screen, name, distance, rating, map, price) {
   updateScreenName(name)
   screen.innerHTML = ''
 
   getScore(screen, rating)
+
+  if (price != 0) {
+    screen.innerHTML += `<p style="margin: 0.5em 0;font-size: 0.8em;">${numberWithSpaces(price)}€ por pessoa.</p>`
+  }
 
   let el1 = document.createElement('button')
   el1.classList.add('blue')
@@ -306,7 +309,7 @@ function updatePlaceInfo (screen, name, distance, rating, map) {
     let el = document.createElement('button')
     el.classList.add('blue')
     el.innerHTML = `<i class="fas fa-book-open"></i> Reservar`
-    el.dataset.args = `${name}`
+    el.dataset.args = `${name}#${price}`
     el.addEventListener('click', () => {
       showScreen('restaurant-booking', el)
     })
@@ -315,7 +318,7 @@ function updatePlaceInfo (screen, name, distance, rating, map) {
     let el = document.createElement('button')
     el.classList.add('cancel')
     el.innerHTML = `<i class="fas fa-book-open"></i> Cancelar Reserva`
-    el.dataset.args = `${name}`
+    el.dataset.args = `${name}#${price}`
     el.addEventListener('click', () => {
       removeReservation(place)
     })
@@ -559,15 +562,15 @@ function confirmationBox ({
   rightButton.addEventListener('click', rightAction)
 }
 
-function createBooking (name) {
+function createBooking (name, price) {
   let data = validateNewBooking()
   if (!data) {
     // this shouldn't happen, but we never know!
     return
   }
-  console.log(name)
+
   confirmationBox({
-    question: `Confirma a reserva para ${data.people} pessoas, na data:\n ${data.time} ?`,
+    question: `Confirma a reserva para ${data.people} pessoas, na data:\n ${data.time}? Terá o custo total de ${numberWithSpaces(data.people * price)}€.`,
     rightHandler: () => {
       var place = getPlace(name)
       place.isReserved = true
@@ -575,8 +578,12 @@ function createBooking (name) {
       place.reservationTime = data.time
       window.data.reservations.push(place)
 
-      console.log(getPlace(name))
-      console.log(window.data.reservations)
+      if (window.data.currentBudget) {
+        window.data.currentBudget.expenses.push({
+          name,
+          value: data.people * price
+        })
+      }
 
       runAndBack(clearBooking)
     }
@@ -825,8 +832,7 @@ function createRecommended () {
 
 // TODO: change
 function showGpsPath (screen, name, distance, map) {
-
-  screen.innerHTML = ""
+  screen.innerHTML = ''
 
   screen.style.backgroundImage = `url(./assets/maps/${map}.png)`
   console.log(screen, name, distance, map)

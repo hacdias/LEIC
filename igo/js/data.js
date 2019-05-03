@@ -122,6 +122,7 @@ window.data = {
         name: 'Templo de Diana',
         distance: 1350,
         rating: 5,
+        price: 3,
         kind: 'monuments',
         isReserved: false,
         reservationTime: '00:00',
@@ -131,6 +132,7 @@ window.data = {
         name: 'Torre de Belém',
         distance: 135,
         rating: 3.5,
+        price: 1.5,
         kind: 'monuments',
         isReserved: false,
         reservationTime: '00:00',
@@ -140,6 +142,7 @@ window.data = {
         name: 'Notre Dame',
         distance: 350,
         rating: 4,
+        price: 2,
         kind: 'monuments',
         isReserved: false,
         reservationTime: '00:00',
@@ -159,6 +162,7 @@ window.data = {
         name: 'Euro Fun',
         distance: 450,
         rating: 3.5,
+        price: 7,
         kind: 'diversions',
         isReserved: false,
         reservationTime: '00:00',
@@ -169,7 +173,13 @@ window.data = {
   favourites: [],
   recommended: [],
   reservations: [],
-  currentBudget: null,
+  currentBudget: {
+    id: uuidv4(),
+    name: 'Viagem ao Técnico',
+    date: new Date(),
+    budget: 5000,
+    expenses: []
+  },
   budgets: [
     {
       id: uuidv4(),
