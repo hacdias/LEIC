@@ -36,15 +36,15 @@ function startGpsRoute (screen, id) {
       screen.style.backgroundImage = `url(./assets/maps/${place.map}-${++i}.png)`
     } else {
       screen.querySelector('button').classList.remove('dn')
-      stop()
+      stop(true)
     }
   }
 
   const interval = setInterval(update, 1000)
 
-  const stop = () => {
+  const stop = (noBack = false) => {
     clearInterval(interval)
-    runAndBack()
+    if (!noBack) runAndBack()
     document.querySelector('[data-to=--back]').removeEventListener('click', stop)
   }
 
