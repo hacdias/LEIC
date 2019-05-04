@@ -116,6 +116,7 @@ function getScore (container, rating) {
 
 function fillPlaceDesc (screen, id) {
   const place = getPlace(id)
+  updateScreenName(place.name)
 
   getScore(screen.querySelector('.rating'), place.rating)
 
