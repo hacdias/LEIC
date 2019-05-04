@@ -198,7 +198,6 @@ function fillBookingDetails (screen, id) {
   window.alert('TODO: ADD NEW PICKER')
 
   /* TODO
-    newPicker(screen, '#new-booking-people', 'Pessoas', 'MM')
     newPicker(screen, '#new-booking-date', 'Data', 'YYYY-MM-DD')
     newPicker(screen, '#new-booking-time', 'Hora', 'HH:mm')
   */
@@ -303,4 +302,8 @@ function removeFavourite (el) {
       runAndBack()
     }
   })
+}
+
+function placesBootstrap () {
+  enableKeybaordFor(document.getElementById('new-booking-people'), false)
 }

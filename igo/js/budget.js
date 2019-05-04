@@ -3,7 +3,9 @@
 
 function budgetBootstrap () {
   enableKeybaordFor(document.getElementById('new-budget-name'))
+  enableKeybaordFor(document.getElementById('new-budget-value'), false)
   enableKeybaordFor(document.getElementById('new-expense-name'))
+  enableKeybaordFor(document.getElementById('new-expense-value'), false)
 }
 
 function getTextDate (date) {

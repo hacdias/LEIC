@@ -90,10 +90,14 @@ function createRecommended () {
 }
 
 function startup () {
-  setClocks()
+  setupClock()
+  setupTextKeyboard()
+  setupNumericKeyboard()
+
   createRecommended()
   enableGoto()
 
+  placesBootstrap()
   gpsBootstrap()
   budgetBootstrap()
 

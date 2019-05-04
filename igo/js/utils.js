@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-function setClocks () {
+function setupClock () {
   const norm = i => i < 10 ? `0${i}` : i
   const today = new Date()
   const hour = norm(today.getHours())
@@ -11,7 +11,7 @@ function setClocks () {
     clock.innerHTML = `${hour}:${mins}`
   }
 
-  setTimeout(setClocks, (60 - today.getSeconds()) * 1000)
+  setTimeout(setupClock, (60 - today.getSeconds()) * 1000)
 }
 
 function uuidv4 () {

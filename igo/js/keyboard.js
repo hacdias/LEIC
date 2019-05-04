@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
-function keyboard () {
-  const result = document.querySelector('#keyboard .result')
+function setupTextKeyboard () {
+  const result = document.querySelector('#text-keyboard .result')
 
   var pause = false
   var lPress = false
@@ -27,7 +27,7 @@ function keyboard () {
     '#': []
   }
 
-  document.querySelectorAll('#keyboard .key').forEach(el => {
+  document.querySelectorAll('#text-keyboard .key').forEach(el => {
     el.addEventListener('mousedown', (event) => {
       event.preventDefault()
       lPressTimeout = window.setTimeout(function () {
@@ -64,11 +64,11 @@ function keyboard () {
     })
   })
 
-  document.querySelector('#keyboard .backspace').addEventListener('mouseup', event => {
+  document.querySelector('#text-keyboard .backspace').addEventListener('mouseup', event => {
     result.value = result.value.substr(0, result.value.length - 1)
   })
 
-  document.querySelector('#keyboard .space').addEventListener('mouseup', event => {
+  document.querySelector('#text-keyboard .space').addEventListener('mouseup', event => {
     result.value = result.value + ' '
   })
 
@@ -106,10 +106,23 @@ function keyboard () {
   }
 }
 
-keyboard()
+function setupNumericKeyboard () {
+  const result = document.querySelector('#num-keyboard .result')
 
-function enableKeybaordFor (element) {
-  let kb = document.querySelector('#keyboard')
+  document.querySelectorAll('#num-keyboard .key').forEach(el => {
+    el.addEventListener('mouseup', (event) => {
+      event.preventDefault()
+      result.value = result.value += event.currentTarget.dataset.value
+    })
+  })
+
+  document.querySelector('#num-keyboard .backspace').addEventListener('mouseup', event => {
+    result.value = result.value.substr(0, result.value.length - 1)
+  })
+}
+
+function enableKeybaordFor (element, text = true) {
+  let kb = document.querySelector(text ? '#text-keyboard' : '#num-keyboard')
   let enter = kb.querySelector('.enter')
   let result = kb.querySelector('.result')
 
@@ -132,5 +145,3 @@ function enableKeybaordFor (element) {
     enter.addEventListener('mouseup', leave)
   })
 }
-
-// TODO: number keyboard
