@@ -24,6 +24,7 @@
       </div>
 
       <div id="screen-space">
+        <!-- Lock Screen -->
         <div class="screen" id="lockscreen">
           <div class="clock"></div>
           <span class="goto" data-to="mainmenu">
@@ -31,19 +32,47 @@
           </span>
         </div>
 
+        <!-- Main Menu -->
         <div class="screen" id="mainmenu">
           <ul>
             <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
             <li class="goto" data-to="gps"><i class="fas fa-map-marked-alt"></i></li>
             <li class="goto" data-to="places"><i class="fas fa-map-pin"></i></li>
-            <li class="goto" data-to="budget"><i class="fas fa-donate"></i></li>
+            <li class="goto" data-to="budget-list"><i class="fas fa-donate"></i></li>
             <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
             <li class="goto" data-to="faq"><i class="fas fa-question"></i></li>
           </ul>
         </div>
 
+        <!-- People Menu -->
         <div class="screen" id="people" data-name="Amigos" data-call="updatePeople">
-          <!-- Faces Go Here -->
+          <template>
+            <div class="tpl item goto" data-to="person-info">
+              <div>
+                <img class="picture" src="assets/people/${picture}">
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas fa-ruler"></i> <span class="distance"></span>m</p>
+              </div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+        </div>
+
+        <!-- Person Info -->
+        <div class="screen" id="person-info" data-call="updatePersonDetails">
+          <p class="name">Primo Joaquim</p>
+          <div>
+            <img class="picture" src="assets/people/joaquim_fonseca.JPG">
+            <div>
+              <p class="phone">+351 968 899 886</p>
+              <p><i class="fas fa-ruler"></i> <span class="distance">4m</p>
+              <p><i class="fas fa-clock"></i> <span class="last-seen">5 mins atrás</span></p>
+            </div>
+          </div>
         </div>
 
         <div class="screen" id="places-list" data-call="updatePlaces">
@@ -55,7 +84,7 @@
         </div>
 
         <div class="screen" id="restaurant-booking" data-name="Reservar" data-call="bookRestaurant">
-          
+
         </div>
 
         <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
@@ -70,11 +99,11 @@
 
           <ul class="gps-results"></ul>
         </div>
-        
+
         <div class="screen" data-call="showGpsPath" id="gps-path" data-name="Percurso">
           <button id="start-route-button" class="goto" data-to="gpsGo">Ir</button>
         </div>
-				
+
 				<div class="screen" id="gpsGo" data-call="startGpsAnimation" data-name="Percurso">
 					<i class="destination fas fa-map-marker"></i>
 				</div>
@@ -121,30 +150,63 @@
           </div>
         </div>
 
-        <div class="screen" id="budget" data-call="listBudgets" data-name="Orçamentos">
+        <!-- Budget List -->
+        <div class="screen" id="budget-list" data-call="fillBudgetList" data-name="Orçamentos">
           <button class="goto blue" data-to="create-budget" id="new-budget-button">
             <i class="fas fa-plus"></i> Novo Orçamento
           </button>
 
-          <div id="budget-list">
+          <template>
+            <div class="tpl item goto" data-to="budget-desc">
+              <div>
+                <i class="fas fa-plane"></i>
+              </div>
+              <div>
+                <p class="name">NAME</p>
+                <p><i class="far fa-calendar-alt"></i> <span class="date">DATE</span></p>
+              </div>
+            </div>
+          </template>
 
+          <div class="content">
+            <!-- Content goes here -->
           </div>
         </div>
 
-        <div class="screen" id="budget-desc" data-call="showBudget" data-name="">
+        <div class="screen" id="budget-desc" data-call="fillBudgetDesc">
           <div id="budget-bar">
             <div></div>
             <span id="budget-spent"></span>
             <span id="budget-max"></span>
           </div>
 
-          <button class="blue only-current goto" data-to="create-expense"><i class="fas fa-money-bill"></i> Nova Despesa</button>
+          <button class="blue only-current goto" data-to="create-expense">
+            <i class="fas fa-money-bill"></i> Nova Despesa
+          </button>
 
-          <div id="budget-expenses"></div>
+          <div id="budget-expenses">
+            <template>
+              <div class="tpl expense">
+                <div>
+                  <p class="name">${name}</p>
+                  <p>Despesa: <span class="value"></span> €</p>
+                </div>
+              </div>
+            </template>
+
+            <div class="content">
+              <!-- Expenses go here -->
+            </div>
+          </div>
 
           <div id="budget-actions" class="only-current">
-            <button class="blue" onclick="endBudget()" ><i class="fas fa-book-open"></i> Concluir Viagem</button>
-            <button class="cancel" onclick="deleteBudget()"><i class="fas fa-trash-alt"></i> Apagar</button>
+            <button class="blue" onclick="endBudget()" >
+              <i class="fas fa-book-open"></i> Concluir Viagem
+            </button>
+
+            <button class="cancel" onclick="deleteBudget()">
+              <i class="fas fa-trash-alt"></i> Apagar
+            </button>
           </div>
         </div>
 
@@ -226,6 +288,8 @@
   <script src="./js/picker.min.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/data.js"></script>
+  <script src="./js/budget.js"></script>
+  <script src="./js/people.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

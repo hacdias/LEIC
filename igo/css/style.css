@@ -320,6 +320,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
+#person-info,
 #restaurant-booking, #faq, #create-expense, #create-budget, #place-desc, #budget-desc {
   padding: 0.5em;
 }
@@ -476,7 +477,7 @@ button:active {
   width: 48%;
 }
 
-#budget .current {
+#budget-list .current {
   color: #2ecc71;
 }
 
@@ -806,4 +807,28 @@ button:active {
 
 .gps-results li:hover {
   background: rgba(0, 0, 0, 0.05)
+}
+
+#person-info > div {
+  display: flex;
+}
+
+#person-info img {
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  margin-right: 0.5em;
+}
+
+#person-info p {
+  margin: 0;
+}
+
+#person-info .name {
+  font-size: 1.4em;
+}
+
+#person-info .phone {
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.8);
 }

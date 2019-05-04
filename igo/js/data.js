@@ -1,6 +1,7 @@
 window.data = {
   people: [
     {
+      id: uuidv4(),
       name: 'Maria João',
       distance: 100,
       picture: 'maria_joao.png',
@@ -9,6 +10,7 @@ window.data = {
       messages: []
     },
     {
+      id: uuidv4(),
       name: 'Manuel Jesus',
       distance: 135,
       picture: 'manuel_jesus.png',
@@ -23,6 +25,7 @@ window.data = {
       }]
     },
     {
+      id: uuidv4(),
       name: 'Tiago Barroso',
       distance: 15,
       picture: 'tiago_barroso.jpg',
@@ -38,6 +41,7 @@ window.data = {
       calls: []
     },
     {
+      id: uuidv4(),
       name: 'Isabel Soares',
       distance: 25,
       picture: 'isabel_soares.jpg',
@@ -47,6 +51,7 @@ window.data = {
       calls: []
     },
     {
+      id: uuidv4(),
       name: 'Ana Silva',
       distance: 4,
       picture: 'ana_silva.jpg',
@@ -60,6 +65,7 @@ window.data = {
       }]
     },
     {
+      id: uuidv4(),
       name: 'Avó Celeste',
       distance: 32,
       picture: 'avo_celeste.jpg',
@@ -69,6 +75,7 @@ window.data = {
       calls: []
     },
     {
+      id: uuidv4(),
       name: 'Primo Joaquim',
       distance: 45,
       picture: 'joaquim_fonseca.jpg',

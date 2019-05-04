@@ -14,16 +14,6 @@ function setClocks () {
 
 let history = []
 
-function updateScreenName (name) {
-  document.querySelector('#current-screen-name').innerHTML = name
-}
-
-function numberWithSpaces (x) {
-  var parts = x.toString().split('.')
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-  return parts.join('.')
-}
-
 function showScreen (name, el) {
   let args = (el ? (el.dataset.args || '') : '').trim().split('#')
 
@@ -82,29 +72,6 @@ function turnOnFlashLight (screen) {
 
 function distanceSort (a, b) {
   return a.distance - b.distance
-}
-
-function updatePeople (screen) {
-  const people = window.data.people.sort(distanceSort)
-  screen.innerHTML = ''
-
-  for (const { name, distance, picture } of people) {
-    let el = document.createElement('div')
-    el.classList.add('item')
-    el.innerHTML = `<div>
-        <img src="assets/people/${picture}">
-      </div>
-      <div>
-        <p>${name}</p>
-        <p><i class="fas fa-ruler"></i> ${distance}m</p>
-      </div>`
-
-    el.addEventListener('click', () => {
-      window.alert('Não implementado: visitar ' + name)
-    })
-
-    screen.appendChild(el)
-  }
 }
 
 const placesIcons = {
@@ -432,16 +399,6 @@ function removeFavourite () {
   })
 }
 
-function getBudgets () {
-  return window.data.budgets.sort((a, b) => {
-    if (a.active && !b.active) return 1
-    if (b.active && !a.active) return 1
-    if (a.date > b.date) return -1
-    if (b.date > a.date) return 1
-    return 0
-  })
-}
-
 function runAndBack (...fns) {
   for (const fn of fns) {
     fn()
@@ -449,32 +406,11 @@ function runAndBack (...fns) {
   showScreen('--back')
 }
 
-function clearBudget () {
-  document.getElementById('new-budget-name').value = ''
-  document.getElementById('new-budget-value').value = ''
-  document.getElementById('new-budget-submit').classList.add('disabled')
-}
 function clearBooking () {
   document.getElementById('new-booking-people').value = ''
   document.getElementById('new-booking-time').value = ''
   document.getElementById('new-booking-date').value = ''
   document.getElementById('new-booking-submit').classList.add('disabled')
-}
-
-function validateNewBudget () {
-  let name = document.getElementById('new-budget-name').value
-  let value = parseFloat(document.getElementById('new-budget-value').value)
-
-  if (name === '' || isNaN(value)) {
-    // this shouldn't happen, but we never know!
-    return
-  }
-
-  if (value <= 0) {
-    return
-  }
-
-  return { name, value }
 }
 
 function validateNewBooking () {
@@ -507,61 +443,6 @@ function onNewBookingChange () {
   }
 }
 
-function onNewBudgetChange () {
-  if (validateNewBudget()) {
-    document.getElementById('new-budget-submit').classList.remove('disabled')
-  } else {
-    document.getElementById('new-budget-submit').classList.add('disabled')
-  }
-}
-
-function confirmationBox ({
-  question,
-  leftMsg = 'Não',
-  rightMsg = 'Sim',
-  leftClass = '',
-  rightClass = 'ok',
-  leftHandler,
-  rightHandler,
-  anywaysHandler
-}) {
-  const overlay = document.getElementById('overlay')
-  const box = document.getElementById('confirmation-box')
-  const leftButton = box.querySelector('#left-confirm')
-  const rightButton = box.querySelector('#right-confirm')
-
-  overlay.classList.add('active')
-  box.classList.add('active')
-
-  box.querySelector('p').innerHTML = question
-  leftButton.innerHTML = leftMsg
-  rightButton.innerHTML = rightMsg
-  leftButton.className = leftClass
-  rightButton.className = rightClass
-
-  const reset = () => {
-    leftButton.removeEventListener('click', leftAction)
-    rightButton.removeEventListener('click', rightAction)
-    overlay.classList.remove('active')
-    box.classList.remove('active')
-  }
-
-  const leftAction = () => {
-    if (leftHandler) leftHandler()
-    if (anywaysHandler) anywaysHandler()
-    reset()
-  }
-
-  const rightAction = () => {
-    if (rightHandler) rightHandler()
-    if (anywaysHandler) anywaysHandler()
-    reset()
-  }
-
-  leftButton.addEventListener('click', leftAction)
-  rightButton.addEventListener('click', rightAction)
-}
-
 function createBooking (name, price) {
   let data = validateNewBooking()
   if (!data) {
@@ -590,221 +471,10 @@ function createBooking (name, price) {
   })
 }
 
-function createBudget () {
-  if (window.data.currentBudget) {
-    // this shouldn't happen, but we never know!
-    return
-  }
-
-  let data = validateNewBudget()
-  if (!data) {
-    // this shouldn't happen, but we never know!
-    return
-  }
-
-  confirmationBox({
-    question: `Confirma a criação de um orçamento de valor ${numberWithSpaces(data.value)} €?`,
-    rightHandler: () => {
-      window.data.currentBudget = {
-        id: uuidv4(),
-        name: data.name,
-        budget: data.value,
-        date: new Date(),
-        expenses: []
-      }
-
-      runAndBack(clearBudget)
-    }
-  })
-}
-
-function deleteBudget () {
-  confirmationBox({
-    question: `Deseja remover o orçamento atual?`,
-    rightClass: 'cancel',
-    rightHandler: () => {
-      window.data.currentBudget = null
-      runAndBack()
-    }
-  })
-}
-
-function endBudget () {
-  confirmationBox({
-    question: `Deseja terminar a viagem atual?`,
-    rightHandler: () => {
-      window.data.budgets.push(window.data.currentBudget)
-      window.data.currentBudget = null
-      runAndBack()
-    }
-  })
-}
-
 function getTextDate (date) {
   const year = date.getFullYear()
   const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()
   return `${year} - ${month}`
-}
-
-function getBudgetElement ({ id, name, date }, current = false) {
-  let el = document.createElement('div')
-  el.classList.add('item')
-  if (current) el.classList.add('current')
-  el.dataset.args = `${id}#${current}`
-  el.innerHTML = `<div>
-      <i class="fas fa-plane"></i>
-    </div>
-    <div>
-      <p>${name}</p>
-      <p><i class="far fa-calendar-alt"></i> ${getTextDate(date)}</p>
-    </div>`
-
-  el.addEventListener('click', () => {
-    showScreen('budget-desc', el)
-  })
-
-  return el
-}
-
-function listBudgets (screen) {
-  let budgets = getBudgets()
-  console.log(window.data.currentBudget)
-
-  let budgetsDiv = screen.querySelector('#budget-list')
-
-  budgetsDiv.innerHTML = ''
-
-  if (window.data.currentBudget === null) {
-    document.getElementById('new-budget-button').classList.remove('dn')
-  } else {
-    document.getElementById('new-budget-button').classList.add('dn')
-    budgetsDiv.appendChild(getBudgetElement(window.data.currentBudget, true))
-  }
-
-  for (const budget of budgets) {
-    budgetsDiv.appendChild(getBudgetElement(budget))
-  }
-
-  console.log(budgets)
-}
-
-function clearExpense () {
-  document.getElementById('new-expense-name').value = ''
-  document.getElementById('new-expense-value').value = ''
-  document.getElementById('new-expense-submit').classList.add('disabled')
-}
-
-function validateNewExpense () {
-  let name = document.getElementById('new-expense-name').value
-  let value = parseFloat(document.getElementById('new-expense-value').value)
-
-  if (name === '' || isNaN(value) || value <= 0) {
-    return
-  }
-
-  return { name, value }
-}
-
-function onNewExpenseChange () {
-  if (validateNewExpense()) {
-    document.getElementById('new-expense-submit').classList.remove('disabled')
-  } else {
-    document.getElementById('new-expense-submit').classList.add('disabled')
-  }
-}
-
-function createExpense () {
-  let data = validateNewExpense()
-  if (!data) {
-    // shouldn't happen
-    return
-  }
-
-  const spent = window.data.currentBudget.expenses.reduce((acc, e) => acc + e.value, 0)
-  const overload = spent + data.value > window.data.currentBudget.budget
-
-  let question = `Deseja adicionar uma despesa no valor de ${numberWithSpaces(data.value)} €?`
-  if (overload) {
-    question += ` Irá exceder o orçamento definido de ${numberWithSpaces(window.data.currentBudget.budget)} €.`
-  }
-
-  confirmationBox({
-    question: question,
-    rightClass: overload ? 'cancel' : 'ok',
-    rightHandler: () => {
-      window.data.currentBudget.expenses.push({ ...data })
-      runAndBack(clearExpense)
-    }
-  })
-}
-
-function getBudget (id) {
-  if (window.data.currentBudget && window.data.currentBudget.id === id) {
-    return window.data.currentBudget
-  }
-
-  for (const budget of window.data.budgets) {
-    if (budget.id === id) return budget
-  }
-}
-
-function showBudget (screen, id) {
-  const { name, budget, expenses } = getBudget(id)
-  const isCurrent = window.data.currentBudget && window.data.currentBudget.id === id
-
-  screen.querySelectorAll('.only-current').forEach(el => {
-    if (isCurrent) el.classList.remove('dn')
-    else el.classList.add('dn')
-  })
-
-  updateScreenName(name)
-
-  const expensesDiv = screen.querySelector('#budget-expenses')
-  expensesDiv.innerHTML = ''
-
-  let spent = 0
-  for (const { name, value } of expenses) {
-    let el = document.createElement('div')
-    el.classList.add('expense')
-    el.innerHTML = `<div>
-        <p>${name}</p>
-        <p>Despesa: ${numberWithSpaces(value)} €</p>
-      </div>`
-
-    spent += value
-    expensesDiv.appendChild(el)
-  }
-
-  screen.querySelector('#budget-bar #budget-spent').innerHTML = numberWithSpaces(spent)
-  screen.querySelector('#budget-bar #budget-max').innerHTML = numberWithSpaces(budget)
-
-  if (spent > budget) {
-    screen.querySelector('#budget-bar div').classList.add('excess')
-  } else {
-    screen.querySelector('#budget-bar div').classList.remove('excess')
-    screen.querySelector('#budget-bar div').style.width = `${spent / budget * 100}%`
-  }
-}
-
-function contactless () {
-  const what = window.prompt('Insira o Vendedor')
-  if (!what) return
-  const howMuch = parseFloat(window.prompt('Insira o Valor da Compra'))
-  if (isNaN(howMuch)) return
-
-  confirmationBox({
-    question: `Confirma a compra no valor de ${numberWithSpaces(howMuch)} € no ${what}?`,
-    rightHandler: () => {
-      if (!window.data.currentBudget) {
-        return
-      }
-
-      window.data.currentBudget.expenses.push({
-        name: what,
-        value: howMuch
-      })
-    }
-  })
 }
 
 function createRecommended () {
@@ -899,17 +569,7 @@ function startup () {
   setClocks()
   createRecommended()
 
-  document.querySelectorAll('.goto').forEach(el => {
-    el.addEventListener('click', event => {
-      event.preventDefault()
-
-      if (el.dataset.needsunlock) {
-        if (!history.find(el => el.name === 'mainmenu')) return
-      }
-
-      showScreen(el.dataset.to, el)
-    })
-  })
+  enableGoto()
 
   document.getElementById('gps-input').addEventListener('keyup', event => {
     const value = event.currentTarget.value.toLowerCase()
