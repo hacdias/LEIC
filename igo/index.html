@@ -10,13 +10,39 @@
   <link rel="stylesheet" href="css/fontawesome.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="dn">
   <button id="contacless" onclick="contactless()">
       <img src="assets/contacless.png">
   </button>
 
   <div id="container">
     <div id="watch">
+      <div id="keyboard">
+        <input class="result" type="text"></input>
+        <table>
+          <tr>
+            <td class="key" data-value="1">. , !</td>
+            <td class="key" data-value="2">ABC</td>
+            <td class="key" data-value="3">DEF</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="4">GHI</td>
+            <td class="key" data-value="5">JKL</td>
+            <td class="key" data-value="6">MNO</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="7">PQRS</td>
+            <td class="key" data-value="8">TUV</td>
+            <td class="key" data-value="9">WXYZ</td>
+          </tr>
+          <tr>
+            <td class="backspace"><i class="fas fa-backspace"></i></td>
+            <td class="space">_</td>
+            <td class="enter">↵</td>
+          </tr>
+        </table>
+      </div>
+
       <div id="status">
         <i class="fas fa-signal"></i>
         <span class="clock"></span>
@@ -75,16 +101,75 @@
           </div>
         </div>
 
-        <div class="screen" id="places-list" data-call="updatePlaces">
-          <!-- Places Go Here -->
+        <!-- Places List -->
+        <div class="screen" id="places-list" data-call="fillPlacesList">
+          <template>
+            <div class="tpl item goto" data-to="place-desc">
+              <div>
+                <i class="fas kind-icon"></i>
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas info-icon"></i> <span class="info"></span></p>
+              </div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+          <div class="empty-content">
+            <p>Não há locais nesta categoria.</p>
+          </div>
         </div>
 
-        <div class="screen" id="place-desc" data-call="updatePlaceInfo">
+        <!-- Place Desc -->
+        <div class="screen" id="place-desc" data-call="fillPlaceDesc">
+          <div>
+            <p>Classificação</p>
+            <div class="rating">
+              <!-- Rating goes here -->
+            </div>
+          </div>
 
+          <p class="price-para" style="margin: 0.5em 0; font-size: 0.8em;"><span class="price"></span>€ por pessoa.</p>
+
+          <button class="blue goto-gps" onclick="onGotoGpsClick(this)">
+            <i class="fas fa-directions"></i> Ir
+          </button>
+
+          <button class="book-btn goto blue" data-to="place-booking">
+            <i class="fas fa-book-open"></i> Reservar
+          </button>
+
+          <button class="unbook-btn cancel" onclick="removeReservation(this)">
+            <i class="fas fa-book-open"></i> Cancelar Reserva
+          </button>
+
+          <button class="fav-btn blue" onclick="addFavourite(this)">
+            <i class="fas fa-star"></i> Adicionar aos Favoritos
+          </button>
+
+          <button class="unfav-btn cancel" onclick="removeFavourite(this)">
+            <i class="fas fa-star"></i> Remover dos Favoritos
+          </button>
         </div>
 
-        <div class="screen" id="restaurant-booking" data-name="Reservar" data-call="bookRestaurant">
+        <div class="screen" id="place-booking" data-name="Reservar" data-call="fillBookingDetails">
+          <input placeholder="Pessoas (12 máx)" type="text" id="new-booking-people" onchange="onNewBookingChange()"></input>
+          <div>
+            <input id="new-booking-date" placeholder="Data" type="text" onchange="onNewBookingChange()"></input>
+            <input id="new-booking-time" placeholder="Horas" type="text" onchange="onNewBookingChange()"></input>
+          </div>
 
+          <div class="flex f-50">
+            <button class="cancel" onclick="runAndBack(clearBooking)">
+              Cancelar
+            </button>
+
+            <button class="book-btn ok disabled" onclick="createBooking(this)">
+              Reservar
+            </button>
+          </div>
         </div>
 
         <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
@@ -93,7 +178,7 @@
 
         <div class="screen" id="gps" data-name="GPS">
           <div class="gps-search">
-            <input id="gps-input" placeholder="Insira destino" type="text"></input>
+            <input id="gps-input" placeholder="Insira destino" type="text" oninput="updateGpsResults(this)"></input>
             <span class="fas fa-search goto" data-to="gps-path"></span>
           </div>
 
@@ -101,12 +186,12 @@
         </div>
 
         <div class="screen" data-call="showGpsPath" id="gps-path" data-name="Percurso">
-          <button id="start-route-button" class="goto" data-to="gpsGo">Ir</button>
+          <button id="start-route-button" class="goto" data-to="gps-route">Começar</button>
         </div>
 
-				<div class="screen" id="gpsGo" data-call="startGpsAnimation" data-name="Percurso">
-					<i class="destination fas fa-map-marker"></i>
-				</div>
+        <div class="screen" data-call="startGpsRoute" id="gps-route" data-name="Percurso">
+          <button id="start-route-button" class="dn" onclick="showScreen('mainmenu')">Concluir</button>
+        </div>
 
         <div class="screen" id="places" data-name="Guia">
           <div class="item category goto" data-to="places-list" data-args="reservations#Reservas">
@@ -173,6 +258,7 @@
           </div>
         </div>
 
+        <!-- Budget Description -->
         <div class="screen" id="budget-desc" data-call="fillBudgetDesc">
           <div id="budget-bar">
             <div></div>
@@ -257,38 +343,16 @@
       </div>
     </div>
 
-    <div id="keyboard">
-      <table>
-        <tr>
-          <td></td>
-          <td>ABC</td>
-          <td>DEF</td>
-        </tr>
-        <tr>
-          <td>GHI</td>
-          <td>JKL</td>
-          <td>MNO</td>
-        </tr>
-        <tr>
-          <td>PQRS</td>
-          <td>TUV</td>
-          <td>WXYZ</td>
-        </tr>
-        <tr>
-          <td><i class="fas fa-backspace"></i></td>
-          <td>_</td>
-          <td>↵</td>
-        </tr>
-      </table>
-    </div>
-
     <div class="goto" data-to="mainmenu" data-needsunlock="true" id="mainbutton"></div>
   </div>
 
   <script src="./js/picker.min.js"></script>
+  <script src="./js/keyboard.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/budget.js"></script>
+  <script src="./js/places.js"></script>
+  <script src="./js/gps.js"></script>
   <script src="./js/people.js"></script>
   <script src="./js/app.js"></script>
 </body>

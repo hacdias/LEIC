@@ -1,5 +1,19 @@
 /* eslint-disable no-unused-vars */
 
+function setClocks () {
+  const norm = i => i < 10 ? `0${i}` : i
+  const today = new Date()
+  const hour = norm(today.getHours())
+  const mins = norm(today.getMinutes())
+  const clocks = document.querySelectorAll('.clock')
+
+  for (const clock of clocks) {
+    clock.innerHTML = `${hour}:${mins}`
+  }
+
+  setTimeout(setClocks, (60 - today.getSeconds()) * 1000)
+}
+
 function uuidv4 () {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0; var v = c == 'x' ? r : (r & 0x3 | 0x8)

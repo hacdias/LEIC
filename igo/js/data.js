@@ -88,6 +88,7 @@ window.data = {
   places: {
     restaurants: [
       {
+        id: uuidv4(),
         name: "Tubarão O'Mar",
         distance: 23,
         rating: 4.5,
@@ -98,6 +99,7 @@ window.data = {
         reservationPeople: 0
       },
       {
+        id: uuidv4(),
         name: 'Monte do Zé',
         distance: 89,
         rating: 2.5,
@@ -108,6 +110,7 @@ window.data = {
         reservationPeople: 0
       },
       {
+        id: uuidv4(),
         name: 'Sabores do Mar',
         distance: 55,
         rating: 5,
@@ -118,6 +121,7 @@ window.data = {
         reservationPeople: 0
       },
       {
+        id: uuidv4(),
         name: 'Prego no Espeto',
         distance: 28,
         rating: 4,
@@ -130,36 +134,42 @@ window.data = {
     ],
     parks: [
       {
+        id: uuidv4(),
         name: 'Quinta das Conchas',
         distance: 150,
         rating: 4,
         kind: 'parks'
       },
       {
+        id: uuidv4(),
         name: 'Bela Vista',
         distance: 980,
         rating: 5,
         kind: 'parks'
       },
       {
+        id: uuidv4(),
         name: 'Jardim do Torel',
         distance: 550,
         rating: 2.5,
         kind: 'parks'
       },
       {
+        id: uuidv4(),
         name: 'Eduardo VII',
         distance: 200,
         rating: 5,
         kind: 'parks'
       },
       {
+        id: uuidv4(),
         name: 'Arco do Cego',
         distance: 5,
         rating: 4,
         kind: 'parks'
       },
       {
+        id: uuidv4(),
         name: 'Gulbenkian',
         distance: 150,
         rating: 5,
@@ -168,6 +178,7 @@ window.data = {
     ],
     monuments: [
       {
+        id: uuidv4(),
         name: 'Templo de Diana',
         distance: 1350,
         rating: 5,
@@ -178,6 +189,7 @@ window.data = {
         reservationPeople: 0
       },
       {
+        id: uuidv4(),
         name: 'Torre de Belém',
         distance: 135,
         rating: 3.5,
@@ -188,6 +200,7 @@ window.data = {
         reservationPeople: 0
       },
       {
+        id: uuidv4(),
         name: 'Notre Dame',
         distance: 350,
         rating: 4,
@@ -200,6 +213,7 @@ window.data = {
     ],
     markets: [
       {
+        id: uuidv4(),
         name: 'Mercado da Ribeira',
         distance: 345,
         rating: 4,
@@ -208,6 +222,7 @@ window.data = {
     ],
     diversions: [
       {
+        id: uuidv4(),
         name: 'Euro Fun',
         distance: 450,
         rating: 3.5,

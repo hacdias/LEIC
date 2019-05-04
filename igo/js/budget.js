@@ -1,6 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+function budgetBootstrap () {
+  enableKeybaordFor(document.getElementById('new-budget-name'))
+  enableKeybaordFor(document.getElementById('new-expense-name'))
+}
+
+function getTextDate (date) {
+  const year = date.getFullYear()
+  const month = date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth()
+  return `${year} - ${month}`
+}
+
 function getBudgets () {
   return data.budgets.sort((a, b) => {
     if (a.active && !b.active) return 1
