@@ -206,7 +206,7 @@ function validateNewBooking () {
   let date = document.getElementById('new-booking-date').value
   let time = `${date} ${hours}`
 
-  if (people <= 0 || people > 16 || !hours || !date) {
+  if (!people || people <= 0 || people > 30 || !hours || !date) {
     return
   }
 
