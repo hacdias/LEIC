@@ -171,7 +171,6 @@ function onGotoGpsClick (el) {
   })
 }
 
-/*
 function newPicker (screen, selector, title, format) {
   return new Picker(screen.querySelector(selector), {
     container: document.querySelector('#watch'),
@@ -185,8 +184,6 @@ function newPicker (screen, selector, title, format) {
   })
 }
 
-*/
-
 function clearBooking () {
   document.getElementById('new-booking-people').value = ''
   document.getElementById('new-booking-time').value = ''
@@ -197,10 +194,8 @@ function clearBooking () {
 function fillBookingDetails (screen, id) {
   window.alert('TODO: ADD NEW PICKER')
 
-  /* TODO
-    newPicker(screen, '#new-booking-date', 'Data', 'YYYY-MM-DD')
-    newPicker(screen, '#new-booking-time', 'Hora', 'HH:mm')
-  */
+  newPicker(screen, '#new-booking-date', 'Data', 'YYYY-MM-DD')
+  newPicker(screen, '#new-booking-time', 'Hora', 'HH:mm')
 
   screen.querySelector('.book-btn').dataset.args = id
 }
