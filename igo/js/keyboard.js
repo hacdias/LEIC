@@ -125,13 +125,15 @@ function enableKeybaordFor (element, text = true) {
   let kb = document.querySelector(text ? '#text-keyboard' : '#num-keyboard')
   let enter = kb.querySelector('.enter')
   let result = kb.querySelector('.result')
+  const overlay = document.getElementById('overlay')
 
   element.addEventListener('click', () => {
     kb.classList.add('active')
+    overlay.classList.add('active')
     result.value = element.value
-
     let leave = () => {
       kb.classList.remove('active')
+      overlay.classList.remove('active')
       element.value = result.value
 
       var evt = document.createEvent('HTMLEvents')
@@ -140,8 +142,10 @@ function enableKeybaordFor (element, text = true) {
 
       result.value = ''
       enter.removeEventListener('mouseup', leave)
+      overlay.removeEventListener('click', leave)
     }
 
+    overlay.addEventListener('click', leave)
     enter.addEventListener('mouseup', leave)
   })
 }
