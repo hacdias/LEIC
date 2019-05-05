@@ -173,6 +173,9 @@ function onGotoGpsClick (el) {
 }
 
 function newPicker (screen, selector, title, format) {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() + 30)
+
   return new Picker(screen.querySelector(selector), {
     container: document.querySelector('#watch'),
     text: {
@@ -180,6 +183,8 @@ function newPicker (screen, selector, title, format) {
       cancel: 'Cancelar',
       confirm: 'OK'
     },
+    minDate: now,
+    maxDate: new Date('2020-12-10'),
     format: format,
     rows: 3
   })
