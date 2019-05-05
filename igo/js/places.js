@@ -198,8 +198,6 @@ function clearBooking () {
 }
 
 function fillBookingDetails (screen, id) {
-  window.alert('TODO: ADD NEW PICKER')
-
   newPicker(screen, '#new-booking-date', 'Data', 'YYYY-MM-DD')
   newPicker(screen, '#new-booking-time', 'Hora', 'HH:mm')
 
