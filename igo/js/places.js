@@ -268,7 +268,7 @@ function createBooking (el) {
       if (window.data.currentBudget) {
         window.data.currentBudget.expenses.push({
           name: place.name,
-          value: data.people * el.price
+          value: data.people * place.price
         })
       }
 
