@@ -29,5 +29,13 @@ function updatePersonDetails (screen, id) {
   screen.querySelector('.phone').innerHTML = friend.phone
   screen.querySelector('.distance').innerHTML = friend.distance + 'm'
 
-  window.alert('TODO')
+  console.warn('TODO: add new contact')
+}
+
+function fillMessages (screen, id) {
+  console.warn('TODO: Fill previous emssages, allow send new message')
+}
+
+function fillCalls (screen, id) {
+  console.warn('TODO: Fill previous calls, add call button')
 }

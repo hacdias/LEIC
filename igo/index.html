@@ -111,6 +111,9 @@
               </div>
             </div>
           </template>
+          <button class="book-btn goto blue" data-to="new-person">
+            <i class="fas fa-plus"></i> Novo
+          </button>
           <div class="content">
             <!-- Content goes here -->
           </div>
@@ -127,6 +130,41 @@
               <p><i class="fas fa-clock"></i> <span class="last-seen">5 mins atrás</span></p>
             </div>
           </div>
+
+          <button class="book-btn goto blue" data-to="messages">
+            <i class="fas fa-comments"></i> Mensagens
+          </button>
+
+          <button class="book-btn goto blue" data-to="calls">
+            <i class="fas fa-phone"></i> Chamadas
+          </button>
+        </div>
+
+        <!-- New Person -->
+        <div class="screen" id="new-person" data-name="Novo Contacto">
+
+        </div>
+
+        <!-- Messages -->
+        <div class="screen" id="messages" data-call="fillMessages" data-name="Mensagens">
+          <template>
+            <!-- TODO: message template -->
+          </template>
+          <div class="content">
+            <!-- Messages go here -->
+          </div>
+          <input type="text" />
+        </div>
+
+        <!-- Calls -->
+        <div class="screen" id="calls" data-call="fillCalls" data-name="Chamadas">
+          <template>
+            <!-- TODO: calls template -->
+          </template>
+          <div class="content">
+            <!-- Call history goes here -->
+          </div>
+          <input type="text" />
         </div>
 
         <!-- Places List -->
