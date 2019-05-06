@@ -37,6 +37,13 @@ window.data = {
       },
       {
         message: 'Estou quase'
+      },
+      {
+        message: 'Estou ao pé do Manuel.'
+      },
+      {
+        from: true,
+        message: 'Vou já já'
       }],
       calls: []
     },

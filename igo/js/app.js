@@ -100,6 +100,7 @@ function startup () {
   placesBootstrap()
   gpsBootstrap()
   budgetBootstrap()
+  bootstrapPeople()
 
   showScreen('lockscreen')
 

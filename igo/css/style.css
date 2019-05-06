@@ -322,6 +322,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
+#messages,
 #person-info,
 #place-booking, #faq, #create-expense, #create-budget, #place-desc, #budget-desc {
   padding: 0.5em;
@@ -837,6 +838,7 @@ button:active {
   display: flex;
 }
 
+#messages img,
 #person-info img {
   width: 3em;
   height: 3em;
@@ -855,4 +857,47 @@ button:active {
 #person-info .phone {
   font-size: 0.8em;
   color: rgba(255, 255, 255, 0.8);
+}
+
+#messages .content {position: fixed;top: 1.5em;height: calc(100% - 6em);overflow: auto;}
+
+#messages input {
+ position: fixed;
+ width: calc(100% - 1em);
+ bottom: 1.5em;
+ left: 0.5em;
+}
+
+#messages img {
+  width: 1em;
+  height: 1em;
+  display: none;
+}
+
+#messages .content > div {
+  margin: .6em 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#messages .content > div:first-of-type {
+  margin-top: 0;
+}
+
+#messages .content > div:last-of-type {
+  margin-bottom: 0;
+}
+
+#messages .content > div.from {
+  justify-content: flex-start;
+}
+
+#messages .from img {
+  display: block;
+}
+
+#messages .message {
+  background: #0fbcf9;
+  padding: .3em;
+  border-radius: 0.2em;
 }

@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+function getPerson (id) {
+  return window.data.people.find(p => p.id === id)
+}
+
 function updatePeople (screen) {
   const people = window.data.people.sort(distanceSort)
   const content = screen.querySelector('.content')
@@ -18,6 +22,7 @@ function updatePeople (screen) {
   }
 
   enableGoto(content)
+  console.warn('TODO: add new contact')
 }
 
 function updatePersonDetails (screen, id) {
@@ -28,14 +33,34 @@ function updatePersonDetails (screen, id) {
   screen.querySelector('.picture').src = `assets/people/${friend.picture}`
   screen.querySelector('.phone').innerHTML = friend.phone
   screen.querySelector('.distance').innerHTML = friend.distance + 'm'
-
-  console.warn('TODO: add new contact')
+  screen.querySelector('.msg-btn').dataset.args = id
+  screen.querySelector('.call-btn').dataset.args = id
 }
 
 function fillMessages (screen, id) {
-  console.warn('TODO: Fill previous emssages, allow send new message')
+  const person = getPerson(id)
+  screen.querySelector('input').value = ''
+  const content = screen.querySelector('.content')
+  content.innerHTML = ''
+
+  for (const { message, from } of person.messages) {
+    let el = getListTemplate(screen)
+
+    if (from) el.classList.add('from')
+
+    el.querySelector('.picture').src = `assets/people/${person.picture}`
+    el.querySelector('.message').innerHTML = message
+
+    content.appendChild(el)
+  }
+
+  content.scrollTo(0, content.scrollHeight)
 }
 
 function fillCalls (screen, id) {
   console.warn('TODO: Fill previous calls, add call button')
+}
+
+function bootstrapPeople () {
+  enableKeybaordFor(document.getElementById('msg-kb'))
 }

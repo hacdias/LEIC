@@ -131,29 +131,31 @@
             </div>
           </div>
 
-          <button class="book-btn goto blue" data-to="messages">
+          <button class="msg-btn goto blue" data-to="messages">
             <i class="fas fa-comments"></i> Mensagens
           </button>
 
-          <button class="book-btn goto blue" data-to="calls">
+          <button class="call-btn goto blue" data-to="calls">
             <i class="fas fa-phone"></i> Chamadas
           </button>
         </div>
 
         <!-- New Person -->
         <div class="screen" id="new-person" data-name="Novo Contacto">
-
         </div>
 
         <!-- Messages -->
         <div class="screen" id="messages" data-call="fillMessages" data-name="Mensagens">
           <template>
-            <!-- TODO: message template -->
+            <div class="tpl">
+              <img class="picture" src="">
+              <div class="message"></div>
+            </div>
           </template>
           <div class="content">
             <!-- Messages go here -->
           </div>
-          <input type="text" />
+          <input type="text" id="msg-kb" placeholder="Escreva a mensagem..." />
         </div>
 
         <!-- Calls -->
