@@ -99,8 +99,25 @@ function confirmationBox ({
 }
 
 function showModal (id) {
-  document.getElementById(id).classList.add('visible')
+  let modal = document.getElementById(id)
+
+  modal.classList.add('visible')
   document.querySelector('.overlay-modal').classList.add('visible')
+
+  let select = modal.querySelector('.contact-list')
+  select.innerHTML = ''
+
+  if (select) {
+    data.people.forEach(p => {
+      select.innerHTML += `<option value="${p.id}">${p.name}</option>`
+    })
+  }
+}
+
+function getContactFromForm (form) {
+  let select = form.querySelector('.contact-list')
+  let id = select.options[select.selectedIndex].value
+  return getPerson(id)
 }
 
 async function runModal (fn, form) {

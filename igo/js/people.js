@@ -183,3 +183,21 @@ function bootstrapPeople () {
 function seePersonInMap (el) {
   console.warn('TODO: see person in map')
 }
+
+function simulateCall (form) {
+  let person = getContactFromForm(form)
+
+  console.warn('TODO: simulate receiving call')
+}
+
+function simulateMessage (form) {
+  let person = getContactFromForm(form)
+  let text = form.querySelector('input[type="text"]').value
+
+  person.messages.push({
+    from: true,
+    message: text
+  })
+
+  console.warn('TODO: show badge on messages and refresh current screen just in case')
+}

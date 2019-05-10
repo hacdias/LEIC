@@ -922,6 +922,7 @@ button:active {
   overflow: auto;
   left: 0.5em;
   width: calc(100% - 1em);
+  padding-top: 0.5em;
 }
 
 #messages .input-with-icon {
