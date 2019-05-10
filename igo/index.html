@@ -131,13 +131,14 @@
             </div>
           </div>
 
-          <button class="msg-btn goto blue" data-to="messages">
-            <i class="fas fa-comments"></i> Mensagens
-          </button>
-
-          <button class="call-btn goto blue" data-to="calls">
-            <i class="fas fa-phone"></i> Chamadas
-          </button>
+          <div class="flex f-50">
+            <button class="msg-btn goto blue" data-to="messages">
+              <i class="fas fa-comments"></i>
+            </button>
+            <button class="call-btn ok" onclick="callContact(this)">
+              <i class="fas fa-phone"></i>
+            </button>
+          </div>
 
           <button class="call-btn goto blue" data-to="calls">
             <i class="fas fa-phone"></i> TODO: GPS
@@ -172,15 +173,13 @@
           </div>
         </div>
 
-        <!-- Calls -->
-        <div class="screen" id="calls" data-call="fillCalls" data-name="Chamadas">
-          <template>
-            <!-- TODO: calls template -->
-          </template>
-          <div class="content">
-            <!-- Call history goes here -->
-          </div>
-          <input type="text" />
+        <!-- Call -->
+        <div class="screen" id="call" data-name="Em chamada..." data-call="fillCall">
+          <img class="picture" src="assets/people/joaquim_fonseca.JPG">
+          <p class="name">Primo Joaquim</p>
+          <button class="cancel">
+            <i class="fas fa-phone"></i>
+          </button>
         </div>
 
         <!-- Places List -->

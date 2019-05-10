@@ -111,6 +111,38 @@ function createPerson () {
   })
 }
 
+function callContact (el) {
+  const person = getPerson(el.dataset.args)
+
+  confirmationBox({
+    question: `Deseja ligar a ${person.name}?`,
+    rightHandler: () => {
+      showScreen('call', el)
+    }
+  })
+}
+
+function fillCall (screen, id) {
+  const person = getPerson(id)
+
+  screen.querySelector('.picture').src = `assets/people/${person.picture}`
+  screen.querySelector('.name').innerHTML = person.name
+
+  const end = () => {
+    confirmationBox({
+      question: 'Deseja terminar a chamada?',
+      rightHandler: () => {
+        document.querySelector('[data-to=--back]').removeEventListener('click', end)
+        screen.querySelector('button').removeEventListener('click', end)
+        runAndBack()
+      }
+    })
+  }
+
+  document.querySelector('[data-to=--back]').addEventListener('click', end)
+  screen.querySelector('button').addEventListener('click', end)
+}
+
 function clearNewPerson () {
   document.getElementById('new-person-submit').classList.add('disabled')
   document.getElementById('new-person-name').value = ''

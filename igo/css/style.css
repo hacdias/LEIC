@@ -30,7 +30,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   /* overflow: hidden;
-   */
+ */
 }
 
 #watch {
@@ -156,20 +156,20 @@ body.flashlight #watch {
 #mainmenu ul li:nth-child(4) {
   background: #f1c40f;
   /* border-bottom-left-radius: 0.1em;
-   */
+ */
   ; }
 
 #mainmenu ul li:nth-child(5) {
   background: #ecf0f1;
   color: #212121;
   /* border-bottom-right-radius: 0.1em;
-   */
+ */
   ; }
 
 #mainmenu ul li:nth-child(6) {
   background: #2980b9;
   /* border-bottom-right-radius: 0.1em;
-   */
+ */
   ; }
 
 .expense {
@@ -932,3 +932,19 @@ button:active {
 #messages .input-with-icon span {
   background: #2ecc71;
 }
+
+#call img {
+  border-radius: 50%;
+  width: 4em;
+  height: 4em;
+  margin: 0 auto;
+  display: block;
+}
+
+#call p {
+  text-align: center;
+  font-size: 1.5em;
+  margin: 0.3em 0;
+}
+
+#call button {margin: 0 auto;width: calc(100% - 2em);}
