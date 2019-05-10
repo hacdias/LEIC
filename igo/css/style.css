@@ -538,6 +538,7 @@ button:active {
   left: 0.5em;
 }
 
+#new-contact-btn,
 #new-budget-button {
   width: calc(100% - 1em);
   margin: 0.5em;
