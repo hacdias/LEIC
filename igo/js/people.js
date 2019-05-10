@@ -5,6 +5,12 @@ function getPerson (id) {
   return window.data.people.find(p => p.id === id)
 }
 
+function personPic (url) {
+  return url.startsWith('data')
+    ? url
+    : `assets/people/${url}`
+}
+
 function updatePeople (screen) {
   const people = window.data.people.sort(distanceSort)
   const content = screen.querySelector('.content')
@@ -14,7 +20,7 @@ function updatePeople (screen) {
     let el = getListTemplate(screen)
 
     el.dataset.args = id
-    el.querySelector('.picture').src = `assets/people/${picture}`
+    el.querySelector('.picture').src = personPic(picture)
     el.querySelector('.name').innerHTML = name
     el.querySelector('.distance').innerHTML = distance
 
@@ -28,8 +34,8 @@ function updatePersonDetails (screen, id) {
   const friend = window.data.people.find(p => p.id === id)
   updateScreenName(friend.name)
 
+  screen.querySelector('.picture').src = personPic(friend.picture)
   screen.querySelector('.name').innerHTML = friend.name
-  screen.querySelector('.picture').src = `assets/people/${friend.picture}`
   screen.querySelector('.phone').innerHTML = friend.phone
   screen.querySelector('.distance').innerHTML = friend.distance + 'm'
   screen.querySelector('.msg-btn').dataset.args = id
@@ -98,7 +104,7 @@ function createPerson () {
         id: uuidv4(),
         name: name,
         distance: Math.floor(Math.random() * 1000) + 1,
-        picture: 'maria_joao.png', // TODO: photo
+        picture: generateAvatar(),
         phone: numberWithSpaces(number),
         lastSeen: Math.floor(Math.random() * 60) + 1,
         messages: []

@@ -337,11 +337,6 @@ function updatePlaceInfo (screen, name, distance, rating, map) {
     })
   }
   screen.appendChild(el)
-
-  // TODO fazer o menu c/ classificaç\ao, distancia, numero de pessoas e possibilidade de encaminhar pro GPS
-  // se for restaurante meter botao reservar.
-
-  console.log(name, distance, rating)
 }
 
 function gotoGPS (el) {
