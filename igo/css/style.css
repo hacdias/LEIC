@@ -1,5 +1,7 @@
 :root {
-  --watch-background: black; --watch-color: #2980b9; }
+  --watch-background: black;
+  --watch-color: #2980b9;
+}
 
 * {
   box-sizing: border-box;
@@ -30,7 +32,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   /* overflow: hidden;
- */
+ */;
 }
 
 #watch {
@@ -157,20 +159,23 @@ body.flashlight #watch {
   background: #f1c40f;
   /* border-bottom-left-radius: 0.1em;
  */
-  ; }
+  ;
+}
 
 #mainmenu ul li:nth-child(5) {
   background: #ecf0f1;
   color: #212121;
   /* border-bottom-right-radius: 0.1em;
  */
-  ; }
+  ;
+}
 
 #mainmenu ul li:nth-child(6) {
   background: #2980b9;
   /* border-bottom-right-radius: 0.1em;
  */
-  ; }
+  ;
+}
 
 .expense {
   display: flex;
@@ -667,7 +672,7 @@ button:active {
 }
 
 #controls {
-  width: 20em;
+  width: 14em;
   box-shadow: 0 0 17px rgba(0, 0, 0, 0.2);
   height: 4em;
   position: fixed;
@@ -680,13 +685,22 @@ button:active {
 #controls button {
   margin: 0;
   border-radius: 0;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #eee;
+}
+
+#controls button:first-of-type {
+  border-bottom-left-radius: 0.5em;
+  border-top-left-radius: 0.5em;
+}
+
+#controls button:last-of-type {
+  border-bottom-right-radius: 0.5em;
+  border-top-right-radius: 0.5em;
 }
 
 #controls button:last-of-type {
   border-right: none;
 }
-
 
 #controls span,
 #controls img {
@@ -881,7 +895,6 @@ button:active {
   margin-bottom: 0;
 }
 
-
 .input-with-icon {
   display: flex;
 }
@@ -970,4 +983,7 @@ button:active {
   margin: 0.3em 0;
 }
 
-#call button {margin: 0 auto;width: calc(100% - 2em);}
+#call button {
+  margin: 0 auto;
+  width: calc(100% - 2em);
+}
