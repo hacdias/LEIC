@@ -666,18 +666,32 @@ button:active {
   opacity: 50%;
 }
 
-#contacless {
-  border-radius: 50%;
-  width: 4em;
+#controls {
+  width: 20em;
   box-shadow: 0 0 17px rgba(0, 0, 0, 0.2);
   height: 4em;
   position: fixed;
   bottom: 1em;
+  border-radius: 0.5em;
   right: 1em;
+  display: flex;
 }
 
-#contacless img {
-  width: 2em;
+#controls button {
+  margin: 0;
+  border-radius: 0;
+  border-right: 1px solid #ddd;
+}
+
+#controls button:last-of-type {
+  border-right: none;
+}
+
+
+#controls span,
+#controls img {
+  width: 2rem;
+  font-size: 1.8em;
 }
 
 #screen-space::-webkit-scrollbar {
@@ -860,7 +874,7 @@ button:active {
 }
 
 #person-info > button:last-of-type {
-  margin-top: 0;
+  margin: 0;
 }
 
 .input-with-icon {

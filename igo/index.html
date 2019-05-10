@@ -11,9 +11,17 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dn">
-  <button id="contacless" onclick="contactless()">
+  <div id="controls">
+    <button id="contacless" onclick="contactless()">
       <img src="assets/contacless.png">
-  </button>
+    </button>
+    <button id="start-call" onclick="call()">
+      <span class="fas fa-phone"></span>
+    </button>
+    <button id="send-message" onclick="sendMessage()">
+      <span class="fas fa-comments"></span>
+    </button>
+  </div>
 
   <div id="container">
     <div id="watch">
