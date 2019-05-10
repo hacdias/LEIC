@@ -237,10 +237,10 @@ function endBudget () {
   })
 }
 
-function contactless () {
-  const what = window.prompt('Insira o Vendedor')
+function simulatePayment (el) {
+  const what = el.querySelector('input[type="text"]').value
   if (!what) return
-  const howMuch = parseFloat(window.prompt('Insira o Valor da Compra'))
+  const howMuch = el.querySelector('input[type="number"]').value
   if (isNaN(howMuch)) return
 
   confirmationBox({

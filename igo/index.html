@@ -12,16 +12,44 @@
 </head>
 <body class="dn">
   <div id="controls">
-    <button id="contacless" onclick="contactless()">
+    <button id="contacless" onclick="showModal('sim-payment')">
       <img src="assets/contacless.png">
     </button>
-    <button id="start-call" onclick="call()">
+    <button id="start-call" onclick="showModal('sim-call')">
       <span class="fas fa-phone"></span>
     </button>
-    <button id="send-message" onclick="sendMessage()">
+    <button id="send-message" onclick="showModal('sim-message')">
       <span class="fas fa-comments"></span>
     </button>
   </div>
+
+  <div class="overlay-modal"></div>
+
+  <form class="modal" id="sim-payment" action="#" onsubmit="runModal(simulatePayment, this)">
+    <label>Vendedor</label>
+    <input type="text">
+    <label>Valor (€)</label>
+    <input type="number">
+    <input type="submit" value="Simular Pagamento" >
+  </form>
+
+  <form class="modal" id="sim-message" action="#" onsubmit="runModal(simulateMessage, this)">
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <label>Mensagem</label>
+    <input type="text">
+    <input type="submit" value="Simular Mensagem" >
+  </form>
+
+  <form class="modal" id="sim-call" action="#" onsubmit="runModal(simulateCall, this)">
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <input type="submit" value="Simular Chamada" >
+  </form>
 
   <div id="container">
     <div id="watch">

@@ -97,3 +97,16 @@ function confirmationBox ({
   leftButton.addEventListener('click', leftAction)
   rightButton.addEventListener('click', rightAction)
 }
+
+function showModal (id) {
+  document.getElementById(id).classList.add('visible')
+  document.querySelector('.overlay-modal').classList.add('visible')
+}
+
+async function runModal (fn, form) {
+  await fn(form)
+
+  form.querySelectorAll('input:not([type="submit"])').forEach(i => { i.value = '' })
+  form.classList.remove('visible')
+  document.querySelector('.overlay-modal').classList.remove('visible')
+}
