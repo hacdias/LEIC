@@ -105,9 +105,8 @@ function showModal (id) {
   document.querySelector('.overlay-modal').classList.add('visible')
 
   let select = modal.querySelector('.contact-list')
-  select.innerHTML = ''
-
   if (select) {
+    select.innerHTML = ''
     data.people.forEach(p => {
       select.innerHTML += `<option value="${p.id}">${p.name}</option>`
     })
