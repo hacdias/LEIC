@@ -322,6 +322,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
+#new-person,
 #messages,
 #person-info,
 #place-booking, #faq, #create-expense, #create-budget, #place-desc, #budget-desc {
@@ -851,14 +852,29 @@ button:active {
 
 #person-info p {
   margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+#person-info p i {
+  font-size: 0.75em;
+  margin-right: 0.2rem;
+  width: 0.7rem;
+}
+
+#person-info > div:first-of-type > div {
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 #person-info .name {
   font-size: 1.4em;
+  margin: 0 0 .3em 0;
 }
 
 #person-info .phone {
-  font-size: 0.8em;
   color: rgba(255, 255, 255, 0.8);
 }
 
