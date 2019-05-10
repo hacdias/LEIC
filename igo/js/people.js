@@ -38,9 +38,7 @@ function updatePersonDetails (screen, id) {
   screen.querySelector('.name').innerHTML = friend.name
   screen.querySelector('.phone').innerHTML = friend.phone
   screen.querySelector('.distance').innerHTML = friend.distance + 'm'
-  screen.querySelector('.msg-btn').dataset.args = id
-  screen.querySelector('.call-btn').dataset.args = id
-  screen.querySelector('.person-map-btn').dataset.args = id
+  screen.querySelectorAll('button').forEach(btn => { btn.dataset.args = id })
 }
 
 function fillMessages (screen, id) {
@@ -111,6 +109,20 @@ function createPerson () {
       })
 
       runAndBack(clearNewPerson)
+    }
+  })
+}
+
+function deletePerson (el) {
+  const person = getPerson(el.dataset.args)
+
+  confirmationBox({
+    question: `Tem a certeza que deseja apagar o contacto "${person.name}"?`,
+    rightClass: 'cancel',
+    rightHandler: () => {
+      const index = data.people.findIndex(el => el.id === person.id)
+      data.people.splice(index, 1)
+      runAndBack()
     }
   })
 }
