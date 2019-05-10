@@ -176,8 +176,8 @@
           </div>
 
           <div class="input-with-icon">
-            <input placeholder="Mensagem..." id="msg-kb" type="text"-></input>
-            <span class="fas fa-reply" data-to="gps-reply" onclick="replyMessage(this)"></span>
+            <input placeholder="Mensagem..." oninput="onMessageInput(this)" id="msg-kb" type="text"-></input>
+            <span class="fas fa-reply disabled" data-to="gps-reply" onclick="replyMessage(this)"></span>
           </div>
         </div>
 

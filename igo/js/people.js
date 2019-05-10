@@ -56,6 +56,8 @@ function fillMessages (screen, id) {
 
   content.scrollTo(0, content.scrollHeight)
   screen.querySelector('.input-with-icon span').dataset.args = id
+
+  onMessageInput(screen.querySelector('.input-with-icon input'))
 }
 
 function replyMessage (el) {
@@ -137,6 +139,15 @@ function fillCall (screen, id) {
 
   document.querySelector('[data-to=--back]').addEventListener('click', end)
   screen.querySelector('button').addEventListener('click', end)
+}
+
+function onMessageInput (el) {
+  const div = el.parentElement
+  if (div.querySelector('input').value !== '') {
+    div.querySelector('span').classList.remove('disabled')
+  } else {
+    div.querySelector('span').classList.add('disabled')
+  }
 }
 
 function clearNewPerson () {
