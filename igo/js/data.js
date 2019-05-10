@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 window.data = {
   people: [
     {
@@ -16,13 +19,7 @@ window.data = {
       picture: 'manuel_jesus.png',
       phone: '+351 945 345 234',
       lastSeen: 13, // minutos,
-      messages: [],
-      calls: [{
-        time: new Date(),
-        incoming: false,
-        missed: false,
-        duration: 23 // minutes
-      }]
+      messages: []
     },
     {
       id: uuidv4(),
@@ -54,8 +51,7 @@ window.data = {
       picture: 'isabel_soares.jpg',
       phone: '+351 956 765 338',
       lastSeen: 74, // minutos,
-      messages: [],
-      calls: []
+      messages: []
     },
     {
       id: uuidv4(),
@@ -64,12 +60,7 @@ window.data = {
       picture: 'ana_silva.jpg',
       phone: '+351 276 345 897',
       lastSeen: 589, // minutos,
-      messages: [],
-      calls: [{
-        time: new Date(),
-        incoming: true,
-        missed: true
-      }]
+      messages: []
     },
     {
       id: uuidv4(),
@@ -78,8 +69,7 @@ window.data = {
       picture: 'avo_celeste.jpg',
       phone: '+351 933 453 876',
       lastSeen: 239, // minutos,
-      messages: [],
-      calls: []
+      messages: []
     },
     {
       id: uuidv4(),
@@ -88,8 +78,7 @@ window.data = {
       picture: 'joaquim_fonseca.jpg',
       phone: '+351 946 765 435',
       lastSeen: 234,
-      messages: [],
-      calls: []
+      messages: []
     }
   ],
   places: {
