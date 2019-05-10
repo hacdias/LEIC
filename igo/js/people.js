@@ -22,7 +22,6 @@ function updatePeople (screen) {
   }
 
   enableGoto(content)
-  console.warn('TODO: add new contact')
 }
 
 function updatePersonDetails (screen, id) {
@@ -35,6 +34,7 @@ function updatePersonDetails (screen, id) {
   screen.querySelector('.distance').innerHTML = friend.distance + 'm'
   screen.querySelector('.msg-btn').dataset.args = id
   screen.querySelector('.call-btn').dataset.args = id
+  screen.querySelector('.person-map-btn').dataset.args = id
 }
 
 function fillMessages (screen, id) {
@@ -67,10 +67,6 @@ function replyMessage (el) {
   person.messages.push({ message: input.value })
 
   fillMessages(screen, id)
-}
-
-function fillCalls (screen, id) {
-  console.warn('TODO: Fill previous calls, add call button')
 }
 
 function validateNewPerson () {
@@ -153,4 +149,8 @@ function bootstrapPeople () {
   enableKeybaordFor(document.getElementById('msg-kb'))
   enableKeybaordFor(document.getElementById('new-person-name'))
   enableKeybaordFor(document.getElementById('new-person-phone'), false)
+}
+
+function seePersonInMap (el) {
+  console.warn('TODO: see person in map')
 }
