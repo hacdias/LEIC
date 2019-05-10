@@ -155,7 +155,11 @@
           <div class="content">
             <!-- Messages go here -->
           </div>
-          <input type="text" id="msg-kb" placeholder="Escreva a mensagem..." />
+
+          <div class="input-with-icon">
+            <input placeholder="Mensagem..." id="msg-kb" type="text"-></input>
+            <span class="fas fa-reply" data-to="gps-reply" onclick="replyMessage(this)"></span>
+          </div>
         </div>
 
         <!-- Calls -->

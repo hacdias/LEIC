@@ -416,6 +416,7 @@ body.flashlight #watch {
   margin-top: 0;
 }
 
+.input-with-icon,
 .gps-search,
 input[type="text"], input[type="number"] {
   width: 100%;
@@ -615,6 +616,7 @@ button:active {
   box-shadow: 0px 0px 4px #0000006e;
 }
 
+.input-with-icon input,
 .gps-search input {
   padding: 0em;
   border-radius: 0em;
@@ -859,9 +861,29 @@ button:active {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.input-with-icon {
+  display: flex;
+}
+
+.input-with-icon span {
+  background: black;
+  border-radius: 50%;
+  width: 1.5rem;
+  font-size: 0.9em;
+  height: 1.5rem;
+  text-align: center;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  right: 0.25rem;
+  bottom: 0.25rem;
+}
+
 #messages .content {position: fixed;top: 1.5em;height: calc(100% - 6em);overflow: auto;}
 
-#messages input {
+#messages .input-with-icon {
  position: fixed;
  width: calc(100% - 1em);
  bottom: 1.5em;
@@ -900,4 +922,8 @@ button:active {
   background: #0fbcf9;
   padding: .3em;
   border-radius: 0.2em;
+}
+
+#messages .input-with-icon span {
+  background: #2ecc71;
 }

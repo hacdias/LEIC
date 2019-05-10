@@ -55,6 +55,18 @@ function fillMessages (screen, id) {
   }
 
   content.scrollTo(0, content.scrollHeight)
+  screen.querySelector('.input-with-icon span').dataset.args = id
+}
+
+function replyMessage (el) {
+  const id = el.dataset.args
+  const input = el.parentElement.querySelector('input')
+  const screen = el.parentElement.parentElement
+
+  const person = getPerson(id)
+  person.messages.push({ message: input.value })
+
+  fillMessages(screen, id)
 }
 
 function fillCalls (screen, id) {
