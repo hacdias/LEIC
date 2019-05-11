@@ -84,6 +84,15 @@ body.flashlight #watch {
   margin-right: auto;
 }
 
+#status .fa-envelope {
+  margin-right: 4.8em;
+  display: none;
+}
+
+#status .visible {
+  display: block;
+}
+
 #status .clock {
   margin-right: 0.2em;
 }

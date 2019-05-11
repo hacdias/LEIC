@@ -10,6 +10,7 @@ window.data = {
       picture: 'maria_joao.png',
       phone: '+351 946 765 435',
       lastSeen: 14, // minutos
+      gotMessage: false,
       messages: []
     },
     {
@@ -19,6 +20,7 @@ window.data = {
       picture: 'manuel_jesus.png',
       phone: '+351 945 345 234',
       lastSeen: 13, // minutos,
+      gotMessage: false,
       messages: []
     },
     {
@@ -28,6 +30,7 @@ window.data = {
       picture: 'tiago_barroso.jpg',
       phone: '+351 946 234 346',
       lastSeen: 12, // minutos,
+      gotMessage: false,
       messages: [{
         from: true,
         message: 'Alô. Já chegaste?'
@@ -51,6 +54,7 @@ window.data = {
       picture: 'isabel_soares.jpg',
       phone: '+351 956 765 338',
       lastSeen: 74, // minutos,
+      gotMessage: false,
       messages: []
     },
     {
@@ -60,6 +64,7 @@ window.data = {
       picture: 'ana_silva.jpg',
       phone: '+351 276 345 897',
       lastSeen: 589, // minutos,
+      gotMessage: false,
       messages: []
     },
     {
@@ -69,6 +74,7 @@ window.data = {
       picture: 'avo_celeste.jpg',
       phone: '+351 933 453 876',
       lastSeen: 239, // minutos,
+      gotMessage: false,
       messages: []
     },
     {
@@ -78,6 +84,7 @@ window.data = {
       picture: 'joaquim_fonseca.jpg',
       phone: '+351 946 765 435',
       lastSeen: 234,
+      gotMessage: false,
       messages: []
     }
   ],

@@ -41,11 +41,28 @@ function updatePersonDetails (screen, id) {
   screen.querySelectorAll('button').forEach(btn => { btn.dataset.args = id })
 }
 
+function checkNewMessages(pId) {
+  let person = getPerson(pId)
+  let el = document.getElementById("gotmessage")
+  let people = window.data.people
+
+  person.gotMessage = false;
+  el.classList.remove("visible")
+  
+  for (const key in people) {
+    if (people[key].gotMessage == true && people[key].id != pId) {
+      el.classList.add("visible")
+      break;
+    }
+  }
+}
+
 function fillMessages (screen, id) {
   const person = getPerson(id)
   screen.querySelector('input').value = ''
   const content = screen.querySelector('.content')
   content.innerHTML = ''
+  checkNewMessages(id)
 
   for (const { message, from } of person.messages) {
     let el = getListTemplate(screen)
@@ -236,16 +253,22 @@ function simulateMessage (form) {
   let person = getContactFromForm(form)
   let text = form.querySelector('input[type="text"]').value
 
+  if (text == "") {
+    return
+  }
+  
   person.messages.push({
     from: true,
     message: text
   })
-
+  person.gotMessage = true
   let messages = document.getElementById('messages')
-
+  console.log(person)
   if (messages.className == 'screen active') {
     fillMessages(messages, person.id)
   }
-
-  console.warn('TODO: show badge on messages')
+  else {
+    let el = document.getElementById("gotmessage")
+    el.classList.add("visible")
+  }
 }

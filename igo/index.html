@@ -115,6 +115,7 @@
 
       <div id="status">
         <i class="fas fa-signal"></i>
+        <i id="gotmessage" class="fas fa-envelope"></i>
         <span class="clock"></span>
         <i class="fas fa-battery-three-quarters"></i>
       </div>
@@ -184,6 +185,14 @@
 
           <button class="blue" onclick="seePersonInMap(this)">
             <i class="fas fa-map-pin"></i> Ver no mapa
+          </button>
+
+          <button class="blue" onclick="recommendPlace(this)">
+            <i class="fas fa-map-marked-alt"></i> Recomendar local
+          </button>
+
+          <button class="blue" onclick="lendMoney(this)">
+            <i class="fas fa-money-bill-alt"></i> Emprestar dinheiro
           </button>
 
           <button class="cancel" onclick="deletePerson(this)">
