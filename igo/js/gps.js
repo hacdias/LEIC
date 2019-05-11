@@ -18,17 +18,23 @@ function preloadImages () {
 }
 
 function showGpsPath (screen, id) {
-  const place = getPlace(id)
+  let place = getPlace(id)
 
+  if (place == undefined) {
+    place = getPerson(id)
+  }
   screen.style.backgroundImage = `url(./assets/maps/${place.map}.png)`
   screen.querySelector('button').dataset.args = id
+  
 }
 
 function startGpsRoute (screen, id) {
-  const place = getPlace(id)
-
+  let place = getPlace(id)
+  if (place == undefined) {
+    place = getPerson(id)
+  }
   let i = 0
-  screen.style.backgroundImage = `url(./assets/maps/${place.map}.png)`
+  screen.style.backgroundImage = `url(./assets/maps/${place.map}-0.png)`
   screen.querySelector('button').classList.add('dn')
 
   const update = () => {

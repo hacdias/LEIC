@@ -128,6 +128,7 @@ function deletePerson (el) {
 }
 
 function callContact (el) {
+  console.log(el)
   const person = getPerson(el.dataset.args)
 
   confirmationBox({
@@ -151,12 +152,42 @@ function fillCall (screen, id) {
         document.querySelector('[data-to=--back]').removeEventListener('click', end)
         screen.querySelector('button').removeEventListener('click', end)
         runAndBack()
+        runAndBack()
       }
     })
   }
 
   document.querySelector('[data-to=--back]').addEventListener('click', end)
   screen.querySelector('button').addEventListener('click', end)
+}
+
+function receiveCall (screen, id) {
+  const person = getPerson(id)
+
+  screen.querySelector('.picture').src = `assets/people/${person.picture}`
+  screen.querySelector('.name').innerHTML = person.name
+
+  const accept = () => {
+    let el = document.createElement('x')
+    el.dataset.args = person.id
+    showScreen('call', el)
+  }
+
+  screen.querySelector('.ok').addEventListener('click', accept)
+
+  const end = () => {
+    confirmationBox({
+      question: 'Deseja rejeitar a chamada?',
+      rightHandler: () => {
+        document.querySelector('[data-to=--back]').removeEventListener('click', end)
+        screen.querySelector('button').removeEventListener('click', end)
+        runAndBack()
+      }
+    })
+  }
+
+  document.querySelector('[data-to=--back]').addEventListener('click', end)
+  screen.querySelector('.cancel').addEventListener('click', end)
 }
 
 function onMessageInput (el) {
@@ -181,13 +212,24 @@ function bootstrapPeople () {
 }
 
 function seePersonInMap (el) {
-  console.warn('TODO: see person in map')
+  const person = getPerson(el.dataset.args)
+
+  confirmationBox({
+    question: `Deseja ir ter com: ${person.name}?`,
+    rightHandler: () => {
+      showScreen('gps-path', el)
+    }
+  })
 }
 
 function simulateCall (form) {
   let person = getContactFromForm(form)
+  console.log(person)
+  console.log(person.id)
+  let el = document.createElement('x')
+  el.dataset.args = person.id
+  showScreen('calling', el)
 
-  console.warn('TODO: simulate receiving call')
 }
 
 function simulateMessage (form) {

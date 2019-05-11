@@ -329,3 +329,8 @@ for (const key in window.data.places) {
     window.data.places[key][i].map = Math.floor(Math.random() * 16) + 1
   }
 }
+for (const key in window.data.people) {
+  window.data.people[key].map = Math.floor(Math.random() * 16) + 1
+  console.log(window.data.people[key])
+  console.log(window.data.people[key].map)
+}
