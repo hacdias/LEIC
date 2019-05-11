@@ -96,7 +96,7 @@ function validateNewPerson () {
   const name = document.getElementById('new-person-name').value
   const number = document.getElementById('new-person-phone').value
 
-  if (name.length > 0 && number > 0) {
+  if (name.length > 0 && name.length <= 16 && number > 0 && number < 10) {
     return { name, number }
   }
 }
@@ -239,6 +239,92 @@ function seePersonInMap (el) {
   })
 }
 
+function validateMoneyAmount() {
+  const number = document.getElementById('lend-money-amount').value
+
+  if (number > 0 && number <= 100) {
+    return { number }
+  }
+}
+
+function onMoneyChange() {
+  if (validateMoneyAmount()) {
+    document.getElementById('lend-money-submit').classList.remove('disabled')
+  } else {
+    document.getElementById('lend-money-submit').classList.add('disabled')
+  }
+}
+
+function clearLendMoney () {
+  document.getElementById('lend-money-submit').classList.add('disabled')
+  document.getElementById('lend-money-amount').value = ''
+}
+
+function sharePlace (screen) {
+  updateScreenName("Recomendar Local")
+}
+
+function fillSharePlacesList (screen, kind, title) {
+  const places = getPlaces(kind)
+  const content = screen.querySelector('.content')
+  content.innerHTML = ''
+  updateScreenName(title)
+
+  for (const place of places) {
+    let el = getListTemplate(screen)
+    if (place.isReserved) el.classList.add('current')
+    el.dataset.args = place.id
+
+    let kindIcon = el.querySelector('.kind-icon')
+    kindIcon.classList.add(place.kind)
+    kindIcon.classList.add(`fa-${placesIcons[place.kind]}`)
+
+    el.querySelector('.name').innerHTML = place.name
+
+    let infoIcon = el.querySelector('.info-icon')
+    let info = el.querySelector('.info')
+
+    infoIcon.classList.add('fa-ruler')
+    info.innerHTML = `${place.distance}m`
+  
+    const end = () => {
+      confirmationBox({
+        question: `Deseja recomendar: ${place.name}?`,
+        rightHandler: () => {
+          runAndBack()
+          runAndBack()
+        }
+      })
+    }
+  
+    el.addEventListener('click', end)
+    content.appendChild(el)
+  }
+}
+
+function lendMoney (el) {
+  let data = validateMoneyAmount()
+  if (!data) {
+    // this shouldn't happen, but we never know!
+    return
+  }
+
+  let expenseName = `Empréstimo`
+  confirmationBox({
+    question: `Confirma o empréstimo de ${numberWithSpaces(data.number)}€.`,
+    rightHandler: () => {
+      if (window.data.currentBudget) {
+        window.data.currentBudget.expenses.push({
+          name: expenseName,
+          value: parseFloat(data.number)
+        })
+      }
+      console.log(window.data.currentBudget)
+      runAndBack(clearLendMoney)
+    }
+  })
+}
+
 function simulateCall (form) {
   let person = getContactFromForm(form)
   console.log(person)
@@ -272,3 +358,4 @@ function simulateMessage (form) {
     el.classList.add("visible")
   }
 }
+

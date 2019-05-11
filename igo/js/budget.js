@@ -199,7 +199,7 @@ function createExpense () {
 
   const spent = data.currentBudget.expenses.reduce((acc, e) => acc + e.value, 0)
   const overload = spent + budget.value > data.currentBudget.budget
-
+  console.log(spent, budget.value)
   let question = `Deseja adicionar uma despesa no valor de ${numberWithSpaces(budget.value)} €?`
   if (overload) {
     question += ` Irá exceder o orçamento definido de ${numberWithSpaces(data.currentBudget.budget)} €.`

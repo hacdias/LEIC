@@ -330,7 +330,7 @@ body.flashlight #watch {
   color: #fc5c65;
 }
 
-#new-person, #messages, #person-info, #place-booking, #faq, #create-expense, #create-budget, #place-desc, #budget-desc {
+#new-person, #messages, #person-info, #place-booking, #faq, #create-expense, #create-budget, #place-desc, #budget-desc, #lend-money {
   padding: 0.5em;
 }
 
@@ -979,6 +979,9 @@ button:active {
   background: #2ecc71;
 }
 
+#new-person input{
+  font-size: 93%;
+} 
 #call img {
   border-radius: 50%;
   width: 4em;

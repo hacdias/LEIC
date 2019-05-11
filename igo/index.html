@@ -187,11 +187,11 @@
             <i class="fas fa-map-pin"></i> Ver no mapa
           </button>
 
-          <button class="blue" onclick="recommendPlace(this)">
+          <button class="msg-btn goto blue" data-to="share-place">
             <i class="fas fa-map-marked-alt"></i> Recomendar local
           </button>
 
-          <button class="blue" onclick="lendMoney(this)">
+          <button class="msg-btn goto blue" data-to="lend-money">
             <i class="fas fa-money-bill-alt"></i> Emprestar dinheiro
           </button>
 
@@ -202,8 +202,8 @@
 
         <!-- New Person -->
         <div class="screen" id="new-person" data-name="Novo Contacto">
-          <input placeholder="Nome" id="new-person-name" type="text" oninput="onNewPersonChange()"></input>
-          <input placeholder="Número" id="new-person-phone" type="number" oninput="onNewPersonChange()"></input>
+          <input placeholder="Nome (até 16 carateres)" id="new-person-name" type="text" oninput="onNewPersonChange()"></input>
+          <input placeholder="Número (até 9 digitos)" id="new-person-phone" type="number" oninput="onNewPersonChange()"></input>
           <div class="flex f-50">
             <button class="cancel" type="button" onclick="runAndBack(clearNewPerson)">Cancelar</button>
             <button class="ok disabled" id="new-person-submit" type="button" onclick="createPerson()">Adicionar</button>
@@ -249,8 +249,62 @@
           </button>
         </div>
 
+        <!-- Share Place -->
+        <div class="screen" id="share-place" data-call="sharePlace">
+          <div class="item category goto" data-to="share-place-list" data-args="restaurants#Restaurantes">
+            <i class="restaurants fas fa-utensils"></i>
+            <p>Restaurantes</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="parks#Parques">
+            <i class="parks fas fa-tree"></i>
+            <p>Parques</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="monuments#Monumentos">
+            <i class="monuments fas fa-landmark"></i>
+            <p>Monumentos</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="markets#Mercados">
+            <i class="markets fas fa-store"></i>
+            <p>Mercados</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="diversions#Diversões">
+            <i class="fas fa-chess"></i>
+            <p>Diversões</p>
+          </div>
+        </div>
+
+        <!-- Share Place List -->
+        <div class="screen" id="share-place-list" data-name="Recomendar Local" data-call="fillSharePlacesList">
+          <template>
+            <div class="tpl item goto">
+              <div>
+                <i class="fas kind-icon"></i>
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas info-icon"></i> <span class="info"></span></p>
+              </div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+          <div class="empty-content">
+            <p>Não há locais nesta categoria.</p>
+          </div>
+        </div>
+        
+        <!-- Lend Money -->
+        <div class="screen" id="lend-money" data-name="Emprestar dinheiro">
+            <input placeholder="Quantia (100 máx)" id="lend-money-amount" type="number" oninput="onMoneyChange()"></input>
+            <div class="flex f-50">
+              <button class="cancel" type="button" onclick="runAndBack(clearLendMoney)">Cancelar</button>
+              <button class="ok disabled" id="lend-money-submit" type="button" onclick="lendMoney(this)">Emprestar</button>
+            </div>
+          </div>
+
         <!-- Places List -->
-        <div class="screen" id="places-list" data-call="fillPlacesList">
+        <div class="screen" id="places-list" data-name="Recomendar Local" data-call="fillPlacesList">
           <template>
             <div class="tpl item goto" data-to="place-desc">
               <div>
