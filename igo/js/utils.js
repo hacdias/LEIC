@@ -126,3 +126,7 @@ async function runModal (fn, form) {
   form.classList.remove('visible')
   document.querySelector('.overlay-modal').classList.remove('visible')
 }
+
+function closeModals (el) {
+  runModal(() => {}, el.parentElement)
+}

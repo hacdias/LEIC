@@ -26,6 +26,8 @@
   <div class="overlay-modal"></div>
 
   <form class="modal" id="sim-payment" action="#" onsubmit="runModal(simulatePayment, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
     <label>Vendedor</label>
     <input type="text">
     <label>Valor (€)</label>
@@ -34,6 +36,8 @@
   </form>
 
   <form class="modal" id="sim-message" action="#" onsubmit="runModal(simulateMessage, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
     <label>Contacto</label>
     <select class="contact-list">
 
@@ -44,6 +48,8 @@
   </form>
 
   <form class="modal" id="sim-call" action="#" onsubmit="runModal(simulateCall, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
     <label>Contacto</label>
     <select class="contact-list">
 

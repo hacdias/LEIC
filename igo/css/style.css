@@ -1043,6 +1043,19 @@ button:active {
   display: block;
 }
 
+.modal .close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  width: 1em;
+  height: 1em;
+  color: black;
+  margin: 0;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+}
+
 .modal label,
 .modal select,
 .modal input {
