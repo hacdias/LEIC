@@ -199,5 +199,11 @@ function simulateMessage (form) {
     message: text
   })
 
-  console.warn('TODO: show badge on messages and refresh current screen just in case')
+  let messages = document.getElementById('messages')
+
+  if (messages.className == 'screen active') {
+    fillMessages(messages, person.id)
+  }
+
+  console.warn('TODO: show badge on messages')
 }
