@@ -16,13 +16,18 @@ function updatePeople (screen) {
   const content = screen.querySelector('.content')
   content.innerHTML = ''
 
-  for (const { name, id, distance, picture } of people) {
+  for (const { name, id, distance, picture, gotMessage } of people) {
     let el = getListTemplate(screen)
 
     el.dataset.args = id
     el.querySelector('.picture').src = personPic(picture)
     el.querySelector('.name').innerHTML = name
     el.querySelector('.distance').innerHTML = distance
+    if (gotMessage) {
+      el.querySelector('.gotmsg').classList.remove('dn')
+    } else {
+      el.querySelector('.gotmsg').classList.add('dn')
+    }
 
     content.appendChild(el)
   }
@@ -333,7 +338,7 @@ function simulateMessage (form) {
   let person = getContactFromForm(form)
   let text = form.querySelector('input[type="text"]').value
 
-  if (text == '') {
+  if (text === '') {
     return
   }
 
@@ -342,8 +347,14 @@ function simulateMessage (form) {
     message: text
   })
   person.gotMessage = true
+
+  let peopleScreen = document.getElementById('people')
+  if (people.classList.contains('active')) {
+    updatePeople(peopleScreen)
+  }
+
   let messages = document.getElementById('messages')
-  if (messages.classList.contains('screen') && messages.classList.contains('active')) {
+  if (messages.classList.contains('active')) {
     fillMessages(messages, person.id)
   } else {
     let el = document.getElementById('gotmessage')

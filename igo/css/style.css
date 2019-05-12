@@ -541,7 +541,7 @@ button:active {
 }
 
 #budget-bar #budget-max::after, #budget-bar #budget-spent::after {
-  content: " €";
+  content: " â‚¬";
 }
 
 #budget-bar #budget-max {
@@ -991,7 +991,7 @@ button:active {
 
 #new-person input{
   font-size: 93%;
-} 
+}
 #call img {
   border-radius: 50%;
   width: 4em;
@@ -1105,4 +1105,8 @@ button:active {
   padding: 0.5em;
   background: #cacaca;
   cursor: pointer;
+}
+
+#people .item > div:last-of-type {
+  margin-left: auto;
 }
