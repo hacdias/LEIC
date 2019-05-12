@@ -359,3 +359,27 @@ function simulateMessage (form) {
   }
 }
 
+function simulateRecommendation (form) {
+  var restaurants = window.data.places.restaurants
+  var monuments = window.data.places.monuments
+  var markets = window.data.places.markets
+  var diversions = window.data.places.diversions
+  var parks = window.data.places.parks
+  var all = restaurants.concat(monuments, markets, diversions, parks)
+  var added = false
+  var random = Math.floor(Math.random() * all.length)
+
+  let recommendation = all[random]
+  let person = getContactFromForm(form)
+
+  confirmationBox({
+    question: `${person.name} recomendou ${recommendation.name}. Pretende adicionar aos recomendados?`,
+    rightHandler: () => {
+      if (window.data.recommended.includes(recommendation)) {
+        return
+      }
+
+      window.data.recommended.push(recommendation)
+    }
+  })
+}

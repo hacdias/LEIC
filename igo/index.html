@@ -21,6 +21,9 @@
     <button id="send-message" onclick="showModal('sim-message')">
       <span class="fas fa-comments"></span>
     </button>
+    <button id="send-recommendation" onclick="showModal('sim-recommendation')">
+      <span class="fas fa-map-pin"></span>
+    </button>
   </div>
 
   <div class="overlay-modal"></div>
@@ -55,6 +58,16 @@
 
     </select>
     <input type="submit" value="Simular Chamada">
+  </form>
+
+  <form class="modal" id="sim-recommendation" action="#" onsubmit="runModal(simulateRecommendation, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <input type="submit" value="Simular Recomendação">
   </form>
 
   <div id="container">

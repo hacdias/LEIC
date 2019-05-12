@@ -681,7 +681,7 @@ button:active {
 }
 
 #controls {
-  width: 14em;
+  width: 18em;
   box-shadow: 0 0 17px rgba(0, 0, 0, 0.2);
   height: 4em;
   position: fixed;
