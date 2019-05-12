@@ -165,7 +165,7 @@ function fillCall (screen, id) {
     confirmationBox({
       question: 'Deseja terminar a chamada?',
       rightHandler: () => {
-        document.querySelector('[data-to=--back]').removeEventListener('click', end)
+        document.querySelector('#only-call').removeEventListener('click', end)
         screen.querySelector('button').removeEventListener('click', end)
         runAndBack()
         runAndBack()
@@ -173,7 +173,7 @@ function fillCall (screen, id) {
     })
   }
 
-  document.querySelector('[data-to=--back]').addEventListener('click', end)
+  document.querySelector('#only-call').addEventListener('click', end)
   screen.querySelector('button').addEventListener('click', end)
 }
 
@@ -195,14 +195,14 @@ function receiveCall (screen, id) {
     confirmationBox({
       question: 'Deseja rejeitar a chamada?',
       rightHandler: () => {
-        document.querySelector('[data-to=--back]').removeEventListener('click', end)
+        document.querySelector('#endCall').removeEventListener('click', end)
         screen.querySelector('button').removeEventListener('click', end)
         runAndBack()
       }
     })
   }
 
-  document.querySelector('[data-to=--back]').addEventListener('click', end)
+  document.querySelector('#endCall').addEventListener('click', end)
   screen.querySelector('.cancel').addEventListener('click', end)
 }
 

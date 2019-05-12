@@ -28,7 +28,8 @@ function numberWithSpaces (x) {
 }
 
 function updateScreenName (name) {
-  document.querySelector('#current-screen-name').innerHTML = name
+  document.querySelectorAll('#current-screen-name')[0].innerHTML = name
+  document.querySelectorAll('#current-screen-name')[1].innerHTML = name
 }
 
 function getListTemplate (screen) {

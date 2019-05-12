@@ -288,6 +288,16 @@ body.flashlight #watch {
   justify-content: space-between;
 }
 
+#backbar #only-call {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.call {
+  cursor: pointer;
+}
+
 .category i {
   font-size: 1.6em;
   width: 1.5em;

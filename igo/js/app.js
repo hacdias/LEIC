@@ -41,9 +41,16 @@ function showScreen (name, el) {
   }
 
   if (name === 'mainmenu') {
+    document.querySelector('#only-call').style.display = 'none'
     document.querySelector('#only-mainmenu').style.display = ''
     document.querySelector('#not-mainmenu').style.display = 'none'
+  }
+  else if (name === 'call' || name === 'calling') {
+    document.querySelector('#only-call').style.display = ''
+    document.querySelector('#only-mainmenu').style.display = 'none'
+    document.querySelector('#not-mainmenu').style.display = 'none'
   } else {
+    document.querySelector('#only-call').style.display = 'none'
     document.querySelector('#not-mainmenu').style.display = ''
     document.querySelector('#only-mainmenu').style.display = 'none'
   }
