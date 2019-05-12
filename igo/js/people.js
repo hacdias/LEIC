@@ -41,18 +41,18 @@ function updatePersonDetails (screen, id) {
   screen.querySelectorAll('button').forEach(btn => { btn.dataset.args = id })
 }
 
-function checkNewMessages(pId) {
+function checkNewMessages (pId) {
   let person = getPerson(pId)
-  let el = document.getElementById("gotmessage")
+  let el = document.getElementById('gotmessage')
   let people = window.data.people
 
-  person.gotMessage = false;
-  el.classList.remove("visible")
-  
+  person.gotMessage = false
+  el.classList.remove('visible')
+
   for (const key in people) {
     if (people[key].gotMessage == true && people[key].id != pId) {
-      el.classList.add("visible")
-      break;
+      el.classList.add('visible')
+      break
     }
   }
 }
@@ -145,7 +145,6 @@ function deletePerson (el) {
 }
 
 function callContact (el) {
-  console.log(el)
   const person = getPerson(el.dataset.args)
 
   confirmationBox({
@@ -239,7 +238,7 @@ function seePersonInMap (el) {
   })
 }
 
-function validateMoneyAmount() {
+function validateMoneyAmount () {
   const number = document.getElementById('lend-money-amount').value
 
   if (number > 0 && number <= 100) {
@@ -247,7 +246,7 @@ function validateMoneyAmount() {
   }
 }
 
-function onMoneyChange() {
+function onMoneyChange () {
   if (validateMoneyAmount()) {
     document.getElementById('lend-money-submit').classList.remove('disabled')
   } else {
@@ -261,7 +260,7 @@ function clearLendMoney () {
 }
 
 function sharePlace (screen) {
-  updateScreenName("Recomendar Local")
+  updateScreenName('Recomendar Local')
 }
 
 function fillSharePlacesList (screen, kind, title) {
@@ -286,7 +285,7 @@ function fillSharePlacesList (screen, kind, title) {
 
     infoIcon.classList.add('fa-ruler')
     info.innerHTML = `${place.distance}m`
-  
+
     const end = () => {
       confirmationBox({
         question: `Deseja recomendar: ${place.name}?`,
@@ -296,7 +295,7 @@ function fillSharePlacesList (screen, kind, title) {
         }
       })
     }
-  
+
     el.addEventListener('click', end)
     content.appendChild(el)
   }
@@ -332,17 +331,16 @@ function simulateCall (form) {
   let el = document.createElement('x')
   el.dataset.args = person.id
   showScreen('calling', el)
-
 }
 
 function simulateMessage (form) {
   let person = getContactFromForm(form)
   let text = form.querySelector('input[type="text"]').value
 
-  if (text == "") {
+  if (text == '') {
     return
   }
-  
+
   person.messages.push({
     from: true,
     message: text
@@ -352,10 +350,9 @@ function simulateMessage (form) {
   console.log(person)
   if (messages.className == 'screen active') {
     fillMessages(messages, person.id)
-  }
-  else {
-    let el = document.getElementById("gotmessage")
-    el.classList.add("visible")
+  } else {
+    let el = document.getElementById('gotmessage')
+    el.classList.add('visible')
   }
 }
 
@@ -382,4 +379,8 @@ function simulateRecommendation (form) {
       window.data.recommended.push(recommendation)
     }
   })
+}
+
+function peopleBootstrap () {
+  enableKeybaordFor(document.getElementById('lend-money-amount'), false)
 }
