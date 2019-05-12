@@ -50,7 +50,7 @@ function checkNewMessages (pId) {
   el.classList.remove('visible')
 
   for (const key in people) {
-    if (people[key].gotMessage == true && people[key].id != pId) {
+    if (people[key].gotMessage && people[key].id !== pId) {
       el.classList.add('visible')
       break
     }
