@@ -101,7 +101,7 @@ function validateNewPerson () {
   const name = document.getElementById('new-person-name').value
   const number = document.getElementById('new-person-phone').value
 
-  if (name.length > 0 && name.length <= 16 && number > 0 && number < 10) {
+  if (name.length > 0 && name.length <= 16 && String(number).length === 9) {
     return { name, number }
   }
 }
