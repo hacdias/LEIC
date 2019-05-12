@@ -86,7 +86,6 @@ function createRecommended () {
   }
 
   window.data.recommended = recommended
-  console.log(recommended)
 }
 
 function startup () {

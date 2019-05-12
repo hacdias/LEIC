@@ -308,17 +308,15 @@ function lendMoney (el) {
     return
   }
 
-  let expenseName = `Empréstimo`
   confirmationBox({
     question: `Confirma o empréstimo de ${numberWithSpaces(data.number)}€.`,
     rightHandler: () => {
       if (window.data.currentBudget) {
         window.data.currentBudget.expenses.push({
-          name: expenseName,
+          name: 'Empréstimo',
           value: parseFloat(data.number)
         })
       }
-      console.log(window.data.currentBudget)
       runAndBack(clearLendMoney)
     }
   })
@@ -326,8 +324,6 @@ function lendMoney (el) {
 
 function simulateCall (form) {
   let person = getContactFromForm(form)
-  console.log(person)
-  console.log(person.id)
   let el = document.createElement('x')
   el.dataset.args = person.id
   showScreen('calling', el)
@@ -347,8 +343,7 @@ function simulateMessage (form) {
   })
   person.gotMessage = true
   let messages = document.getElementById('messages')
-  console.log(person)
-  if (messages.className == 'screen active') {
+  if (messages.classList.contains('screen') && messages.classList.contains('active')) {
     fillMessages(messages, person.id)
   } else {
     let el = document.getElementById('gotmessage')
