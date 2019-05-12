@@ -14,7 +14,7 @@ function setupTextKeyboard () {
   var count = -1
   var numPads = {
     0: [],
-    1: ['.', ',', '!'],
+    1: ['.', ',', '!', '?'],
     2: ['a', 'b', 'c', 'A', 'B', 'C'],
     3: ['d', 'e', 'f', 'D', 'E', 'F'],
     4: ['g', 'h', 'i', 'G', 'H', 'I'],
