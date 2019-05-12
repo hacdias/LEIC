@@ -372,6 +372,11 @@ function simulateRecommendation (form) {
       }
 
       window.data.recommended.push(recommendation)
+      let placesList = document.getElementById('places-list')
+
+      if (placesList.classList.contains('screen') && placesList.classList.contains('active')) {
+        fillPlacesList(placesList, 'recommended', 'Recomendar local')
+      }
     }
   })
 }
