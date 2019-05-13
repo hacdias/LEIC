@@ -25,7 +25,6 @@ function showGpsPath (screen, id) {
   }
   screen.style.backgroundImage = `url(./assets/maps/${place.map}.png)`
   screen.querySelector('button').dataset.args = id
-  
 }
 
 function startGpsRoute (screen, id) {
