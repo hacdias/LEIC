@@ -24,6 +24,10 @@ function distanceSort (a, b) {
   return a.distance - b.distance
 }
 
+function alphabeticalSort (a, b) {
+  return a.name.localeCompare(b.name)
+}
+
 function canBeBooked (type) {
   return type === 'restaurants' ||
     type === 'diversions' ||

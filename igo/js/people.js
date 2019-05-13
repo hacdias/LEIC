@@ -12,7 +12,7 @@ function personPic (url) {
 }
 
 function updatePeople (screen) {
-  const people = window.data.people.sort(distanceSort)
+  const people = window.data.people.sort(alphabeticalSort)
   const content = screen.querySelector('.content')
   content.innerHTML = ''
 
