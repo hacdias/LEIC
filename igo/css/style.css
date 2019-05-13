@@ -1063,8 +1063,9 @@ button:active {
   background: white;
   padding: 1em;
   box-shadow: 0 0 17px rgba(0, 0, 0, 0.2);
-  min-width: 28em;
+  max-width: 28em;
   display: none;
+  width: 90%;
 }
 
 .modal.visible {
