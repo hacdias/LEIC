@@ -727,16 +727,19 @@ button:active {
   font-size: 1.8em;
 }
 
+#messages .content::-webkit-scrollbar,
 #screen-space::-webkit-scrollbar {
   width: 5px;
   border-bottom: 10px;
 }
 
+#messages .content::-webkit-scrollbar-track,
 #screen-space::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 8px;
 }
 
+#messages .content::-webkit-scrollbar-thumb,
 #screen-space::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.5);
   border-radius: 8px;
@@ -943,6 +946,7 @@ button:active {
   left: 0.5em;
   width: calc(100% - 1em);
   padding-top: 0.5em;
+  padding-right: 0.1em;
 }
 
 #messages .input-with-icon {
