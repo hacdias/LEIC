@@ -1116,3 +1116,21 @@ button:active {
 #people .item > div:last-of-type {
   margin-left: auto;
 }
+
+#faq h1 {
+  margin-top: 0;
+  margin-bottom: 0.3em;
+}
+
+#faq p {
+  font-size: 0.9em;
+}
+
+#faq p:nth-child(even) {
+  font-weight: bold;
+  margin: 0;
+}
+
+#faq p:nth-child(odd) {
+  margin-top: 0.2em;
+}
