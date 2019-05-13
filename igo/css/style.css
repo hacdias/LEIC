@@ -1018,6 +1018,7 @@ button:active {
   height: 4em;
   margin: 0 auto;
   display: block;
+  object-fit: cover;
 }
 
 #calling p {
