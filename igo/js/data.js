@@ -212,6 +212,17 @@ window.data = {
         isReserved: false,
         reservationTime: '00:00',
         reservationPeople: 0
+      },
+      {
+        id: uuidv4(),
+        name: 'Torre Eiffel',
+        distance: 900,
+        rating: 4.5,
+        price: 5,
+        kind: 'monuments',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
       }
     ],
     markets: [
@@ -220,6 +231,27 @@ window.data = {
         name: 'Mercado da Ribeira',
         distance: 345,
         rating: 4,
+        kind: 'markets'
+      },
+      {
+        id: uuidv4(),
+        name: 'Mercado Caramelo',
+        distance: 52,
+        rating: 5,
+        kind: 'markets'
+      },
+      {
+        id: uuidv4(),
+        name: 'Mercado Biológico',
+        distance: 1093,
+        rating: 2.5,
+        kind: 'markets'
+      },
+      {
+        id: uuidv4(),
+        name: 'Feira do Livro',
+        distance: 345,
+        rating: 4.5,
         kind: 'markets'
       }
     ],
@@ -230,6 +262,17 @@ window.data = {
         distance: 450,
         rating: 3.5,
         price: 7,
+        kind: 'diversions',
+        isReserved: false,
+        reservationTime: '00:00',
+        reservationPeople: 0
+      },
+      {
+        id: uuidv4(),
+        name: 'Jardim Zoológico',
+        distance: 3000,
+        rating: 5,
+        price: 15,
         kind: 'diversions',
         isReserved: false,
         reservationTime: '00:00',
