@@ -2,4 +2,3 @@
 
 Databases project and exercises.
 
-# BD-1920
