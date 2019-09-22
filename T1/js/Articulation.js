@@ -6,7 +6,7 @@ class Articulation extends THREE.Object3D {
     super()
 
     const material = new THREE.MeshBasicMaterial({
-      color: 0xC0C0C0
+      color: 0xF0F0F0
     })
 
     const geometry = new THREE.SphereGeometry(radius, 32, 32, 0, 2 * Math.PI, 0, Math.PI / 2)

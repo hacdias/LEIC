@@ -4,7 +4,7 @@
 class Joint extends THREE.Mesh {
   constructor (radius) {
     const material = new THREE.MeshBasicMaterial({
-      color: 0xC0C0C0
+      color: 0xF0F0F0
     })
 
     const geometry = new THREE.SphereGeometry(radius, 32, 32)
