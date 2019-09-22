@@ -13,7 +13,7 @@ class Hand extends THREE.Mesh {
 }
 
 class RoboticArm extends THREE.Object3D {
-  constructor ({ length, depth }) {
+  constructor ({ length, depth, forearmLength }) {
     super()
 
     const jointRadius = depth + 1
@@ -21,17 +21,17 @@ class RoboticArm extends THREE.Object3D {
     const handHeight = depth
 
     const armJoint = new Joint(jointRadius)
-    armJoint.position.y = length / 2
+    armJoint.position.y = forearmLength / 2
     armJoint.position.z = length
 
     const forearmJoint = new Joint(jointRadius)
-    forearmJoint.position.y = length / 2
+    forearmJoint.position.y = forearmLength / 2
 
-    const forearm = new Arm({ length, depth })
+    const forearm = new Arm({ length: forearmLength, depth })
 
     const arm = new Arm({ length, depth })
     arm.rotation.x = Math.PI / 2
-    arm.position.y = length / 2
+    arm.position.y = forearmLength / 2
     arm.position.z = length / 2
 
     const hand = new Hand({

@@ -8,7 +8,7 @@ class Machine extends THREE.Object3D {
     this._buildSurface({ width, depth })
     this._buildWheels({ width, depth })
     this._buildArticulation({ depth, radius: 7 })
-    this._buildArm({ length: width * 0.7, depth: depth * 0.7 })
+    this._buildArm({ length: width * 0.7, depth: depth * 0.7, artRadius: 7, base: depth * 5 / 2 })
   }
 
   _buildSurface ({ width, depth }) {
@@ -57,13 +57,19 @@ class Machine extends THREE.Object3D {
     this.add(this.articulation)
   }
 
-  _buildArm ({ length, depth }) {
-    this.arm = new RoboticArm({ length, depth })
-    this.arm.position.y = 20
-    this.arm.position.z = -6
-    // this.arm.rotation.x = -Math.PI / 6
+  _buildArm ({ length, depth, base, artRadius }) {
+    this.arm = new RoboticArm({ length, depth, forearmLength: length + artRadius })
+    this.arm.position.y = (length + artRadius) / 2
+    this.arm.position.z = 0
 
-    this.add(this.arm)
+    this.armPivot = new THREE.Group()
+    this.armPivot.add(this.arm)
+    this.armPivot.position.set(0, 0, 0)
+
+    this.armPivot.position.y = base
+    this.armPivot.rotation.x = -Math.PI / 6
+
+    this.add(this.armPivot)
   }
 
   rotateLeft () {
@@ -75,14 +81,15 @@ class Machine extends THREE.Object3D {
   }
 
   moveArmFront () {
-    console.warn('MOVE ARM FRONT')
-    this.arm.rotation.x -= Math.PI / 360
+    if (this.armPivot.rotation.x < Math.PI / 3) {
+      this.armPivot.rotation.x += 0.01
+    }
   }
 
   moveArmBack () {
-    console.warn('MOVE ARM BACK')
-
-    this.arm.rotation.x += Math.PI / 360
+    if (this.armPivot.rotation.x > -Math.PI / 3) {
+      this.armPivot.rotation.x -= 0.01
+    }
   }
 
   translate (vector) {
