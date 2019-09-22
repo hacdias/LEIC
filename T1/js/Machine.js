@@ -61,7 +61,7 @@ class Machine extends THREE.Object3D {
     this.arm = new RoboticArm({ length, depth })
     this.arm.position.y = 20
     this.arm.position.z = -6
-    this.arm.rotation.x = -Math.PI / 6
+    // this.arm.rotation.x = -Math.PI / 6
 
     this.add(this.arm)
   }

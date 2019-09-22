@@ -1,4 +1,4 @@
-/* global THREE, Machine  */
+/* global THREE, Machine, Target  */
 'use strict'
 
 const flags = {
