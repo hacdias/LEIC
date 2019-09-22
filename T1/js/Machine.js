@@ -73,11 +73,11 @@ class Machine extends THREE.Object3D {
   }
 
   rotateLeft () {
-    this.rotation.y += Math.PI / 360
+    this.armPivot.rotation.y += Math.PI / 360
   }
 
   rotateRight () {
-    this.rotation.y -= Math.PI / 360
+    this.armPivot.rotation.y -= Math.PI / 360
   }
 
   moveArmFront () {
