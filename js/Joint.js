@@ -2,8 +2,8 @@
 'use strict'
 
 class Joint extends THREE.Mesh {
-  constructor (radius = 3) {
-    const material = new THREE.MeshStandardMaterial({
+  constructor (radius) {
+    const material = new THREE.MeshBasicMaterial({
       color: 0xC0C0C0
     })
 

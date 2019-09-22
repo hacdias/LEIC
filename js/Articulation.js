@@ -5,7 +5,7 @@ class Articulation extends THREE.Object3D {
   constructor (radius = 7) {
     super()
 
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
       color: 0xC0C0C0
     })
 

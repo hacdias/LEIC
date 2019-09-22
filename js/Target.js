@@ -1,21 +1,26 @@
-/* global THREE, Machine, Floor  */
+/* global THREE, Machine  */
 'use strict'
 
 class Target extends THREE.Object3D {
   constructor () {
     super(...arguments)
+    this._buildCylinder()
+    this._buildTorus()
+  }
 
-    var geometry = new THREE.CylinderGeometry(7, 7, 30, 32)
-    var material = new THREE.MeshStandardMaterial({ color: 0xffff00 })
-    var cylinder = new THREE.Mesh(geometry, material)
-    this.add(cylinder)
+  _buildCylinder () {
+    const geometry = new THREE.CylinderGeometry(7, 7, 30, 32)
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 })
+    this.cylinder = new THREE.Mesh(geometry, material)
+    this.cylinder.position.y = 15
+    this.add(this.cylinder)
+  }
 
-    cylinder.position.y = 15
-
-    var geometry = new THREE.TorusGeometry(5, 2, 16, 100)
-    var material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-    var torus = new THREE.Mesh(geometry, material)
-    torus.position.y = 37
-    this.add(torus)
+  _buildTorus () {
+    const geometry = new THREE.TorusGeometry(5, 2, 16, 100)
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    this.torus = new THREE.Mesh(geometry, material)
+    this.torus.position.y = 37
+    this.add(this.torus)
   }
 }

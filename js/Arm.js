@@ -6,7 +6,7 @@ class Arm extends THREE.Object3D {
     super(...arguments)
 
     const geometry = new THREE.BoxGeometry(depth, length, depth)
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
       color: 0xC0C0C0
     })
 

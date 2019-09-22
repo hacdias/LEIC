@@ -5,7 +5,7 @@ class Wheel extends THREE.Object3D {
   constructor (radius) {
     super()
 
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
       color: 0xC0C0C0
     })
 
