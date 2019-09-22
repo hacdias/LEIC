@@ -10,7 +10,8 @@ const flags = {
 const ASPECT_RATIO = 16 / 9
 const PLANE_H = 100
 
-var scene; var renderer; var machine; var cameras = new Array(3)
+var scene, renderer, machine
+var cameras = new Array(3)
 
 function createScene () {
   scene = new THREE.Scene()
@@ -26,7 +27,7 @@ function createScene () {
   scene.add(target)
 }
 
-function calcCameraSize () {
+function getCameraSizes () {
   const scale = window.innerWidth / window.innerHeight
   let width, height
 
@@ -42,7 +43,7 @@ function calcCameraSize () {
 }
 
 function createOrtographicCamera ({ position, lookAt }) {
-  var { width, height } = calcCameraSize()
+  var { width, height } = getCameraSizes()
 
   const cam = new THREE.OrthographicCamera(
     -width / 2,
@@ -58,14 +59,23 @@ function createOrtographicCamera ({ position, lookAt }) {
 }
 
 function createCamera () {
-  const width = window.innerWidth
-  const height = window.innerHeight
-
   cameras[0] = createOrtographicCamera({ position: [0, 10, 0], lookAt: [0, 0, 0] })
   cameras[1] = createOrtographicCamera({ position: [30, 20, 0], lookAt: [0, 20, 0] })
   cameras[2] = createOrtographicCamera({ position: [0, 20, -30], lookAt: [0, 20, 0] })
 
   cameras.forEach(cam => scene.add(cam))
+}
+
+function resizeCameras () {
+  const { width, height } = getCameraSizes()
+
+  for (const cam of cameras) {
+    cam.left = -width / 2
+    cam.right = width / 2
+    cam.top = height / 2
+    cam.bottom = -height / 2
+    cam.updateProjectionMatrix()
+  }
 }
 
 function animate () {
@@ -80,14 +90,7 @@ function animate () {
   if (flags.resize) {
     flags.resize = false
     renderer.setSize(window.innerWidth, window.innerHeight)
-
-    // TODO: FIX THIS
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-      cameras.forEach(camera => {
-        camera.aspect = window.innerWidth / window.innerHeight
-        camera.updateProjectionMatrix()
-      })
-    }
+    resizeCameras()
   }
 
   if (flags.pressed.KeyA) {
@@ -106,23 +109,11 @@ function animate () {
     machine.moveArmBack()
   }
 
-  const transVector = [0, 0, 0]
-
-  if (flags.pressed.ArrowRight) {
-    transVector[0] = 1
-  }
-
-  if (flags.pressed.ArrowLeft) {
-    transVector[0] = -1
-  }
-
-  if (flags.pressed.ArrowUp) {
-    transVector[2] = 1
-  }
-
-  if (flags.pressed.ArrowDown) {
-    transVector[2] = -1
-  }
+  const transVector = [
+    flags.pressed.ArrowRight ? 1 : flags.pressed.ArrowLeft ? -1 : 0,
+    0,
+    flags.pressed.ArrowUp ? 1 : flags.pressed.ArrowDown ? -1 : 0
+  ]
 
   machine.translate(transVector)
   renderer.render(scene, cameras[flags.camera - 1])
