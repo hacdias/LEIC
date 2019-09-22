@@ -9,6 +9,7 @@ class Machine extends THREE.Object3D {
     this._buildWheels({ width, depth })
     this._buildArticulation({ depth, radius: 7 })
     this._buildArm({ length: width * 0.7, depth: depth * 0.7, artRadius: 7, base: depth * 5 / 2 })
+    this._mergeArmArticulation()
   }
 
   _buildSurface ({ width, depth }) {
@@ -53,8 +54,6 @@ class Machine extends THREE.Object3D {
   _buildArticulation ({ radius, depth }) {
     this.articulation = new Articulation(radius)
     this.articulation.position.y = depth * 2
-
-    this.add(this.articulation)
   }
 
   _buildArm ({ length, depth, base, artRadius }) {
@@ -68,16 +67,21 @@ class Machine extends THREE.Object3D {
 
     this.armPivot.position.y = base
     this.armPivot.rotation.x = -Math.PI / 6
+  }
 
-    this.add(this.armPivot)
+  _mergeArmArticulation () {
+    this.armArticulation = new THREE.Group()
+    this.armArticulation.add(this.armPivot)
+    this.armArticulation.add(this.articulation)
+    this.add(this.armArticulation)
   }
 
   rotateLeft () {
-    this.armPivot.rotation.y += Math.PI / 360
+    this.armArticulation.rotation.y += 0.01
   }
 
   rotateRight () {
-    this.armPivot.rotation.y -= Math.PI / 360
+    this.armArticulation.rotation.y -= 0.01
   }
 
   moveArmFront () {
