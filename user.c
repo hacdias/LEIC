@@ -24,7 +24,6 @@ typedef struct udpConn {
   struct addrinfo hints, *res;
 } UDPConn;
 
-
 Options getOptions (int argc, char** argv) {
   Options opts = {LOCALHOST, PORT};
   long opt;
@@ -75,7 +74,7 @@ char* sendUDP (UDPConn *conn, char* msg) {
   return buffer;
 }
 
-void registerUser (UDPConn *conn) {
+char *registerUser (UDPConn *conn) {
   char msg[11] = "REG ";
   scanf("%s", msg + 4);
   msg[9] = '\n';
@@ -85,16 +84,20 @@ void registerUser (UDPConn *conn) {
   char *buffer = sendUDP(conn, msg);
 
   if (buffer == NULL) {
-    return;
+    return NULL;
   }
 
   if (strcmp(buffer, "RGR OK\n") == 0) {
     printf("User registred!\n");
   } else {
     printf("Registration failed!\n");
+    return NULL;
   }
 
+  msg[9] = '\0';
+  char *userID = strdup(msg + 4);
   free(buffer);
+  return userID;
 }
 
 void topicList (UDPConn *conn) {
@@ -106,7 +109,7 @@ void topicList (UDPConn *conn) {
   char *spaceToken = strtok(buffer + pos, " :");
 
   for (int i = 0; spaceToken != NULL; i++) {
-    printf(" %d. Topic '%s'", i, spaceToken);
+    printf("%d. Topic '%s'", i, spaceToken);
     spaceToken = strtok(NULL, " :"); 
     printf(" from user %s\n", spaceToken);
     spaceToken = strtok(NULL, " :"); 
@@ -115,12 +118,18 @@ void topicList (UDPConn *conn) {
   free(buffer);
 }
 
-void topicSelect (UDPConn *conn) {
-  printf("I do nothing yet. Get away!");
+int topicSelect () {
+  int num;
+  scanf("%d", &num);
+  printf("Topic %d selected!\n", num);
+  return num;
 }
 
-void topicPropose (UDPConn *conn) {
-  printf("I do nothing yet. Get away!");
+void topicPropose (UDPConn *conn, char* userID, int currentTopic) {
+  char* res = sendUDP(conn, "PTP 89455 myBeautifulTopic\n");
+  printf("%s\n", res);
+
+  free(res);
 }
 
 void questionList (UDPConn *conn) {
@@ -180,17 +189,19 @@ int main(int argc, char** argv) {
 
   printf("> ");
   while (scanf("%s", cmd) == 1) {
+    int currentTopic = -1;
+    char *userID = NULL;
 
     if (strcmp(cmd, "exit") == 0) {
       break;
     } else if (checkCommand(cmd, "register", "reg")) {
-      registerUser(conn);
+      userID = registerUser(conn);
     } else if (checkCommand(cmd, "topic_list", "tl")) {
       topicList(conn);
     } else if (checkCommand(cmd, "topic_select", "ts")) {
-      topicSelect(conn);
+      currentTopic = topicSelect();
     } else if (checkCommand(cmd, "topic_propose", "tp")) {
-      topicPropose(conn);
+      topicPropose(conn, userID, currentTopic);
     } else if (checkCommand(cmd, "question_list", "ql")) {
       questionList(conn);
     } else if (checkCommand(cmd, "question_get", "qg")) {
@@ -202,6 +213,8 @@ int main(int argc, char** argv) {
     } else {
       printf("Invalid command! Go read a book.\n");
     }
+
+    printf("%s\n", userID);
 
     printf("> ");
   }
