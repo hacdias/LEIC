@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -106,13 +107,14 @@ void topicList (UDPConn *conn) {
   sscanf(buffer, "LTR %d%n", &topics, &pos);
   pos++;
 
-  char *spaceToken = strtok(buffer + pos, " :");
+  char *spaceToken = strtok(buffer + pos, " :\n");
+  printf("Available Topics:\n");
 
-  for (int i = 0; spaceToken != NULL; i++) {
-    printf("%d. Topic '%s'", i, spaceToken);
+  for (int i = 0; i < topics; i++) {
+    printf("%d. '%s'", i + 1, spaceToken);
     spaceToken = strtok(NULL, " :"); 
-    printf(" from user %s\n", spaceToken);
-    spaceToken = strtok(NULL, " :"); 
+    printf(" (proposed by %s)", spaceToken);
+    spaceToken = strtok(NULL, " :");
   }
 
   free(buffer);
@@ -125,8 +127,15 @@ int topicSelect () {
   return num;
 }
 
-void topicPropose (UDPConn *conn, char* userID, int currentTopic) {
-  char* res = sendUDP(conn, "PTP 89455 myBeautifulTopic\n");
+void topicPropose (UDPConn *conn, char* userID) {
+  int step = 0;
+  char msg[256] = "PTP ";
+  strcpy(msg + 4, userID);
+  msg[9] = ' ';
+  scanf("%s%n", msg + 10, &step);
+  msg[10 + step - 1] = '\n';
+  msg[10 + step] = '\0';
+  char* res = sendUDP(conn, msg);
   printf("%s\n", res);
 
   free(res);
@@ -177,6 +186,11 @@ void closeUDP (UDPConn* conn) {
   free(conn);
 }
 
+void clearInput () {
+  int c;
+  while ((c = getchar()) != '\n' && c != EOF) { }
+}
+
 int main(int argc, char** argv) {
   Options opts = getOptions(argc, argv);
   UDPConn* conn = connectUDP(opts);
@@ -186,11 +200,11 @@ int main(int argc, char** argv) {
   }
 
   char cmd[256];
+  char *userID = NULL;
+  int currentTopic = -1;
 
   printf("> ");
   while (scanf("%s", cmd) == 1) {
-    int currentTopic = -1;
-    char *userID = NULL;
 
     if (strcmp(cmd, "exit") == 0) {
       break;
@@ -201,22 +215,33 @@ int main(int argc, char** argv) {
     } else if (checkCommand(cmd, "topic_select", "ts")) {
       currentTopic = topicSelect();
     } else if (checkCommand(cmd, "topic_propose", "tp")) {
-      topicPropose(conn, userID, currentTopic);
+      if (userID == NULL) {
+        printf("User must be registred first!\n");
+      } else {
+        topicPropose(conn, userID);
+      }
     } else if (checkCommand(cmd, "question_list", "ql")) {
       questionList(conn);
     } else if (checkCommand(cmd, "question_get", "qg")) {
       questionGet();
     } else if (checkCommand(cmd, "question_submit", "qs")) {
-      questionSubmit();
+      if (userID == NULL) {
+        printf("User must be registred first!\n");
+      } else {
+        questionSubmit();
+      }
     } else if (checkCommand(cmd, "answer_submit", "as")) {
-      answerSubmit();
+      if (userID == NULL) {
+        printf("User must be registred first!\n");
+      } else {
+        answerSubmit();
+      }
     } else {
       printf("Invalid command! Go read a book.\n");
     }
 
-    printf("%s\n", userID);
-
     printf("> ");
+    clearInput();
   }
 
   closeUDP(conn);
