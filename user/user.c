@@ -80,23 +80,28 @@ char *registerUser (UDPConn *conn) {
   msg[9] = '\n';
   msg[10] = '\0';
 
-  struct sockaddr_in addr;
   char *buffer = sendUDP(conn, msg);
 
   if (buffer == NULL) {
     return NULL;
   }
 
-  if (strcmp(buffer, "RGR OK\n") == 0) {
+  int ok = strcmp(buffer, "RGR OK\n") == 0;
+
+  if (ok) {
     printf("User registred!\n");
   } else {
     printf("Registration failed!\n");
+  }
+
+  free(buffer);
+
+  if (!ok) {
     return NULL;
   }
 
   msg[9] = '\0';
   char *userID = strdup(msg + 4);
-  free(buffer);
   return userID;
 }
 

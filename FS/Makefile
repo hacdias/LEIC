@@ -1,2 +1,2 @@
 default:
-	gcc FS.c -o FS
+	gcc -Wall FS.c -o FS

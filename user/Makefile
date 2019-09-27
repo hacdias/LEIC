@@ -1,2 +1,2 @@
 default:
-	gcc user.c -o user
+	gcc -Wall user.c -o user
