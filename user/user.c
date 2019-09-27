@@ -107,8 +107,33 @@ void topicPropose (UDPConn *conn, char* userID) {
   free(res);
 }
 
-void questionList (UDPConn *conn) {
-  printf("I do nothing yet. Get away!");
+void questionList (UDPConn *conn, char *topic) {
+  if (topic == NULL) {
+    printf("You must pick a topic first!\n");
+    return;
+  }
+
+  char msg[256];
+  sprintf(msg, "LQU %s\n", topic);
+  char *buffer = sendUDP(conn, msg);
+
+  int count = 0;
+  int pos = 0;
+  sscanf(buffer, "LQR %d%n", &count, &pos);
+  pos++;
+  
+
+  char *spaceToken = strtok(buffer + pos, " :\n");
+  printf("Available Questions for %s:\n", topic);
+
+  for (int i = 0; i < count; i++) {
+    printf("%d. '%s'", i + 1, spaceToken);
+    spaceToken = strtok(NULL, " :\n");
+    printf(" (asked by %s", spaceToken);
+    spaceToken = strtok(NULL, " :\n");
+    printf(" with %s answers)\n", spaceToken);
+    spaceToken = strtok(NULL, " :\n");
+  }
 }
 
 void questionGet () {
@@ -177,7 +202,7 @@ int main(int argc, char** argv) {
         }
         break;
       case QuestionList:
-        questionList(conn);
+        questionList(conn, currentTopic);
         break;
       case QuestionGet:
         questionGet();
