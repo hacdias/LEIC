@@ -37,14 +37,14 @@ char *registerUser (UDPConn *conn) {
   return userID;
 }
 
-typedef struct topics {
+typedef struct stringArray {
   int count;
   char **names;
-} Topics;
+} StringArray;
 
-Topics* topicList (UDPConn *conn) {
+StringArray* topicList (UDPConn *conn) {
   char* buffer = sendUDP(conn, "LTP\n");
-  Topics *topics = malloc(sizeof(Topics));
+  StringArray *topics = malloc(sizeof(StringArray));
   int pos = 0;
   sscanf(buffer, "LTR %d%n", &topics->count, &pos);
   pos++;
@@ -66,7 +66,7 @@ Topics* topicList (UDPConn *conn) {
   return topics;
 }
 
-char* topicSelect (Topics *topics) {
+char* topicSelect (StringArray *topics) {
   if (topics == NULL) {
     printf("You must get the topics list first!\n");
     return NULL;
@@ -107,37 +107,75 @@ void topicPropose (UDPConn *conn, char* userID) {
   free(res);
 }
 
-void questionList (UDPConn *conn, char *topic) {
+StringArray* questionList (UDPConn *conn, char *topic) {
   if (topic == NULL) {
     printf("You must pick a topic first!\n");
-    return;
+    return NULL;
   }
 
+  StringArray *questions = malloc(sizeof(StringArray));
   char msg[256];
   sprintf(msg, "LQU %s\n", topic);
   char *buffer = sendUDP(conn, msg);
 
-  int count = 0;
   int pos = 0;
-  sscanf(buffer, "LQR %d%n", &count, &pos);
+  sscanf(buffer, "LQR %d%n", &questions->count, &pos);
   pos++;
-  
+
+  questions->names = malloc(questions->count * sizeof(char *));
 
   char *spaceToken = strtok(buffer + pos, " :\n");
   printf("Available Questions for %s:\n", topic);
 
-  for (int i = 0; i < count; i++) {
-    printf("%d. '%s'", i + 1, spaceToken);
+  for (int i = 0; i < questions->count; i++) {
+    questions->names[i] = strdup(spaceToken);
+    printf("%d. '%s'", i + 1, questions->names[i]);
     spaceToken = strtok(NULL, " :\n");
     printf(" (asked by %s", spaceToken);
     spaceToken = strtok(NULL, " :\n");
     printf(" with %s answers)\n", spaceToken);
     spaceToken = strtok(NULL, " :\n");
   }
+
+  return questions;
 }
 
-void questionGet () {
-  printf("I do nothing yet. Get away!");
+void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
+  if (questions == NULL) {
+    printf("You must get the questions first!\n");
+    return;
+  }
+
+  int num;
+  scanf("%d", &num);
+
+  if (num <= 0 || num > questions->count) {
+    printf("Invalid question number!\n");
+    return;
+  }
+
+  char msg[1024];
+  sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
+
+  TCPConn* conn = connectTCP(opts);
+
+  if (write(conn->fd, msg, strlen(msg)) == -1) {
+    printf("I'm sad :(");
+    closeTCP(conn);
+    return;
+  }
+
+
+  char buffer[1024];
+
+  while (read(conn->fd, buffer, 256) != -1) {
+    printf("%s\n", buffer);
+  }
+
+  printf("I'm TCPing'");
+
+  closeTCP(conn);
+
 }
 
 void questionSubmit () {
@@ -172,7 +210,8 @@ int main(int argc, char** argv) {
 
   char cmd[256];
   char *userID = NULL;
-  Topics *topics = NULL;
+  StringArray *topics = NULL;
+  StringArray *questions = NULL;
   char *currentTopic = NULL;
   int exit = 0;
 
@@ -202,10 +241,10 @@ int main(int argc, char** argv) {
         }
         break;
       case QuestionList:
-        questionList(conn, currentTopic);
+        questions = questionList(conn, currentTopic);
         break;
       case QuestionGet:
-        questionGet();
+        questionGet(opts, currentTopic, questions);
         break;
       case QuestionSubmit:
         if (hasUserId(userID)) {

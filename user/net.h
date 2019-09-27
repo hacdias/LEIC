@@ -20,6 +20,11 @@ typedef struct udpConn {
   struct addrinfo hints, *res;
 } UDPConn;
 
+typedef struct tcpConn {
+  int fd;
+  struct addrinfo hints, *res;
+} TCPConn;
+
 ServerOptions getOptions (int argc, char** argv);
 
 UDPConn *connectUDP (ServerOptions opts);
@@ -27,5 +32,9 @@ UDPConn *connectUDP (ServerOptions opts);
 void closeUDP (UDPConn* conn);
 
 char* sendUDP (UDPConn *conn, char* msg);
+
+TCPConn *connectTCP (ServerOptions opts);
+
+void closeTCP (TCPConn* conn);
 
 #endif

@@ -76,3 +76,36 @@ char* sendUDP (UDPConn *conn, char* msg) {
   buffer[len] = '\0';
   return buffer;
 }
+
+TCPConn *connectTCP (ServerOptions opts) {
+  TCPConn *conn = malloc(sizeof(TCPConn));
+  int n;
+
+	memset(&conn->hints, 0, sizeof(conn->hints));
+	conn->hints.ai_family = AF_INET;
+	conn->hints.ai_socktype = SOCK_STREAM;
+	conn->hints.ai_flags = AI_NUMERICSERV;
+
+  n = getaddrinfo(opts.ip, opts.port, &conn->hints, &conn->res);
+	if (n != 0) {
+    return NULL;
+  }
+
+  conn->fd = socket(conn->res->ai_family, conn->res->ai_socktype, conn->res->ai_protocol);
+	if (conn->fd == -1) {
+    return NULL;
+  }
+
+  n = connect(conn->fd, conn->res->ai_addr, conn->res->ai_addrlen);
+  if (n == -1) {
+    return NULL;
+  }
+
+  return conn;
+}
+
+void closeTCP (TCPConn* conn) {
+  freeaddrinfo(conn->res);
+	close(conn->fd);
+  free(conn);
+}
