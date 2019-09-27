@@ -1,4 +1,3 @@
-/* http://tejo.tecnico.ulisboa.pt/ */
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,9 +111,9 @@ void topicList (UDPConn *conn) {
 
   for (int i = 0; i < topics; i++) {
     printf("%d. '%s'", i + 1, spaceToken);
-    spaceToken = strtok(NULL, " :"); 
-    printf(" (proposed by %s)", spaceToken);
-    spaceToken = strtok(NULL, " :");
+    spaceToken = strtok(NULL, " :\n"); 
+    printf(" (proposed by %s)\n", spaceToken);
+    spaceToken = strtok(NULL, " :\n");
   }
 
   free(buffer);
