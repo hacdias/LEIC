@@ -1,2 +1,2 @@
 default:
-	gcc -Wall user.c cmds.c -o user
+	gcc -Wall user.c cmds.c net.c -o user

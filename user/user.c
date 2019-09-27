@@ -1,75 +1,10 @@
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include "cmds.h"
-
-#define LOCALHOST "127.0.0.1"
-#define PORT "58035"
-
-typedef struct options {
-  char ip[16];
-  char port[6];
-} Options;
-
-typedef struct udpConn {
-  int fd;
-  struct addrinfo hints, *res;
-} UDPConn;
-
-Options getOptions (int argc, char** argv) {
-  Options opts = {LOCALHOST, PORT};
-  long opt;
-
-  while ((opt = getopt(argc, argv, "n:p:")) != -1) {
-    switch (opt) {
-      case 'n':
-        strcpy(opts.ip, optarg);
-        break;
-      case 'p':
-        strcpy(opts.port, optarg);
-        break;
-      default:
-        exit(1);
-    }
-  }
-
-  return opts;
-}
-
-// TODO: IMPROVE THIS
-char* sendUDP (UDPConn *conn, char* msg) {
-  int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
-  if (n == -1) {
-    return NULL;
-  }
-
-  struct sockaddr_in addr;
-  socklen_t addrlen = sizeof(addr);
-
-  int size = 3, prevLen = 0, len = 0;
-  char *buffer = NULL;
-
-  do {
-    size++;
-    buffer = realloc(buffer, size);
-    prevLen = len;
-    len = recvfrom(conn->fd, buffer, size, MSG_PEEK, (struct sockaddr*) &addr, &addrlen);
-  } while (len != prevLen);
-
-  buffer = realloc(buffer, len + 1);
-  len = recvfrom(conn->fd, buffer, size, 0, (struct sockaddr*) &addr, &addrlen);
-  buffer[len] = '\0';
-  return buffer;
-}
+#include "net.h"
 
 char *registerUser (UDPConn *conn) {
   char msg[11] = "REG ";
@@ -163,35 +98,6 @@ void answerSubmit () {
   printf("I do nothing yet. Get away!");
 }
 
-
-UDPConn *connectUDP (Options opts) {
-  UDPConn *udpConn = malloc(sizeof(UDPConn));
-  int n;
-
-	memset(&udpConn->hints, 0, sizeof(udpConn->hints));
-	udpConn->hints.ai_family = AF_INET;
-	udpConn->hints.ai_socktype = SOCK_DGRAM;
-	udpConn->hints.ai_flags = AI_NUMERICSERV;
-
-  n = getaddrinfo(opts.ip, opts.port, &udpConn->hints, &udpConn->res);
-	if (n != 0) {
-    return NULL;
-  }
-
-  udpConn->fd = socket(udpConn->res->ai_family, udpConn->res->ai_socktype, udpConn->res->ai_protocol);
-	if (udpConn->fd == -1) {
-    return NULL;
-  }
-
-  return udpConn;
-}
-
-void closeUDP (UDPConn* conn) {
-  freeaddrinfo(conn->res);
-	close(conn->fd);
-  free(conn);
-}
-
 void clearInput () {
   int c;
   while ((c = getchar()) != '\n' && c != EOF) { }
@@ -207,7 +113,7 @@ int hasUserId (char* userID) {
 }
 
 int main(int argc, char** argv) {
-  Options opts = getOptions(argc, argv);
+  ServerOptions opts = getOptions(argc, argv);
   UDPConn* conn = connectUDP(opts);
 
   if (conn == NULL) {
