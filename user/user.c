@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include "cmds.h"
 
 #define LOCALHOST "127.0.0.1"
 #define PORT "58035"
@@ -42,10 +43,6 @@ Options getOptions (int argc, char** argv) {
   }
 
   return opts;
-}
-
-int checkCommand (char *cmd, char longForm[256], char shortForm[256]) {
-  return strcmp(cmd, longForm) == 0 || strcmp(cmd, shortForm) == 0;
 }
 
 // TODO: IMPROVE THIS
@@ -116,7 +113,7 @@ void topicList (UDPConn *conn) {
 
   for (int i = 0; i < topics; i++) {
     printf("%d. '%s'", i + 1, spaceToken);
-    spaceToken = strtok(NULL, " :\n"); 
+    spaceToken = strtok(NULL, " :\n");
     printf(" (proposed by %s)\n", spaceToken);
     spaceToken = strtok(NULL, " :\n");
   }
@@ -200,6 +197,15 @@ void clearInput () {
   while ((c = getchar()) != '\n' && c != EOF) { }
 }
 
+int hasUserId (char* userID) {
+  if (userID == NULL) {
+    printf("User must be registred first!\n");
+    return 0;
+  }
+
+  return 1;
+}
+
 int main(int argc, char** argv) {
   Options opts = getOptions(argc, argv);
   UDPConn* conn = connectUDP(opts);
@@ -211,47 +217,55 @@ int main(int argc, char** argv) {
   char cmd[256];
   char *userID = NULL;
   int currentTopic = -1;
+  int exit = 0;
 
-  printf("> ");
-  while (scanf("%s", cmd) == 1) {
+  do {
+    printf("> ");
 
-    if (strcmp(cmd, "exit") == 0) {
+    if (scanf("%s", cmd) != 1) {
       break;
-    } else if (checkCommand(cmd, "register", "reg")) {
-      userID = registerUser(conn);
-    } else if (checkCommand(cmd, "topic_list", "tl")) {
-      topicList(conn);
-    } else if (checkCommand(cmd, "topic_select", "ts")) {
-      currentTopic = topicSelect();
-    } else if (checkCommand(cmd, "topic_propose", "tp")) {
-      if (userID == NULL) {
-        printf("User must be registred first!\n");
-      } else {
-        topicPropose(conn, userID);
-      }
-    } else if (checkCommand(cmd, "question_list", "ql")) {
-      questionList(conn);
-    } else if (checkCommand(cmd, "question_get", "qg")) {
-      questionGet();
-    } else if (checkCommand(cmd, "question_submit", "qs")) {
-      if (userID == NULL) {
-        printf("User must be registred first!\n");
-      } else {
-        questionSubmit();
-      }
-    } else if (checkCommand(cmd, "answer_submit", "as")) {
-      if (userID == NULL) {
-        printf("User must be registred first!\n");
-      } else {
-        answerSubmit();
-      }
-    } else {
-      printf("Invalid command! Go read a book.\n");
     }
 
-    printf("> ");
+    switch (getCommand(cmd)) {
+      case Exit:
+        exit = 1;
+        break;
+      case Register:
+        userID = registerUser(conn);
+        break;
+      case TopicList:
+        topicList(conn);
+        break;
+      case TopicSelect:
+       currentTopic = topicSelect();
+       break;
+      case TopicPropose:
+        if (hasUserId(userID)) {
+          topicPropose(conn, userID);
+        }
+        break;
+      case QuestionList:
+        questionList(conn);
+        break;
+      case QuestionGet:
+        questionGet();
+        break;
+      case QuestionSubmit:
+        if (hasUserId(userID)) {
+          questionSubmit();
+        }
+        break;
+      case AnswerSubmit:
+        if (hasUserId(userID)) {
+          answerSubmit();
+        }
+        break;
+      default:
+        printf("Invalid command! Go read a book.\n");
+    }
+
     clearInput();
-  }
+  } while (!exit);
 
   closeUDP(conn);
   return 0;
