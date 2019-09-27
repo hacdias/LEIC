@@ -135,7 +135,12 @@ void topicPropose (UDPConn *conn, char* userID) {
   msg[10 + step - 1] = '\n';
   msg[10 + step] = '\0';
   char* res = sendUDP(conn, msg);
-  printf("%s\n", res);
+
+  if (strcmp(res, "PTR OK\n") == 0) {
+    printf("Topic proposed successfully!\n");
+  } else {
+    printf("Could not propose topic.\n");
+  }
 
   free(res);
 }
