@@ -37,30 +37,51 @@ char *registerUser (UDPConn *conn) {
   return userID;
 }
 
-void topicList (UDPConn *conn) {
+typedef struct topics {
+  int count;
+  char **names;
+} Topics;
+
+Topics* topicList (UDPConn *conn) {
   char* buffer = sendUDP(conn, "LTP\n");
-  int topics = 0, pos = 0;
-  sscanf(buffer, "LTR %d%n", &topics, &pos);
+  Topics *topics = malloc(sizeof(Topics));
+  int pos = 0;
+  sscanf(buffer, "LTR %d%n", &topics->count, &pos);
   pos++;
 
   char *spaceToken = strtok(buffer + pos, " :\n");
   printf("Available Topics:\n");
 
-  for (int i = 0; i < topics; i++) {
-    printf("%d. '%s'", i + 1, spaceToken);
+  topics->names = malloc(topics->count * sizeof(char *));
+
+  for (int i = 0; i < topics->count; i++) {
+    topics->names[i] = strdup(spaceToken);
+    printf("%d. '%s'", i + 1, topics->names[i]);
     spaceToken = strtok(NULL, " :\n");
     printf(" (proposed by %s)\n", spaceToken);
     spaceToken = strtok(NULL, " :\n");
   }
 
   free(buffer);
+  return topics;
 }
 
-int topicSelect () {
+char* topicSelect (Topics *topics) {
+  if (topics == NULL) {
+    printf("You must get the topics list first!\n");
+    return NULL;
+  }
+
   int num;
   scanf("%d", &num);
-  printf("Topic %d selected!\n", num);
-  return num;
+
+  if (num <= 0 || num > topics->count) {
+    printf("Invalid topic number!\n");
+    return NULL;
+  }
+
+  printf("Topic %s selected!\n", topics->names[num - 1]);
+  return topics->names[num - 1];
 }
 
 void topicPropose (UDPConn *conn, char* userID) {
@@ -75,6 +96,10 @@ void topicPropose (UDPConn *conn, char* userID) {
 
   if (strcmp(res, "PTR OK\n") == 0) {
     printf("Topic proposed successfully!\n");
+  } else if (strcmp(res, "PTR DUP\n") == 0) {
+    printf("Topic proposed already exists!\n");
+  } else if (strcmp(res, "PTR FUL\n") == 0) {
+    printf("Topic list is full!\n");
   } else {
     printf("Could not propose topic.\n");
   }
@@ -122,7 +147,8 @@ int main(int argc, char** argv) {
 
   char cmd[256];
   char *userID = NULL;
-  int currentTopic = -1;
+  Topics *topics = NULL;
+  char *currentTopic = NULL;
   int exit = 0;
 
   do {
@@ -140,11 +166,11 @@ int main(int argc, char** argv) {
         userID = registerUser(conn);
         break;
       case TopicList:
-        topicList(conn);
+        topics = topicList(conn);
         break;
       case TopicSelect:
-       currentTopic = topicSelect();
-       break;
+        currentTopic = topicSelect(topics);
+        break;
       case TopicPropose:
         if (hasUserId(userID)) {
           topicPropose(conn, userID);
