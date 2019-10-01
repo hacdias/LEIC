@@ -3,6 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include "cmds.h"
 #include "net.h"
 
@@ -168,7 +169,7 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
   char buffer[1024];
 
-  while (read(conn->fd, buffer, 256) != -1) {
+  while (read(conn->fd, buffer, 256) > 0) {
     printf("%s\n", buffer);
   }
 
@@ -178,12 +179,74 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
 }
 
-void questionSubmit () {
-  printf("I do nothing yet. Get away!");
+void questionSubmit (ServerOptions opts, char *userID, char *topic) {
+  if (topic == NULL) {
+    printf("You must get the topics list first!\n");
+    return;
+  }
+
+  char str[1024];
+
+  if (fgets (str, 1024, stdin) == NULL) {
+    printf("Cannot read.\n");
+    return;
+  }
+
+  char *question = strtok(str+1, " \n");
+  char *txtFile = strtok(NULL, " \n");
+  char *imgFile = strtok(NULL, " \n");
+
+  if (question == NULL || txtFile == NULL) {
+    printf("A question and a text file are required!\n");
+    return;
+  }
+
+  if (access(txtFile, F_OK) == -1 || (imgFile != NULL && access(imgFile, F_OK) == -1)) {
+    printf("Text or image file does not exist!\n");
+    return;
+  }
+
+  TCPConn* conn = connectTCP(opts);
+
+  // TODO: check for errors
+  write(conn->fd, "QUS ", 4);
+  write(conn->fd, userID, 5);
+  write(conn->fd, " ", 1);
+  write(conn->fd, topic, strlen(topic));
+  write(conn->fd, " ", 1);
+  write(conn->fd, question, strlen(question));
+  write(conn->fd, " ", 1);
+
+  if (sendFile(conn->fd, txtFile, 0) == -1) {
+    printf("Cannot send file properly!\n");
+    return;
+  }
+
+  if (imgFile != NULL) {
+    write(conn->fd, "1 ", 2);
+    if (sendFile(conn->fd, imgFile, 1) == -1) {
+      printf("Cannot send image properly!\n");
+      return;
+    }
+  } else {
+    write(conn->fd, "0", 1);
+  }
+  printf("meda\n");
+
+  write(conn->fd, "\n", 1);
+
+  char buffer[1024];
+
+  while (read(conn->fd, buffer, 1024) > 0) {
+  printf("%s\n", buffer);
+  }
+
+
+  closeTCP(conn);
 }
 
 void answerSubmit () {
-  printf("I do nothing yet. Get away!");
+  printf("I do nothing yet. Get away!\n");
 }
 
 void clearInput () {
@@ -228,27 +291,33 @@ int main(int argc, char** argv) {
         break;
       case Register:
         userID = registerUser(conn);
+        clearInput();
         break;
       case TopicList:
         topics = topicList(conn);
+        clearInput();
         break;
       case TopicSelect:
         currentTopic = topicSelect(topics);
+        clearInput();
         break;
       case TopicPropose:
         if (hasUserId(userID)) {
           topicPropose(conn, userID);
+          clearInput();
         }
         break;
       case QuestionList:
         questions = questionList(conn, currentTopic);
+        clearInput();
         break;
       case QuestionGet:
         questionGet(opts, currentTopic, questions);
+        clearInput();
         break;
       case QuestionSubmit:
         if (hasUserId(userID)) {
-          questionSubmit();
+          questionSubmit(opts, userID, currentTopic);
         }
         break;
       case AnswerSubmit:
@@ -259,8 +328,6 @@ int main(int argc, char** argv) {
       default:
         printf("Invalid command! Go read a book.\n");
     }
-
-    clearInput();
   } while (!exit);
 
   closeUDP(conn);

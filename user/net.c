@@ -109,3 +109,55 @@ void closeTCP (TCPConn* conn) {
 	close(conn->fd);
   free(conn);
 }
+
+int sendFile (int connFd, char *file, int extension) {
+  struct stat st;
+  if (stat(file, &st) == -1) {
+    return -1;
+  }
+
+  if (extension) {
+    const char *dot = strrchr(file, '.');
+    if (!dot || dot == file) {
+      return -1;
+    }
+
+    if (write(connFd, dot + 1, strlen(dot + 1)) == -1) {
+      return -1;
+    }
+
+    printf("%s %d\n", dot + 1, strlen(dot + 1));
+
+    write(connFd, " ", 1);
+  }
+
+  char size[256];
+  sprintf(size, "%lld ", st.st_size); 
+  if (write(connFd, size, strlen(size)) == -1) {
+    return -1;
+  }
+
+  printf("%s\n", size);
+
+  FILE *fpointer = fopen(file, "r");
+  if (fpointer == NULL) {
+    return -1;
+  }
+
+  unsigned char fileData[10000];
+  size_t nbytes = 0;
+  while ((nbytes = fread(fileData, sizeof(unsigned char), 10000, fpointer)) > 0) {
+    if (write(connFd, fileData, nbytes) < 0) {
+      printf("%d\n", nbytes);
+      break;
+    }
+
+    bzero(fileData, 10000);
+  }
+
+  printf("PIPI\n");
+  printf("CACA\n");
+  fclose(fpointer);
+  return 0;
+}
+

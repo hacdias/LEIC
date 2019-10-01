@@ -2,6 +2,7 @@
 #define __SERVER_H__
 
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -9,6 +10,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <strings.h>
+#include <sys/stat.h>
+ #include <strings.h>
 
 typedef struct serverOptions {
   char ip[16];
@@ -36,5 +39,7 @@ char* sendUDP (UDPConn *conn, char* msg);
 TCPConn *connectTCP (ServerOptions opts);
 
 void closeTCP (TCPConn* conn);
+
+int sendFile (int connFd, char *file, int extension);
 
 #endif
