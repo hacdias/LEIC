@@ -77,22 +77,22 @@ class Machine extends THREE.Object3D {
   }
 
   rotateLeft () {
-    this.armArticulation.rotation.y += 0.01
+    this.armArticulation.rotation.y += 0.005
   }
 
   rotateRight () {
-    this.armArticulation.rotation.y -= 0.01
+    this.armArticulation.rotation.y -= 0.005
   }
 
   moveArmFront () {
-    if (this.armPivot.rotation.x < Math.PI / 3) {
-      this.armPivot.rotation.x += 0.01
+    if (this.armPivot.rotation.x < Math.PI / 4) {
+      this.armPivot.rotation.x += 0.005
     }
   }
 
   moveArmBack () {
     if (this.armPivot.rotation.x > -Math.PI / 3) {
-      this.armPivot.rotation.x -= 0.01
+      this.armPivot.rotation.x -= 0.005
     }
   }
 
