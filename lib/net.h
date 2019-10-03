@@ -32,6 +32,10 @@ ServerOptions getOptions (int argc, char** argv);
 
 UDPConn *connectUDP (ServerOptions opts);
 
+UDPConn *listenUDP (ServerOptions opts);
+
+TCPConn *listenTCP (ServerOptions opts);
+
 void closeUDP (UDPConn* conn);
 
 char* sendUDP (UDPConn *conn, char* msg);

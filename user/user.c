@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "cmds.h"
-#include "net.h"
+#include "../lib/net.h"
 
 char *registerUser (UDPConn *conn) {
   char msg[11] = "REG ";

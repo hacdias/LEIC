@@ -24,25 +24,52 @@ ServerOptions getOptions (int argc, char** argv) {
 }
 
 UDPConn *connectUDP (ServerOptions opts) {
-  UDPConn *udpConn = malloc(sizeof(UDPConn));
+  UDPConn *conn = malloc(sizeof(UDPConn));
   int n;
 
-	memset(&udpConn->hints, 0, sizeof(udpConn->hints));
-	udpConn->hints.ai_family = AF_INET;
-	udpConn->hints.ai_socktype = SOCK_DGRAM;
-	udpConn->hints.ai_flags = AI_NUMERICSERV;
+	memset(&conn->hints, 0, sizeof(conn->hints));
+	conn->hints.ai_family = AF_INET;
+	conn->hints.ai_socktype = SOCK_DGRAM;
+	conn->hints.ai_flags = AI_NUMERICSERV;
 
-  n = getaddrinfo(opts.ip, opts.port, &udpConn->hints, &udpConn->res);
+  n = getaddrinfo(opts.ip, opts.port, &conn->hints, &conn->res);
 	if (n != 0) {
     return NULL;
   }
 
-  udpConn->fd = socket(udpConn->res->ai_family, udpConn->res->ai_socktype, udpConn->res->ai_protocol);
-	if (udpConn->fd == -1) {
+  conn->fd = socket(conn->res->ai_family, conn->res->ai_socktype, conn->res->ai_protocol);
+	if (conn->fd == -1) {
     return NULL;
   }
 
-  return udpConn;
+  return conn;
+}
+
+UDPConn *listenUDP (ServerOptions opts) {
+  UDPConn *conn = malloc(sizeof(UDPConn));
+  int n;
+
+	memset(&conn->hints, 0, sizeof(conn->hints));
+	conn->hints.ai_family = AF_INET;
+	conn->hints.ai_socktype = SOCK_DGRAM;
+	conn->hints.ai_flags = AI_PASSIVE|AI_NUMERICSERV;
+
+  n = getaddrinfo(NULL, opts.port, &conn->hints, &conn->res);
+	if (n != 0) {
+    return NULL;
+  }
+
+  conn->fd = socket(conn->res->ai_family, conn->res->ai_socktype, conn->res->ai_protocol);
+	if (conn->fd == -1) {
+    return NULL;
+  }
+
+  n = bind(conn->fd, conn->res->ai_addr, conn->res->ai_addrlen);
+  if (n == -1) {
+    return NULL;
+  }
+
+  return conn;
 }
 
 void closeUDP (UDPConn* conn) {
@@ -104,6 +131,37 @@ TCPConn *connectTCP (ServerOptions opts) {
   return conn;
 }
 
+TCPConn *listenTCP (ServerOptions opts) {
+  TCPConn *conn = malloc(sizeof(TCPConn));
+  int n;
+
+	memset(&conn->hints, 0, sizeof(conn->hints));
+	conn->hints.ai_family = AF_INET;
+	conn->hints.ai_socktype = SOCK_STREAM;
+	conn->hints.ai_flags = AI_PASSIVE|AI_NUMERICSERV;
+
+  n = getaddrinfo(NULL, opts.port, &conn->hints, &conn->res);
+	if (n != 0) {
+    return NULL;
+  }
+
+  conn->fd = socket(conn->res->ai_family, conn->res->ai_socktype, conn->res->ai_protocol);
+	if (conn->fd == -1) {
+    return NULL;
+  }
+
+  n = bind(conn->fd, conn->res->ai_addr, conn->res->ai_addrlen);
+  if (n == -1) {
+    return NULL;
+  }
+
+  if (listen(conn->fd, 5) == -1) {
+    return NULL;
+  }
+
+  return conn;
+}
+
 void closeTCP (TCPConn* conn) {
   freeaddrinfo(conn->res);
 	close(conn->fd);
@@ -132,7 +190,7 @@ int sendFile (int connFd, char *file, int extension) {
   }
 
   char size[256];
-  sprintf(size, "%ld ", st.st_size); 
+  sprintf(size, "%lld ", st.st_size); 
   if (write(connFd, size, strlen(size)) == -1) {
     return -1;
   }
