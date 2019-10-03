@@ -126,13 +126,13 @@ int sendFile (int connFd, char *file, int extension) {
       return -1;
     }
 
-    printf("%s %d\n", dot + 1, strlen(dot + 1));
+    printf("%s %lu\n", dot + 1, strlen(dot + 1));
 
     write(connFd, " ", 1);
   }
 
   char size[256];
-  sprintf(size, "%lld ", st.st_size); 
+  sprintf(size, "%ld ", st.st_size); 
   if (write(connFd, size, strlen(size)) == -1) {
     return -1;
   }
@@ -148,7 +148,7 @@ int sendFile (int connFd, char *file, int extension) {
   size_t nbytes = 0;
   while ((nbytes = fread(fileData, sizeof(unsigned char), 10000, fpointer)) > 0) {
     if (write(connFd, fileData, nbytes) < 0) {
-      printf("%d\n", nbytes);
+      printf("%lu\n", nbytes);
       break;
     }
 

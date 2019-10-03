@@ -141,6 +141,45 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   return questions;
 }
 
+int readAndSave (int socket, int isImg, char* filename) {
+  FILE *fp = fopen(filename, "a");
+  char tmp[256];
+  int size = 0;
+  int i = 0;
+  int readCode;
+
+  while ((readCode = read(socket, tmp + i, 1)) == 1) {
+    if (tmp[i] == ' ') {
+      tmp[i] = '\0';
+      size = atoi(tmp);
+      break;
+    }
+    i++;
+  }
+
+  int toRead = 256;
+  if (size < toRead) {
+    toRead = size;
+  }
+
+  while (size > 0 && (readCode = read(socket, tmp, toRead)) > 0) {
+    printf("%d\n", readCode);
+
+
+    fwrite (tmp , sizeof(char), readCode, fp);
+
+    if (size < toRead) {
+      toRead = size;
+    } else {
+      size -= toRead;
+    }
+  }
+
+
+  fclose(fp);
+  return 0;
+}
+
 void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   if (questions == NULL) {
     printf("You must get the questions first!\n");
@@ -161,22 +200,65 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   TCPConn* conn = connectTCP(opts);
 
   if (write(conn->fd, msg, strlen(msg)) == -1) {
-    printf("I'm sad :(");
+    printf("An error has occurred.\n");
     closeTCP(conn);
     return;
   }
 
+  char c[1];
+  char code[4];
+  char userID[6];
+  int readCode;
 
-  char buffer[1024];
+  char tmp[256];
 
-  while (read(conn->fd, buffer, 256) > 0) {
-    printf("%s\n", buffer);
+  int step = 0;
+  int i = 0;
+
+  int currentSize = 0;
+  int readingSize = 0;
+  int readingData = 0;
+
+  code[3] = '\0';
+  userID[5] = '\0';
+
+  while ((readCode = read(conn->fd, c, 1)) == 1) {
+    if (step == 0) {
+      if (i < 3) {
+        code[i] = c[0];
+      }
+
+      if (i == 3 && strcmp(code, "QGR") != 0) {
+        printf("Response not ok.\n");
+        break;
+      }
+
+      if (i >= 4 && i < 9) {
+        userID[i - 4] = c[0];
+      }
+
+      i++;
+
+      if (i == 10) {
+        step = 1;
+        i = 0;
+      }
+    }
+
+    if (step == 1) {
+      readAndSave(conn->fd, 0, "q.txt");
+      step++;
+    }
+
   }
 
-  printf("I'm TCPing'");
+  if (readCode < 0) {
+    printf("An error has occurred.\n");
+  }
+
+  // printf("%s\n", userID);
 
   closeTCP(conn);
-
 }
 
 void questionSubmit (ServerOptions opts, char *userID, char *topic) {

@@ -1,5 +1,5 @@
 tl
-ts 29
+ts 4
 ql
 qg 1
 exit

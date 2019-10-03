@@ -1,5 +1,4 @@
 #include "cmds.h"
-#include "strings.h"
 
 int checkCommand (char *cmd, char longForm[256], char shortForm[256]) {
   return strcmp(cmd, longForm) == 0 || strcmp(cmd, shortForm) == 0;

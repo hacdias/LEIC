@@ -11,7 +11,7 @@
 #include <netdb.h>
 #include <strings.h>
 #include <sys/stat.h>
- #include <strings.h>
+ #include <string.h>
 
 typedef struct serverOptions {
   char ip[16];
