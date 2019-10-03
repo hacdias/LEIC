@@ -2,4 +2,7 @@ tl
 ts 4
 ql
 qg 1
+qg 2
+qg 3
+qg 4
 exit

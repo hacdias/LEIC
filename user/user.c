@@ -142,11 +142,19 @@ StringArray* questionList (UDPConn *conn, char *topic) {
 }
 
 int readAndSave (int socket, int isImg, char* filename) {
-  FILE *fp = fopen(filename, "a");
   char tmp[256];
+  int readCode;
+
+  if (isImg) {
+    read(socket, tmp, 4);
+    tmp[3] = '\0';
+    strcat(filename, ".");
+    strcat(filename, tmp);
+  }
+
+  FILE *fp = fopen(filename, "w");
   int size = 0;
   int i = 0;
-  int readCode;
 
   while ((readCode = read(socket, tmp + i, 1)) == 1) {
     if (tmp[i] == ' ') {
@@ -158,25 +166,54 @@ int readAndSave (int socket, int isImg, char* filename) {
   }
 
   int toRead = 256;
-  if (size < toRead) {
-    toRead = size;
-  }
-
-  while (size > 0 && (readCode = read(socket, tmp, toRead)) > 0) {
-    printf("%d\n", readCode);
-
-
+  do {
+    if (size < toRead) toRead = size;
+    readCode = read(socket, tmp, toRead);
+    if (readCode <= 0) break;
+    size -= readCode;
     fwrite (tmp , sizeof(char), readCode, fp);
-
-    if (size < toRead) {
-      toRead = size;
-    } else {
-      size -= toRead;
-    }
-  }
-
+  } while (size > 0);
 
   fclose(fp);
+  return 0;
+}
+
+int readTextAndImage (int socket, char *basename) {
+  char buffer[256], filename[256];
+
+  if (read(socket, buffer, 6) != 6) {
+    return -1;
+  }
+
+  buffer[6] = '\0';
+
+  strcpy(filename, basename);
+  strcat(filename, "/user.txt");
+
+  FILE *fp = fopen(filename, "w");
+  if (fputs(buffer + 1, fp) == EOF || fclose(fp) == EOF) {
+    return -1;
+  }
+
+  strcpy(filename, basename);
+  strcat(filename, "/question.txt");
+
+  readAndSave(socket, 0, filename);
+
+  if (read(socket, buffer, 2) != 2) {
+    return -1;
+  }
+
+  if (buffer[1] == '1') {
+    if (read(socket, buffer, 1) != 1) {
+      return -1;
+    }
+
+    strcpy(filename, basename);
+    strcat(filename, "/image");
+    readAndSave(socket, 1, filename);
+  }
+
   return 0;
 }
 
@@ -185,6 +222,7 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     printf("You must get the questions first!\n");
     return;
   }
+
 
   int num;
   scanf("%d", &num);
@@ -197,6 +235,10 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   char msg[1024];
   sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
 
+  if (mkdir(questions->names[num - 1], S_IRWXU) == -1) {
+    printf("Cannot create dir\n");
+    return;
+  }
   TCPConn* conn = connectTCP(opts);
 
   if (write(conn->fd, msg, strlen(msg)) == -1) {
@@ -205,59 +247,51 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     return;
   }
 
-  char c[1];
-  char code[4];
-  char userID[6];
-  int readCode;
+  char buffer[256], filename[256];
 
-  char tmp[256];
-
-  int step = 0;
-  int i = 0;
-
-  int currentSize = 0;
-  int readingSize = 0;
-  int readingData = 0;
-
-  code[3] = '\0';
-  userID[5] = '\0';
-
-  while ((readCode = read(conn->fd, c, 1)) == 1) {
-    if (step == 0) {
-      if (i < 3) {
-        code[i] = c[0];
-      }
-
-      if (i == 3 && strcmp(code, "QGR") != 0) {
-        printf("Response not ok.\n");
-        break;
-      }
-
-      if (i >= 4 && i < 9) {
-        userID[i - 4] = c[0];
-      }
-
-      i++;
-
-      if (i == 10) {
-        step = 1;
-        i = 0;
-      }
-    }
-
-    if (step == 1) {
-      readAndSave(conn->fd, 0, "q.txt");
-      step++;
-    }
-
+  if (read(conn->fd, buffer, 3) != 3) {
+    printf("ERR\n"); closeTCP(conn); return;
   }
 
-  if (readCode < 0) {
-    printf("An error has occurred.\n");
+  // TODO: check errs
+  buffer[3] = '\0';
+  if (strcmp(buffer, "QGR")) {
+    printf("ERR\n"); closeTCP(conn); return;
   }
 
-  // printf("%s\n", userID);
+  read(conn->fd, buffer, 1);
+  readTextAndImage(conn->fd, questions->names[num - 1]);
+  read(conn->fd, buffer, 1);
 
+  read(conn->fd, buffer, 1);
+  int answers = 0;
+
+  if (buffer[0] == '1') {
+    read(conn->fd, buffer, 1);
+    answers = 10;
+  } else {
+    buffer[1] = '\0';
+    answers = atoi(buffer);
+  }
+
+  if (answers != 0) {
+    read(conn->fd, buffer, 1);
+
+    for (; answers > 0; answers--) {
+      strcpy(filename, questions->names[num - 1]);
+      strcat(filename, "/");
+      read(conn->fd, buffer, 3);
+      buffer[2] = '\0';
+
+      strcat(filename, buffer);
+      mkdir(filename, S_IRWXU);
+      
+      readTextAndImage(conn->fd, filename);
+      read(conn->fd, buffer, 1);
+    }
+  }
+
+  printf("Question and answers downloaded to %s\n", questions->names[num - 1]);
   closeTCP(conn);
 }
 
