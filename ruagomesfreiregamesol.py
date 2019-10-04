@@ -4,10 +4,9 @@ import time
 
 class SearchProblem:
   def __init__(self, goal, model, auxheur = []):
-    ##
-    ## to implement
-    ##
-    pass
+    self.goal = goal
+    self.model = model
+    self.auxheur = auxheur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf]):
     ##
