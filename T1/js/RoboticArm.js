@@ -15,7 +15,7 @@ class Hand extends THREE.Mesh {
     fingerLeft.position.x = 2
     fingerLeft.position.y = 4 - height
     fingerLeft.position.z = 0
-    
+
     fingerRight.position.x = -2
     fingerRight.position.y = 4 - height
     fingerRight.position.z = 0

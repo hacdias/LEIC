@@ -1,7 +1,7 @@
 /* global THREE, Machine  */
 'use strict'
 
-class Target extends THREE.Object3D {
+class Target extends WireframeToggler {
   constructor () {
     super(...arguments)
     this._buildCylinder()

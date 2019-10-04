@@ -2,7 +2,7 @@
 'use strict'
 
 const flags = {
-  showWireframe: true,
+  toggleWireframe: true,
   camera: 1,
   pressed: {}
 }
@@ -10,7 +10,7 @@ const flags = {
 const ASPECT_RATIO = 16 / 9
 const PLANE_H = 100
 
-var scene, renderer, machine
+var scene, renderer, machine, target
 var cameras = new Array(3)
 
 function createScene () {
@@ -20,7 +20,7 @@ function createScene () {
   machine = new Machine()
   machine.position.z = -25
 
-  const target = new Target()
+  target = new Target()
   target.position.z = 25
 
   scene.add(machine)
@@ -81,11 +81,11 @@ function resizeCameras () {
 function animate () {
   requestAnimationFrame(animate)
 
-  scene.traverse(child => {
-    if (child instanceof THREE.Mesh) {
-      child.material.wireframe = flags.showWireframe
-    }
-  })
+  if (flags.toggleWireframe) {
+    flags.toggleWireframe = false
+    machine.toggleWireframe()
+    target.toggleWireframe()
+  }
 
   if (flags.resize) {
     flags.resize = false
@@ -147,7 +147,7 @@ document.addEventListener('keyup', event => {
       flags.camera = parseInt(event.key)
       break
     case '4':
-      flags.showWireframe = !flags.showWireframe
+      flags.toggleWireframe = true
   }
 
   flags.pressed[event.code] = false

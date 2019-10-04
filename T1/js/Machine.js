@@ -1,7 +1,7 @@
 /* global THREE, Wheel, RoboticArm */
 'use strict'
 
-class Machine extends THREE.Object3D {
+class Machine extends WireframeToggler {
   constructor (width = 35, depth = 3) {
     super(...arguments)
 
