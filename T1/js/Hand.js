@@ -24,7 +24,7 @@ class Hand extends THREE.Mesh {
   }
 
   _buildFinger () {
-    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 })
+    const material = new THREE.MeshBasicMaterial({ color: 0xff0f00 })
     const geometry = new THREE.BoxGeometry(1, 5, 1)
     return new THREE.Mesh(geometry, material)
   }
