@@ -97,6 +97,52 @@ void handleLtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
   }
 }
 
+void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
+  buffer = buffer + 4;
+  char dirName[1024];
+  char userID[5];
+  DIR* dir;
+
+  for (int i = 0; i < 5; i++) {
+    if (buffer[i] < '0' && buffer[i] > '9') {
+      sendto(socket, "PTR NOK\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
+      return;
+    }
+
+    userID[i] = buffer[i];
+  }
+
+  buffer = buffer + 6;
+  buffer[strlen(buffer) - 1] = '\0';
+  
+  sprintf(dirName, "%s/%s", STORAGE, buffer);
+  dir = opendir(dirName);
+  if (dir) {
+    sendto(socket, "PTR DUP\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
+    closedir(dir);
+  } else if (ENOENT == errno) {
+    if (mkdir(dirName, S_IRWXU) == -1) {
+      printf("Error creating directory %s\n", dirName);
+      sendto(socket, "PTR NOK\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
+    } else {
+      strcat(dirName, "/");
+      strcat(dirName, buffer);
+      strcat(dirName, "_UID.txt");
+
+      FILE *fp = fopen(dirName, "w");
+      printf("%s-%s\n", userID, dirName);
+      fwrite(userID, sizeof(char), sizeof(userID), fp);
+      printf("Teste\n");
+      fclose(fp);
+      sendto(socket, "PTR OK\n", 7, 0, (struct sockaddr*)&addr, sizeof(addr));
+    }
+  } else {
+    // TODO: do something
+  }
+
+  // TODO: Directory full needs to be implemented!
+}
+
 void handleUDP (int socket) {
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
@@ -123,7 +169,7 @@ void handleUDP (int socket) {
   } else if (!strcmp(buffer, "LTP")) {
     handleLtp(socket, clientAddr, buffer);
   } else if (!strcmp(buffer, "PTP")) {
-    
+    handlePtp(socket, clientAddr, buffer);
   } else if (!strcmp(buffer, "LQU")) {
     
   } else {
