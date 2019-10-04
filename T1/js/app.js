@@ -61,7 +61,7 @@ function createOrtographicCamera ({ position, lookAt }) {
 function createCamera () {
   cameras[0] = createOrtographicCamera({ position: [0, 10, 0], lookAt: [0, 0, 0] })
   cameras[1] = createOrtographicCamera({ position: [30, 20, 0], lookAt: [0, 20, 0] })
-  cameras[2] = createOrtographicCamera({ position: [0, 20, -30], lookAt: [0, 20, 0] })
+  cameras[2] = createOrtographicCamera({ position: [0, 20, 30], lookAt: [0, 20, 0] })
 
   cameras.forEach(cam => scene.add(cam))
 }
