@@ -1,0 +1,1 @@
+auxheur - calcular dist entre pos atual e objetivo e ver se aumenta ou diminui qnd mover para outra posicao.

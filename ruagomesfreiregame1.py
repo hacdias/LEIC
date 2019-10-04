@@ -68,6 +68,8 @@ if validatepath(nn,I,U):
 else:
         print("invalid path")
 
+"""
+
 print("\n(4 val) Exercise 2 - One agent, Limits")
 print("Init [30] Goal [56]")
 SP = SearchProblem(goal = [56], model = U, auxheur=coords)
@@ -133,4 +135,4 @@ print("\n(4 val) Exercise 5 - Three agents, Limits, Any-Order")
 tendtotal = time.process_time()
 print("Total time %.1fms"%((tendtotal-tinittotal)*1000))
 
-
+"""
