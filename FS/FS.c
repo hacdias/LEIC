@@ -132,7 +132,6 @@ void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
       FILE *fp = fopen(dirName, "w");
       printf("%s-%s\n", userID, dirName);
       fwrite(userID, sizeof(char), sizeof(userID), fp);
-      printf("Teste\n");
       fclose(fp);
       sendto(socket, "PTR OK\n", 7, 0, (struct sockaddr*)&addr, sizeof(addr));
     }
