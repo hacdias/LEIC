@@ -78,6 +78,10 @@ void closeUDP (UDPConn* conn) {
   free(conn);
 }
 
+int sendUDP (UDPConn *conn, const char* msg, struct sockaddr_in addr) {
+  return sendto(conn->fd, msg, strlen(msg), 0, (struct sockaddr*)&addr, sizeof(addr));
+}
+
 char* sendWithReplyUDP (UDPConn *conn, char* msg) {
   int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
   if (n == -1) {

@@ -31,7 +31,7 @@ int mkdirIfNotExists (const char *name) {
   }
 }
 
-void handleReg (int socket, struct sockaddr_in addr, char buffer[1024]) {
+int handleReg (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   int notOk = 0;
 
   for (int i = 4; i < 9; i++) {
@@ -41,13 +41,13 @@ void handleReg (int socket, struct sockaddr_in addr, char buffer[1024]) {
   }
 
   if (buffer[9] != '\n' || notOk) {
-    sendto(socket, "RGR NOK\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
-  } else {
-    sendto(socket, "RGR OK\n", 7, 0, (struct sockaddr*)&addr, sizeof(addr));
+    return sendUDP(conn, "RGR NOK\n", addr);
   }
+
+  return sendUDP(conn, "RGR OK\n", addr);
 }
 
-void handleLtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
+int handleLtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   DIR *d = opendir(STORAGE);
   struct dirent *dir;
   int i = 0;
@@ -55,7 +55,7 @@ void handleLtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
   if (d) {
     char str[1024];
     bzero(str, sizeof(str));
-  
+
     while ((dir = readdir(d)) != NULL) {
       if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..")) {
         continue;
@@ -66,16 +66,17 @@ void handleLtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
 
       FILE *fp = fopen(filename, "r");
       if (fp == NULL) {
-        // TODO: handle
-        continue;
+        closedir(d);
+        return -1;
       }
 
       char userID[6];
       userID[5] = '\0';
 
       if (fread(userID, sizeof(char), 5, fp) == -1) {
-        // TODO: handle
-        printf("err while reading\n"); continue;
+        closedir(d);
+        fclose(fp);
+        return -1;
       }
 
       strcat(str, " ");
@@ -91,22 +92,20 @@ void handleLtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
 
     char buffer[1024];
     sprintf(buffer, "LTR %d%s\n", i, str);
-    sendto(socket, buffer, strlen(buffer), 0, (struct sockaddr*)&addr, sizeof(addr));
+    return sendUDP(conn, buffer, addr);
   } else {
-    // TODO: do sth
+    return -1;
   }
 }
 
-void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
+int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   buffer = buffer + 4;
   char dirName[1024];
   char userID[5];
-  DIR* dir;
 
   for (int i = 0; i < 5; i++) {
-    if (buffer[i] < '0' && buffer[i] > '9') {
-      sendto(socket, "PTR NOK\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
-      return;
+    if (buffer[i] < '0' || buffer[i] > '9') {
+      return sendUDP(conn, "PTR NOK\n", addr);
     }
 
     userID[i] = buffer[i];
@@ -114,16 +113,16 @@ void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
 
   buffer = buffer + 6;
   buffer[strlen(buffer) - 1] = '\0';
-  
+
   sprintf(dirName, "%s/%s", STORAGE, buffer);
-  dir = opendir(dirName);
+  DIR *dir = opendir(dirName);
   if (dir) {
-    sendto(socket, "PTR DUP\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
     closedir(dir);
+    return sendUDP(conn, "PTR DUP\n", addr);
   } else if (ENOENT == errno) {
     if (mkdir(dirName, S_IRWXU) == -1) {
       printf("Error creating directory %s\n", dirName);
-      sendto(socket, "PTR NOK\n", 8, 0, (struct sockaddr*)&addr, sizeof(addr));
+      return sendUDP(conn, "PTR NOK\n", addr);
     } else {
       strcat(dirName, "/");
       strcat(dirName, buffer);
@@ -133,18 +132,21 @@ void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
       printf("%s-%s\n", userID, dirName);
       fwrite(userID, sizeof(char), sizeof(userID), fp);
       fclose(fp);
-      sendto(socket, "PTR OK\n", 7, 0, (struct sockaddr*)&addr, sizeof(addr));
+      return sendUDP(conn, "PTR OK\n", addr);
     }
   } else {
-    // TODO: do something
+    return -1;
   }
 
   // TODO: Directory full needs to be implemented!
+
+  return 0;
 }
 
 void handleUDP (UDPConn* conn) {
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
+  int n = 0;
 
   char* buffer = receiveUDP(conn, &clientAddr, &len);
   if (buffer == NULL) {
@@ -152,26 +154,30 @@ void handleUDP (UDPConn* conn) {
     return;
   }
 
-  printf("UDP conn from %s", inet_ntoa(clientAddr.sin_addr));
+  printf("UDP/IP %s", inet_ntoa(clientAddr.sin_addr));
   if (buffer[3] != ' ' && buffer[3] != '\n') {
-    sendto(conn->fd, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, len);
+    sendUDP(conn, "ERR\n", clientAddr);
     free(buffer);
     return;
   }
 
   buffer[3] = '\0';
-  printf(" of type %s\n", buffer);
+  printf(" %s\n", buffer);
 
   if (!strcmp(buffer, "REG")) {
-    handleReg(conn->fd, clientAddr, buffer);
+    n = handleReg(conn, clientAddr, buffer);
   } else if (!strcmp(buffer, "LTP")) {
-    handleLtp(conn->fd, clientAddr, buffer);
+    n = handleLtp(conn, clientAddr, buffer);
   } else if (!strcmp(buffer, "PTP")) {
-    handlePtp(conn->fd, clientAddr, buffer);
+    n = handlePtp(conn, clientAddr, buffer);
   } else if (!strcmp(buffer, "LQU")) {
-    
+
   } else {
-    sendto(conn->fd, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, len);
+    sendUDP(conn, "ERR\n", clientAddr);
+  }
+
+  if (n == -1) {
+    printf("An error occurred while processing a %s request.\n", buffer);
   }
 
   free(buffer);

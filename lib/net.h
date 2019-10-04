@@ -38,6 +38,8 @@ TCPConn *listenTCP (ServerOptions opts);
 
 void closeUDP (UDPConn* conn);
 
+int sendUDP (UDPConn *conn, const char* msg, struct sockaddr_in addr);
+
 char* sendWithReplyUDP (UDPConn *conn, char* msg);
 
 char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen);
