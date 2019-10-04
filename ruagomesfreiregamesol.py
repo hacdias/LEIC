@@ -9,9 +9,24 @@ class SearchProblem:
     self.auxheur = auxheur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf]):
+    print(self.heuristic(init))
     path = self.aux(init[0], self.goal[0], init[0], path = [[[], init]])
     print(path)
     return path
+
+  def heuristic(self, positions):
+    if len(self.auxheur) == 0:
+      return 0
+
+    heur = []
+
+    for i, pos in enumerate(positions):
+      heur.append(
+        math.sqrt(math.pow(self.auxheur[self.goal[i] - 1][0] - self.auxheur[pos - 1][0], 2) + math.pow(self.auxheur[self.goal[i] - 1][1] - self.auxheur[pos - 1][1], 2))
+      )
+    
+    return heur
+
 
   def aux(self, init, goal, current, visited = [], path = []):
     visited.append(current)
