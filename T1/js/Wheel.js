@@ -1,16 +1,13 @@
 /* global THREE */
 'use strict'
 
-class Wheel extends THREE.Object3D {
+class Wheel extends THREE.Mesh {
   constructor (radius) {
-    super()
-
     const material = new THREE.MeshBasicMaterial({
       color: 0xFF0000
     })
 
     const geometry = new THREE.SphereGeometry(radius, 32, 32)
-    const mesh = new THREE.Mesh(geometry, material)
-    this.add(mesh)
+    super(geometry, material)
   }
 }
