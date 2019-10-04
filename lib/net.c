@@ -78,7 +78,6 @@ void closeUDP (UDPConn* conn) {
   free(conn);
 }
 
-// TODO: IMPROVE THIS
 char* sendUDP (UDPConn *conn, char* msg) {
   int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
   if (n == -1) {
@@ -213,6 +212,7 @@ int sendFile (int connFd, char *file, int extension) {
     bzero(fileData, 10000);
   }
 
+  // TODO: is this working?
   printf("PIPI\n");
   printf("CACA\n");
   fclose(fpointer);
