@@ -78,7 +78,7 @@ void closeUDP (UDPConn* conn) {
   free(conn);
 }
 
-char* sendUDP (UDPConn *conn, char* msg) {
+char* sendWithReplyUDP (UDPConn *conn, char* msg) {
   int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
   if (n == -1) {
     return NULL;

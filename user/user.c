@@ -13,7 +13,7 @@ char *registerUser (UDPConn *conn) {
   msg[9] = '\n';
   msg[10] = '\0';
 
-  char *buffer = sendUDP(conn, msg);
+  char *buffer = sendWithReplyUDP(conn, msg);
 
   if (buffer == NULL) {
     return NULL;
@@ -44,7 +44,7 @@ typedef struct stringArray {
 } StringArray;
 
 StringArray* topicList (UDPConn *conn) {
-  char* buffer = sendUDP(conn, "LTP\n");
+  char* buffer = sendWithReplyUDP(conn, "LTP\n");
   StringArray *topics = malloc(sizeof(StringArray));
   int pos = 0;
   sscanf(buffer, "LTR %d%n", &topics->count, &pos);
@@ -93,7 +93,7 @@ void topicPropose (UDPConn *conn, char* userID) {
   scanf("%s%n", msg + 10, &step);
   msg[10 + step - 1] = '\n';
   msg[10 + step] = '\0';
-  char* res = sendUDP(conn, msg);
+  char* res = sendWithReplyUDP(conn, msg);
 
   if (strcmp(res, "PTR OK\n") == 0) {
     printf("Topic proposed successfully!\n");
@@ -117,7 +117,7 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   StringArray *questions = malloc(sizeof(StringArray));
   char msg[256];
   sprintf(msg, "LQU %s\n", topic);
-  char *buffer = sendUDP(conn, msg);
+  char *buffer = sendWithReplyUDP(conn, msg);
 
   int pos = 0;
   sscanf(buffer, "LQR %d%n", &questions->count, &pos);
