@@ -40,6 +40,8 @@ void closeUDP (UDPConn* conn);
 
 char* sendUDP (UDPConn *conn, char* msg);
 
+char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen);
+
 TCPConn *connectTCP (ServerOptions opts);
 
 void closeTCP (TCPConn* conn);

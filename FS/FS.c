@@ -142,21 +142,20 @@ void handlePtp (int socket, struct sockaddr_in addr, char buffer[1024]) {
   // TODO: Directory full needs to be implemented!
 }
 
-void handleUDP (int socket) {
+void handleUDP (UDPConn* conn) {
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
-  char buffer[1024];
-  bzero(buffer, sizeof(buffer));
 
-  int n = recvfrom(socket, buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddr, &len);
-  if (n == -1) {
-    printf("An error has occurred!\n");
+  char* buffer = receiveUDP(conn, &clientAddr, &len);
+  if (buffer == NULL) {
+    printf("Could not read message!\n");
     return;
   }
 
   printf("UDP conn from %s", inet_ntoa(clientAddr.sin_addr));
   if (buffer[3] != ' ' && buffer[3] != '\n') {
-    sendto(socket, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, sizeof(clientAddr));
+    sendto(conn->fd, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, len);
+    free(buffer);
     return;
   }
 
@@ -164,17 +163,18 @@ void handleUDP (int socket) {
   printf(" of type %s\n", buffer);
 
   if (!strcmp(buffer, "REG")) {
-    handleReg(socket, clientAddr, buffer);
+    handleReg(conn->fd, clientAddr, buffer);
   } else if (!strcmp(buffer, "LTP")) {
-    handleLtp(socket, clientAddr, buffer);
+    handleLtp(conn->fd, clientAddr, buffer);
   } else if (!strcmp(buffer, "PTP")) {
-    handlePtp(socket, clientAddr, buffer);
+    handlePtp(conn->fd, clientAddr, buffer);
   } else if (!strcmp(buffer, "LQU")) {
     
   } else {
-    sendto(socket, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, sizeof(clientAddr));
-    return;
+    sendto(conn->fd, "ERR\n", 4, 0, (struct sockaddr*)&clientAddr, len);
   }
+
+  free(buffer);
 }
 
 int main(int argc, char** argv) {
@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
     ready = select(maxDesc, &desc, NULL, NULL, NULL);
 
     if (FD_ISSET(tcpConn->fd, &desc)) handleTCP();
-    if (FD_ISSET(udpConn->fd, &desc)) handleUDP(udpConn->fd);
+    if (FD_ISSET(udpConn->fd, &desc)) handleUDP(udpConn);
   }
 
   closeUDP(udpConn);

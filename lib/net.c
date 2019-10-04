@@ -84,21 +84,29 @@ char* sendUDP (UDPConn *conn, char* msg) {
     return NULL;
   }
 
-  struct sockaddr_in addr;
-  socklen_t addrlen = sizeof(addr);
+  return receiveUDP(conn, NULL, NULL);
+}
 
-  int size = 3, prevLen = 0, len = 0;
+char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
+  int size = 0, len = 0;
   char *buffer = NULL;
 
   do {
-    size++;
+    size += 1024;
     buffer = realloc(buffer, size);
-    prevLen = len;
-    len = recvfrom(conn->fd, buffer, size, MSG_PEEK, (struct sockaddr*) &addr, &addrlen);
-  } while (len != prevLen);
+    len = recvfrom(conn->fd, buffer, size - 1, MSG_PEEK, (struct sockaddr*)addr, addrlen);
+  } while (len > size && len > 0);
 
-  buffer = realloc(buffer, len + 1);
-  len = recvfrom(conn->fd, buffer, size, 0, (struct sockaddr*) &addr, &addrlen);
+  if (len < 0) {
+    free(buffer);
+    return NULL;
+  }
+
+  len = recvfrom(conn->fd, buffer, size, 0, (struct sockaddr*)addr, addrlen);
+  if (len < 0) {
+    free(buffer);
+    return NULL;
+  }
   buffer[len] = '\0';
   return buffer;
 }
@@ -189,7 +197,7 @@ int sendFile (int connFd, char *file, int extension) {
   }
 
   char size[256];
-  sprintf(size, "%lld ", st.st_size); 
+  sprintf(size, "%lld ", st.st_size);
   if (write(connFd, size, strlen(size)) == -1) {
     return -1;
   }
