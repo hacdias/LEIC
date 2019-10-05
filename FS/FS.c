@@ -143,6 +143,85 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   return 0;
 }
 
+int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
+  buffer = buffer + 4;
+  DIR *d;
+  struct dirent *dir;
+  int i = 0;
+  char * topic = strdup(buffer);
+  topic[strlen(topic) - 1] = '\0';
+
+  char dirNameTopic[2048];
+  sprintf(dirNameTopic, "%s/%s", STORAGE, topic);
+  d = opendir(dirNameTopic);
+
+  if (d) {
+    char str[2048];
+    bzero(str, sizeof(str));
+
+    while ((dir = readdir(d)) != NULL) {
+      char topicUID[256];
+      sprintf(topicUID, "%s_UID.txt", topic);
+      if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..") || !strcmp(dir->d_name, topicUID)) {
+        continue;
+      }
+
+      int nAnswers = 0;
+      char questionDirName[1024];
+      sprintf(questionDirName, "%s/%s", dirNameTopic, dir->d_name);
+      DIR *dQuestion = opendir(questionDirName);
+      struct dirent *subDir;
+      while ((subDir = readdir(dQuestion)) != NULL) {
+        if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..")) {
+          continue;
+        }
+
+        nAnswers += 1;
+      }
+      nAnswers--;
+      closedir(dQuestion);
+
+      char filename[256];
+      sprintf(filename, "%s/%s/%s/%s_UID.txt", STORAGE, topic, dir->d_name, dir->d_name);
+
+      FILE *fp = fopen(filename, "r");
+      if (fp == NULL) {
+        closedir(d);
+        return -1;
+      }
+
+      char userID[6];
+      userID[5] = '\0';
+
+      if (fread(userID, sizeof(char), 5, fp) == -1) {
+        closedir(d);
+        fclose(fp);
+        return -1;
+      }
+
+      char nAnswersString[32];
+      sprintf(nAnswersString, "%d", nAnswers);
+      strcat(str, " ");
+      strcat(str, dir->d_name);
+      strcat(str, ":");
+      strcat(str, userID);
+      strcat(str, ":");
+      strcat(str, nAnswersString);
+
+      fclose(fp);
+      i++;
+    }
+
+    closedir(d);
+
+    char buffer[1024];
+    sprintf(buffer, "LQR %d%s\n", i, str);
+    return sendUDP(conn, buffer, addr);
+  } else {
+    return -1;
+  }
+} 
+
 void handleUDP (UDPConn* conn) {
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
@@ -171,7 +250,7 @@ void handleUDP (UDPConn* conn) {
   } else if (!strcmp(buffer, "PTP")) {
     n = handlePtp(conn, clientAddr, buffer);
   } else if (!strcmp(buffer, "LQU")) {
-
+    n = handleLqu(conn, clientAddr, buffer);
   } else {
     sendUDP(conn, "ERR\n", clientAddr);
   }
