@@ -12,7 +12,7 @@ class Node():
     self.f = 0
 
   def __eq__(self, other):
-    return self.position == other.position
+    return self.position == other.position and self.transport == other.transport
 
 class SearchProblem:
   def __init__(self, goal, model, auxheur = []):
@@ -36,25 +36,30 @@ class SearchProblem:
         currentIndex = 0
 
         for index, item in enumerate(openList):
-            if item.f < currentNode.f:
-                currentNode = item
-                currentIndex = index
+          if item.f < currentNode.f:
+            currentNode = item
+            currentIndex = index
+
+        if currentNode.transport is not None:
+          tickets[currentNode.transport] -= 1
 
         openList.pop(currentIndex)
         closedList.append(currentNode)
 
-        # Found the goal
-        if currentNode == endNode:
+        if currentNode.position == endNode.position:
             path = []
             current = currentNode
             while current is not None:
                 path.append([[current.transport], [current.position]])
                 current = current.parent
-            print(path)
-            return path[::-1] # Return reversed path
+            print("MY PATH", path[::-1])
+            return path[::-1] # reversed path
 
         for newPosition in self.model[currentNode.position]:
           child = Node(currentNode, newPosition[1], newPosition[0])
+
+          if tickets[newPosition[0]] -1 < 0:
+            continue
 
           if child in closedList:
             continue
