@@ -162,7 +162,7 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
     while ((dir = readdir(d)) != NULL) {
       char topicUID[256];
       sprintf(topicUID, "%s_UID.txt", topic);
-      if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..") || !strcmp(dir->d_name, topicUID)) {
+      if (strchr(dir->d_name, '.') != NULL) {
         continue;
       }
 
@@ -172,13 +172,12 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
       DIR *dQuestion = opendir(questionDirName);
       struct dirent *subDir;
       while ((subDir = readdir(dQuestion)) != NULL) {
-        if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..")) {
+        if (strchr(subDir->d_name, '.') != NULL) {
           continue;
         }
 
         nAnswers += 1;
       }
-      nAnswers--;
       closedir(dQuestion);
 
       char filename[256];
