@@ -32,52 +32,52 @@ class SearchProblem:
     openList.append(startNode)
     
     while len(openList) > 0:
-        currentNode = openList[0]
-        currentIndex = 0
+      currentNode = openList[0]
+      currentIndex = 0
 
-        for index, item in enumerate(openList):
-          if item.f < currentNode.f:
-            currentNode = item
-            currentIndex = index
+      for index, item in enumerate(openList):
+        if item.f < currentNode.f:
+          currentNode = item
+          currentIndex = index
 
-        if currentNode.transport is not None:
-          tickets[currentNode.transport] -= 1
+      if currentNode.transport is not None:
+        tickets[currentNode.transport] -= 1
 
-        openList.pop(currentIndex)
-        closedList.append(currentNode)
+      openList.pop(currentIndex)
+      closedList.append(currentNode)
 
-        if currentNode.position == endNode.position:
-            path = []
-            current = currentNode
-            while current is not None:
-                path.append([[current.transport], [current.position]])
-                current = current.parent
-            print("MY PATH", path[::-1])
-            return path[::-1] # reversed path
+      if currentNode.position == endNode.position:
+          path = []
+          current = currentNode
+          while current is not None:
+              path.append([[current.transport], [current.position]])
+              current = current.parent
+          print("MY PATH", path[::-1])
+          return path[::-1] # reversed path
 
-        for newPosition in self.model[currentNode.position]:
-          child = Node(currentNode, newPosition[1], newPosition[0])
+      for newPosition in self.model[currentNode.position]:
+        child = Node(currentNode, newPosition[1], newPosition[0])
 
-          if tickets[newPosition[0]] -1 < 0:
-            continue
+        if tickets[newPosition[0]] -1 < 0:
+          continue
 
-          if child in closedList:
-            continue
+        if child in closedList:
+          continue
 
-          child.g = currentNode.g + self.__distance(child.position, currentNode.position)
-          child.h = self.__distance(child.position, endNode.position)
-          child.f = child.g + child.h
+        child.g = currentNode.g + self.__distance(child.position, currentNode.position)
+        child.h = self.__distance(child.position, endNode.position)
+        child.f = child.g + child.h
 
-          shouldContinue = False
-          for openNode in openList:
-            if child == openNode and child.g > openNode.g:
-              shouldContinue = True
-              break
+        shouldContinue = False
+        for openNode in openList:
+          if child == openNode and child.g > openNode.g:
+            shouldContinue = True
+            break
 
-          if shouldContinue:
-            continue
+        if shouldContinue:
+          continue
 
-          openList.append(child)
+        openList.append(child)
 
   def __heuristic (self, pos):
     return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
