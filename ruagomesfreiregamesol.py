@@ -14,19 +14,13 @@ class SearchProblem:
     print(path)
     return path
 
-  def heuristic(self, positions):
-    if len(self.auxheur) == 0:
-      return 0
+  def __heuristic (self, pos):
+    return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
 
-    heur = []
-
-    for i, pos in enumerate(positions):
-      heur.append(
-        math.sqrt(math.pow(self.auxheur[self.goal[i] - 1][0] - self.auxheur[pos - 1][0], 2) + math.pow(self.auxheur[self.goal[i] - 1][1] - self.auxheur[pos - 1][1], 2))
-      )
-    
-    return heur
-
+  def __distance (self, src, dst):
+    x = self.auxheur[dst - 1][0] - self.auxheur[src - 1][0]
+    y = self.auxheur[dst - 1][1] - self.auxheur[src - 1][1]
+    return math.sqrt(math.pow(x, 2) + math.pow(y, 2))
 
   def aux(self, init, goal, current, visited = [], path = []):
     visited.append(current)
