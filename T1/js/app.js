@@ -119,8 +119,6 @@ function animate () {
   const isDiagonal = transVector.filter(a => a !== 0).length > 1
   if (isDiagonal) transVector = transVector.map(a => a * DIAG_UNIT)
 
-  console.log(transVector)
-
   machine.translate(transVector)
   renderer.render(scene, cameras[flags.camera - 1])
 }
