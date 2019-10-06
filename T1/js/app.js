@@ -9,6 +9,7 @@ const flags = {
 
 const ASPECT_RATIO = 16 / 9
 const PLANE_H = 100
+const DIAG_UNIT = Math.sqrt(0.5)
 
 var scene, renderer, machine, target
 var cameras = new Array(3)
@@ -109,11 +110,16 @@ function animate () {
     machine.moveArmBack()
   }
 
-  const transVector = [
+  let transVector = [
     flags.pressed.ArrowRight ? 1 : flags.pressed.ArrowLeft ? -1 : 0,
     0,
     flags.pressed.ArrowUp ? 1 : flags.pressed.ArrowDown ? -1 : 0
   ]
+
+  const isDiagonal = transVector.filter(a => a !== 0).length > 1
+  if (isDiagonal) transVector = transVector.map(a => a * DIAG_UNIT)
+
+  console.log(transVector)
 
   machine.translate(transVector)
   renderer.render(scene, cameras[flags.camera - 1])
