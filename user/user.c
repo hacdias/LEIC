@@ -185,13 +185,13 @@ int readTextAndImage (int socket, char *basename) {
     return -1;
   }
 
-  buffer[6] = '\0';
+  buffer[5] = '\0';
 
   strcpy(filename, basename);
   strcat(filename, "/user.txt");
 
   FILE *fp = fopen(filename, "w");
-  if (fputs(buffer + 1, fp) == EOF || fclose(fp) == EOF) {
+  if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
     return -1;
   }
 
