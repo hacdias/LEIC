@@ -339,13 +339,13 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
   }
 
   if (imgFile != NULL) {
-    write(conn->fd, "1 ", 2);
+    write(conn->fd, " 1 ", 3);
     if (sendFile(conn->fd, imgFile, 1) == -1) {
       printf("Cannot send image properly!\n");
       return;
     }
   } else {
-    write(conn->fd, "0", 1);
+    write(conn->fd, " 0", 2);
   }
 
   write(conn->fd, "\n", 1);
@@ -415,13 +415,13 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
   }
 
   if (imgFile != NULL) {
-    write(conn->fd, "1 ", 2);
+    write(conn->fd, " 1 ", 3);
     if (sendFile(conn->fd, imgFile, 1) == -1) {
       printf("Cannot send image properly!\n");
       return;
     }
   } else {
-    write(conn->fd, "0", 1);
+    write(conn->fd, " 0", 2);
   }
 
   write(conn->fd, "\n", 1);

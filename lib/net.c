@@ -224,10 +224,6 @@ int sendFile (int connFd, char *file, int extension) {
     bzero(fileData, 10000);
   }
 
-  // TODO: is this working?
-  printf("PIPI\n");
-  printf("CACA\n");
-  fclose(fpointer);
   return 0;
 }
 
