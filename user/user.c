@@ -217,19 +217,18 @@ int readTextAndImage (int socket, char *basename) {
   return 0;
 }
 
-void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
+char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   if (questions == NULL) {
     printf("You must get the questions first!\n");
-    return;
+    return NULL;
   }
-
 
   int num;
   scanf("%d", &num);
 
   if (num <= 0 || num > questions->count) {
     printf("Invalid question number!\n");
-    return;
+    return NULL;
   }
 
   char msg[1024];
@@ -237,26 +236,26 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
   if (mkdir(questions->names[num - 1], S_IRWXU) == -1) {
     printf("Cannot create dir\n");
-    return;
+    return NULL;
   }
   TCPConn* conn = connectTCP(opts);
 
   if (write(conn->fd, msg, strlen(msg)) == -1) {
     printf("An error has occurred.\n");
     closeTCP(conn);
-    return;
+    return NULL;
   }
 
   char buffer[256], filename[256];
 
   if (read(conn->fd, buffer, 3) != 3) {
-    printf("ERR\n"); closeTCP(conn); return;
+    printf("ERR\n"); closeTCP(conn); return NULL;
   }
 
   // TODO: check errs
   buffer[3] = '\0';
   if (strcmp(buffer, "QGR")) {
-    printf("ERR\n"); closeTCP(conn); return;
+    printf("ERR\n"); closeTCP(conn); return NULL;
   }
 
   read(conn->fd, buffer, 1);
@@ -293,6 +292,7 @@ void questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
   printf("Question and answers downloaded to %s\n", questions->names[num - 1]);
   closeTCP(conn);
+  return questions->names[num - 1];
 }
 
 void questionSubmit (ServerOptions opts, char *userID, char *topic) {
@@ -347,22 +347,98 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
   } else {
     write(conn->fd, "0", 1);
   }
-  printf("meda\n");
 
   write(conn->fd, "\n", 1);
 
-  char buffer[1024];
+  char buffer[8];
+  read(conn->fd, buffer, 8);
 
-  while (read(conn->fd, buffer, 1024) > 0) {
-  printf("%s\n", buffer);
+  if (strcmp(buffer, "QUR OK\n") == 0) {
+    printf("Question submited successfully!\n");
+  } else if (strcmp(buffer, "QUR DUP\n") == 0) {
+    printf("Question submited already exists!\n");
+  } else if (strcmp(buffer, "QUR FUL\n") == 0) {
+    printf("Question list is full!\n");
+  } else {
+    printf("Could not submit question.\n");
   }
-
 
   closeTCP(conn);
 }
 
-void answerSubmit () {
-  printf("I do nothing yet. Get away!\n");
+void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question) {
+  if (topic == NULL) {
+    printf("You must pick a topic first!\n");
+    return;
+  }
+
+  if (question == NULL) {
+    printf("You must pick a question first!\n");
+    return;
+  }
+
+  printf("%s\n", question);
+  char str[1024];
+
+  if (fgets (str, 1024, stdin) == NULL) {
+    printf("Cannot read.\n");
+    return;
+  }
+
+  char *txtFile = strtok(str+1, " \n");
+  char *imgFile = strtok(NULL, " \n");
+
+  if (txtFile == NULL) {
+    printf("At least a text file is required!\n");
+    return;
+  }
+
+  if (access(txtFile, F_OK) == -1 || (imgFile != NULL && access(imgFile, F_OK) == -1)) {
+    printf("Text or image file does not exist!\n");
+    return;
+  }
+
+  TCPConn* conn = connectTCP(opts);
+
+  // TODO: check for errors
+  write(conn->fd, "ANS ", 4);
+  write(conn->fd, userID, 5);
+  write(conn->fd, " ", 1);
+  write(conn->fd, topic, strlen(topic));
+  write(conn->fd, " ", 1);
+  write(conn->fd, question, strlen(question));
+  write(conn->fd, " ", 1);
+
+  if (sendFile(conn->fd, txtFile, 0) == -1) {
+    printf("Cannot send file properly!\n");
+    return;
+  }
+
+  if (imgFile != NULL) {
+    write(conn->fd, "1 ", 2);
+    if (sendFile(conn->fd, imgFile, 1) == -1) {
+      printf("Cannot send image properly!\n");
+      return;
+    }
+  } else {
+    write(conn->fd, "0", 1);
+  }
+
+  write(conn->fd, "\n", 1);
+
+  char buffer[8];
+
+  read(conn->fd, buffer, 8);
+
+  if (strcmp(buffer, "ANR OK\n") == 0) {
+    printf("Answer submited successfully!\n");
+  } else if (strcmp(buffer, "ANR FUL\n") == 0) {
+    printf("Answer list is full!\n");
+  } else {
+    printf("Could not submit answer.\n");
+  }
+
+  closeTCP(conn);
 }
 
 void clearInput () {
@@ -392,6 +468,7 @@ int main(int argc, char** argv) {
   StringArray *topics = NULL;
   StringArray *questions = NULL;
   char *currentTopic = NULL;
+  char *currentQuestion = NULL;
   int exit = 0;
 
   do {
@@ -428,7 +505,7 @@ int main(int argc, char** argv) {
         clearInput();
         break;
       case QuestionGet:
-        questionGet(opts, currentTopic, questions);
+        currentQuestion = questionGet(opts, currentTopic, questions);
         clearInput();
         break;
       case QuestionSubmit:
@@ -438,7 +515,7 @@ int main(int argc, char** argv) {
         break;
       case AnswerSubmit:
         if (hasUserId(userID)) {
-          answerSubmit();
+          answerSubmit(opts, userID, currentTopic, currentQuestion);
         }
         break;
       default:
