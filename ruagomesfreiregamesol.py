@@ -21,63 +21,47 @@ class SearchProblem:
     self.auxheur = auxheur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf]):
-    startNode = Node(None, init[0])
-    startNode.g = startNode.h = startNode.f = 0
-    endNode = Node(None, self.goal[0])
-    endNode.h = endNode.h = endNode.f = 0
+    opened = [Node(None, init[0], None)]
+    closed = []
 
-    openList = []
-    closedList = []
+    while len(opened) > 0:
+      curr = opened[0]
+      curri = 0
 
-    openList.append(startNode)
-    
-    while len(openList) > 0:
-      currentNode = openList[0]
-      currentIndex = 0
+      for i, node in enumerate(opened):
+        if node.f < curr.f:
+          curr = node
+          curri = i
 
-      for index, item in enumerate(openList):
-        if item.f < currentNode.f:
-          currentNode = item
-          currentIndex = index
+      if curr.transport is not None:
+        tickets[curr.transport] -= 1
 
-      if currentNode.transport is not None:
-        tickets[currentNode.transport] -= 1
+      opened.pop(curri)
+      closed.append(curr)
 
-      openList.pop(currentIndex)
-      closedList.append(currentNode)
+      if curr.position == self.goal[0]:
+        path = []
+        while curr is not None:
+          path.insert(0, [[curr.transport], [curr.position]])
+          curr = curr.parent
+        print("PATH to GOAL:", path)
+        return path
 
-      if currentNode.position == endNode.position:
-          path = []
-          current = currentNode
-          while current is not None:
-              path.append([[current.transport], [current.position]])
-              current = current.parent
-          print("MY PATH", path[::-1])
-          return path[::-1] # reversed path
+      for newPos in self.model[curr.position]:
+        child = Node(curr, newPos[1], newPos[0])
 
-      for newPosition in self.model[currentNode.position]:
-        child = Node(currentNode, newPosition[1], newPosition[0])
-
-        if tickets[newPosition[0]] -1 < 0:
+        if tickets[newPos[0]] -1 < 0:
           continue
 
-        if child in closedList:
+        if child in closed:
           continue
 
-        child.g = currentNode.g + self.__distance(child.position, currentNode.position)
-        child.h = self.__distance(child.position, endNode.position)
+        child.g = curr.g + 1
+        child.h = self.__distance(child.position, self.goal[0])
         child.f = child.g + child.h
 
-        shouldContinue = False
-        for openNode in openList:
-          if child == openNode and child.g > openNode.g:
-            shouldContinue = True
-            break
-
-        if shouldContinue:
-          continue
-
-        openList.append(child)
+        if not isInListWithG(child, opened):
+          opened.append(child)
 
   def __heuristic (self, pos):
     return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
@@ -85,4 +69,10 @@ class SearchProblem:
   def __distance (self, src, dst):
     x = self.auxheur[dst - 1][0] - self.auxheur[src - 1][0]
     y = self.auxheur[dst - 1][1] - self.auxheur[src - 1][1]
-    return math.sqrt(x ** 2 + y ** 2)
+    return math.hypot(x, y)
+
+def isInListWithG (node, list):
+  for n in list:
+    if node == n and node.g > n.g:
+      return True
+  return False
