@@ -41,6 +41,9 @@ class SearchProblem:
       opened.pop(curri)
       closed.append(curr)
 
+      if curr[0].g > limitdepth:
+        continue
+
       if all(list(self.goal[i] == node.position for i, node in enumerate(curr))):
         path = []
         while curr[0] is not None:
