@@ -26,6 +26,7 @@ class SearchProblem:
     closed = []
 
     while len(opened) > 0:
+      print(len(opened))
       curr = opened[0]
       curri = 0
       avg = average(curr)
@@ -45,16 +46,11 @@ class SearchProblem:
       isGoal = list(self.goal[i] == node.position for i, node in enumerate(curr))
 
       if all(isGoal):
-        """
         path = []
-        while curr is not None:
-          path.insert(0, [[curr.transport], [curr.position]])
-          curr = curr.parent
-        print("PATH to GOAL:", path)
+        while curr[0] is not None:
+          path.insert(0, [list(n.transport for n in curr), list(n.position for n in curr)])
+          curr = list(n.parent for n in curr)
         return path
-        """
-        print("IM AT THE END")
-        return []
 
       if any(isGoal):
         continue
@@ -67,30 +63,30 @@ class SearchProblem:
         if any(x < 0 for x in tk):
           continue
 
-
         move = list(Node(curr[i], pos, trans) for i, (trans, pos) in enumerate(tup))
 
-        if move in closed:
-          continue
+        shouldContinue = False
+        for m in closed:
+          for i, node in enumerate(move):
+            if m[i] == node:
+              shouldContinue = True
+              break
+          if shouldContinue:
+            break
+
+        print(shouldContinue)
+        if shouldContinue:
+            continue
 
         for (c, n, g) in zip(curr, move, self.goal):
           n.g = c.g + 1
           n.h = self.__distance(n.position, g)
           n.f = n.g + n.h
 
-        print(list(n.f for n in move))
+        if not isInListWithG(move, opened):
+          opened.append(move)
   
       
-      """
-      for newPos in self.model[curr.position]:
-        child = Node(curr, newPos[1], newPos[0])
-        if child in closed:
-          continue
-
-        if not isInListWithG(child, opened):
-          opened.append(child)
-      """
-
   def __heuristic (self, pos):
     return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
 
@@ -99,9 +95,10 @@ class SearchProblem:
     y = self.auxheur[dst - 1][1] - self.auxheur[src - 1][1]
     return math.hypot(x, y)
 
-def isInListWithG (node, list):
-  for n in list:
-    if node == n and node.g > n.g:
+def isInListWithG (move, list):
+  avg = averageG(move)
+  for l in list:
+    if averageG(l) > avg and all(m == n for (m, n) in zip(move, l)):
       return True
   return False
 
@@ -109,4 +106,10 @@ def average (list):
   sum = 0
   for node in list:
     sum = sum + node.f
+  return sum / len(list)
+
+def averageG (list):
+  sum = 0
+  for node in list:
+    sum = sum + node.g
   return sum / len(list)
