@@ -26,13 +26,21 @@ class SearchProblem:
     closed = []
 
     while len(opened) > 0:
-      print(len(opened))
+      # print(len(opened))
       curr = opened[0]
       curri = 0
       avg = average(curr)
 
+      for x in opened:
+        print(list(((n.position) for n in x)))
+
+      if len(opened) > 1:
+        return
+    
       for i, lst in enumerate(opened):
-        if average(lst) < avg:
+        newAvg = average(lst)
+        if newAvg < avg:
+          avg = newAvg
           curr = lst
           curri = i
 
@@ -44,18 +52,25 @@ class SearchProblem:
       closed.append(curr)
 
       isGoal = list(self.goal[i] == node.position for i, node in enumerate(curr))
+      #print(any(isGoal))
 
       if all(isGoal):
         path = []
         while curr[0] is not None:
           path.insert(0, [list(n.transport for n in curr), list(n.position for n in curr)])
           curr = list(n.parent for n in curr)
+        print(path)
         return path
 
       if any(isGoal):
         continue
 
+      print(list((n.position) for n in curr))
+
       for tup in itertools.product(*list(self.model[node.position] for node in curr)):
+        if not allDifferent(tup):
+          continue
+
         tk = tickets.copy()
         for move in tup:
           tk[move[0]] -= 1
@@ -68,13 +83,13 @@ class SearchProblem:
         shouldContinue = False
         for m in closed:
           for i, node in enumerate(move):
-            if m[i] == node:
+            if m[i].position == node.position:
               shouldContinue = True
               break
           if shouldContinue:
             break
 
-        print(shouldContinue)
+        # print(shouldContinue)
         if shouldContinue:
             continue
 
@@ -85,6 +100,7 @@ class SearchProblem:
 
         if not isInListWithG(move, opened):
           opened.append(move)
+
   
       
   def __heuristic (self, pos):
@@ -96,11 +112,20 @@ class SearchProblem:
     return math.hypot(x, y)
 
 def isInListWithG (move, list):
-  avg = averageG(move)
+  # avg = averageG(move)
   for l in list:
-    if averageG(l) > avg and all(m == n for (m, n) in zip(move, l)):
+    allEqual = True
+    for i, m in enumerate(l):
+      if m.position != move[i].position:
+        allEqual = False
+        break
+    if allEqual:
       return True
   return False
+    #if averageG(l) > avg and all(m == n for (m, n) in zip(move, l)):
+     # return True
+
+  #return False
 
 def average (list):
   sum = 0
@@ -113,3 +138,11 @@ def averageG (list):
   for node in list:
     sum = sum + node.g
   return sum / len(list)
+
+def allDifferent (tup):
+  for i, l1 in enumerate(tup):
+    for j, l2 in enumerate(tup):
+      if i is not j and l1[1] is l2[1]:
+        return False
+  return True
+    
