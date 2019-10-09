@@ -5,14 +5,13 @@ import itertools
 from functools import reduce
 
 class Node():
-  def __init__(self, parent=None, position=None, transport=None, depth = 0):
+  def __init__(self, parent=None, position=None, transport=None):
     self.position = position
     self.parent = parent
     self.transport = transport
     self.g = 0
     self.h = 0
     self.f = 0
-    self.depth = depth
 
   def __eq__(self, other):
     return self.position == other.position and self.transport == other.transport
@@ -31,17 +30,13 @@ class SearchProblem:
       curr = opened[0]
       curri = 0
       avg = heurAvgF(curr)
-    
+
       for i, lst in enumerate(opened):
         newAvg = heurAvgF(lst)
         if newAvg < avg:
           avg = newAvg
           curr = lst
           curri = i
-
-      #for node in curr:
-        #if node.transport is not None:
-          #tickets[node.transport] -= 1
 
       opened.pop(curri)
       closed.append(curr)
@@ -51,20 +46,21 @@ class SearchProblem:
         while curr[0] is not None:
           path.insert(0, [list(n.transport for n in curr), list(n.position for n in curr)])
           curr = list(n.parent for n in curr)
-        print(path)
         return path
 
+      for node in curr:
+        if node.transport is not None:
+          tickets[node.transport] -= 1
+
+      deadend = True
       for tup in itertools.product(*list(self.model[node.position] for node in curr)):
         if not allDifferent(tup):
           continue
 
-        #tk = tickets.copy()
-        #for move in tup:
-        #  tk[move[0]] -= 1
-        #if any(x < 0 for x in tk):
-        #  continue
+        move = list(Node(curr[i], pos, trans) for i, (trans, pos) in enumerate(tup))
 
-        move = list(Node(curr[i], pos, trans, depth = curr[i].depth + 1) for i, (trans, pos) in enumerate(tup))
+        if not ticketsInLimits(move, tickets):
+          continue
 
         if isInList(move, closed):
           continue
@@ -74,11 +70,16 @@ class SearchProblem:
           n.h = self.__distance(n.position, g)
           n.f = n.g + n.h
 
-        if not isInList(move, opened):
-          opened.append(move)
+        # SHOULD BE ALL? If so, put before calculations!
+        if isInList(move, opened):
+          continue
 
-  def __heuristic (self, pos):
-    return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
+        deadend = False
+        opened.append(move)
+
+      if deadend:
+        for node in curr:
+          tickets[node.transport] += 1
 
   def __distance (self, src, dst):
     x = self.auxheur[dst - 1][0] - self.auxheur[src - 1][0]
@@ -105,4 +106,13 @@ def allDifferent (tup):
       if i is not j and l1[1] is l2[1]:
         return False
   return True
-    
+
+def ticketsInLimits (move, tickets):
+  tk = [0, 0, 0]
+  curr = move
+  while curr[0] is not None:
+    for node in curr:
+      if node.transport is not None:
+        tk[node.transport] += 1
+    curr = list(n.parent for n in curr)
+  return all(list(x <= tickets[i] for i, x in enumerate(tk)))
