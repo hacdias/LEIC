@@ -1,6 +1,7 @@
 import math
 import pickle
 import time
+import itertools
 
 class Node():
   def __init__(self, parent=None, position=None, transport=None):
@@ -20,48 +21,75 @@ class SearchProblem:
     self.model = model
     self.auxheur = auxheur
 
-  def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf]):
-    opened = [Node(None, init[0], None)]
+  def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf], anyorder=False):
+    opened = [list(Node(None, x, None) for x in init)]
     closed = []
 
     while len(opened) > 0:
       curr = opened[0]
       curri = 0
+      avg = average(curr)
 
-      for i, node in enumerate(opened):
-        if node.f < curr.f:
-          curr = node
+      for i, lst in enumerate(opened):
+        if average(lst) < avg:
+          curr = lst
           curri = i
 
-      if curr.transport is not None:
-        tickets[curr.transport] -= 1
+      for node in curr:
+        if node.transport is not None:
+          tickets[node.transport] -= 1
 
       opened.pop(curri)
       closed.append(curr)
 
-      if curr.position == self.goal[0]:
+      isGoal = list(self.goal[i] == node.position for i, node in enumerate(curr))
+
+      if all(isGoal):
+        """
         path = []
         while curr is not None:
           path.insert(0, [[curr.transport], [curr.position]])
           curr = curr.parent
         print("PATH to GOAL:", path)
         return path
+        """
+        print("IM AT THE END")
+        return []
 
-      for newPos in self.model[curr.position]:
-        child = Node(curr, newPos[1], newPos[0])
+      if any(isGoal):
+        continue
 
-        if tickets[newPos[0]] -1 < 0:
+      for tup in itertools.product(*list(self.model[node.position] for node in curr)):
+        tk = tickets.copy()
+        for move in tup:
+          tk[move[0]] -= 1
+
+        if any(x < 0 for x in tk):
           continue
 
+
+        move = list(Node(curr[i], pos, trans) for i, (trans, pos) in enumerate(tup))
+
+        if move in closed:
+          continue
+
+        for (c, n, g) in zip(curr, move, self.goal):
+          n.g = c.g + 1
+          n.h = self.__distance(n.position, g)
+          n.f = n.g + n.h
+
+        print(list(n.f for n in move))
+  
+      
+      """
+      for newPos in self.model[curr.position]:
+        child = Node(curr, newPos[1], newPos[0])
         if child in closed:
           continue
 
-        child.g = curr.g + 1
-        child.h = self.__distance(child.position, self.goal[0])
-        child.f = child.g + child.h
-
         if not isInListWithG(child, opened):
           opened.append(child)
+      """
 
   def __heuristic (self, pos):
     return map(lambda arg : self.__distance(arg[1], self.goal[arg[0]]), enumerate(pos))
@@ -76,3 +104,9 @@ def isInListWithG (node, list):
     if node == n and node.g > n.g:
       return True
   return False
+
+def average (list):
+  sum = 0
+  for node in list:
+    sum = sum + node.f
+  return sum / len(list)

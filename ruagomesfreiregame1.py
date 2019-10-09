@@ -83,7 +83,6 @@ if validatepath(nn,I,U, tickets = [5,5,2]):
 else:
         print("invalid path")
 
-"""
 print("\n(6 val) Exercise 3 - Three agents, No limits (test 1)")
 print("Init [1,3,7] Goal [2,21,9]")
 SP = SearchProblem(goal = [2,21,9], model = U, auxheur=coords)
@@ -134,4 +133,3 @@ print("\n(4 val) Exercise 5 - Three agents, Limits, Any-Order")
 tendtotal = time.process_time()
 print("Total time %.1fms"%((tendtotal-tinittotal)*1000))
 
-"""
