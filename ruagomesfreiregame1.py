@@ -52,7 +52,7 @@ def validatepath(oP,I,U,tickets=[25,25,25]):
         return True
 
 tinittotal = time.process_time()
-"""
+
 print("\n(2 val) Exercise 1 - One agent, No limits")
 print("Init [30] Goal [56]")
 SP = SearchProblem(goal = [56], model = U, auxheur=coords)
@@ -67,7 +67,7 @@ if validatepath(nn,I,U):
         plotpath(nn,coords)     
 else:
         print("invalid path")
-
+"""
 print("\n(4 val) Exercise 2 - One agent, Limits")
 print("Init [30] Goal [56]")
 SP = SearchProblem(goal = [56], model = U, auxheur=coords)
