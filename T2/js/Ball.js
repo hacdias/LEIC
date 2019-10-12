@@ -1,4 +1,4 @@
-/* global THREE, Field */
+/* global THREE, Field, getRandomInt */
 'use strict'
 
 const calcAngleToRotate = (vector) => {
@@ -16,7 +16,7 @@ const Y_AXIS = new THREE.Vector3(0, 1, 0)
 const Z_AXIS = new THREE.Vector3(0, 0, 1)
 
 class Ball extends THREE.Object3D {
-  constructor ({ radius }) {
+  constructor ({ radius, direction, speed }) {
     super()
     const geometry = new THREE.SphereGeometry(radius, 15, 15)
     const material = new THREE.MeshBasicMaterial({
@@ -34,8 +34,12 @@ class Ball extends THREE.Object3D {
 
     this.add(new THREE.AxesHelper(5))
 
-    this.speed = 10
-    this.direction = new THREE.Vector3(Math.random() * 2 - 1, 0, Math.random() * 2 - 1).normalize()
+    this.speed = speed || getRandomInt(4, 10)
+    this.direction = direction || new THREE.Vector3(
+      Math.random() * 2 - 1,
+      0,
+      Math.random() * 2 - 1
+    ).normalize()
 
     setInterval(this.updateSpeed.bind(this), 1000)
 

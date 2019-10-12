@@ -1,4 +1,4 @@
-/* global THREE, Field, Ball, Cannon  */
+/* global THREE, Field, Ball, Cannon, getRandomInt */
 'use strict'
 
 const flags = {
@@ -21,12 +21,6 @@ const DIAG_UNIT = Math.sqrt(0.5)
 var scene, renderer, clock, field, balls = []
 var cameras = new Array(3)
 var cannons = new Array(3)
-
-function getRandomInt (min, max) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min)) + min
-}
 
 function createScene () {
   scene = new THREE.Scene()
@@ -191,7 +185,20 @@ function animate () {
 
   if (flags.shoot) {
     flags.shoot = false
+
+    const ball = new Ball({ radius: BALL_RADIUS, direction: new THREE.Vector3(-1, 0, 0) })
+    // ball.position.x = cannons[flags.cannon].x
+
+    console.warn(
+      cannons[flags.cannon].rotation.x,
+      cannons[flags.cannon].rotation.y,
+      cannons[flags.cannon].rotation.z,
+    )
+
     console.warn('Shoot')
+
+    scene.add(ball)
+    balls.push(ball)
   }
 
   const delta = clock.getDelta()
