@@ -48,6 +48,8 @@ TCPConn *connectTCP (ServerOptions opts);
 
 void closeTCP (TCPConn* conn);
 
+char* readTCP (int socket);
+
 int sendFile (int connFd, char *file, int extension);
 
 #endif

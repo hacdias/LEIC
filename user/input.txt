@@ -1,5 +1,5 @@
 tl
-ts 4
+ts 15
 ql
 qg 1
 qg 2

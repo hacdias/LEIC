@@ -173,6 +173,29 @@ TCPConn *listenTCP (ServerOptions opts) {
   return conn;
 }
 
+char* readTCP (int socket) {
+  int size = 32;
+  char* buffer = malloc(sizeof(char) * size);
+  int offset = 0, n;
+
+  while ((n = read(socket, buffer + offset, 1)) == 1 && buffer[offset] != ' ' && buffer[offset] != '\n' && buffer[offset] != '\r') {
+    offset++;
+
+    if (offset >= size) {
+      size += 32;
+      buffer = realloc(buffer, size);
+    }
+  }
+
+  if (n == -1) {
+    return NULL;
+  }
+
+  buffer = realloc(buffer, offset);
+  buffer[offset] = '\0';
+  return buffer; 
+}
+
 void closeTCP (TCPConn* conn) {
   freeaddrinfo(conn->res);
 	close(conn->fd);

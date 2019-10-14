@@ -15,8 +15,77 @@ int max (int x, int y) {
   return x > y ? x : y;
 }
 
-void handleTCP () {
+int dirExists (const char *name) {
+  printf("%s\n", name);
+  DIR* dir = opendir(name);
+  if (dir) {
+    closedir(dir);
+    return 1;
+  } else if (ENOENT == errno) {
+    return 0;
+  } else {
+    return -1;
+  }
+}
 
+int handleGqu (int socket) {
+  char* topic = readTCP(socket);
+  if (topic == NULL) return -1;
+  char* question = readTCP(socket);
+  if (question == NULL) return -1;
+
+  char dirName[258];
+  sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
+
+  int exists = dirExists(dirName);
+
+  if (exists == 1) {
+    printf("CUCU");
+
+    return 0;
+  } else if (exists == 0) {
+    return write(socket, "QGR EOF\n", 8);
+  }
+
+  return write(socket, "QGR ERR\n", 8);
+}
+
+int handleQus (int socket) {
+
+}
+
+int handleAns (int socket) {
+
+}
+
+void handleTCP (TCPConn *conn) {
+  int fd, n;
+  struct sockaddr_in clientAddr;
+  socklen_t len = sizeof(clientAddr);
+
+  if ((fd = accept(conn->fd,(struct sockaddr*)&clientAddr, &len)) == -1) {
+    return;
+  }
+
+  char* cmd = readTCP(fd);
+  if (cmd == NULL) {
+    printf("Merda aconeceu;");
+    return;
+  }
+
+  if (!strcmp(cmd, "GQU")) {
+    n = handleGqu(fd);
+  } else if (!strcmp(cmd, "QUS")) {
+    n = handleQus(fd);
+  } else if (!strcmp(cmd, "ANS")) {
+    n = handleAns(fd);
+  } else {
+    write(fd, "ERR\n", 4);
+  }
+
+  free(cmd);
+  printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
+  close(fd);
 }
 
 int mkdirIfNotExists (const char *name) {
@@ -219,7 +288,7 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
   } else {
     return -1;
   }
-} 
+}
 
 void handleUDP (UDPConn* conn) {
   struct sockaddr_in clientAddr;
@@ -291,7 +360,7 @@ int main(int argc, char** argv) {
 
     ready = select(maxDesc, &desc, NULL, NULL, NULL);
 
-    if (FD_ISSET(tcpConn->fd, &desc)) handleTCP();
+    if (FD_ISSET(tcpConn->fd, &desc)) handleTCP(tcpConn);
     if (FD_ISSET(udpConn->fd, &desc)) handleUDP(udpConn);
   }
 
