@@ -29,6 +29,9 @@ int dirExists (const char *name) {
 }
 
 int handleGqu (int socket) {
+  DIR *d;
+  FILE *fp;
+
   char* topic = readTCP(socket);
   if (topic == NULL) return -1;
   char* question = readTCP(socket);
@@ -40,7 +43,45 @@ int handleGqu (int socket) {
   int exists = dirExists(dirName);
 
   if (exists == 1) {
-    printf("CUCU");
+    char buffer[256];
+    char filename[256];
+    char filenameUID[256];
+    char filenameText[256];
+    sprintf(filenameUID, "%s/%s/%s/%s_UID.txt", STORAGE, topic, question, question);
+    sprintf(filenameText, "%s/%s/%s/%s.txt", STORAGE, topic, question, question);
+
+    fp = fopen(filenameUID, "r");
+    if (fp == NULL) {
+      return -1;
+    }
+
+    char userID[6];
+    userID[5] = '\0';
+
+    if (fread(userID, sizeof(char), 5, fp) == -1) {
+      fclose(fp);
+      return -1;
+    }
+
+    close(fp);
+
+    write(socket, "QGR ", 4);
+    write(socket, userID, 5);
+
+    d = opendir(dirName);
+    struct dirent *dir;
+    int i = 0;
+
+    while ((dir = readdir(d)) != NULL) {
+      if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..") || !strcmp(dir->d_name, filenameUID)) {
+        continue;
+      }
+
+      i++;
+    }
+
+    write(socket, "\n", 1);
+    closedir(d);
 
     return 0;
   } else if (exists == 0) {
