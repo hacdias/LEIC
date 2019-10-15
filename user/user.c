@@ -7,6 +7,8 @@
 #include "cmds.h"
 #include "../lib/net.h"
 
+int errorHappened = 0;
+
 char *registerUser (UDPConn *conn) {
   char msg[11] = "REG ";
   scanf("%s", msg + 4);
@@ -16,6 +18,7 @@ char *registerUser (UDPConn *conn) {
   char *buffer = sendWithReplyUDP(conn, msg);
 
   if (buffer == NULL) {
+    errorHappened = 1;
     return NULL;
   }
 
@@ -43,9 +46,30 @@ typedef struct stringArray {
   char **names;
 } StringArray;
 
+void freeStringArray (StringArray* arr) {
+  if (arr == NULL) return;
+
+  for (int i = 0; i < arr->count; i++) {
+    free(arr->names[i]);
+  }
+
+  free(arr->names);
+  free(arr);
+}
+
 StringArray* topicList (UDPConn *conn) {
   char* buffer = sendWithReplyUDP(conn, "LTP\n");
+  if (buffer == NULL) {
+    errorHappened = 1;
+    return NULL;
+  }
+
   StringArray *topics = malloc(sizeof(StringArray));
+  if (topics == NULL) {
+    errorHappened = 1;
+    return NULL;
+  }
+
   int pos = 0;
   sscanf(buffer, "LTR %d%n", &topics->count, &pos);
   pos++;
@@ -54,6 +78,10 @@ StringArray* topicList (UDPConn *conn) {
   printf("Available Topics:\n");
 
   topics->names = malloc(topics->count * sizeof(char *));
+  if (topics == NULL) {
+    errorHappened = 1;
+    return NULL;
+  }
 
   for (int i = 0; i < topics->count; i++) {
     topics->names[i] = strdup(spaceToken);
@@ -94,6 +122,10 @@ void topicPropose (UDPConn *conn, char* userID) {
   msg[10 + step - 1] = '\n';
   msg[10 + step] = '\0';
   char* res = sendWithReplyUDP(conn, msg);
+  if (res == NULL) {
+    errorHappened = 1;
+    return;
+  }
 
   if (strcmp(res, "PTR OK\n") == 0) {
     printf("Topic proposed successfully!\n");
@@ -115,15 +147,31 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   }
 
   StringArray *questions = malloc(sizeof(StringArray));
+  if (questions == NULL) {
+    errorHappened = 1;
+    return NULL;
+  }
+
   char msg[256];
   sprintf(msg, "LQU %s\n", topic);
   char *buffer = sendWithReplyUDP(conn, msg);
+  if (buffer == NULL) {
+    free(questions);
+    errorHappened = 1;
+    return NULL;
+  }
 
   int pos = 0;
   sscanf(buffer, "LQR %d%n", &questions->count, &pos);
   pos++;
 
   questions->names = malloc(questions->count * sizeof(char *));
+  if (questions->names == NULL) {
+    free(questions);
+    free(buffer);
+    errorHappened = 1;
+    return NULL;
+  }
 
   char *spaceToken = strtok(buffer + pos, " :\n");
   printf("Available Questions for %s:\n", topic);
@@ -138,6 +186,7 @@ StringArray* questionList (UDPConn *conn, char *topic) {
     spaceToken = strtok(NULL, " :\n");
   }
 
+  free(buffer);
   return questions;
 }
 
@@ -235,13 +284,14 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
 
   if (mkdir(questions->names[num - 1], S_IRWXU) == -1) {
-    printf("Cannot create dir\n");
+    printf("Directory already exists for that question. Please remove it first.\n");
     return NULL;
   }
+
   TCPConn* conn = connectTCP(opts);
 
   if (write(conn->fd, msg, strlen(msg)) == -1) {
-    printf("An error has occurred.\n");
+    errorHappened = 1;
     closeTCP(conn);
     return NULL;
   }
@@ -249,7 +299,9 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   char buffer[256], filename[256];
 
   if (read(conn->fd, buffer, 3) != 3) {
-    printf("ERR\n"); closeTCP(conn); return NULL;
+    errorHappened = 1;
+    closeTCP(conn);
+    return NULL;
   }
 
   // TODO: check errs
@@ -258,15 +310,22 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     printf("ERR\n"); closeTCP(conn); return NULL;
   }
 
-  read(conn->fd, buffer, 1);
-  readTextAndImage(conn->fd, questions->names[num - 1]);
-  read(conn->fd, buffer, 1);
+  if (read(conn->fd, buffer, 1) != 1 ||
+    readTextAndImage(conn->fd, questions->names[num - 1]) == -1 ||
+    read(conn->fd, buffer, 2) != 2) {
+    errorHappened = 1;
+    closeTCP(conn);
+    return NULL;
+  }
 
-  read(conn->fd, buffer, 1);
   int answers = 0;
 
   if (buffer[0] == '1') {
-    read(conn->fd, buffer, 1);
+    if (read(conn->fd, buffer, 1) != 1) {
+      errorHappened = 1;
+      closeTCP(conn);
+      return NULL;
+    }
     answers = 10;
   } else {
     buffer[1] = '\0';
@@ -274,19 +333,35 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   }
 
   if (answers != 0) {
-    read(conn->fd, buffer, 1);
+    if (read(conn->fd, buffer, 1) != 1) {
+      errorHappened = 1;
+      closeTCP(conn);
+      return NULL;
+    }
 
     for (; answers > 0; answers--) {
       strcpy(filename, questions->names[num - 1]);
       strcat(filename, "/");
-      read(conn->fd, buffer, 3);
+      if (read(conn->fd, buffer, 3) != 3) {
+        errorHappened = 1;
+        closeTCP(conn);
+        return NULL;
+      }
       buffer[2] = '\0';
 
       strcat(filename, buffer);
       mkdir(filename, S_IRWXU);
-      
-      readTextAndImage(conn->fd, filename);
-      read(conn->fd, buffer, 1);
+
+      if (readTextAndImage(conn->fd, filename) == -1) {
+        errorHappened = 1;
+        closeTCP(conn);
+        return NULL;
+      }
+      if (read(conn->fd, buffer, 1) != 1) {
+        errorHappened = 1;
+        closeTCP(conn);
+        return NULL;
+      }
     }
   }
 
@@ -324,34 +399,48 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
 
   TCPConn* conn = connectTCP(opts);
 
-  // TODO: check for errors
-  write(conn->fd, "QUS ", 4);
-  write(conn->fd, userID, 5);
-  write(conn->fd, " ", 1);
-  write(conn->fd, topic, strlen(topic));
-  write(conn->fd, " ", 1);
-  write(conn->fd, question, strlen(question));
-  write(conn->fd, " ", 1);
+  if (write(conn->fd, "QUS ", 4) != 4 ||
+    write(conn->fd, userID, 5) != 5 ||
+    write(conn->fd, " ", 1) != 1 ||
+    write(conn->fd, topic, strlen(topic)) != strlen(topic) ||
+    write(conn->fd, " ", 1) != 2 ||
+    write(conn->fd, question, strlen(question)) != strlen(question) ||
+    write(conn->fd, " ", 1) != 1) {
+    errorHappened = 1;
+    closeTCP(conn);
+    return;
+  }
 
   if (sendFile(conn->fd, txtFile, 0) == -1) {
     printf("Cannot send file properly!\n");
+    errorHappened = 1;
+    closeTCP(conn);
     return;
   }
 
   if (imgFile != NULL) {
-    write(conn->fd, " 1 ", 3);
-    if (sendFile(conn->fd, imgFile, 1) == -1) {
+    if (write(conn->fd, " 1 ", 3) != 3 ||
+      sendFile(conn->fd, imgFile, 1) == -1) {
       printf("Cannot send image properly!\n");
+      errorHappened = 1;
+      closeTCP(conn);
       return;
     }
   } else {
-    write(conn->fd, " 0", 2);
+    if (write(conn->fd, " 0", 2) != 2) {
+      errorHappened = 1;
+      closeTCP(conn);
+      return;
+    }
   }
-
-  write(conn->fd, "\n", 1);
-
   char buffer[8];
-  read(conn->fd, buffer, 8);
+
+  if (write(conn->fd, "\n", 1) != 1 ||
+    read(conn->fd, buffer, 8)) {
+      errorHappened = 1;
+      closeTCP(conn);
+      return;
+  }
 
   if (strcmp(buffer, "QUR OK\n") == 0) {
     printf("Question submited successfully!\n");
@@ -381,7 +470,7 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
   char str[1024];
 
   if (fgets (str, 1024, stdin) == NULL) {
-    printf("Cannot read.\n");
+    errorHappened = 1;
     return;
   }
 
@@ -400,35 +489,48 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
 
   TCPConn* conn = connectTCP(opts);
 
-  // TODO: check for errors
-  write(conn->fd, "ANS ", 4);
-  write(conn->fd, userID, 5);
-  write(conn->fd, " ", 1);
-  write(conn->fd, topic, strlen(topic));
-  write(conn->fd, " ", 1);
-  write(conn->fd, question, strlen(question));
-  write(conn->fd, " ", 1);
+  if (write(conn->fd, "ANS ", 4) != 4 ||
+    write(conn->fd, userID, 5) != 5 ||
+    write(conn->fd, " ", 1) != 1 ||
+    write(conn->fd, topic, strlen(topic)) != strlen(topic) ||
+    write(conn->fd, " ", 1) != 1 ||
+    write(conn->fd, question, strlen(question)) != strlen(question) ||
+    write(conn->fd, " ", 1) != 1) {
+    errorHappened = 1;
+    closeTCP(conn);
+    return;
+  }
 
   if (sendFile(conn->fd, txtFile, 0) == -1) {
     printf("Cannot send file properly!\n");
+    errorHappened = 1;
+    closeTCP(conn);
     return;
   }
 
   if (imgFile != NULL) {
-    write(conn->fd, " 1 ", 3);
-    if (sendFile(conn->fd, imgFile, 1) == -1) {
+    if (write(conn->fd, " 1 ", 3) != 3 || sendFile(conn->fd, imgFile, 1) == -1) {
       printf("Cannot send image properly!\n");
+      errorHappened = 1;
+      closeTCP(conn);
       return;
     }
   } else {
-    write(conn->fd, " 0", 2);
+    if (write(conn->fd, " 0", 2) != 2) {
+      errorHappened = 1;
+      closeTCP(conn);
+      return;
+    }
   }
-
-  write(conn->fd, "\n", 1);
 
   char buffer[8];
 
-  read(conn->fd, buffer, 8);
+  if (write(conn->fd, "\n", 1) != 1 ||
+    read(conn->fd, buffer, 8) != 8) {
+    errorHappened = 1;
+    closeTCP(conn);
+    return;
+  }
 
   if (strcmp(buffer, "ANR OK\n") == 0) {
     printf("Answer submited successfully!\n");
@@ -478,6 +580,11 @@ int main(int argc, char** argv) {
       break;
     }
 
+    if (errorHappened == 1) {
+      printf("An error has happened while processing your request.\n");
+      break;
+    }
+
     switch (getCommand(cmd)) {
       case Exit:
         exit = 1;
@@ -519,10 +626,16 @@ int main(int argc, char** argv) {
         }
         break;
       default:
-        printf("Invalid command! Go read a book.\n");
+        printf("Invalid command!\n");
     }
   } while (!exit);
 
+  free(userID);
+  freeStringArray(topics);
+  freeStringArray(questions);
+  // Do not free currentTopic not currentQuestion
+  // because they're pointers to places in topics or questions,
+  // respectively.
   closeUDP(conn);
-  return 0;
+  return errorHappened;
 }
