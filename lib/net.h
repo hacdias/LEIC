@@ -52,4 +52,6 @@ char* readTCP (int socket);
 
 int sendFile (int connFd, char *file, int extension, int sendSize);
 
+int readTextAndImage (int socket, const char *basename, int isServer);
+
 #endif

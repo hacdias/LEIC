@@ -1,8 +1,5 @@
+reg 89455
 tl
-ts 16
+ts 1
 ql
 qg 1
-qg 2
-qg 3
-qg 4
-exit

@@ -191,81 +191,6 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   return questions;
 }
 
-int readAndSave (int socket, int isImg, char* filename) {
-  char tmp[256];
-  int readCode;
-
-  if (isImg) {
-    read(socket, tmp, 4);
-    tmp[3] = '\0';
-    strcat(filename, ".");
-    strcat(filename, tmp);
-  }
-
-  FILE *fp = fopen(filename, "w");
-  int size = 0;
-  int i = 0;
-
-  while ((readCode = read(socket, tmp + i, 1)) == 1) {
-    if (tmp[i] == ' ') {
-      tmp[i] = '\0';
-      size = atoi(tmp);
-      break;
-    }
-    i++;
-  }
-
-  int toRead = 256;
-  do {
-    if (size < toRead) toRead = size;
-    readCode = read(socket, tmp, toRead);
-    if (readCode <= 0) break;
-    size -= readCode;
-    fwrite (tmp , sizeof(char), readCode, fp);
-  } while (size > 0);
-
-  fclose(fp);
-  return 0;
-}
-
-int readTextAndImage (int socket, char *basename) {
-  char buffer[256], filename[256];
-
-  if (read(socket, buffer, 6) != 6) {
-    return -1;
-  }
-
-  buffer[5] = '\0';
-
-  strcpy(filename, basename);
-  strcat(filename, ".txt");
-
-  FILE *fp = fopen(filename, "w");
-  if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
-    return -1;
-  }
-
-  strcpy(filename, basename);
-  strcat(filename, "_user.txt");
-
-  readAndSave(socket, 0, filename);
-
-  if (read(socket, buffer, 2) != 2) {
-    return -1;
-  }
-
-  if (buffer[1] == '1') {
-    if (read(socket, buffer, 1) != 1) {
-      return -1;
-    }
-
-    strcpy(filename, basename);
-    readAndSave(socket, 1, filename);
-  }
-
-  return 0;
-}
-
 char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   if (questions == NULL) {
     printf("You must get the questions first!\n");
@@ -313,7 +238,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
   sprintf(filename, "%s/%s", topic, questions->names[num - 1]);
 
   if (read(conn->fd, buffer, 1) != 1 ||
-    readTextAndImage(conn->fd, filename) == -1 ||
+    readTextAndImage(conn->fd, filename, 0) == -1 ||
     read(conn->fd, buffer, 2) != 2) {
     errorHappened = 1;
     closeTCP(conn);
@@ -322,7 +247,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
   int answers = 0;
 
-  if (buffer[0] == '1') {
+  if (buffer[1] == '1') {
     if (read(conn->fd, buffer, 1) != 1) {
       errorHappened = 1;
       closeTCP(conn);
@@ -330,7 +255,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     }
     answers = 10;
   } else {
-    buffer[1] = '\0';
+    buffer[2] = '\0';
     answers = atoi(buffer);
   }
 
@@ -351,7 +276,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
 
       sprintf(filename, "%s/%s_%d", topic, questions->names[num - 1], answers);
 
-      if (readTextAndImage(conn->fd, filename) == -1) {
+      if (readTextAndImage(conn->fd, filename, 0) == -1) {
         errorHappened = 1;
         closeTCP(conn);
         return NULL;
@@ -579,11 +504,6 @@ int main(int argc, char** argv) {
       break;
     }
 
-    if (errorHappened == 1) {
-      printf("An error has happened while processing your request.\n");
-      break;
-    }
-
     switch (getCommand(cmd)) {
       case Exit:
         exit = 1;
@@ -626,6 +546,11 @@ int main(int argc, char** argv) {
         break;
       default:
         printf("Invalid command!\n");
+    }
+
+    if (errorHappened == 1) {
+      printf("An error has happened while processing your request.\n");
+      break;
     }
   } while (!exit);
 

@@ -16,6 +16,18 @@ int max (int x, int y) {
   return x > y ? x : y;
 }
 
+int isValidUserID (const char *userID) {
+  if (strlen(userID) != 5) return 0;
+
+  for (int i = 0; i < 5; i++) {
+    if (userID[i] < '0' && userID[i] > '9') {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
 int sendUserDataAndImage (int socket, const char* dir) {
   char filename[1024];
   sprintf(filename, "%s/user", dir);
@@ -48,8 +60,7 @@ int numOfDirectories (const char* name) {
   struct dirent *dir;
 
   while ((dir = readdir(d)) != NULL) {
-    if (!strcmp(dir->d_name, ".")
-      || !strcmp(dir->d_name, "..")
+    if (dir->d_name[0] == '.'
       || dir->d_type != DT_DIR) {
       continue;
     }
@@ -92,34 +103,86 @@ int handleGqu (int socket) {
       write(socket, count, 1);
     } else {
       write(socket, "0\n", 2);
+      free(topic);
+      free(question);
       return 0;
     }
 
-    int firstImg = answersCount;
+    int firstAns = answersCount;
 
     if (answersCount <= 10) {
-      firstImg = 1;
+      firstAns = 1;
     } else {
-      firstImg = answersCount - 9;
+      firstAns = answersCount - 9;
     }
 
-    for (; firstImg <= answersCount; firstImg++) {
+    for (; firstAns <= answersCount; firstAns++) {
       write(socket, " ", 1);
-      sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, firstImg);
+      sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, firstAns);
       sendUserDataAndImage(socket, dirName);
     }
-    
+
     write(socket, "\n", 1);
+    free(topic);
+    free(question);
     return 0;
   } else if (exists == 0) {
+    free(topic);
+    free(question);
     return write(socket, "QGR EOF\n", 8);
   }
 
+  free(topic);
+  free(question);
   return write(socket, "QGR ERR\n", 8);
 }
 
 int handleQus (int socket) {
-  return 0;
+  char* userID = readTCP(socket);
+  if (userID == NULL) return -1;
+  if (!isValidUserID(userID)) {
+    free(userID);
+    return write(socket, "QUR NOK\n", 8) != 8;
+  }
+
+  char *topic = readTCP(socket);
+  if (topic == NULL) {
+    free(userID);
+    return -1;
+  }
+
+  char *question = readTCP(socket);
+  if (question == NULL) {
+    free(topic);
+    free(userID);
+    return -1;
+  }
+
+  char dirName[256];
+  sprintf(dirName, "%s/%s", STORAGE, topic);
+  if (dirExists(dirName) != 1) {
+    free(userID);
+    free(topic);
+    free(question);
+
+    return write(socket, "QUR NOK\n", 8) != 8;
+  }
+
+  sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
+  if (dirExists(dirName) == 1) {
+    free(userID);
+    free(topic);
+    free(question);
+
+    return write(socket, "QUR DUP\n", 8) != 8;
+  }
+
+  int success = readTextAndImage(socket, dirName, 1);
+
+  free(userID);
+  free(topic);
+  free(question);
+  return success;
 }
 
 int handleAns (int socket) {
@@ -151,21 +214,21 @@ void handleTCP (TCPConn *conn) {
     write(fd, "ERR\n", 4);
   }
 
+  // TODO: ver n
+
   free(cmd);
   printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
   close(fd);
 }
 
 int handleReg (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
-  int notOk = 0;
-
-  for (int i = 4; i < 9; i++) {
-    if (buffer[i] < '0' && buffer[i] > '9') {
-      notOk = 1; break;
-    }
+  if (buffer[9] != '\n') {
+    return sendUDP(conn, "RGR NOK\n", addr);
   }
 
-  if (buffer[9] != '\n' || notOk) {
+  buffer[9] = '\0';
+
+  if (!isValidUserID(buffer + 4)) {
     return sendUDP(conn, "RGR NOK\n", addr);
   }
 
@@ -182,7 +245,7 @@ int handleLtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
     bzero(str, sizeof(str));
 
     while ((dir = readdir(d)) != NULL) {
-      if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..")) {
+      if (dir->d_name[0] == '.') {
         continue;
       }
 

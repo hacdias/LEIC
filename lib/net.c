@@ -193,7 +193,7 @@ char* readTCP (int socket) {
 
   buffer = realloc(buffer, offset);
   buffer[offset] = '\0';
-  return buffer; 
+  return buffer;
 }
 
 void closeTCP (TCPConn* conn) {
@@ -247,3 +247,94 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
   return 0;
 }
 
+int readAndSave (int socket, const char* basename, int isImg, int isServer) {
+  char tmp[256], filename[256];
+  int readCode;
+
+  if (isImg) {
+    read(socket, tmp, 4);
+    tmp[3] = '\0';
+
+    if (isServer) {
+      sprintf(filename, "%s/img_ext", basename);
+
+      FILE *fp = fopen(filename, "w");
+      fwrite (tmp , sizeof(char), 3, fp);
+      fclose(fp);
+
+      sprintf(filename, "%s/img", basename);
+    } else {
+      sprintf(filename, "%s.%s", basename, tmp);
+    }
+  } else {
+    sprintf(filename, "%s", basename);
+  }
+
+  FILE *fp = fopen(filename, "w");
+  int size = 0;
+  int i = 0;
+
+  while ((readCode = read(socket, tmp + i, 1)) == 1) {
+    if (tmp[i] == ' ') {
+      tmp[i] = '\0';
+      size = atoi(tmp);
+      break;
+    }
+    i++;
+  }
+
+  int toRead = 256;
+  do {
+    if (size < toRead) toRead = size;
+    readCode = read(socket, tmp, toRead);
+    if (readCode <= 0) break;
+    size -= readCode;
+    fwrite (tmp , sizeof(char), readCode, fp);
+  } while (size > 0);
+
+  fclose(fp);
+  return 0;
+}
+
+int readTextAndImage (int socket, const char *basename, int isServer) {
+  char buffer[256], filename[256];
+
+  if (read(socket, buffer, 6) != 6) {
+    return -1;
+  }
+
+  buffer[5] = '\0';
+
+  if (isServer) {
+    sprintf(filename, "%s/user", basename);
+  } else {
+    sprintf(filename, "%s_user.txt", basename);
+  }
+
+  FILE *fp = fopen(filename, "w");
+  if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
+    return -1;
+  }
+
+  if (isServer) {
+    sprintf(filename, "%s/data", basename);
+  } else {
+    sprintf(filename, "%s.txt", basename);
+  }
+
+  readAndSave(socket, filename, 0, isServer);
+
+  if (read(socket, buffer, 2) != 2) {
+    return -1;
+  }
+
+  if (buffer[1] == '1') {
+    if (read(socket, buffer, 1) != 1) {
+      return -1;
+    }
+
+    readAndSave(socket, basename, 1, isServer);
+  }
+
+  return 0;
+}
