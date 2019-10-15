@@ -74,9 +74,6 @@ int numOfDirectories (const char* name) {
 }
 
 int handleGqu (int socket) {
-  DIR *d;
-  FILE *fp;
-
   char* topic = readTCP(socket);
   if (topic == NULL) return -1;
   char* question = readTCP(socket);
@@ -304,8 +301,6 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
     bzero(str, sizeof(str));
 
     while ((dir = readdir(d)) != NULL) {
-      char topicUID[256];
-      sprintf(topicUID, "user", topic);
       if (strchr(dir->d_name, '.') != NULL) {
         continue;
       }
