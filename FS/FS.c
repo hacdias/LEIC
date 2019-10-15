@@ -92,11 +92,11 @@ int handleGqu (int socket) {
 }
 
 int handleQus (int socket) {
-
+  return 0;
 }
 
 int handleAns (int socket) {
-
+  return 0;
 }
 
 void handleTCP (TCPConn *conn) {
@@ -172,7 +172,7 @@ int handleLtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
       }
 
       char filename[256];
-      sprintf(filename, "%s/%s/%s_UID.txt", STORAGE, dir->d_name, dir->d_name);
+      sprintf(filename, "%s/%s/user", STORAGE, dir->d_name);
 
       FILE *fp = fopen(filename, "r");
       if (fp == NULL) {
@@ -235,8 +235,7 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
       return sendUDP(conn, "PTR NOK\n", addr);
     } else {
       strcat(dirName, "/");
-      strcat(dirName, buffer);
-      strcat(dirName, "_UID.txt");
+      strcat(dirName, "user");
 
       FILE *fp = fopen(dirName, "w");
       printf("%s-%s\n", userID, dirName);
@@ -261,6 +260,10 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
   char * topic = strdup(buffer);
   topic[strlen(topic) - 1] = '\0';
 
+  if (!strcmp(topic, "")) {
+    return sendUDP(conn, "ERR\n", addr);
+  }
+
   char dirNameTopic[2048];
   sprintf(dirNameTopic, "%s/%s", STORAGE, topic);
   d = opendir(dirNameTopic);
@@ -271,8 +274,12 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
 
     while ((dir = readdir(d)) != NULL) {
       char topicUID[256];
-      sprintf(topicUID, "%s_UID.txt", topic);
+      sprintf(topicUID, "user", topic);
       if (strchr(dir->d_name, '.') != NULL) {
+        continue;
+      }
+
+      if (dir->d_type != DT_DIR) {
         continue;
       }
 
@@ -286,12 +293,16 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
           continue;
         }
 
-        nAnswers += 1;
+        if (subDir->d_type == DT_DIR) {
+          nAnswers += 1;
+        }
       }
+      printf("%s\n", str);
       closedir(dQuestion);
 
       char filename[256];
-      sprintf(filename, "%s/%s/%s/%s_UID.txt", STORAGE, topic, dir->d_name, dir->d_name);
+      sprintf(filename, "%s/%s/%s/user", STORAGE, topic, dir->d_name);
+
 
       FILE *fp = fopen(filename, "r");
       if (fp == NULL) {
@@ -323,9 +334,9 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
 
     closedir(d);
 
-    char buffer[1024];
-    sprintf(buffer, "LQR %d%s\n", i, str);
-    return sendUDP(conn, buffer, addr);
+    char message[1024];
+    sprintf(message, "LQR %d%s\n", i, str);
+    return sendUDP(conn, message, addr);
   } else {
     return -1;
   }
