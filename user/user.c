@@ -411,7 +411,7 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
     return;
   }
 
-  if (sendFile(conn->fd, txtFile, 0) == -1) {
+  if (sendFile(conn->fd, txtFile, 0, 1) == -1) {
     printf("Cannot send file properly!\n");
     errorHappened = 1;
     closeTCP(conn);
@@ -420,7 +420,7 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
 
   if (imgFile != NULL) {
     if (write(conn->fd, " 1 ", 3) != 3 ||
-      sendFile(conn->fd, imgFile, 1) == -1) {
+      sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
       errorHappened = 1;
       closeTCP(conn);
@@ -501,7 +501,7 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
     return;
   }
 
-  if (sendFile(conn->fd, txtFile, 0) == -1) {
+  if (sendFile(conn->fd, txtFile, 0, 1) == -1) {
     printf("Cannot send file properly!\n");
     errorHappened = 1;
     closeTCP(conn);

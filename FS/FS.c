@@ -28,6 +28,50 @@ int dirExists (const char *name) {
   }
 }
 
+int sendUserDataAndImage (int socket, const char* dir) {
+  char filename[1024];
+  sprintf(filename, "%s/user", dir);
+  sendFile(socket, filename, 0, 0);
+  write(socket, " ", 1);
+
+  sprintf(filename, "%s/data", dir);
+  sendFile(socket, filename, 0, 1);
+
+  sprintf(filename, "%s/img_ext", dir);
+
+  struct stat st;
+  if (stat(filename, &st) == -1) {
+    write(socket, " 0", 2);
+  } else {
+    write(socket, " 1 ", 3);
+    sendFile(socket, filename, 0, 0);
+    write(socket, " ", 1);
+    sprintf(filename, "%s/img", dir);
+    sendFile(socket, filename, 0, 1);
+  }
+
+  return 0;
+}
+int numOfDirectories (const char* name) {
+  if (!dirExists(name)) return -1;
+
+  int count = 0;
+  DIR *d = opendir(name);
+  struct dirent *dir;
+
+  while ((dir = readdir(d)) != NULL) {
+    if (!strcmp(dir->d_name, ".")
+      || !strcmp(dir->d_name, "..")
+      || dir->d_type != DT_DIR) {
+      continue;
+    }
+
+    count++;
+  }
+
+  return count;
+}
+
 int handleGqu (int socket) {
   DIR *d;
   FILE *fp;
@@ -43,46 +87,44 @@ int handleGqu (int socket) {
   int exists = dirExists(dirName);
 
   if (exists == 1) {
-    char buffer[256];
-    char filename[256];
-    char filenameUID[256];
-    char filenameText[256];
-    sprintf(filenameUID, "%s/%s/%s/%s_UID.txt", STORAGE, topic, question, question);
-    sprintf(filenameText, "%s/%s/%s/%s.txt", STORAGE, topic, question, question);
-
-    fp = fopen(filenameUID, "r");
-    if (fp == NULL) {
-      return -1;
-    }
-
-    char userID[6];
-    userID[5] = '\0';
-
-    if (fread(userID, sizeof(char), 5, fp) == -1) {
-      fclose(fp);
-      return -1;
-    }
-
-    close(fp);
-
     write(socket, "QGR ", 4);
-    write(socket, userID, 5);
 
-    d = opendir(dirName);
-    struct dirent *dir;
-    int i = 0;
+    sendUserDataAndImage(socket, dirName);
 
-    while ((dir = readdir(d)) != NULL) {
-      if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..") || !strcmp(dir->d_name, filenameUID)) {
-        continue;
-      }
-
-      i++;
+    int answersCount = numOfDirectories(dirName);
+    if (answersCount == -1) {
+      printf("ERRO");
+      // TODO;
     }
 
-    write(socket, "\n", 1);
-    closedir(d);
+    char count[3];
+    write(socket, " ", 1);
 
+    if (answersCount >= 10) {
+      write(socket, "10", 2);
+    } else if (answersCount >= 1) {
+      sprintf(count, "%d", answersCount);
+      write(socket, count, 1);
+    } else {
+      write(socket, "0\n", 2);
+      return 0;
+    }
+
+    int firstImg = answersCount;
+
+    if (answersCount <= 10) {
+      firstImg = 1;
+    } else {
+      firstImg = answersCount - 9;
+    }
+
+    for (; firstImg <= answersCount; firstImg++) {
+      write(socket, " ", 1);
+      sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, firstImg);
+      sendUserDataAndImage(socket, dirName);
+    }
+    
+    write(socket, "\n", 1);
     return 0;
   } else if (exists == 0) {
     return write(socket, "QGR EOF\n", 8);
@@ -297,12 +339,10 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
           nAnswers += 1;
         }
       }
-      printf("%s\n", str);
       closedir(dQuestion);
 
       char filename[256];
       sprintf(filename, "%s/%s/%s/user", STORAGE, topic, dir->d_name);
-
 
       FILE *fp = fopen(filename, "r");
       if (fp == NULL) {
