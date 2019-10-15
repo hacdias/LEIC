@@ -8,4 +8,6 @@
 
 int mkdirIfNotExists (const char *name);
 
+int dirExists (const char *name);
+
 #endif

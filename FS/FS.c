@@ -16,19 +16,6 @@ int max (int x, int y) {
   return x > y ? x : y;
 }
 
-int dirExists (const char *name) {
-  printf("%s\n", name);
-  DIR* dir = opendir(name);
-  if (dir) {
-    closedir(dir);
-    return 1;
-  } else if (ENOENT == errno) {
-    return 0;
-  } else {
-    return -1;
-  }
-}
-
 int sendUserDataAndImage (int socket, const char* dir) {
   char filename[1024];
   sprintf(filename, "%s/user", dir);
@@ -419,7 +406,7 @@ int main(int argc, char** argv) {
   }
 
   if (udpConn == NULL || tcpConn == NULL) {
-    printf("Not working bitch.\n");
+    printf("Cannot listen.\n");
     return 1;
   }
 
