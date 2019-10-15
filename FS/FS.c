@@ -316,7 +316,6 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
       strcat(dirName, "user");
 
       FILE *fp = fopen(dirName, "w");
-      printf("%s-%s\n", userID, dirName);
       fwrite(userID, sizeof(char), sizeof(userID), fp);
       fclose(fp);
       return sendUDP(conn, "PTR OK\n", addr);
