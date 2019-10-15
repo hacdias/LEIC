@@ -99,7 +99,7 @@ char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
     size += 1024;
     buffer = realloc(buffer, size);
     len = recvfrom(conn->fd, buffer, size - 1, MSG_PEEK, (struct sockaddr*)addr, addrlen);
-  } while (len > size && len > 0);
+  } while (len == size - 1);
 
   if (len < 0) {
     free(buffer);
@@ -223,7 +223,7 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
 
   if (sendSize) {
     char size[256];
-    sprintf(size, "%lld ", st.st_size);
+    sprintf(size, "%ld ", st.st_size);
     if (write(connFd, size, strlen(size)) == -1) {
       return -1;
     }

@@ -488,7 +488,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  char cmd[256];
+  char cmd[1024];
   char *userID = NULL;
   StringArray *topics = NULL;
   StringArray *questions = NULL;

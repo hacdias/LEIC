@@ -251,7 +251,7 @@ int handleLtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
         continue;
       }
 
-      char filename[256];
+      char filename[1024];
       sprintf(filename, "%s/%s/user", STORAGE, dir->d_name);
 
       FILE *fp = fopen(filename, "r");
@@ -376,7 +376,7 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
       }
       closedir(dQuestion);
 
-      char filename[256];
+      char filename[1024];
       sprintf(filename, "%s/%s/%s/user", STORAGE, topic, dir->d_name);
 
       FILE *fp = fopen(filename, "r");
