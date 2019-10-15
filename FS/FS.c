@@ -158,6 +158,8 @@ int handleQus (int socket) {
     return -1;
   }
 
+  printf("%s %s %s", userID, topic, question);
+
   char dirName[256];
   sprintf(dirName, "%s/%s", STORAGE, topic);
   if (dirExists(dirName) != 1) {

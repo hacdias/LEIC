@@ -327,7 +327,7 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
     write(conn->fd, userID, 5) != 5 ||
     write(conn->fd, " ", 1) != 1 ||
     write(conn->fd, topic, strlen(topic)) != strlen(topic) ||
-    write(conn->fd, " ", 1) != 2 ||
+    write(conn->fd, " ", 1) != 1 ||
     write(conn->fd, question, strlen(question)) != strlen(question) ||
     write(conn->fd, " ", 1) != 1) {
     errorHappened = 1;
@@ -359,11 +359,10 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
   }
   char buffer[8];
 
-  if (write(conn->fd, "\n", 1) != 1 ||
-    read(conn->fd, buffer, 8)) {
-      errorHappened = 1;
-      closeTCP(conn);
-      return;
+  if (write(conn->fd, "\n", 1) != 1) {
+    errorHappened = 1;
+    closeTCP(conn);
+    return;
   }
 
   if (strcmp(buffer, "QUR OK\n") == 0) {
