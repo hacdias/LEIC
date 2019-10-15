@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include "cmds.h"
 #include "../lib/net.h"
+#include "../lib/dirs.h"
 
 int errorHappened = 0;
 
@@ -237,7 +238,7 @@ int readTextAndImage (int socket, char *basename) {
   buffer[5] = '\0';
 
   strcpy(filename, basename);
-  strcat(filename, "/user.txt");
+  strcat(filename, ".txt");
 
   FILE *fp = fopen(filename, "w");
   if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
@@ -245,7 +246,7 @@ int readTextAndImage (int socket, char *basename) {
   }
 
   strcpy(filename, basename);
-  strcat(filename, "/question.txt");
+  strcat(filename, "_user.txt");
 
   readAndSave(socket, 0, filename);
 
@@ -259,7 +260,6 @@ int readTextAndImage (int socket, char *basename) {
     }
 
     strcpy(filename, basename);
-    strcat(filename, "/image");
     readAndSave(socket, 1, filename);
   }
 
@@ -280,13 +280,13 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     return NULL;
   }
 
-  char msg[1024];
-  sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
-
-  if (mkdir(questions->names[num - 1], S_IRWXU) == -1) {
-    printf("Directory already exists for that question. Please remove it first.\n");
+  if (mkdirIfNotExists(topic) == -1) {
+    printf("Cannot create '%s' directory.\n", topic);
     return NULL;
   }
+
+  char msg[1024];
+  sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
 
   TCPConn* conn = connectTCP(opts);
 
@@ -310,8 +310,10 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     printf("ERR\n"); closeTCP(conn); return NULL;
   }
 
+  sprintf(filename, "%s/%s", topic, questions->names[num - 1]);
+
   if (read(conn->fd, buffer, 1) != 1 ||
-    readTextAndImage(conn->fd, questions->names[num - 1]) == -1 ||
+    readTextAndImage(conn->fd, filename) == -1 ||
     read(conn->fd, buffer, 2) != 2) {
     errorHappened = 1;
     closeTCP(conn);
@@ -340,8 +342,6 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     }
 
     for (; answers > 0; answers--) {
-      strcpy(filename, questions->names[num - 1]);
-      strcat(filename, "/");
       if (read(conn->fd, buffer, 3) != 3) {
         errorHappened = 1;
         closeTCP(conn);
@@ -349,8 +349,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
       }
       buffer[2] = '\0';
 
-      strcat(filename, buffer);
-      mkdir(filename, S_IRWXU);
+      sprintf(filename, "%s/%s_%d", topic, questions->names[num - 1], answers);
 
       if (readTextAndImage(conn->fd, filename) == -1) {
         errorHappened = 1;
@@ -509,7 +508,7 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
   }
 
   if (imgFile != NULL) {
-    if (write(conn->fd, " 1 ", 3) != 3 || sendFile(conn->fd, imgFile, 1) == -1) {
+    if (write(conn->fd, " 1 ", 3) != 3 || sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
       errorHappened = 1;
       closeTCP(conn);

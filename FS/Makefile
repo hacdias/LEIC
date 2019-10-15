@@ -1,2 +1,2 @@
 default:
-	gcc -Wall FS.c ../lib/net.c -o FS
+	gcc -Wall FS.c ../lib/net.c ../lib/dirs.c -o FS

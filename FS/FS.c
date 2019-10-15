@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "../lib/net.h"
+#include "../lib/dirs.h"
 
 #define STORAGE "TOPICS"
 
@@ -169,18 +170,6 @@ void handleTCP (TCPConn *conn) {
   free(cmd);
   printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
   close(fd);
-}
-
-int mkdirIfNotExists (const char *name) {
-  DIR* dir = opendir(name);
-  if (dir) {
-    closedir(dir);
-    return 0;
-  } else if (ENOENT == errno) {
-    return mkdir(name, S_IRWXU);
-  } else {
-    return -1;
-  }
 }
 
 int handleReg (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
