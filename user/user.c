@@ -267,15 +267,21 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
       return NULL;
     }
 
+    char answerNumber[2];
     for (; answers > 0; answers--) {
-      if (read(conn->fd, buffer, 3) != 3) {
+      if (read(conn->fd, answerNumber, 2) != 2) {
         errorHappened = 1;
         closeTCP(conn);
         return NULL;
       }
-      buffer[2] = '\0';
 
-      sprintf(filename, "%s/%s_%d", topic, questions->names[num - 1], answers);
+      if (read(conn->fd, buffer, 1) != 1) {
+        errorHappened = 1;
+        closeTCP(conn);
+        return NULL;
+      }
+
+      sprintf(filename, "%s/%s_%s", topic, questions->names[num - 1], answerNumber);
 
       if (readTextAndImage(conn->fd, filename, 0) == -1) {
         errorHappened = 1;

@@ -109,15 +109,16 @@ int handleGqu (int socket) {
     }
 
     int firstAns = answersCount;
-
     if (answersCount <= 10) {
       firstAns = 1;
     } else {
       firstAns = answersCount - 9;
     }
 
+    char answerNumber[32];
     for (; firstAns <= answersCount; firstAns++) {
-      write(socket, " ", 1);
+      sprintf(answerNumber, " %02d ", firstAns);
+      write(socket, answerNumber, sizeof(firstAns));
       sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, firstAns);
       sendUserDataAndImage(socket, dirName);
     }
