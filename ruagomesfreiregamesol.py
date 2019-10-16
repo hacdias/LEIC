@@ -4,17 +4,51 @@ import time
 import itertools
 from functools import reduce
 
-class Node():
-  def __init__(self, parent=None, position=None, transport=None):
-    self.position = position
-    self.parent = parent
-    self.transport = transport
-    self.g = 0
-    self.h = 0
-    self.f = 0
+def heuristic (auxheur, src, dst):
+  sum = 0
+  for (s, d) in zip(src, dst):
+    x = auxheur[d - 1][0] - auxheur[s - 1][0]
+    y = auxheur[d - 1][1] - auxheur[s - 1][1]
+    sum += x ** 2 + y ** 2
+  return sum
 
-  def __eq__(self, other):
-    return self.position == other.position and self.transport == other.transport
+class State():
+  def __init__(self, path, tickets, goal, auxheur):
+    self.path = path
+    self.tickets = tickets
+    self.depth = len(path)
+    self.heuristic = heuristic(auxheur, path[-1][1], goal)
+
+  def __gt__(self, other):
+    return self.depth + self.heuristic > other.depth + other.heuristic
+
+  def __ge__(self, other):
+    return self.depth + self.heuristic >= other.depth + other.heuristic
+
+  def __lt__(self, other):
+    return self.depth + self.heuristic < other.depth + other.heuristic
+
+  def __le__(self, other):
+    return self.depth + self.heuristic <= other.depth + other.heuristic
+
+  #def __eq__(self, other):
+    #return self.tickets == other.tickets and self.depth == other.depth
+
+  def isValid(self):
+    return all(x >= 0 for x in self.tickets)
+
+  def isGoal(self, goal):
+    # IF 5, check any order
+    return self.path[-1][1] == goal
+
+  def expand(self, pos, goal, auxheur):
+    newPath = self.path.copy()
+    newPath.append(pos)
+
+    newTickets = self.tickets.copy()
+    for t in pos[0]:
+      newTickets[t] -= 1
+    return State(newPath, newTickets, goal, auxheur)
 
 class SearchProblem:
   def __init__(self, goal, model, auxheur = []):
@@ -23,87 +57,53 @@ class SearchProblem:
     self.auxheur = auxheur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf], anyorder=False):
-    opened = [list(Node(None, x, None) for x in init)]
+    opened = [State([[[], init.copy()]], tickets.copy(), self.goal, self.auxheur)]
+    openedTwo = [init.copy()]
     closed = []
+    closedTwo = []
 
     while len(opened) > 0:
-      curr = opened[0]
-      curri = 0
-      avg = heurAvgF(curr)
-
-      for i, lst in enumerate(opened):
-        newAvg = heurAvgF(lst)
-        if newAvg < avg:
-          avg = newAvg
-          curr = lst
-          curri = i
-
-      opened.pop(curri)
+      opened.sort()
+      curr = opened.pop(0)
+      openedTwo.remove(curr.path[-1][1])
       closed.append(curr)
+      closedTwo.append(curr.path[-1][1])
 
-      if curr[0].g > limitdepth:
-        continue
+      print(curr.heuristic + curr.depth)
+
+      #print(curr.path[-1])
 
       limitexp -= 1
 
-      if all(list(self.goal[i] == node.position for i, node in enumerate(curr))) or limitexp == 0:
-        path = []
-        while curr[0] is not None:
-          path.insert(0, [list(n.transport for n in curr), list(n.position for n in curr)])
-          curr = list(n.parent for n in curr)
-        return path
+      if curr.isGoal(self.goal) or limitexp == 0:
+        return curr.path
 
-      for node in curr:
-        if node.transport is not None:
-          tickets[node.transport] -= 1
-
-      deadend = True
-      for tup in itertools.product(*list(self.model[node.position] for node in curr)):
+      for tup in itertools.product(*list(self.model[x] for x in curr.path[-1][1])):
+        # print(tup)
         if not allDifferent(tup):
           continue
 
-        move = list(Node(curr[i], pos, trans) for i, (trans, pos) in enumerate(tup))
+        nextPos = [[], []]
+        for (trans, pos) in tup:
+          nextPos[0].append(trans)
+          nextPos[1].append(pos)
 
-        if not ticketsInLimits(move, tickets):
+        move = curr.expand(nextPos, self.goal, self.auxheur)
+
+        if not move.isValid():
           continue
 
-        if isInList(move, closed):
+        if move.depth > limitdepth:
           continue
 
-        for (c, n, g) in zip(curr, move, self.goal):
-          n.g = c.g + 1
-          n.h = self.__distance(n.position, g)
-          n.f = n.g + n.h
-
-        # SHOULD BE ALL? If so, put before calculations!
-        if isInList(move, opened):
+        if move.path[-1][1] in closedTwo:
           continue
 
-        deadend = False
+        if move.path[-1][1] in openedTwo:
+          continue
+
         opened.append(move)
-
-      if deadend:
-        for node in curr:
-          tickets[node.transport] += 1
-
-  def __distance (self, src, dst):
-    x = self.auxheur[dst - 1][0] - self.auxheur[src - 1][0]
-    y = self.auxheur[dst - 1][1] - self.auxheur[src - 1][1]
-    return x ** 2 + y ** 2
-
-def isInList (move, list):
-  for l in list:
-    allEqual = True
-    for i, m in enumerate(l):
-      if m.position != move[i].position:
-        allEqual = False
-        break
-    if allEqual:
-      return True
-  return False
-
-def heurAvgF (list):
-  return reduce(lambda a, b: a + b.f, list, 0)
+        openedTwo.append(move.path[-1][1])
 
 def allDifferent (tup):
   for i, l1 in enumerate(tup):
@@ -111,13 +111,3 @@ def allDifferent (tup):
       if i is not j and l1[1] is l2[1]:
         return False
   return True
-
-def ticketsInLimits (move, tickets):
-  tk = [0, 0, 0]
-  curr = move
-  while curr[0] is not None:
-    for node in curr:
-      if node.transport is not None:
-        tk[node.transport] += 1
-    curr = list(n.parent for n in curr)
-  return all(list(x <= tickets[i] for i, x in enumerate(tk)))
