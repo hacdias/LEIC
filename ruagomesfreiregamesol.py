@@ -44,7 +44,9 @@ class SearchProblem:
       if curr[0].g > limitdepth:
         continue
 
-      if all(list(self.goal[i] == node.position for i, node in enumerate(curr))):
+      limitexp -= 1
+
+      if all(list(self.goal[i] == node.position for i, node in enumerate(curr))) or limitexp == 0:
         path = []
         while curr[0] is not None:
           path.insert(0, [list(n.transport for n in curr), list(n.position for n in curr)])
