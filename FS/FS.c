@@ -158,25 +158,28 @@ int handleQus (int socket) {
     return -1;
   }
 
-  printf("%s %s %s", userID, topic, question);
-
   char dirName[256];
   sprintf(dirName, "%s/%s", STORAGE, topic);
   if (dirExists(dirName) != 1) {
     free(userID);
     free(topic);
     free(question);
-
     return write(socket, "QUR NOK\n", 8) != 8;
   }
 
   sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
-  if (dirExists(dirName) == 1) {
+  if (dirExists(dirName) == 1 || mkdirIfNotExists(dirName) == -1) {
     free(userID);
     free(topic);
     free(question);
-
     return write(socket, "QUR DUP\n", 8) != 8;
+  }
+
+  char filename[124];
+  sprintf(filename, "%s/user", dirName);
+  FILE *fp = fopen(filename, "w");
+  if (fputs(userID, fp) == EOF || fclose(fp) == EOF) {
+    return -1;
   }
 
   int success = readTextAndImage(socket, dirName, 1);
@@ -184,7 +187,7 @@ int handleQus (int socket) {
   free(userID);
   free(topic);
   free(question);
-  return success;
+  return write(socket, "QUR OK\n", 7) != 7;
 }
 
 int handleAns (int socket) {
@@ -199,13 +202,8 @@ void handleTCP (TCPConn *conn) {
   if ((fd = accept(conn->fd,(struct sockaddr*)&clientAddr, &len)) == -1) {
     return;
   }
-
+  
   char* cmd = readTCP(fd);
-  if (cmd == NULL) {
-    printf("Merda aconeceu;");
-    return;
-  }
-
   if (!strcmp(cmd, "GQU")) {
     n = handleGqu(fd);
   } else if (!strcmp(cmd, "QUS")) {
@@ -218,8 +216,8 @@ void handleTCP (TCPConn *conn) {
 
   // TODO: ver n
 
-  free(cmd);
   printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
+  free(cmd);
   close(fd);
 }
 

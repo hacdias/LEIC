@@ -176,22 +176,25 @@ TCPConn *listenTCP (ServerOptions opts) {
 char* readTCP (int socket) {
   int size = 32;
   char* buffer = malloc(sizeof(char) * size);
-  int offset = 0, n;
+  int offset = 0, n = 0;
 
-  while ((n = read(socket, buffer + offset, 1)) == 1 && buffer[offset] != ' ' && buffer[offset] != '\n' && buffer[offset] != '\r') {
+  while ((n = read(socket, buffer + offset, 1)) == 1) {
+    if (buffer[offset] == ' ' || buffer[offset] == '\n' || buffer[offset] == '\r') {
+      break;
+    }
+
+    if (n == -1) {
+      return NULL;
+    }
+
     offset++;
-
-    if (offset >= size) {
+    if (offset >= size - 1) {
       size += 32;
-      buffer = realloc(buffer, size);
+      buffer = realloc(buffer, sizeof(char) * size);
     }
   }
 
-  if (n == -1) {
-    return NULL;
-  }
-
-  buffer = realloc(buffer, offset);
+  buffer = realloc(buffer, offset + 1);
   buffer[offset] = '\0';
   return buffer;
 }
@@ -299,22 +302,20 @@ int readAndSave (int socket, const char* basename, int isImg, int isServer) {
 int readTextAndImage (int socket, const char *basename, int isServer) {
   char buffer[256], filename[256];
 
-  if (read(socket, buffer, 6) != 6) {
-    return -1;
-  }
+  if (!isServer) {
+    if (read(socket, buffer, 6) != 6) {
+      return -1;
+    }
+    buffer[5] = '\0';
 
-  buffer[5] = '\0';
-
-  if (isServer) {
-    sprintf(filename, "%s/user", basename);
-  } else {
     sprintf(filename, "%s_user.txt", basename);
+
+    FILE *fp = fopen(filename, "w");
+    if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
+      return -1;
+    }
   }
 
-  FILE *fp = fopen(filename, "w");
-  if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
-    return -1;
-  }
 
   if (isServer) {
     sprintf(filename, "%s/data", basename);
