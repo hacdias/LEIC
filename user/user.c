@@ -39,6 +39,7 @@ char *registerUser (UDPConn *conn) {
 
   msg[9] = '\0';
   char *userID = strdup(msg + 4);
+
   return userID;
 }
 
@@ -357,13 +358,16 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
       return;
     }
   }
-  char buffer[8];
 
   if (write(conn->fd, "\n", 1) != 1) {
     errorHappened = 1;
     closeTCP(conn);
     return;
   }
+
+  char buffer[8];
+  int len = read(conn->fd, buffer, 8);
+  buffer[len] = '\0';
 
   if (strcmp(buffer, "QUR OK\n") == 0) {
     printf("Question submited successfully!\n");
@@ -388,8 +392,7 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
     printf("You must pick a question first!\n");
     return;
   }
-
-  printf("%s\n", question);
+  
   char str[1024];
 
   if (fgets (str, 1024, stdin) == NULL) {
@@ -432,7 +435,8 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
   }
 
   if (imgFile != NULL) {
-    if (write(conn->fd, " 1 ", 3) != 3 || sendFile(conn->fd, imgFile, 1, 1) == -1) {
+    if (write(conn->fd, " 1 ", 3) != 3 ||
+      sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
       errorHappened = 1;
       closeTCP(conn);
@@ -446,14 +450,15 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
     }
   }
 
-  char buffer[8];
-
-  if (write(conn->fd, "\n", 1) != 1 ||
-    read(conn->fd, buffer, 8) != 8) {
+  if (write(conn->fd, "\n", 1) != 1) {
     errorHappened = 1;
     closeTCP(conn);
     return;
   }
+
+  char buffer[8];
+  int len = read(conn->fd, buffer, 8);
+  buffer[len] = '\0';
 
   if (strcmp(buffer, "ANR OK\n") == 0) {
     printf("Answer submited successfully!\n");
