@@ -75,6 +75,7 @@ int numOfDirectories (const char* name) {
 int handleGqu (int socket) {
   char* topic = readTCP(socket);
   if (topic == NULL) return -1;
+
   char* question = readTCP(socket);
   if (question == NULL) return -1;
 
@@ -119,7 +120,7 @@ int handleGqu (int socket) {
     for (; firstAns <= answersCount; firstAns++) {
       sprintf(answerNumber, " %02d ", firstAns);
       write(socket, answerNumber, sizeof(firstAns));
-      sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, firstAns);
+      sprintf(dirName, "%s/%s/%s/%02d", STORAGE, topic, question, firstAns);
       sendUserDataAndImage(socket, dirName);
     }
 
@@ -220,7 +221,7 @@ int handleAns (int socket) {
     free(question);
     return write(socket, "ANR NOK\n", 8) != 8;
   }
-  
+
   char filename[124];
   int nextAnswer = numOfDirectories(dirName) + 1;
   sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, nextAnswer);
@@ -253,7 +254,7 @@ void handleTCP (TCPConn *conn) {
   if ((fd = accept(conn->fd,(struct sockaddr*)&clientAddr, &len)) == -1) {
     return;
   }
-  
+
   char* cmd = readTCP(fd);
   if (!strcmp(cmd, "GQU")) {
     n = handleGqu(fd);
