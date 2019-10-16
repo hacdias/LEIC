@@ -191,7 +191,57 @@ int handleQus (int socket) {
 }
 
 int handleAns (int socket) {
-  return 0;
+  char* userID = readTCP(socket);
+  if (userID == NULL) return -1;
+  if (!isValidUserID(userID)) {
+    free(userID);
+    return write(socket, "ANR NOK\n", 8) != 8;
+  }
+
+  char *topic = readTCP(socket);
+  if (topic == NULL) {
+    free(userID);
+    return -1;
+  }
+
+  char *question = readTCP(socket);
+  if (question == NULL) {
+    free(topic);
+    free(userID);
+    return -1;
+  }
+
+  char dirName[256];
+  sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
+  if (dirExists(dirName) != 1) {
+    free(userID);
+    free(topic);
+    free(question);
+    return write(socket, "ANR NOK\n", 8) != 8;
+  }
+  
+  char filename[124];
+  int nextAnswer = numOfDirectories(dirName) + 1;
+  sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, nextAnswer);
+  if (mkdirIfNotExists(dirName) == -1) {
+    free(userID);
+    free(topic);
+    free(question);
+    return write(socket, "ERR\n", 4) != 4;
+  }
+
+  sprintf(filename, "%s/user", dirName);
+  FILE *fp = fopen(filename, "w");
+  if (fputs(userID, fp) == EOF || fclose(fp) == EOF) {
+    return -1;
+  }
+
+  int success = readTextAndImage(socket, dirName, 1);
+
+  free(userID);
+  free(topic);
+  free(question);
+  return write(socket, "ANR OK\n", 7) != 7;
 }
 
 void handleTCP (TCPConn *conn) {
