@@ -89,7 +89,7 @@ class SearchProblem:
   def __distance (self, src, dst):
     x = self.auxheur[dst - 1][0] - self.auxheur[src - 1][0]
     y = self.auxheur[dst - 1][1] - self.auxheur[src - 1][1]
-    return math.hypot(x, y)
+    return x ** 2 + y ** 2
 
 def isInList (move, list):
   for l in list:
