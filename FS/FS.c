@@ -52,6 +52,7 @@ int sendUserDataAndImage (int socket, const char* dir) {
 
   return 0;
 }
+
 int numOfDirectories (const char* name) {
   if (!dirExists(name)) return -1;
 
@@ -84,7 +85,6 @@ int handleGqu (int socket) {
 
   if (exists == 1) {
     write(socket, "QGR ", 4);
-
     sendUserDataAndImage(socket, dirName);
 
     int answersCount = numOfDirectories(dirName);
@@ -129,12 +129,12 @@ int handleGqu (int socket) {
   } else if (exists == 0) {
     free(topic);
     free(question);
-    return write(socket, "QGR EOF\n", 8);
+    return write(socket, "QGR EOF\n", 8) == 8;
   }
 
   free(topic);
   free(question);
-  return write(socket, "QGR ERR\n", 8);
+  return write(socket, "QGR ERR\n", 8) == 8;
 }
 
 int handleQus (int socket) {
