@@ -486,7 +486,8 @@ int hasUserId (char* userID) {
 }
 
 void help () {
-  printf("register/reg <userID>topic_list/tl\n");
+  printf("register/reg <userID>\n");
+  printf("topic_list/tl\n");
   printf("topic_select <topic name>\n");
   printf("ts <topic_number>\n");
   printf("topic_propose/tp <topic>\n");
