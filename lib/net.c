@@ -83,12 +83,28 @@ int sendUDP (UDPConn *conn, const char* msg, struct sockaddr_in addr) {
 }
 
 char* sendWithReplyUDP (UDPConn *conn, char* msg) {
-  int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
-  if (n == -1) {
-    return NULL;
+  int tries = 0;
+
+  while (tries < 3) {
+    int n = sendto(conn->fd, msg, strlen(msg), 0, conn->res->ai_addr, conn->res->ai_addrlen);
+    if (n == -1) {
+      return NULL;
+    }
+
+    sleep(0.5);
+    char* res = receiveUDP(conn, NULL, NULL);
+    if (res == NULL && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      tries++;
+      sleep(1.5);
+    }
+
+    if (res != NULL) {
+      return res;
+    }
   }
 
-  return receiveUDP(conn, NULL, NULL);
+  printf("Cannot contact the server.\n");
+  return NULL;
 }
 
 char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
@@ -98,7 +114,7 @@ char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
   do {
     size += 1024;
     buffer = realloc(buffer, size);
-    len = recvfrom(conn->fd, buffer, size - 1, MSG_PEEK, (struct sockaddr*)addr, addrlen);
+    len = recvfrom(conn->fd, buffer, size - 1, MSG_DONTWAIT|MSG_PEEK, (struct sockaddr*)addr, addrlen);
   } while (len == size - 1);
 
   if (len < 0) {
@@ -246,7 +262,7 @@ void closeTCP (TCPConn* conn) {
   free(conn);
 }
 
-int writeTCP(int socket, char* buffer, int size) {
+int writeTCP(int socket, const char* buffer, int size) {
   int n = 0;
 
   while (n != size) {

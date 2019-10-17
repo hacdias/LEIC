@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <errno.h>
 #include <strings.h>
 #include <sys/stat.h>
  #include <string.h>
@@ -54,7 +55,7 @@ int readTCP (int socket, char* buffer, int chars);
 
 int readSpaceTCP (int socket);
 
-int writeTCP(int socket, char* buffer, int size);
+int writeTCP(int socket, const char* buffer, int size);
 
 int sendFile (int connFd, char *file, int extension, int sendSize);
 
