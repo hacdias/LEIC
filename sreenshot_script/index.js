@@ -20,7 +20,7 @@ async function main () {
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
 
-  for (let i = 1; i < 10; i++) {
+  for (let i = 1; i <= 10; i++) {
     await page.goto(urlBuilder(argv.ip, argv.port, i), { waitUntil: 'networkidle2' })
     await page.screenshot({path: `screenshot-${i}.png`, fullPage: true })
     await sleep(10000)
