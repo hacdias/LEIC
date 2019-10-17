@@ -73,10 +73,10 @@ int numOfDirectories (const char* name) {
 }
 
 int handleGqu (int socket) {
-  char* topic = readTCP(socket);
+  char* topic = readWordTCP(socket);
   if (topic == NULL) return -1;
 
-  char* question = readTCP(socket);
+  char* question = readWordTCP(socket);
   if (question == NULL) return -1;
 
   char dirName[258];
@@ -139,20 +139,20 @@ int handleGqu (int socket) {
 }
 
 int handleQus (int socket) {
-  char* userID = readTCP(socket);
+  char* userID = readWordTCP(socket);
   if (userID == NULL) return -1;
   if (!isValidUserID(userID)) {
     free(userID);
     return write(socket, "QUR NOK\n", 8) != 8;
   }
 
-  char *topic = readTCP(socket);
+  char *topic = readWordTCP(socket);
   if (topic == NULL) {
     free(userID);
     return -1;
   }
 
-  char *question = readTCP(socket);
+  char *question = readWordTCP(socket);
   if (question == NULL) {
     free(topic);
     free(userID);
@@ -194,20 +194,20 @@ int handleQus (int socket) {
 }
 
 int handleAns (int socket) {
-  char* userID = readTCP(socket);
+  char* userID = readWordTCP(socket);
   if (userID == NULL) return -1;
   if (!isValidUserID(userID)) {
     free(userID);
     return write(socket, "ANR NOK\n", 8) != 8;
   }
 
-  char *topic = readTCP(socket);
+  char *topic = readWordTCP(socket);
   if (topic == NULL) {
     free(userID);
     return -1;
   }
 
-  char *question = readTCP(socket);
+  char *question = readWordTCP(socket);
   if (question == NULL) {
     free(topic);
     free(userID);
@@ -262,7 +262,7 @@ int handleTCP (TCPConn *conn) {
     return -1;
   }
 
-  char* cmd = readTCP(fd);
+  char* cmd = readWordTCP(fd);
   if (!strcmp(cmd, "GQU")) {
     n = handleGqu(fd);
   } else if (!strcmp(cmd, "QUS")) {

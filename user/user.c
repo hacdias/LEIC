@@ -213,6 +213,12 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   return questions;
 }
 
+char* errorCloseAndReturnTCP (TCPConn *conn) {
+  errorHappened = 1;
+  closeTCP(conn);
+  return NULL;
+}
+
 char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int isNum) {
   if (questions == NULL) {
     printf("You must get the questions first!\n");
@@ -245,91 +251,41 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
     return NULL;
   }
 
-
   char msg[1024];
   sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
 
   TCPConn* conn = connectTCP(opts);
 
-  if (write(conn->fd, msg, strlen(msg)) == -1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return NULL;
+  if (write(conn->fd, msg, strlen(msg)) == -1) return errorCloseAndReturnTCP(conn);
+
+  char filename[256];
+
+  char *code = readWordTCP(conn->fd);
+  if (code == NULL) return errorCloseAndReturnTCP(conn);
+
+  if (strcmp(code, "QGR") != 0) {
+    free(code);
+    return errorCloseAndReturnTCP(conn);
   }
 
-  char buffer[256], filename[256];
-
-  if (read(conn->fd, buffer, 3) != 3) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return NULL;
-  }
-
-  // TODO: check errs
-  buffer[3] = '\0';
-  if (strcmp(buffer, "QGR")) {
-    printf("ERR\n"); closeTCP(conn); return NULL;
-  }
+  free(code);
 
   sprintf(filename, "%s/%s", topic, questions->names[num - 1]);
-  if (read(conn->fd, buffer, 1) != 1 ||
-    readTextAndImage(conn->fd, filename, 0) == -1 ||
-    read(conn->fd, buffer, 1) != 1 ||
-    read(conn->fd, buffer, 1) != 1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return NULL;
+  if (readTextAndImage(conn->fd, filename, 0) == -1) {
+    return errorCloseAndReturnTCP(conn);
   }
 
-  int answers = 0;
+  long int answers = readPositiveNumber(conn->fd);
+  if (answers < 0) return errorCloseAndReturnTCP(conn);
 
-  if (buffer[0] == '0') {
-    buffer[1] = '\0';
-  } else {
-    if (read(conn->fd, buffer + 1, 1) != 1) {
-      errorHappened = 1;
-      closeTCP(conn);
-      return NULL;
-    }
+  for (; answers > 0; answers--) {
+    long int number = readPositiveNumber(conn->fd);
+    if (number < 0) return errorCloseAndReturnTCP(conn);
 
-    if (buffer[1] == ' ') {
-      buffer[1] = '\0';
-    } else {
-      buffer[2] = '\0';
-    }
-  }
+    sprintf(filename, "%s/%s_%ld", topic, questions->names[num - 1], number);
 
-  answers = atoi(buffer);
-
-  if (answers != 0) {
-    char answerNumber[3];
-    for (; answers > 0; answers--) {
-      if (read(conn->fd, answerNumber, 2) != 2) {
-        errorHappened = 1;
-        closeTCP(conn);
-        return NULL;
-      }
-
-      answerNumber[3] = '\0';
-      if (read(conn->fd, buffer, 1) != 1) {
-        errorHappened = 1;
-        closeTCP(conn);
-        return NULL;
-      }
-
-      sprintf(filename, "%s/%s_%s", topic, questions->names[num - 1], answerNumber);
-
-      if (readTextAndImage(conn->fd, filename, 0) == -1) {
-        errorHappened = 1;
-        closeTCP(conn);
-        return NULL;
-      }
-      if (read(conn->fd, buffer, 1) != 1) {
-        errorHappened = 1;
-        closeTCP(conn);
-        return NULL;
-      }
-    }
+    if (readTextAndImage(conn->fd, filename, 0) == -1)
+      return errorCloseAndReturnTCP(conn);
   }
 
   printf("Question and answers downloaded to %s\n", questions->names[num - 1]);
@@ -337,17 +293,17 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
   return questions->names[num - 1];
 }
 
-void questionSubmit (ServerOptions opts, char *userID, char *topic) {
+char* questionSubmit (ServerOptions opts, char *userID, char *topic) {
   if (topic == NULL) {
     printf("You must get the topics list first!\n");
-    return;
+    return NULL;
   }
 
   char str[1024];
 
   if (fgets (str, 1024, stdin) == NULL) {
     printf("Cannot read.\n");
-    return;
+    return NULL;
   }
 
   char *question = strtok(str+1, " \n");
@@ -356,12 +312,12 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
 
   if (question == NULL || txtFile == NULL) {
     printf("A question and a text file are required!\n");
-    return;
+    return NULL;
   }
 
   if (access(txtFile, F_OK) == -1 || (imgFile != NULL && access(imgFile, F_OK) == -1)) {
     printf("Text or image file does not exist!\n");
-    return;
+    return NULL;
   }
 
   TCPConn* conn = connectTCP(opts);
@@ -373,73 +329,74 @@ void questionSubmit (ServerOptions opts, char *userID, char *topic) {
     write(conn->fd, " ", 1) != 1 ||
     write(conn->fd, question, strlen(question)) != strlen(question) ||
     write(conn->fd, " ", 1) != 1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+      return errorCloseAndReturnTCP(conn);
   }
 
   if (sendFile(conn->fd, txtFile, 0, 1) == -1) {
     printf("Cannot send file properly!\n");
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+    return errorCloseAndReturnTCP(conn);
   }
 
   if (imgFile != NULL) {
     if (write(conn->fd, " 1 ", 3) != 3 ||
       sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
-      errorHappened = 1;
-      closeTCP(conn);
-      return;
+      return errorCloseAndReturnTCP(conn);
     }
   } else {
     if (write(conn->fd, " 0", 2) != 2) {
-      errorHappened = 1;
-      closeTCP(conn);
-      return;
+      return errorCloseAndReturnTCP(conn);
     }
   }
 
   if (write(conn->fd, "\n", 1) != 1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+    return errorCloseAndReturnTCP(conn);
   }
 
-  char buffer[8];
-  int len = read(conn->fd, buffer, 8);
-  buffer[len] = '\0';
+  char *code = readWordTCP(conn->fd);
+  if (code == NULL) return errorCloseAndReturnTCP(conn);
+  if (strcmp(code, "QUR")) {
+    free(code);
+    return errorCloseAndReturnTCP(conn);
+  }
 
-  if (strcmp(buffer, "QUR OK\n") == 0) {
+  free(code);
+
+  char *subcode = readWordTCP(conn->fd);
+  if (subcode == NULL) return errorCloseAndReturnTCP(conn);
+
+  if (strcmp(subcode, "OK") == 0) {
     printf("Question submited successfully!\n");
-  } else if (strcmp(buffer, "QUR DUP\n") == 0) {
+  } else if (strcmp(subcode, "NOK") == 0) {
+    printf("Could not submit question.\n");
+  } else if (strcmp(subcode, "DUP") == 0) {
     printf("Question submited already exists!\n");
-  } else if (strcmp(buffer, "QUR FUL\n") == 0) {
+  } else if (strcmp(subcode, "FUL") == 0) {
     printf("Question list is full!\n");
   } else {
-    printf("Could not submit question.\n");
+    return errorCloseAndReturnTCP(conn);
   }
 
   closeTCP(conn);
+  return NULL;
 }
 
-void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question) {
+char* answerSubmit (ServerOptions opts, char *userID, char *topic, char *question) {
   if (topic == NULL) {
     printf("You must pick a topic first!\n");
-    return;
+    return NULL;
   }
 
   if (question == NULL) {
     printf("You must pick a question first!\n");
-    return;
+    return NULL;
   }
-  
+
   char str[1024];
 
-  if (fgets (str, 1024, stdin) == NULL) {
+  if (fgets(str, 1024, stdin) == NULL) {
     errorHappened = 1;
-    return;
+    return NULL;
   }
 
   char *txtFile = strtok(str+1, " \n");
@@ -447,12 +404,12 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
 
   if (txtFile == NULL) {
     printf("At least a text file is required!\n");
-    return;
+    return NULL;
   }
 
   if (access(txtFile, F_OK) == -1 || (imgFile != NULL && access(imgFile, F_OK) == -1)) {
     printf("Text or image file does not exist!\n");
-    return;
+    return NULL;
   }
 
   TCPConn* conn = connectTCP(opts);
@@ -464,53 +421,54 @@ void answerSubmit (ServerOptions opts, char *userID, char *topic, char *question
     write(conn->fd, " ", 1) != 1 ||
     write(conn->fd, question, strlen(question)) != strlen(question) ||
     write(conn->fd, " ", 1) != 1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+    return errorCloseAndReturnTCP(conn);
   }
 
   if (sendFile(conn->fd, txtFile, 0, 1) == -1) {
     printf("Cannot send file properly!\n");
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+    return errorCloseAndReturnTCP(conn);
   }
 
   if (imgFile != NULL) {
     if (write(conn->fd, " 1 ", 3) != 3 ||
       sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
-      errorHappened = 1;
-      closeTCP(conn);
-      return;
+      return errorCloseAndReturnTCP(conn);
     }
   } else {
     if (write(conn->fd, " 0", 2) != 2) {
-      errorHappened = 1;
-      closeTCP(conn);
-      return;
+      return errorCloseAndReturnTCP(conn);
     }
   }
 
   if (write(conn->fd, "\n", 1) != 1) {
-    errorHappened = 1;
-    closeTCP(conn);
-    return;
+    return errorCloseAndReturnTCP(conn);
   }
 
-  char buffer[8];
-  int len = read(conn->fd, buffer, 8);
-  buffer[len] = '\0';
+  char *code = readWordTCP(conn->fd);
+  if (code == NULL) return errorCloseAndReturnTCP(conn);
+  if (strcmp(code, "ANR")) {
+    free(code);
+    return errorCloseAndReturnTCP(conn);
+  }
 
-  if (strcmp(buffer, "ANR OK\n") == 0) {
+  free(code);
+
+  char *subcode = readWordTCP(conn->fd);
+  if (subcode == NULL) return errorCloseAndReturnTCP(conn);
+
+  if (strcmp(subcode, "OK") == 0) {
     printf("Answer submited successfully!\n");
-  } else if (strcmp(buffer, "ANR FUL\n") == 0) {
+  } else if (strcmp(subcode, "NOK") == 0) {
+    printf("Could not submit answer.\n");
+  } else if (strcmp(subcode, "FUL") == 0) {
     printf("Answer list is full!\n");
   } else {
-    printf("Could not submit answer.\n");
+    return errorCloseAndReturnTCP(conn);
   }
 
   closeTCP(conn);
+  return NULL;
 }
 
 void clearInput () {

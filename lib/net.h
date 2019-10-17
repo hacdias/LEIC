@@ -48,10 +48,16 @@ TCPConn *connectTCP (ServerOptions opts);
 
 void closeTCP (TCPConn* conn);
 
-char* readTCP (int socket);
+char* readWordTCP (int socket);
+
+int readTCP (int socket, char* buffer, int chars);
+
+int readSpaceTCP (int socket);
 
 int sendFile (int connFd, char *file, int extension, int sendSize);
 
 int readTextAndImage (int socket, const char *basename, int isServer);
+
+long int readPositiveNumber (int socket);
 
 #endif

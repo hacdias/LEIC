@@ -173,18 +173,55 @@ TCPConn *listenTCP (ServerOptions opts) {
   return conn;
 }
 
-char* readTCP (int socket) {
-  int size = 32;
-  char* buffer = malloc(sizeof(char) * size);
-  int offset = 0, n = 0;
+int readTCP (int socket, char* buffer, int chars) {
+  int n = 0;
 
-  while ((n = read(socket, buffer + offset, 1)) == 1) {
-    if (buffer[offset] == ' ' || buffer[offset] == '\n' || buffer[offset] == '\r') {
-      break;
+  while (n != chars) {
+    int k = read(socket, buffer, chars - n);
+
+    if (k < 0) {
+      return k;
     }
 
-    if (n == -1) {
-      return NULL;
+    n += k;
+  }
+
+  return 0;
+}
+
+// readSpaceTCP returns 0 if a space is successfully read,
+// 1 if it's not a space, -1 if an error occurred.
+int readSpaceTCP (int socket) {
+  char c;
+
+  if (readTCP(socket, &c, 1) != 0) {
+    return -1;
+  }
+
+  return c != ' ';
+}
+
+// readSpaceOrNewLineTCP returns 0 if a space is successfully read,
+// 1 if it's not a space, -1 if an error occurred.
+int readSpaceOrNewLineTCP (int socket) {
+  char c;
+
+  if (readTCP(socket, &c, 1) != 0) {
+    return -1;
+  }
+
+  return !(c == ' ' || c == '\n' || c == '\r');
+}
+
+// readWordTCP reads a contiguos word via TCP. It consumes a
+// space, \n or \r after the last character.
+char* readWordTCP (int socket) {
+  int size = 32, offset = 0, n = 0;
+  char* buffer = malloc(sizeof(char) * size);
+
+  while ((n = readTCP(socket, buffer + offset, 1)) == 0) {
+    if (buffer[offset] == ' ' || buffer[offset] == '\n' || buffer[offset] == '\r') {
+      break;
     }
 
     offset++;
@@ -192,6 +229,10 @@ char* readTCP (int socket) {
       size += 32;
       buffer = realloc(buffer, sizeof(char) * size);
     }
+  }
+
+  if (n != 0) {
+    return NULL;
   }
 
   buffer = realloc(buffer, offset + 1);
@@ -250,21 +291,26 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
   return 0;
 }
 
+// reads a message like this: [ext] size data
 int readAndSave (int socket, const char* basename, int isImg, int isServer) {
   char tmp[256], filename[256];
   int readCode;
 
   if (isImg) {
-    read(socket, tmp, 4);
+    if (readTCP(socket, tmp, 3) != 0 || readSpaceTCP(socket) != 0) {
+      return -1;
+    }
+
     tmp[3] = '\0';
 
     if (isServer) {
       sprintf(filename, "%s/img_ext", basename);
 
       FILE *fp = fopen(filename, "w");
-      fwrite (tmp , sizeof(char), 3, fp);
-      fclose(fp);
+      if (fp == NULL) return -1;
 
+      fwrite(tmp , sizeof(char), 3, fp);
+      fclose(fp);
       sprintf(filename, "%s/img", basename);
     } else {
       sprintf(filename, "%s.%s", basename, tmp);
@@ -274,25 +320,18 @@ int readAndSave (int socket, const char* basename, int isImg, int isServer) {
   }
 
   FILE *fp = fopen(filename, "w");
-  int size = 0;
-  int i = 0;
+  if (fp == NULL) return -1;
 
-  while ((readCode = read(socket, tmp + i, 1)) == 1) {
-    if (tmp[i] == ' ') {
-      tmp[i] = '\0';
-      size = atoi(tmp);
-      break;
-    }
-    i++;
-  }
+  long int size = readPositiveNumber(socket);
+  if (size < 0) return -1;
 
   int toRead = 256;
   do {
     if (size < toRead) toRead = size;
     readCode = read(socket, tmp, toRead);
-    if (readCode <= 0) break;
+    if (readCode < 0) break;
     size -= readCode;
-    fwrite (tmp , sizeof(char), readCode, fp);
+    fwrite(tmp , sizeof(char), readCode, fp);
   } while (size > 0);
 
   fclose(fp);
@@ -300,20 +339,21 @@ int readAndSave (int socket, const char* basename, int isImg, int isServer) {
 }
 
 int readTextAndImage (int socket, const char *basename, int isServer) {
-  char buffer[256], filename[256];
+  char filename[256];
 
   if (!isServer) {
-    if (read(socket, buffer, 6) != 6) {
-      return -1;
-    }
-    buffer[5] = '\0';
+    char *userID = readWordTCP(socket);
+    if (userID == NULL) return -1;
+    if (strlen(userID) != 5) { free(userID); return -1; }
 
     sprintf(filename, "%s_user.txt", basename);
 
     FILE *fp = fopen(filename, "w");
-    if (fputs(buffer, fp) == EOF || fclose(fp) == EOF) {
+    if (fp == NULL || fputs(userID, fp) == EOF || fclose(fp) == EOF) {
+      free(userID);
       return -1;
     }
+    free(userID);
   }
 
   if (isServer) {
@@ -326,19 +366,28 @@ int readTextAndImage (int socket, const char *basename, int isServer) {
     return -1;
   }
 
-  if (read(socket, buffer, 2) != 2) {
-    return -1;
-  }
+  if (readSpaceTCP(socket) != 0) return -1;
+  char *hasImage = readWordTCP(socket);
+  if (hasImage == NULL) return -1;
+  if (strlen(hasImage) != 1) { free(hasImage); return -1; }
 
-  if (buffer[1] == '1') {
-    if (read(socket, buffer, 1) != 1) {
-      return -1;
-    }
-
-    if (readAndSave(socket, basename, 1, isServer) != 0) {
-      return -1;
-    }
+  if (hasImage[0] == '1') {
+    free(hasImage);
+    if (readAndSave(socket, basename, 1, isServer) != 0) return -1;
+    if (readSpaceOrNewLineTCP(socket) != 0) return -1;
   }
 
   return 0;
+}
+
+long int readPositiveNumber (int socket) {
+  char *string = readWordTCP(socket);
+  if (string == NULL) return -1;
+
+  char *ptr;
+  long int answers = strtol(string, &ptr, 10);
+  free(string);
+
+  if (*ptr != '\0') return -1;
+  return answers;
 }
