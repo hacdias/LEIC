@@ -1,4 +1,6 @@
 reg 89455
 tl
-ts 1
-qs myDick coco
+topic_select IOT
+ql
+qg 2
+exit

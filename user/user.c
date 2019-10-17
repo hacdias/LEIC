@@ -302,7 +302,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
       return NULL;
     }
 
-    char answerNumber[2];
+    char answerNumber[3];
     for (; answers > 0; answers--) {
       if (read(conn->fd, answerNumber, 2) != 2) {
         errorHappened = 1;
@@ -310,6 +310,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
         return NULL;
       }
 
+      answerNumber[3] = '\0';
       if (read(conn->fd, buffer, 1) != 1) {
         errorHappened = 1;
         closeTCP(conn);
