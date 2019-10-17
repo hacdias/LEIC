@@ -560,6 +560,7 @@ int main(int argc, char** argv) {
         break;
       default:
         printf("Invalid command!\n");
+        clearInput();
     }
 
     if (errorHappened == 1) {
