@@ -227,7 +227,7 @@ int handleAns (int socket) {
 
   char filename[124];
   int nextAnswer = numOfDirectories(dirName) + 1;
-  sprintf(dirName, "%s/%s/%s/%d", STORAGE, topic, question, nextAnswer);
+  sprintf(dirName, "%s/%s/%s/%02d", STORAGE, topic, question, nextAnswer);
   if (mkdirIfNotExists(dirName) == -1) {
     free(userID);
     free(topic);

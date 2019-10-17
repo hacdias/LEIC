@@ -91,11 +91,12 @@ char* sendWithReplyUDP (UDPConn *conn, char* msg) {
       return NULL;
     }
 
-    sleep(0.5);
+    sleep(1);
     char* res = receiveUDP(conn, NULL, NULL);
     if (res == NULL && (errno == EAGAIN || errno == EWOULDBLOCK)) {
       tries++;
-      sleep(1.5);
+      sleep(3);
+      res = receiveUDP(conn, NULL, NULL);
     }
 
     if (res != NULL) {
@@ -122,7 +123,7 @@ char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
     return NULL;
   }
 
-  len = recvfrom(conn->fd, buffer, size, 0, (struct sockaddr*)addr, addrlen);
+  len = recvfrom(conn->fd, buffer, size, MSG_DONTWAIT, (struct sockaddr*)addr, addrlen);
   if (len < 0) {
     free(buffer);
     return NULL;
