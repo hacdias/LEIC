@@ -1,3 +1,3 @@
 default:
-	(cd fs; make $(MFLAGS))
+	(cd FS; make $(MFLAGS))
 	(cd user; make $(MFLAGS))

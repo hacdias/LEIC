@@ -79,7 +79,7 @@ void closeUDP (UDPConn* conn) {
 }
 
 int sendUDP (UDPConn *conn, const char* msg, struct sockaddr_in addr) {
-  return sendto(conn->fd, msg, strlen(msg), 0, (struct sockaddr*)&addr, sizeof(addr));
+  return sendto(conn->fd, msg, strlen(msg), 0, (struct sockaddr*)&addr, sizeof(addr)) != strlen(msg);
 }
 
 char* sendWithReplyUDP (UDPConn *conn, char* msg) {
@@ -316,14 +316,15 @@ int readTextAndImage (int socket, const char *basename, int isServer) {
     }
   }
 
-
   if (isServer) {
     sprintf(filename, "%s/data", basename);
   } else {
     sprintf(filename, "%s.txt", basename);
   }
 
-  readAndSave(socket, filename, 0, isServer);
+  if (readAndSave(socket, filename, 0, isServer) != 0) {
+    return -1;
+  }
 
   if (read(socket, buffer, 2) != 2) {
     return -1;
@@ -334,7 +335,9 @@ int readTextAndImage (int socket, const char *basename, int isServer) {
       return -1;
     }
 
-    readAndSave(socket, basename, 1, isServer);
+    if (readAndSave(socket, basename, 1, isServer) != 0) {
+      return -1;
+    }
   }
 
   return 0;

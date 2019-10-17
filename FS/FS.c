@@ -90,8 +90,7 @@ int handleGqu (int socket) {
 
     int answersCount = numOfDirectories(dirName);
     if (answersCount == -1) {
-      printf("ERRO");
-      // TODO;
+      return -1;
     }
 
     char count[3];
@@ -184,7 +183,9 @@ int handleQus (int socket) {
     return -1;
   }
 
-  int success = readTextAndImage(socket, dirName, 1);
+  if (readTextAndImage(socket, dirName, 1) != 0) {
+    return -1;
+  }
 
   free(userID);
   free(topic);
@@ -239,6 +240,12 @@ int handleAns (int socket) {
   }
 
   int success = readTextAndImage(socket, dirName, 1);
+  if (success != 0) {
+    free(userID);
+    free(topic);
+    free(question);
+    return -1;
+  }
 
   free(userID);
   free(topic);
@@ -246,13 +253,13 @@ int handleAns (int socket) {
   return write(socket, "ANR OK\n", 7) != 7;
 }
 
-void handleTCP (TCPConn *conn) {
+int handleTCP (TCPConn *conn) {
   int fd, n;
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
 
   if ((fd = accept(conn->fd,(struct sockaddr*)&clientAddr, &len)) == -1) {
-    return;
+    return -1;
   }
 
   char* cmd = readTCP(fd);
@@ -263,14 +270,20 @@ void handleTCP (TCPConn *conn) {
   } else if (!strcmp(cmd, "ANS")) {
     n = handleAns(fd);
   } else {
-    write(fd, "ERR\n", 4);
+    n = 1;
   }
 
-  // TODO: ver n
+  if (n != 0) {
+    write(fd, "ERR\n", 4);
+    free(cmd);
+    close(fd);
+    return -1;
+  }
 
   printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
   free(cmd);
   close(fd);
+  return 0;
 }
 
 int handleReg (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
@@ -467,7 +480,7 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
   }
 }
 
-void handleUDP (UDPConn* conn) {
+int handleUDP (UDPConn* conn) {
   struct sockaddr_in clientAddr;
   socklen_t len = sizeof(clientAddr);
   int n = 0;
@@ -475,14 +488,14 @@ void handleUDP (UDPConn* conn) {
   char* buffer = receiveUDP(conn, &clientAddr, &len);
   if (buffer == NULL) {
     printf("Could not read message!\n");
-    return;
+    return -1;
   }
 
   printf("UDP/IP %s", inet_ntoa(clientAddr.sin_addr));
   if (buffer[3] != ' ' && buffer[3] != '\n') {
     sendUDP(conn, "ERR\n", clientAddr);
     free(buffer);
-    return;
+    return -1;
   }
 
   buffer[3] = '\0';
@@ -497,19 +510,21 @@ void handleUDP (UDPConn* conn) {
   } else if (!strcmp(buffer, "LQU")) {
     n = handleLqu(conn, clientAddr, buffer);
   } else {
-    sendUDP(conn, "ERR\n", clientAddr);
+    n = -1;
   }
 
-  if (n == -1) {
-    printf("An error occurred while processing a %s request.\n", buffer);
+  if (n != 0) {
+    sendUDP(conn, "ERR\n", clientAddr);
+    return -1;
   }
 
   free(buffer);
+  return 0;
 }
 
 int main(int argc, char** argv) {
   fd_set desc;
-  int maxDesc, ready;
+  int maxDesc;
   ServerOptions opts = getOptions(argc, argv);
   UDPConn *udpConn = listenUDP(opts);
   TCPConn *tcpConn = listenTCP(opts);
@@ -531,17 +546,30 @@ int main(int argc, char** argv) {
 
   sleep(1);
 
+  int exitCode = 0;
+
   while (1) {
     FD_SET(udpConn->fd, &desc);
     FD_SET(tcpConn->fd, &desc);
+    int n = 0;
 
-    ready = select(maxDesc, &desc, NULL, NULL, NULL);
+    if (select(maxDesc, &desc, NULL, NULL, NULL) == -1) {
+      exitCode = errno;
+      printf("There was an issue selecting the channel. Error %d.\n", errno);
+      break;
+    }
 
-    if (FD_ISSET(tcpConn->fd, &desc)) handleTCP(tcpConn);
-    if (FD_ISSET(udpConn->fd, &desc)) handleUDP(udpConn);
+    if (FD_ISSET(tcpConn->fd, &desc)) n = handleTCP(tcpConn);
+    if (FD_ISSET(udpConn->fd, &desc)) n = handleUDP(udpConn);
+
+    if (n != 0) {
+      exitCode = errno != 0 ? errno : 1;
+      printf("There was an issue replying to the call. Error %d.\n", exitCode);
+      break;
+    }
   }
 
   closeUDP(udpConn);
   closeTCP(tcpConn);
-  return 0;
+  return exitCode;
 }
