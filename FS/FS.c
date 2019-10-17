@@ -7,26 +7,11 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include "../lib/util.h"
 #include "../lib/net.h"
 #include "../lib/dirs.h"
 
 #define STORAGE "TOPICS"
-
-int max (int x, int y) {
-  return x > y ? x : y;
-}
-
-int isValidUserID (const char *userID) {
-  if (strlen(userID) != 5) return 0;
-
-  for (int i = 0; i < 5; i++) {
-    if (userID[i] < '0' && userID[i] > '9') {
-      return 0;
-    }
-  }
-
-  return 1;
-}
 
 int sendUserDataAndImage (int socket, const char* dir) {
   char filename[1024];
@@ -396,6 +381,7 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   return 0;
 }
 
+
 int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
   buffer = buffer + 4;
   DIR *d;
@@ -404,7 +390,7 @@ int handleLqu (UDPConn *conn, struct sockaddr_in addr, char *buffer){
   char * topic = strdup(buffer);
   topic[strlen(topic) - 1] = '\0';
 
-  if (!strcmp(topic, "")) {
+  if (isTitleValid(topic) == 0) {
     return sendUDP(conn, "ERR\n", addr);
   }
 

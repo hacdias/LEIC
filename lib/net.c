@@ -259,7 +259,7 @@ char* readWordTCP (int socket) {
 
 void closeTCP (TCPConn* conn) {
   freeaddrinfo(conn->res);
-	close(conn->fd);
+  close(conn->fd);
   free(conn);
 }
 

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "cmds.h"
+#include "../lib/util.h"
 #include "../lib/net.h"
 #include "../lib/dirs.h"
 
@@ -13,6 +14,13 @@ int errorHappened = 0;
 char *registerUser (UDPConn *conn) {
   char msg[11] = "REG ";
   scanf("%s", msg + 4);
+  msg[9] = '\0';
+
+  if (!isValidUserID(msg + 4)) {
+    printf("Invalid user id. It must be a 5 digit number.\n");
+    return NULL;
+  }
+
   msg[9] = '\n';
   msg[10] = '\0';
 
@@ -142,6 +150,13 @@ void topicPropose (UDPConn *conn, char* userID) {
   strcpy(msg + 4, userID);
   msg[9] = ' ';
   scanf("%s%n", msg + 10, &step);
+  msg[10 + step - 1] = '\0';
+
+  if (!isTitleValid(msg + 10)) {
+    printf("Invalid topic name. It must be an 10-chars alphanumeric title.\n");
+    return;
+  }
+
   msg[10 + step - 1] = '\n';
   msg[10 + step] = '\0';
   char* res = sendWithReplyUDP(conn, msg);
@@ -301,12 +316,18 @@ char* questionSubmit (ServerOptions opts, char *userID, char *topic) {
 
   char str[1024];
 
-  if (fgets (str, 1024, stdin) == NULL) {
+  if (fgets(str, 1024, stdin) == NULL) {
     printf("Cannot read.\n");
     return NULL;
   }
 
   char *question = strtok(str+1, " \n");
+
+  if (!isTitleValid(question)) {
+    printf("Invalid question name. It must be an 10-chars alphanumeric title.\n");
+    return NULL;
+  }
+
   char *txtFile = strtok(NULL, " \n");
   char *imgFile = strtok(NULL, " \n");
 
