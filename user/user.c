@@ -272,10 +272,10 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
   }
 
   sprintf(filename, "%s/%s", topic, questions->names[num - 1]);
-
   if (read(conn->fd, buffer, 1) != 1 ||
     readTextAndImage(conn->fd, filename, 0) == -1 ||
-    read(conn->fd, buffer, 2) != 2) {
+    read(conn->fd, buffer, 1) != 1 ||
+    read(conn->fd, buffer, 1) != 1) {
     errorHappened = 1;
     closeTCP(conn);
     return NULL;
@@ -283,25 +283,25 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
 
   int answers = 0;
 
-  if (buffer[1] == '1') {
-    if (read(conn->fd, buffer, 1) != 1) {
+  if (buffer[0] == '0') {
+    buffer[1] = '\0';
+  } else {
+    if (read(conn->fd, buffer + 1, 1) != 1) {
       errorHappened = 1;
       closeTCP(conn);
       return NULL;
     }
-    answers = 10;
-  } else {
-    buffer[2] = '\0';
-    answers = atoi(buffer);
+
+    if (buffer[1] == ' ') {
+      buffer[1] = '\0';
+    } else {
+      buffer[2] = '\0';
+    }
   }
 
-  if (answers != 0) {
-    if (read(conn->fd, buffer, 1) != 1) {
-      errorHappened = 1;
-      closeTCP(conn);
-      return NULL;
-    }
+  answers = atoi(buffer);
 
+  if (answers != 0) {
     char answerNumber[3];
     for (; answers > 0; answers--) {
       if (read(conn->fd, answerNumber, 2) != 2) {
