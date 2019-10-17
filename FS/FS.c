@@ -31,23 +31,23 @@ int isValidUserID (const char *userID) {
 int sendUserDataAndImage (int socket, const char* dir) {
   char filename[1024];
   sprintf(filename, "%s/user", dir);
-  sendFile(socket, filename, 0, 0);
-  write(socket, " ", 1);
 
+  if (sendFile(socket, filename, 0, 0) != 0 || writeTCP(socket, " ", 1) != 0) return -1;
   sprintf(filename, "%s/data", dir);
-  sendFile(socket, filename, 0, 1);
+  if (sendFile(socket, filename, 0, 1) != 0) return -1;
 
   sprintf(filename, "%s/img_ext", dir);
 
   struct stat st;
   if (stat(filename, &st) == -1) {
-    write(socket, " 0", 2);
+    if (writeTCP(socket, " 0", 2) != 0) return -1;
   } else {
-    write(socket, " 1 ", 3);
-    sendFile(socket, filename, 0, 0);
-    write(socket, " ", 1);
+    if (writeTCP(socket, " 1 ", 3) != 0
+      || sendFile(socket, filename, 0, 0) != 0
+      || writeTCP(socket, " ", 1) != 0) return -1;
+
     sprintf(filename, "%s/img", dir);
-    sendFile(socket, filename, 0, 1);
+    if (sendFile(socket, filename, 0, 1) != 0) return -1;
   }
 
   return 0;
@@ -56,9 +56,11 @@ int sendUserDataAndImage (int socket, const char* dir) {
 int numOfDirectories (const char* name) {
   if (!dirExists(name)) return -1;
 
-  int count = 0;
   DIR *d = opendir(name);
+  if (d == NULL) return -1;
+
   struct dirent *dir;
+  int count = 0;
 
   while ((dir = readdir(d)) != NULL) {
     if (dir->d_name[0] == '.'
@@ -85,8 +87,8 @@ int handleGqu (int socket) {
   int exists = dirExists(dirName);
 
   if (exists == 1) {
-    write(socket, "QGR ", 4);
-    sendUserDataAndImage(socket, dirName);
+    if (writeTCP(socket, "QGR ", 4) != 0
+      || sendUserDataAndImage(socket, dirName) != 0) return -1;
 
     int answersCount = numOfDirectories(dirName);
     if (answersCount == -1) {
@@ -94,15 +96,15 @@ int handleGqu (int socket) {
     }
 
     char count[3];
-    write(socket, " ", 1);
+    if (writeTCP(socket, " ", 1) != 0) return -1;
 
     if (answersCount >= 10) {
-      write(socket, "10", 2);
+      if (writeTCP(socket, "10", 2)) return -1;
     } else if (answersCount >= 1) {
       sprintf(count, "%d", answersCount);
-      write(socket, count, 1);
+      if (writeTCP(socket, count, 1)) return -1;
     } else {
-      write(socket, "0\n", 2);
+      if (writeTCP(socket, "0\n", 2)) return -1;
       free(topic);
       free(question);
       return 0;
@@ -118,24 +120,24 @@ int handleGqu (int socket) {
     char answerNumber[32];
     for (; firstAns <= answersCount; firstAns++) {
       sprintf(answerNumber, " %02d ", firstAns);
-      write(socket, answerNumber, sizeof(firstAns));
+      if (writeTCP(socket, answerNumber, sizeof(firstAns))) return -1;
       sprintf(dirName, "%s/%s/%s/%02d", STORAGE, topic, question, firstAns);
       sendUserDataAndImage(socket, dirName);
     }
 
-    write(socket, "\n", 1);
+    if (writeTCP(socket, "\n", 1)) return -1;
     free(topic);
     free(question);
     return 0;
   } else if (exists == 0) {
     free(topic);
     free(question);
-    return write(socket, "QGR EOF\n", 8) == 8;
+    return writeTCP(socket, "QGR EOF\n", 8) != 0;
   }
 
   free(topic);
   free(question);
-  return write(socket, "QGR ERR\n", 8) == 8;
+  return writeTCP(socket, "QGR ERR\n", 8) != 0;
 }
 
 int handleQus (int socket) {
@@ -143,7 +145,7 @@ int handleQus (int socket) {
   if (userID == NULL) return -1;
   if (!isValidUserID(userID)) {
     free(userID);
-    return write(socket, "QUR NOK\n", 8) != 8;
+    return writeTCP(socket, "QUR NOK\n", 8) != 0;
   }
 
   char *topic = readWordTCP(socket);
@@ -165,7 +167,7 @@ int handleQus (int socket) {
     free(userID);
     free(topic);
     free(question);
-    return write(socket, "QUR NOK\n", 8) != 8;
+    return writeTCP(socket, "QUR NOK\n", 8) != 0;
   }
 
   sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
@@ -173,7 +175,7 @@ int handleQus (int socket) {
     free(userID);
     free(topic);
     free(question);
-    return write(socket, "QUR DUP\n", 8) != 8;
+    return writeTCP(socket, "QUR DUP\n", 8) != 0;
   }
 
   char filename[124];
@@ -190,7 +192,7 @@ int handleQus (int socket) {
   free(userID);
   free(topic);
   free(question);
-  return write(socket, "QUR OK\n", 7) != 7;
+  return writeTCP(socket, "QUR OK\n", 7) != 0;
 }
 
 int handleAns (int socket) {
@@ -198,7 +200,7 @@ int handleAns (int socket) {
   if (userID == NULL) return -1;
   if (!isValidUserID(userID)) {
     free(userID);
-    return write(socket, "ANR NOK\n", 8) != 8;
+    return writeTCP(socket, "ANR NOK\n", 8) != 0;
   }
 
   char *topic = readWordTCP(socket);
@@ -220,7 +222,7 @@ int handleAns (int socket) {
     free(userID);
     free(topic);
     free(question);
-    return write(socket, "ANR NOK\n", 8) != 8;
+    return writeTCP(socket, "ANR NOK\n", 8) != 0;
   }
 
   char filename[124];
@@ -230,12 +232,12 @@ int handleAns (int socket) {
     free(userID);
     free(topic);
     free(question);
-    return write(socket, "ERR\n", 4) != 4;
+    return writeTCP(socket, "ERR\n", 4) != 0;
   }
 
   sprintf(filename, "%s/user", dirName);
   FILE *fp = fopen(filename, "w");
-  if (fputs(userID, fp) == EOF || fclose(fp) == EOF) {
+  if (fp == NULL || fputs(userID, fp) == EOF || fclose(fp) == EOF) {
     return -1;
   }
 
@@ -250,7 +252,7 @@ int handleAns (int socket) {
   free(userID);
   free(topic);
   free(question);
-  return write(socket, "ANR OK\n", 7) != 7;
+  return writeTCP(socket, "ANR OK\n", 7) != 0;
 }
 
 int handleTCP (TCPConn *conn) {
@@ -274,7 +276,7 @@ int handleTCP (TCPConn *conn) {
   }
 
   if (n != 0) {
-    write(fd, "ERR\n", 4);
+    writeTCP(fd, "ERR\n", 4);
     free(cmd);
     close(fd);
     return -1;

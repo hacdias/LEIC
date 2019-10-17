@@ -177,7 +177,7 @@ int readTCP (int socket, char* buffer, int chars) {
   int n = 0;
 
   while (n != chars) {
-    int k = read(socket, buffer, chars - n);
+    int k = read(socket, buffer + n, chars - n);
 
     if (k < 0) {
       return k;
@@ -246,6 +246,19 @@ void closeTCP (TCPConn* conn) {
   free(conn);
 }
 
+int writeTCP(int socket, char* buffer, int size) {
+  int n = 0;
+
+  while (n != size) {
+    int k = write(socket, buffer + n, size - n);
+    if (k < 0) return -1;
+    n += k;
+  }
+
+  return 0;
+}
+
+// returns -1 on error.
 int sendFile (int connFd, char *file, int extension, int sendSize) {
   struct stat st;
   if (stat(file, &st) == -1) {
@@ -258,17 +271,15 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
       return -1;
     }
 
-    if (write(connFd, dot + 1, strlen(dot + 1)) == -1) {
+    if (writeTCP(connFd, dot + 1, strlen(dot + 1)) != 0 || writeTCP(connFd, " ", 1) != 0) {
       return -1;
     }
-
-    write(connFd, " ", 1);
   }
 
   if (sendSize) {
     char size[256];
     sprintf(size, "%ld ", st.st_size);
-    if (write(connFd, size, strlen(size)) == -1) {
+    if (writeTCP(connFd, size, strlen(size)) != 0) {
       return -1;
     }
   }
@@ -281,7 +292,7 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
   unsigned char fileData[10000];
   size_t nbytes = 0;
   while ((nbytes = fread(fileData, sizeof(unsigned char), 10000, fpointer)) > 0) {
-    if (write(connFd, fileData, nbytes) < 0) {
+    if (writeTCP(connFd, fileData, nbytes) != 0) {
       break;
     }
 

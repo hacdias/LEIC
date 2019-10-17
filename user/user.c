@@ -256,7 +256,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int 
 
   TCPConn* conn = connectTCP(opts);
 
-  if (write(conn->fd, msg, strlen(msg)) == -1) return errorCloseAndReturnTCP(conn);
+  if (writeTCP(conn->fd, msg, strlen(msg)) != 0) return errorCloseAndReturnTCP(conn);
 
   char filename[256];
 
@@ -322,13 +322,13 @@ char* questionSubmit (ServerOptions opts, char *userID, char *topic) {
 
   TCPConn* conn = connectTCP(opts);
 
-  if (write(conn->fd, "QUS ", 4) != 4 ||
-    write(conn->fd, userID, 5) != 5 ||
-    write(conn->fd, " ", 1) != 1 ||
-    write(conn->fd, topic, strlen(topic)) != strlen(topic) ||
-    write(conn->fd, " ", 1) != 1 ||
-    write(conn->fd, question, strlen(question)) != strlen(question) ||
-    write(conn->fd, " ", 1) != 1) {
+  if (writeTCP(conn->fd, "QUS ", 4) != 0 ||
+    writeTCP(conn->fd, userID, 5) != 0 ||
+    writeTCP(conn->fd, " ", 1) != 0 ||
+    writeTCP(conn->fd, topic, strlen(topic)) != 0||
+    writeTCP(conn->fd, " ", 1) != 0 ||
+    writeTCP(conn->fd, question, strlen(question)) != 0 ||
+    writeTCP(conn->fd, " ", 1) != 0) {
       return errorCloseAndReturnTCP(conn);
   }
 
@@ -338,18 +338,18 @@ char* questionSubmit (ServerOptions opts, char *userID, char *topic) {
   }
 
   if (imgFile != NULL) {
-    if (write(conn->fd, " 1 ", 3) != 3 ||
+    if (writeTCP(conn->fd, " 1 ", 3) != 0 ||
       sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
       return errorCloseAndReturnTCP(conn);
     }
   } else {
-    if (write(conn->fd, " 0", 2) != 2) {
+    if (writeTCP(conn->fd, " 0", 2) != 0) {
       return errorCloseAndReturnTCP(conn);
     }
   }
 
-  if (write(conn->fd, "\n", 1) != 1) {
+  if (writeTCP(conn->fd, "\n", 1) != 0) {
     return errorCloseAndReturnTCP(conn);
   }
 
@@ -414,13 +414,13 @@ char* answerSubmit (ServerOptions opts, char *userID, char *topic, char *questio
 
   TCPConn* conn = connectTCP(opts);
 
-  if (write(conn->fd, "ANS ", 4) != 4 ||
-    write(conn->fd, userID, 5) != 5 ||
-    write(conn->fd, " ", 1) != 1 ||
-    write(conn->fd, topic, strlen(topic)) != strlen(topic) ||
-    write(conn->fd, " ", 1) != 1 ||
-    write(conn->fd, question, strlen(question)) != strlen(question) ||
-    write(conn->fd, " ", 1) != 1) {
+  if (writeTCP(conn->fd, "ANS ", 4) != 0 ||
+    writeTCP(conn->fd, userID, 5) != 0 ||
+    writeTCP(conn->fd, " ", 1) != 0 ||
+    writeTCP(conn->fd, topic, strlen(topic)) != 0 ||
+    writeTCP(conn->fd, " ", 1) != 0 ||
+    writeTCP(conn->fd, question, strlen(question)) != 0 ||
+    writeTCP(conn->fd, " ", 1) != 0) {
     return errorCloseAndReturnTCP(conn);
   }
 
@@ -430,18 +430,18 @@ char* answerSubmit (ServerOptions opts, char *userID, char *topic, char *questio
   }
 
   if (imgFile != NULL) {
-    if (write(conn->fd, " 1 ", 3) != 3 ||
+    if (writeTCP(conn->fd, " 1 ", 3) != 0 ||
       sendFile(conn->fd, imgFile, 1, 1) == -1) {
       printf("Cannot send image properly!\n");
       return errorCloseAndReturnTCP(conn);
     }
   } else {
-    if (write(conn->fd, " 0", 2) != 2) {
+    if (writeTCP(conn->fd, " 0", 2) != 0) {
       return errorCloseAndReturnTCP(conn);
     }
   }
 
-  if (write(conn->fd, "\n", 1) != 1) {
+  if (writeTCP(conn->fd, "\n", 1) != 0) {
     return errorCloseAndReturnTCP(conn);
   }
 

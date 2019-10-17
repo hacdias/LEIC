@@ -54,6 +54,8 @@ int readTCP (int socket, char* buffer, int chars);
 
 int readSpaceTCP (int socket);
 
+int writeTCP(int socket, char* buffer, int size);
+
 int sendFile (int connFd, char *file, int extension, int sendSize);
 
 int readTextAndImage (int socket, const char *basename, int isServer);
