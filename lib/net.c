@@ -306,14 +306,14 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
     return -1;
   }
 
-  unsigned char fileData[10000];
+  char fileData[256];
   size_t nbytes = 0;
-  while ((nbytes = fread(fileData, sizeof(unsigned char), 10000, fpointer)) > 0) {
+  while ((nbytes = fread(fileData, sizeof(char), 256, fpointer)) > 0) {
     if (writeTCP(connFd, fileData, nbytes) != 0) {
       break;
     }
 
-    bzero(fileData, 10000);
+    bzero(fileData, 256);
   }
 
   return 0;

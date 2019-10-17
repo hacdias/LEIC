@@ -249,6 +249,17 @@ int handleTCP (TCPConn *conn) {
     return -1;
   }
 
+  int pid = fork();
+
+  if (pid < 0) {
+    printf("Cannot fork.\n");
+    return -1;
+  }
+
+  if (pid != 0) {
+    return 0;
+  }
+
   char* cmd = readWordTCP(fd);
   if (!strcmp(cmd, "GQU")) {
     n = handleGqu(fd);
@@ -556,6 +567,8 @@ int main(int argc, char** argv) {
       break;
     }
   }
+
+  while (wait(NULL) > 0) {}
 
   closeUDP(udpConn);
   closeTCP(tcpConn);

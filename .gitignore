@@ -3,3 +3,4 @@ user/user
 .vscode
 TOPICS
 node_modules
+*.png
