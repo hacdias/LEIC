@@ -491,6 +491,19 @@ int hasUserId (char* userID) {
   return 1;
 }
 
+void help () {
+  printf("register/reg <userID>topic_list/tl\n");
+  printf("topic_select <topic name>\n");
+  printf("ts <topic_number>\n");
+  printf("topic_propose/tp <topic>\n");
+  printf("question_list/ql\n");
+  printf("question_get <question name>\n");
+  printf("qg <question_number>\n");
+  printf("answer_submit/as <text_file [image_file]>\n");
+  printf("question_submit/qs <question_name> <text_file [image_file]>\n");
+  printf("exit\n");
+}
+
 int main(int argc, char** argv) {
   ServerOptions opts = getOptions(argc, argv);
   UDPConn* conn = connectUDP(opts);
@@ -506,6 +519,8 @@ int main(int argc, char** argv) {
   char *currentTopic = NULL;
   char *currentQuestion = NULL;
   int exit = 0;
+
+  printf("\nYou are connected to %s:%s. Type '?' for help.\n\n", opts.ip, opts.port);
 
   do {
     printf("> ");
@@ -557,6 +572,9 @@ int main(int argc, char** argv) {
         if (hasUserId(userID)) {
           answerSubmit(opts, userID, currentTopic, currentQuestion);
         }
+        break;
+      case Help:
+        help();
         break;
       default:
         printf("Invalid command!\n");

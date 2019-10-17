@@ -23,6 +23,8 @@ Command getCommand (char *cmd) {
     return QuestionSubmit;
   } else if (checkCommand(cmd, "answer_submit", "as")) {
     return AnswerSubmit;
+  } else if (checkCommand(cmd, "help", "?")) {
+    return Help;
   } else {
     return Unknown;
   }
