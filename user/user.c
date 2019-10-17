@@ -115,6 +115,27 @@ char* topicSelect (StringArray *topics) {
   return topics->names[num - 1];
 }
 
+char *topicSelectLong (StringArray *topics) {
+  if (topics == NULL) {
+    printf("You must get the topics list first!\n");
+    return NULL;
+  }
+
+  char topic[11];
+  scanf("%s", topic);
+
+  for (int i = 0; i < topics->count; i++) {
+    if (strcmp(topics->names[i], topic) == 0) {
+      printf("Topic %s selected!\n", topics->names[i]);
+      return topics->names[i];
+    }
+  }
+
+
+  printf("404: Topic not found!\n");
+  return NULL;
+}
+
 void topicPropose (UDPConn *conn, char* userID) {
   int step = 0;
   char msg[256] = "PTP ";
@@ -192,17 +213,30 @@ StringArray* questionList (UDPConn *conn, char *topic) {
   return questions;
 }
 
-char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
+char* questionGet (ServerOptions opts, char* topic, StringArray *questions, int isNum) {
   if (questions == NULL) {
     printf("You must get the questions first!\n");
     return NULL;
   }
 
   int num;
-  scanf("%d", &num);
+
+  if (isNum) {
+    scanf("%d", &num);
+  } else {
+    char question[11];
+    num = -1;
+    scanf("%s", question);
+
+    for (int i = 0; i < questions->count; i++) {
+      if (strcmp(questions->names[i], question) == 0) {
+        num = i + 1;
+      }
+    }
+  }
 
   if (num <= 0 || num > questions->count) {
-    printf("Invalid question number!\n");
+    printf("Invalid question!\n");
     return NULL;
   }
 
@@ -210,6 +244,7 @@ char* questionGet (ServerOptions opts, char* topic, StringArray *questions) {
     printf("Cannot create '%s' directory.\n", topic);
     return NULL;
   }
+
 
   char msg[1024];
   sprintf(msg, "GQU %s %s\n", topic, questions->names[num - 1]);
@@ -545,8 +580,12 @@ int main(int argc, char** argv) {
         topics = topicList(conn);
         clearInput();
         break;
-      case TopicSelect:
+      case TopicSelectShort:
         currentTopic = topicSelect(topics);
+        clearInput();
+        break;
+      case TopicSelectLong:
+        currentTopic = topicSelectLong(topics);
         clearInput();
         break;
       case TopicPropose:
@@ -559,8 +598,12 @@ int main(int argc, char** argv) {
         questions = questionList(conn, currentTopic);
         clearInput();
         break;
-      case QuestionGet:
-        currentQuestion = questionGet(opts, currentTopic, questions);
+      case QuestionGetShort:
+        currentQuestion = questionGet(opts, currentTopic, questions, 1);
+        clearInput();
+        break;
+      case QuestionGetLong:
+        currentQuestion = questionGet(opts, currentTopic, questions, 0);
         clearInput();
         break;
       case QuestionSubmit:
