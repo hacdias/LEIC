@@ -519,7 +519,11 @@ int main(int argc, char** argv) {
         exit = 1;
         break;
       case Register:
-        userID = registerUser(conn);
+        if (userID != NULL) {
+          printf("User %s is already registred!\n", userID);
+        } else {
+          userID = registerUser(conn);
+        }
         clearInput();
         break;
       case TopicList:
