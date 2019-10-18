@@ -10,23 +10,29 @@ const argv = require('yargs')
   .option('port', { type: 'string', alias: 'p', default: '58035', required: true })
   .argv
 
-function sleep (ms){
-  return new Promise(resolve=>{
-    setTimeout(resolve,ms)
+function sleep (ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
   })
 }
 
 const urlBuilder = (ip, port, n) => `http://193.136.138.142:58000/index.html?IP=${ip}&PORT=${port}&SCRIPT=${n}`
 
 async function main () {
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    defaultViewport: {
+      width: 800,
+      height: 600,
+      deviceScaleFactor: 2
+    }
+  })
   const page = await browser.newPage()
   const screenshots = []
 
   for (let i = 1; i <= 10; i++) {
     await page.goto(urlBuilder(argv.ip, argv.port, i), { waitUntil: 'networkidle2' })
     const screenshot = `screenshot-${i}.png`
-    await page.screenshot({path: screenshot, fullPage: true })
+    await page.screenshot({ path: screenshot, fullPage: true })
     screenshots.push(screenshot)
     await sleep(10000)
   }
