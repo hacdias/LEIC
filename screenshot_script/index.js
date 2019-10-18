@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 
-const fs = require('fs')
 const puppeteer = require('puppeteer')
-const imagesToPdf = require('images-to-pdf')
 
 const argv = require('yargs')
   .option('ip', { type: 'string', alias: 'i', required: true })
@@ -31,10 +29,17 @@ async function main () {
 
   for (let i = 1; i <= 10; i++) {
     await page.goto(urlBuilder(argv.ip, argv.port, i), { waitUntil: 'networkidle2' })
-    const screenshot = `screenshot-${i}.png`
-    await page.screenshot({ path: screenshot, fullPage: true })
-    await imagesToPdf([screenshot], `screenshot-${i}.pdf`)
-    fs.unlinkSync(screenshot)
+    await page.pdf({
+      path: `screenshot-${i}.pdf`,
+      displayHeaderFooter: true,
+      format: 'A4',
+      margin: {
+        top: '2.56cm',
+        bottom: '2.56cm',
+        left: '2.56cm',
+        right: '2.56cm'
+      }
+    })
     await sleep(10000)
   }
 
