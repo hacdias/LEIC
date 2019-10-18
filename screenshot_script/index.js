@@ -26,21 +26,16 @@ async function main () {
       deviceScaleFactor: 2
     }
   })
+
   const page = await browser.newPage()
-  const screenshots = []
 
   for (let i = 1; i <= 10; i++) {
     await page.goto(urlBuilder(argv.ip, argv.port, i), { waitUntil: 'networkidle2' })
     const screenshot = `screenshot-${i}.png`
     await page.screenshot({ path: screenshot, fullPage: true })
-    screenshots.push(screenshot)
-    await sleep(10000)
-  }
-
-  await imagesToPdf(screenshots, './screenshots.pdf')
-
-  for (const screenshot of screenshots) {
+    await imagesToPdf([screenshot], `screenshot-${i}.pdf`)
     fs.unlinkSync(screenshot)
+    await sleep(10000)
   }
 
   await browser.close()
