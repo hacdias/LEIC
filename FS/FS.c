@@ -155,6 +155,16 @@ int handleQus (int socket) {
     return writeTCP(socket, "QUR NOK\n", 8) != 0;
   }
 
+  int n = numOfDirectories(dirName);
+
+  if (n == -1) {
+    return -1;
+  }
+
+  if (n == 99) {
+    return writeTCP(socket, "QUR FUL\n", 8) != 0;
+  }
+
   sprintf(dirName, "%s/%s/%s", STORAGE, topic, question);
   if (dirExists(dirName) == 1 || mkdirIfNotExists(dirName) == -1) {
     free(userID);
@@ -211,7 +221,18 @@ int handleAns (int socket) {
   }
 
   char filename[124];
-  int nextAnswer = numOfDirectories(dirName) + 1;
+  int nextAnswer = numOfDirectories(dirName);
+
+  if (nextAnswer == -1) {
+    return -1;
+  }
+
+  if (nextAnswer == 99) {
+    return writeTCP(socket, "ANR FUL\n", 8) != 0;
+  }
+
+  nextAnswer++;
+
   sprintf(dirName, "%s/%s/%s/%02d", STORAGE, topic, question, nextAnswer);
   if (mkdirIfNotExists(dirName) == -1) {
     free(userID);
@@ -362,6 +383,16 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
     userID[i] = buffer[i];
   }
 
+  int n = numOfDirectories(STORAGE);
+
+  if (n == -1) {
+    return -1;
+  }
+
+  if (n == 99) {
+    return sendUDP(conn, "PTR FUL\n", addr);
+  }
+
   buffer = buffer + 6;
   buffer[strlen(buffer) - 1] = '\0';
 
@@ -386,8 +417,6 @@ int handlePtp (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
   } else {
     return -1;
   }
-
-  // TODO: Directory full needs to be implemented!
 
   return 0;
 }
