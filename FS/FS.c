@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/wait.h> 
 #include <errno.h>
 #include "../lib/util.h"
 #include "../lib/net.h"
