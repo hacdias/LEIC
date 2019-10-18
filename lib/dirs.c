@@ -1,5 +1,7 @@
 #include "dirs.h"
 
+// mkdirIfNotExists creates a directory if it does not
+// exist already. Returns 0 on success.
 int mkdirIfNotExists (const char *name) {
   DIR* dir = opendir(name);
   if (dir) {
@@ -12,6 +14,7 @@ int mkdirIfNotExists (const char *name) {
   }
 }
 
+// dirExists returns 1 if a certain directory exists.
 int dirExists (const char *name) {
   DIR* dir = opendir(name);
   if (dir) {

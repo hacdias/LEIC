@@ -3,6 +3,7 @@
 #define LOCALHOST "127.0.0.1"
 #define PORT "58035"
 
+// getOptions retrieves the options for the command line.
 ServerOptions getOptions (int argc, char** argv) {
   ServerOptions opts = {LOCALHOST, PORT};
   long opt;
@@ -23,6 +24,8 @@ ServerOptions getOptions (int argc, char** argv) {
   return opts;
 }
 
+// connectUDP connects to an UDP server through a socket.
+// Returns NULL if an error occurred.
 UDPConn *connectUDP (ServerOptions opts) {
   UDPConn *conn = malloc(sizeof(UDPConn));
   int n;
@@ -45,6 +48,8 @@ UDPConn *connectUDP (ServerOptions opts) {
   return conn;
 }
 
+// listenUDP starts listening to an UDP socket.
+// Returns NULL if an error occurred.
 UDPConn *listenUDP (ServerOptions opts) {
   UDPConn *conn = malloc(sizeof(UDPConn));
   int n;
@@ -82,6 +87,9 @@ int sendUDP (UDPConn *conn, const char* msg, struct sockaddr_in addr) {
   return sendto(conn->fd, msg, strlen(msg), 0, (struct sockaddr*)&addr, sizeof(addr)) != strlen(msg);
 }
 
+// sendWithReplyUDP sends an UDP message to a certain connection. If the reply
+// is not received within a few seconds, we retry three times. Returns a pointer
+// to the reply when it's successfull. NULL otherwise.
 char* sendWithReplyUDP (UDPConn *conn, char* msg) {
   int tries = 0;
 
@@ -108,6 +116,8 @@ char* sendWithReplyUDP (UDPConn *conn, char* msg) {
   return NULL;
 }
 
+// receiveUDP receives an entire UDP message. It uses MSG_PEEK to know how
+// many characters there are to read in the socket. Returns NULL on error.
 char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
   int size = 0, len = 0;
   char *buffer = NULL;
@@ -132,6 +142,7 @@ char* receiveUDP (UDPConn *conn, struct sockaddr_in* addr, socklen_t* addrlen) {
   return buffer;
 }
 
+// connectTCP connects to a TCP client. Returns NULL on error.
 TCPConn *connectTCP (ServerOptions opts) {
   TCPConn *conn = malloc(sizeof(TCPConn));
   int n;
@@ -159,6 +170,8 @@ TCPConn *connectTCP (ServerOptions opts) {
   return conn;
 }
 
+// listenTCP starts listening to TCP connections on a certain IP and Port. Returns
+// NULL on error.
 TCPConn *listenTCP (ServerOptions opts) {
   TCPConn *conn = malloc(sizeof(TCPConn));
   int n;
@@ -190,6 +203,7 @@ TCPConn *listenTCP (ServerOptions opts) {
   return conn;
 }
 
+// readTCP reads a certain amount of characters from a TCP socket.
 int readTCP (int socket, char* buffer, int chars) {
   int n = 0;
 
@@ -263,6 +277,7 @@ void closeTCP (TCPConn* conn) {
   free(conn);
 }
 
+// writeTCP writes a certain amount of characters to a TCP connection.
 int writeTCP(int socket, const char* buffer, int size) {
   int n = 0;
 
@@ -275,7 +290,8 @@ int writeTCP(int socket, const char* buffer, int size) {
   return 0;
 }
 
-// returns -1 on error.
+// sendFile sends a file to the user with the format [extension] [size] [data].
+// Returns -1 on error.
 int sendFile (int connFd, char *file, int extension, int sendSize) {
   struct stat st;
   if (stat(file, &st) == -1) {
@@ -319,7 +335,7 @@ int sendFile (int connFd, char *file, int extension, int sendSize) {
   return 0;
 }
 
-// reads a message like this: [ext] size data
+// Reads a message like this: [ext] size data
 int readAndSave (int socket, const char* basename, int isImg, int isServer) {
   char tmp[256], filename[256];
   int readCode;
@@ -408,6 +424,8 @@ int readTextAndImage (int socket, const char *basename, int isServer) {
   return 0;
 }
 
+// readPositiveNumber reads a positive number from a TCP socket.
+// It returns -1 on error, or a long int otherwise.
 long int readPositiveNumber (int socket) {
   char *string = readWordTCP(socket);
   if (string == NULL) return -1;
