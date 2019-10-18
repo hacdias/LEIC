@@ -4,22 +4,22 @@ Computer Networks course project.
 
 ## Build
 
-```
-make
+```console
+$ make
 ```
 
 ## Run
 
 Server:
 
-```
-./FS/Fs [-p port]
+```console
+$ ./FS/Fs [-p port]
 ```
 
 Client:
 
-```
-./user/user [-i ip] [-p port]
+```console
+$ ./user/user [-i ip] [-p port]
 ```
 
 ## Server Files Structure
