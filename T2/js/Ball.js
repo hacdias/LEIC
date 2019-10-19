@@ -16,39 +16,38 @@ const Y_AXIS = new THREE.Vector3(0, 1, 0)
 const Z_AXIS = new THREE.Vector3(0, 0, 1)
 
 class Ball extends THREE.Object3D {
-  constructor ({ radius, direction, speed }) {
+  constructor ({ radius, direction, position, speed }) {
     super()
+
+    this.radius = radius
+    this.speed = speed || 0
+    this.direction = direction || new THREE.Vector3(0, 0, 0)
+
     const geometry = new THREE.SphereGeometry(radius, 15, 15)
     const material = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       wireframe: true
     })
 
-    this.falling = false
-    this.radius = radius
-    this.diameterSquared = Math.pow(radius * 2, 2)
-
     this.ball = new THREE.Mesh(geometry, material)
+    this.ball.add(new THREE.AxesHelper(radius + 3))
 
     this.add(this.ball)
+    this.applyMatrix(makeTrans(position.x, position.y, position.z))
+    this.oldPosition = position.clone()
 
-    this.add(new THREE.AxesHelper(5))
-
-    this.speed = speed || getRandomInt(4, 10)
-    this.direction = direction || new THREE.Vector3(
-      Math.random() * 2 - 1,
-      0,
-      Math.random() * 2 - 1
-    ).normalize()
-
-    setInterval(this.updateSpeed.bind(this), 1000)
-
-    // this.rotation.x = -Math.PI / 2
+    this.collided = false
+    this.falling = false
   }
 
-  animate (delta) {
-    if (this.speed === 0) {
-      return
+  move (delta) {
+    if (this.speed === 0) return
+
+    this.updateSpeed(delta)
+
+    if (!this.atTheBase) {
+      const gForce = new THREE.Vector3(0, -0.98, 0).multiplyScalar(delta)
+      this.direction = this.direction.clone().add(gForce)
     }
 
     this.position.add(this.direction.clone().multiplyScalar(this.speed * delta))
@@ -58,19 +57,30 @@ class Ball extends THREE.Object3D {
 
   collidesWith (obj) {
     if (obj instanceof Ball) {
-      return this.position.distanceToSquared(obj.position) <= this.diameterSquared
+      //console.log(this.position.distanceToSquared(obj.position), (this.radius * 2) ** 2)
+      return detectCollisionCubes(this, obj)
     }
 
     if (obj instanceof Field) {
-      for (const { wall, normal } of obj.walls) {
-        const u = new THREE.Vector3()
-        const union = this.getWorldPosition(u).clone().sub(wall.getWorldPosition(u))
-        const copy = normal.clone()
-        const dst = union.projectOnVector(copy)
+      if (!this.atTheBase && detectCollisionCubes(this, obj.base)) {
+        this.atTheBase = true
+        this.direction.multiply(new THREE.Vector3(1, 0, 1))
+      }
 
-        if (dst.dot(copy) < 0 /* || dst.lengthSq() <= (this.radius + wall.depth / 2) ** 2 */) {
-          // console.log('p')
-          this.direction.reflect(copy)
+      if (this.atTheBase && !detectCollisionCubes(obj, this)) {
+        if (!this.falling) {
+          this.direction.setComponent(1, -1)
+          this.falling = true
+        }
+
+        return false
+      }
+
+      for (const { wall, normal } of obj.walls) {
+        if (detectCollisionCubes(this, wall)) {
+          this.direction.reflect(normal)
+          this.collided = true
+          return true
         }
       }
     }
@@ -78,23 +88,46 @@ class Ball extends THREE.Object3D {
     return false
   }
 
-  resolveCollision(obj) {
-    [this.direction, obj.direction] = [obj.direction, this.direction];
-    [this.velocity, obj.velocity] = [obj.velocity, this.velocity];
-    this.collided = true;
-    obj.collided = true;
-  }
+  solveCollision (ball) {
+    console.log(ball)
+    const bDir = ball.direction.clone()
+    const mDir = this.direction.clone()
 
-  updateSpeed () {
-    if (this.falling) {
-      this.speed += 1
-    } else if (this.speed > 0) {
-      this.speed = Math.max(0, this.speed - 0.25)
+    ball.direction = mDir
+    this.direction = bDir
+
+    // TODO: IF one of the directions is 0,0,0
+
+    let bSpeed = ball.speed
+    let mSpeed = this.speed
+
+    if (bSpeed === 0) {
+      bSpeed = mSpeed / 2
+    } else if (mSpeed === 0) {
+      mSpeed = bSpeed / 2
     }
+
+    this.speed = bSpeed
+    ball.speed = mSpeed
+    this.collided = true
+    ball.collided = true
   }
 
-  fallToInfinity () {
-    this.direction.setComponent(1, -1)
-    this.falling = true
+  check () {
+    if (this.collided) {
+      this.position.set(this.oldPosition.x, this.oldPosition.y, this.oldPosition.z)
+    } else {
+      this.oldPosition = this.position.clone()
+    }
+
+    this.collided = false
+  }
+
+  updateSpeed (delta) {
+    if (this.falling) {
+      this.speed += 1 * delta
+    } else if (this.speed > 0) {
+      this.speed = Math.max(0, this.speed - 5 * delta)
+    }
   }
 }

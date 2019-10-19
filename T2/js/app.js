@@ -41,7 +41,7 @@ function createScene () {
 
 function generateCannons () {
   for (let i = 0; i < cannons.length; i++) {
-    const cannon = new Cannon({ radius: BALL_RADIUS, length: CANNON_LENGTH })
+    const cannon = new Cannon({ radius: BALL_RADIUS + 2, length: CANNON_LENGTH })
     cannon.position.x = 2 * CANNON_LENGTH + BALL_RADIUS
     scene.add(cannon)
     cannons[i] = cannon
@@ -50,12 +50,12 @@ function generateCannons () {
   cannons[0].position.z = -FIELD_WIDTH / 2 + BALL_RADIUS
   cannons[2].position.z = -cannons[0].position.z
 
-  cannons[0].rotation.z += Math.PI / 10
-  cannons[2].rotation.z -= Math.PI / 10
+  cannons[0].increaseAngle(35)
+  cannons[2].decreaseAngle(35)
 }
 
 function generateBalls () {
-  let initialBalls = getRandomInt(3, 8)
+  let initialBalls = 8 // getRandomInt(3, 8)
 
   const MIN_X = -FIELD_WIDTH / 2 + field.position.x + WALLS_DEPTH + BALL_RADIUS
   const MAX_X = FIELD_WIDTH / 2 + field.position.x - BALL_RADIUS
@@ -67,9 +67,7 @@ function generateBalls () {
     const x = getRandomInt(MIN_X, MAX_X)
     const z = getRandomInt(MIN_Z, MAX_Z)
 
-    const ball = new Ball({ radius: BALL_RADIUS })
-    ball.position.x = x
-    ball.position.z = z
+    const ball = new Ball({ radius: BALL_RADIUS, position: new THREE.Vector3(x, 0, z) })
 
     let collided = false
 
@@ -142,9 +140,9 @@ function updatePerspectiveCamera (cam) {
 
 function createCamera () {
   cameras[0] = createOrtographicCamera({ position: [0, 30, 0], lookAt: [0, 0, 0] })
-
-  // TODO: perspective cameras
   cameras[1] = createPerspectiveCamera({ position: [150, 60, 0], lookAt: [0, 0, 0] })
+
+  // TODO: follow ball
   cameras[2] = createOrtographicCamera({ position: [0, 20, 30], lookAt: [0, 20, 0] })
 
   cameras.forEach(cam => scene.add(cam))
@@ -186,43 +184,37 @@ function animate () {
   if (flags.shoot) {
     flags.shoot = false
 
-    const ball = new Ball({ radius: BALL_RADIUS, direction: new THREE.Vector3(-1, 0, 0) })
-    // ball.position.x = cannons[flags.cannon].x
-
-    console.warn(
-      cannons[flags.cannon].rotation.x,
-      cannons[flags.cannon].rotation.y,
-      cannons[flags.cannon].rotation.z,
-    )
-
-    console.warn('Shoot')
-
+    const ball = cannons[flags.cannon].shoot()
     scene.add(ball)
     balls.push(ball)
   }
 
+  if (flags.toggleAxis) {
+    flags.toggleAxis = false
+
+    // TODO
+  }
+
+  animateBalls()
+  renderer.render(scene, cameras[flags.camera - 1])
+}
+
+function animateBalls () {
   const delta = clock.getDelta()
 
-  for (const ball of balls) {
-    ball.animate(delta)
-
-    if (ball.position.x > field.position.x + FIELD_WIDTH / 2 + BALL_RADIUS) {
-      ball.fallToInfinity()
-    }
-  }
+  for (const ball of balls)
+    ball.move(delta)
 
   for (let i = 0; i < balls.length; i++) {
     balls[i].collidesWith(field)
 
-    for (let j = i + 1; j < balls.length; j++) {
-      if (balls[i].collidesWith(balls[j])) {
-        balls[i].resolveCollision(balls[j])
-        console.log('collided')
-      }
-    }
+    for (let j = i + 1; j < balls.length; j++)
+      if (balls[i].collidesWith(balls[j]))
+        balls[i].solveCollision(balls[j])
   }
 
-  renderer.render(scene, cameras[flags.camera - 1])
+  for (const ball of balls)
+    ball.check()
 }
 
 function init () {
@@ -264,6 +256,9 @@ document.addEventListener('keyup', event => {
       break
     case 'KeyE':
       flags.newCannon = 2
+      break
+    case 'KeyR':
+      flags.toggleAxis = true
       break
     case 'Space':
       flags.shoot = true
