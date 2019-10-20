@@ -69,8 +69,7 @@ class SearchProblem:
       closed.append(curr)
       closedTwo.append(curr.path[-1][1])
 
-      print(curr.heuristic + curr.depth)
-
+      #print(curr.heuristic + curr.depth)
       #print(curr.path[-1])
 
       limitexp -= 1
@@ -79,7 +78,6 @@ class SearchProblem:
         return curr.path
 
       for tup in itertools.product(*list(self.model[x] for x in curr.path[-1][1])):
-        # print(tup)
         if not allDifferent(tup):
           continue
 
