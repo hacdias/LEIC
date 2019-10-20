@@ -57,8 +57,13 @@ class Ball extends THREE.Object3D {
 
   collidesWith (obj) {
     if (obj instanceof Ball) {
-      //console.log(this.position.distanceToSquared(obj.position), (this.radius * 2) ** 2)
-      return detectCollisionCubes(this, obj)
+      const thisPos = new THREE.Vector3()
+      this.ball.getWorldPosition(thisPos)
+
+      const otherPos = new THREE.Vector3()
+      obj.ball.getWorldPosition(otherPos)
+      
+      return thisPos.distanceToSquared(otherPos) <= (BALL_RADIUS * 2) ** 2
     }
 
     if (obj instanceof Field) {
@@ -89,7 +94,6 @@ class Ball extends THREE.Object3D {
   }
 
   solveCollision (ball) {
-    console.log(ball)
     const bDir = ball.direction.clone()
     const mDir = this.direction.clone()
 

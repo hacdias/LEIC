@@ -55,7 +55,7 @@ function generateCannons () {
 }
 
 function generateBalls () {
-  let initialBalls = 8 // getRandomInt(3, 8)
+  let initialBalls = 5 // getRandomInt(3, 5)
 
   const MIN_X = -FIELD_WIDTH / 2 + field.position.x + WALLS_DEPTH + BALL_RADIUS
   const MAX_X = FIELD_WIDTH / 2 + field.position.x - BALL_RADIUS
@@ -63,26 +63,32 @@ function generateBalls () {
   const MIN_Z = -FIELD_WIDTH / 2 + WALLS_DEPTH + BALL_RADIUS
   const MAX_Z = FIELD_WIDTH / 2 - WALLS_DEPTH - BALL_RADIUS
 
+  const positions = []
+
   while (initialBalls !== 0) {
     const x = getRandomInt(MIN_X, MAX_X)
     const z = getRandomInt(MIN_Z, MAX_Z)
 
-    const ball = new Ball({ radius: BALL_RADIUS, position: new THREE.Vector3(x, 0, z) })
+    const position = new THREE.Vector3(x, 0, z)
 
     let collided = false
 
-    for (const theOtherBall of balls) {
-      if (theOtherBall.collidesWith(ball)) {
+    for (const otherPosition of positions) {
+      if (position.distanceToSquared(otherPosition) <= (BALL_RADIUS * 2) ** 2) {
         collided = true
-        break
       }
     }
 
     if (!collided) {
-      scene.add(ball)
-      balls.push(ball)
       initialBalls--
+      positions.push(position)
     }
+  }
+
+  for (const position of positions) {
+    const ball = new Ball({ radius: BALL_RADIUS, position })
+    scene.add(ball)
+    balls.push(ball)
   }
 }
 
