@@ -99,8 +99,8 @@ class SearchProblem:
         if move.path[-1][1] in closedTwo:
           continue
 
-        if move.path[-1][1] in openedTwo:
-          continue
+        #if move.path[-1][1] in openedTwo:
+        #  continue
 
         opened.append(move)
         openedTwo.append(move.path[-1][1])
