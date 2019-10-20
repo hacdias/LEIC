@@ -21,6 +21,7 @@ const DIAG_UNIT = Math.sqrt(0.5)
 var scene, renderer, clock, field, balls = []
 var cameras = new Array(3)
 var cannons = new Array(3)
+var movingBall
 
 function createScene () {
   scene = new THREE.Scene()
@@ -90,6 +91,8 @@ function generateBalls () {
     scene.add(ball)
     balls.push(ball)
   }
+
+  movingBall = balls[0]
 }
 
 function getCameraSizes () {
@@ -148,10 +151,14 @@ function createCamera () {
   cameras[0] = createOrtographicCamera({ position: [0, 30, 0], lookAt: [0, 0, 0] })
   cameras[1] = createPerspectiveCamera({ position: [150, 60, 0], lookAt: [0, 0, 0] })
 
-  // TODO: follow ball
-  cameras[2] = createOrtographicCamera({ position: [0, 20, 30], lookAt: [0, 20, 0] })
+  scene.add(cameras[0])
+  scene.add(cameras[1])
 
-  cameras.forEach(cam => scene.add(cam))
+  // TODO: follow ball AND FIX
+  cameras[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
+  cameras[2].position.set(0, 10, 10)
+  cameras[2].lookAt(movingBall.position)
+  movingBall.add(cameras[2])
 }
 
 function resizeCameras () {

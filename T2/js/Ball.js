@@ -100,6 +100,14 @@ class Ball extends THREE.Object3D {
     ball.direction = mDir
     this.direction = bDir
 
+    if (ball.direction.getComponent(0) == 0 && ball.direction.getComponent(2) == 0) {
+      ball.direction = bDir.clone().negate()
+    }
+
+    if (this.direction.getComponent(0) == 0 && this.direction.getComponent(2) == 0) {
+      this.direction = mDir.clone().negate()
+    }
+
     // TODO: IF one of the directions is 0,0,0
 
     let bSpeed = ball.speed
@@ -115,6 +123,14 @@ class Ball extends THREE.Object3D {
     ball.speed = mSpeed
     this.collided = true
     ball.collided = true
+
+    if (ball.atTheBase) {
+      ball.direction.setComponent(1, 0)
+    }
+
+    if (this.atTheBase) {
+      this.direction.setComponent(1, 0)
+    }
   }
 
   check () {
