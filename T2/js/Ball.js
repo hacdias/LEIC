@@ -147,7 +147,7 @@ class Ball extends THREE.Object3D {
   updateSpeed (delta) {
     if (this.falling) {
       this.speed += 1 * delta
-    } else if (this.speed > 0) {
+    } else if (this.speed > 0 && this.atTheBase) {
       this.speed = Math.max(0, this.speed - 5 * delta)
     }
   }

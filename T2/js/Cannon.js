@@ -22,6 +22,7 @@ class Cannon extends THREE.Object3D {
     })
 
     this.length = length
+    this.lastShoot = null
     this.refBall = refBall()
     this.botBall = refBall()
     this.mesh = new THREE.Mesh(geometry, material)
@@ -56,6 +57,11 @@ class Cannon extends THREE.Object3D {
   }
 
   shoot () {
+    // a cannon can only shoot a ball every 3 seconds
+    if (this.lastShoot && Date.now() - this.lastShoot < 3 * 1000) {
+      return
+    }
+
     const bot = new THREE.Vector3()
     this.botBall.getWorldPosition(bot)
 
@@ -72,6 +78,7 @@ class Cannon extends THREE.Object3D {
       speed: 50
     })
 
+    this.lastShoot = Date.now()
     return ball
   }
 }

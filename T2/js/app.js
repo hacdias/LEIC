@@ -199,8 +199,10 @@ function animate () {
     flags.shoot = false
 
     const ball = cannons[flags.cannon].shoot()
-    scene.add(ball)
-    balls.push(ball)
+    if (ball) {
+      balls.push(ball)
+      scene.add(ball)
+    }
   }
 
   animateBalls()
