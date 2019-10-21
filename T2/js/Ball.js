@@ -30,7 +30,8 @@ class Ball extends THREE.Object3D {
     })
 
     this.ball = new THREE.Mesh(geometry, material)
-    this.ball.add(new THREE.AxesHelper(radius + 3))
+    this.axis = new THREE.AxesHelper(radius + 3)
+    this.ball.add(this.axis)
 
     this.add(this.ball)
     this.applyMatrix(makeTrans(position.x, position.y, position.z))
@@ -62,7 +63,7 @@ class Ball extends THREE.Object3D {
 
       const otherPos = new THREE.Vector3()
       obj.ball.getWorldPosition(otherPos)
-      
+
       return thisPos.distanceToSquared(otherPos) <= (BALL_RADIUS * 2) ** 2
     }
 
@@ -149,5 +150,9 @@ class Ball extends THREE.Object3D {
     } else if (this.speed > 0) {
       this.speed = Math.max(0, this.speed - 5 * delta)
     }
+  }
+
+  showAxis (visible) {
+    this.axis.visible = visible
   }
 }

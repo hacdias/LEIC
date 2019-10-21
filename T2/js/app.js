@@ -6,6 +6,7 @@ const flags = {
   newCannon: 1,
   cannon: 0,
   shoot: false,
+  visibleAxis: true,
   pressed: {}
 }
 
@@ -18,7 +19,7 @@ const ASPECT_RATIO = 2
 const PLANE_H = 130
 const DIAG_UNIT = Math.sqrt(0.5)
 
-var scene, renderer, clock, field, balls = []
+var scene, renderer, clock, field, balls = [], fallingBalls = []
 var cameras = new Array(3)
 var cannons = new Array(3)
 var movingBall
@@ -202,12 +203,6 @@ function animate () {
     balls.push(ball)
   }
 
-  if (flags.toggleAxis) {
-    flags.toggleAxis = false
-
-    // TODO
-  }
-
   animateBalls()
   renderer.render(scene, cameras[flags.camera - 1])
 }
@@ -226,8 +221,10 @@ function animateBalls () {
         balls[i].solveCollision(balls[j])
   }
 
-  for (const ball of balls)
+  for (const ball of balls) {
     ball.check()
+    ball.showAxis(flags.visibleAxis)
+  }
 }
 
 function init () {
@@ -271,7 +268,7 @@ document.addEventListener('keyup', event => {
       flags.newCannon = 2
       break
     case 'KeyR':
-      flags.toggleAxis = true
+      flags.visibleAxis = !flags.visibleAxis
       break
     case 'Space':
       flags.shoot = true
