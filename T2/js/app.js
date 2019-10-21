@@ -7,6 +7,7 @@ const flags = {
   cannon: 0,
   shoot: false,
   visibleAxis: true,
+  movingBallChanged: true,
   pressed: {}
 }
 
@@ -158,24 +159,22 @@ function createCamera () {
   // TODO: follow ball AND FIX
   cameras[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
   cameras[2].position.set(0, 10, 10)
-  cameras[2].lookAt(movingBall.position)
-  movingBall.add(cameras[2])
 }
 
 function resizeCameras () {
   updateOrtographicCamera(cameras[0])
   updatePerspectiveCamera(cameras[1])
   updateOrtographicCamera(cameras[2])
+
+  if (flags.movingBallChanged) {
+    flags.movingBallChanged = false
+    cameras[2].lookAt(movingBall.position)
+    movingBall.add(cameras[2])
+  }
 }
 
 function animate () {
   requestAnimationFrame(animate)
-
-  if (flags.resize) {
-    flags.resize = false
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    resizeCameras()
-  }
 
   if (flags.newCannon !== flags.cannon) {
     for (let i = 0; i < cannons.length; i++) {
@@ -206,6 +205,13 @@ function animate () {
   }
 
   animateBalls()
+
+  if (flags.resize || flags.movingBallChanged) {
+    flags.resize = false
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    resizeCameras()
+  }
+
   renderer.render(scene, cameras[flags.camera - 1])
 }
 
@@ -227,6 +233,23 @@ function animateBalls () {
     ball.check()
     ball.showAxis(flags.visibleAxis)
   }
+
+  // Remove balls that are falling for more than 5 seconds and balls
+  // that were shoot but did not touch the ground for more than 5 seconds.
+  balls = balls.filter(ball => {
+    if ((ball.falling && Date.now() - ball.fallingTime >= 5 * 1000)
+      || (!ball.atTheBase && Date.now() - ball.creationTime >= 5 * 1000)) {
+      scene.remove(ball)
+      return false
+    }
+
+    return true
+  })
+
+  if (!balls.includes(movingBall)) {
+    movingBall = balls[0]
+    flags.movingBallChanged = true
+  }
 }
 
 function init () {
@@ -237,6 +260,7 @@ function init () {
 
   createScene()
   createCamera()
+  resizeCameras()
 
   clock = new THREE.Clock()
 

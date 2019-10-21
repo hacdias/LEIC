@@ -32,6 +32,7 @@ class Ball extends THREE.Object3D {
     this.ball = new THREE.Mesh(geometry, material)
     this.axis = new THREE.AxesHelper(radius + 3)
     this.ball.add(this.axis)
+    this.creationTime = Date.now()
 
     this.add(this.ball)
     this.applyMatrix(makeTrans(position.x, position.y, position.z))
@@ -77,6 +78,7 @@ class Ball extends THREE.Object3D {
         if (!this.falling) {
           this.direction.setComponent(1, -1)
           this.falling = true
+          this.fallingTime = Date.now()
         }
 
         return false
