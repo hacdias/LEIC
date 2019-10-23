@@ -51,9 +51,8 @@ function generateCannons () {
     cannons[i] = cannon
   }
 
-  cannons[0].position.z = -FIELD_WIDTH / 2 + BALL_RADIUS
-  cannons[2].position.z = -cannons[0].position.z
-
+  cannons[0].applyMatrix(makeTrans(0, 0, -FIELD_WIDTH / 2 + BALL_RADIUS))
+  cannons[2].applyMatrix(makeTrans(0, 0, -cannons[0].position.z))
   cannons[0].increaseAngle(35)
   cannons[2].decreaseAngle(35)
 }
@@ -124,7 +123,7 @@ function createOrtographicCamera ({ position, lookAt }) {
     -1000,
     1000
   )
-  cam.position.set(...position)
+  cam.applyMatrix(makeTrans(...position))
   cam.lookAt(new THREE.Vector3(...lookAt))
   return cam
 }
@@ -140,7 +139,7 @@ function updateOrtographicCamera (cam) {
 
 function createPerspectiveCamera ({ position, lookAt }) {
   const cam = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
-  cam.position.set(...position)
+  cam.applyMatrix(makeTrans(...position))
   cam.lookAt(new THREE.Vector3(...lookAt))
   return cam
 }
@@ -166,7 +165,7 @@ function resizeCameras () {
     flags.movingBallChanged = false
     cameras[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
     movingBall.add(cameras[2])
-    cameras[2].position.set(-10, 10, -10)
+    cameras[2].applyMatrix(makeTrans(-10, 10, -10))
     cameras[2].lookAt(movingBall.position)
   }
 

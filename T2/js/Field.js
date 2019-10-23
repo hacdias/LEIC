@@ -12,12 +12,12 @@ class Field extends THREE.Object3D {
     this.bottom = new Wall({ width, height, depth })
     this.base = new Wall({ width: width, height: width, depth })
 
-    this.top.position.z = -width / 2 - depth / 2
-    this.bottom.position.z = -this.top.position.z
-    this.left.position.x = this.top.position.z + depth
-    this.left.rotation.y = Math.PI / 2
-    this.base.rotation.x = Math.PI / 2
-    this.base.position.y = -height / 2 - depth / 2
+    this.top.applyMatrix(makeTrans(0, 0, -width / 2 - depth /2))
+    this.bottom.applyMatrix(makeTrans(0, 0, -this.top.position.z))
+    this.left.applyMatrix(makeRotY(Math.PI / 2))
+    this.left.applyMatrix(makeTrans(this.top.position.z + depth, 0, 0))
+    this.base.applyMatrix(makeRotX(Math.PI / 2))
+    this.base.applyMatrix(makeTrans(0, -height / 2 - depth / 2, 0))
 
     this.add(this.top)
     this.add(this.left)
