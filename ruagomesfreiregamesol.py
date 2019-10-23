@@ -37,15 +37,11 @@ class State():
   def isValid(self):
     return all(x >= 0 for x in self.tickets)
 
-  def isGoal(self, goals, anyorder):
-    # IF 5, check any order
-    if anyorder:
-      for goal in goals:
-        if self.path[-1][1] == goal:
-          return True
-      return False
-    else:
-      return self.path[-1][1] == goals[0]
+  def isGoal(self, goals):
+    for goal in goals:
+      if self.path[-1][1] == goal:
+        return True
+    return False
 
   def expand(self, pos, goals, heur):
     newPath = self.path.copy()
@@ -69,22 +65,16 @@ class SearchProblem:
     for goal in self.goal:
       heur[goal] = {goal: 0}
       queue = [(goal, 0)]
-      #levels = []
       while queue:
-        vertex, level = queue.pop(0)
+        vertex, cost = queue.pop(0)
         for node in self.model[vertex]:
           if node[1] not in heur[goal]:
-            heur[goal][node[1]] = level + 1
-            queue.append((node[1], level + 1))
+            heur[goal][node[1]] = cost + 1
+            queue.append((node[1], cost + 1))
     self.heur = heur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf], anyorder=False):
-    goals = []
-    if anyorder:
-      goals = [list(elem) for elem in list(itertools.permutations(self.goal))]
-    else:
-      goals.append(self.goal)
-
+    goals = list(list(i) for i in itertools.permutations(self.goal)) if anyorder else [self.goal]
     opened = [State([[[], init.copy()]], tickets.copy(), goals, self.heur)]
     closed = []
 
@@ -95,7 +85,7 @@ class SearchProblem:
 
       limitexp -= 1
 
-      if curr.isGoal(goals, anyorder) or limitexp == 0:
+      if curr.isGoal(goals) or limitexp == 0:
         return curr.path
 
       for tup in itertools.product(*list(self.model[x] for x in curr.path[-1][1])):
