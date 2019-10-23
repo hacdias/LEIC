@@ -5,6 +5,8 @@ class Field extends THREE.Object3D {
   constructor ({ width, height, depth }) {
     super()
 
+    this.depth = depth
+
     this.top = new Wall({ width, height, depth })
     this.left = new Wall({ width, height, depth })
     this.bottom = new Wall({ width, height, depth })

@@ -27,15 +27,15 @@ var movingBall
 
 function createScene () {
   scene = new THREE.Scene()
-  scene.add(new THREE.AxesHelper(10))
+  scene.add(new THREE.AxesHelper(15))
 
   field = new Field({
     width: FIELD_WIDTH,
-    height: BALL_RADIUS * 2,
+    height: BALL_RADIUS * 4,
     depth: WALLS_DEPTH
   })
 
-  field.position.x = -FIELD_WIDTH / 2 - 2 * BALL_RADIUS + CANNON_LENGTH
+  field.applyMatrix(makeTrans(-FIELD_WIDTH / 1.5, BALL_RADIUS * 2, 0))
   scene.add(field)
 
   generateCannons()
@@ -44,8 +44,9 @@ function createScene () {
 
 function generateCannons () {
   for (let i = 0; i < cannons.length; i++) {
-    const cannon = new Cannon({ radius: BALL_RADIUS + 2, length: CANNON_LENGTH })
-    cannon.position.x = 2 * CANNON_LENGTH + BALL_RADIUS
+    const cannon = new Cannon({ radius: BALL_RADIUS, length: CANNON_LENGTH })
+
+    cannon.applyMatrix(makeTrans(1.5 * CANNON_LENGTH, BALL_RADIUS, 0))
     scene.add(cannon)
     cannons[i] = cannon
   }
@@ -72,7 +73,7 @@ function generateBalls () {
     const x = getRandomInt(MIN_X, MAX_X)
     const z = getRandomInt(MIN_Z, MAX_Z)
 
-    const position = new THREE.Vector3(x, 0, z)
+    const position = new THREE.Vector3(x, BALL_RADIUS, z)
 
     let collided = false
 
@@ -150,27 +151,26 @@ function updatePerspectiveCamera (cam) {
 }
 
 function createCamera () {
-  cameras[0] = createOrtographicCamera({ position: [0, 30, 0], lookAt: [0, 0, 0] })
-  cameras[1] = createPerspectiveCamera({ position: [150, 60, 0], lookAt: [0, 0, 0] })
+  cameras[0] = createOrtographicCamera({ position: [-BALL_RADIUS * 3, 30, 0], lookAt: [-BALL_RADIUS * 3, 0, 0] })
+  cameras[1] = createPerspectiveCamera({ position: [150, 60, 0], lookAt: [, 0, 0] })
 
   scene.add(cameras[0])
   scene.add(cameras[1])
-
-  // TODO: follow ball AND FIX
-  cameras[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
-  cameras[2].position.set(0, 10, 10)
 }
 
 function resizeCameras () {
   updateOrtographicCamera(cameras[0])
   updatePerspectiveCamera(cameras[1])
-  updateOrtographicCamera(cameras[2])
 
   if (flags.movingBallChanged) {
     flags.movingBallChanged = false
-    cameras[2].lookAt(movingBall.position)
+    cameras[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000)
     movingBall.add(cameras[2])
+    cameras[2].position.set(-10, 10, -10)
+    cameras[2].lookAt(movingBall.position)
   }
+
+  updateOrtographicCamera(cameras[2])
 }
 
 function animate () {
@@ -199,6 +199,8 @@ function animate () {
 
     const ball = cannons[flags.cannon].shoot()
     if (ball) {
+      movingBall = ball
+      flags.movingBallChanged = true
       balls.push(ball)
       scene.add(ball)
     }
@@ -237,8 +239,7 @@ function animateBalls () {
   // Remove balls that are falling for more than 5 seconds and balls
   // that were shoot but did not touch the ground for more than 5 seconds.
   balls = balls.filter(ball => {
-    if ((ball.falling && Date.now() - ball.fallingTime >= 5 * 1000)
-      || (!ball.atTheBase && Date.now() - ball.creationTime >= 5 * 1000)) {
+    if ((ball.falling && Date.now() - ball.fallingTime >= 5 * 1000)) {
       scene.remove(ball)
       return false
     }

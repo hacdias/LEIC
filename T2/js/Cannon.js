@@ -27,10 +27,9 @@ class Cannon extends THREE.Object3D {
     this.botBall = refBall()
     this.mesh = new THREE.Mesh(geometry, material)
 
-    this.mesh.applyMatrix(makeRotZ(2 * Math.PI / 5))
-    this.mesh.applyMatrix(makeTrans(0, 10, 0))
-    this.refBall.applyMatrix(makeTrans(-length / 2, 15, 0))
-    this.botBall.applyMatrix(makeTrans(length / 2, 5, 0))
+    this.mesh.applyMatrix(makeRotZ(Math.PI / 2))
+    this.refBall.applyMatrix(makeTrans(-length / 2, 0, 0))
+    this.botBall.applyMatrix(makeTrans(length / 2, 0, 0))
     this.add(this.mesh)
     this.add(this.refBall)
     this.add(this.botBall)
@@ -57,8 +56,8 @@ class Cannon extends THREE.Object3D {
   }
 
   shoot () {
-    // a cannon can only shoot a ball every 3 seconds
-    if (this.lastShoot && Date.now() - this.lastShoot < 3 * 1000) {
+    // a cannon can only shoot a ball every 1 second
+    if (this.lastShoot && Date.now() - this.lastShoot < 1 * 1000) {
       return
     }
 
@@ -75,7 +74,7 @@ class Cannon extends THREE.Object3D {
       radius: BALL_RADIUS,
       position: pos,
       direction: direction,
-      speed: 50
+      speed: getRandomInt(50, 100)
     })
 
     this.lastShoot = Date.now()
