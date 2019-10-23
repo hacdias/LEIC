@@ -6,29 +6,29 @@ from ruagomesfreiregamesol import SearchProblem
 
 with open("coords.pickle", "rb") as fp:   # Unpickling
     coords = pickle.load(fp)
-    
+
 with open("mapasgraph.pickle", "rb") as fp:   #Unpickling
     AA = pickle.load(fp)
 U = AA[1]
 
-def plotpath(P,coords):   
+def plotpath(P,coords):
         img = plt.imread('maps.png')
         plt.imshow(img)
         colors = ['r.-','g+-','b^-']
         I = P[0][1]
         for agind in range(len(P[0][1])):
                 st = I[agind]-1
-                for tt in P:                        
+                for tt in P:
                         nst = tt[1][agind]-1
                         plt.plot([coords[st][0],coords[nst][0]],[coords[st][1],coords[nst][1]],colors[agind])
                         st = nst
         plt.axis('off')
         fig = plt.gcf()
         fig.set_size_inches(1.*18.5, 1.*10.5)
-        #fig.savefig('test2png.png', dpi=100)   
+        #fig.savefig('test2png.png', dpi=100)
         plt.show()
-        
-def validatepath(oP,oI,U,tickets=[25,25,25]): 
+
+def validatepath(oP,oI,U,tickets=[25,25,25]):
         print(oP)
         if not oP:
                 return False
@@ -42,7 +42,7 @@ def validatepath(oP,oI,U,tickets=[25,25,25]):
                 print('path does not start in the initial state')
                 return False
         del P[0]
-        
+
         for tt in P:
                 for agind,ag in enumerate(tt[1]):
                         #print(ag)
@@ -53,7 +53,7 @@ def validatepath(oP,oI,U,tickets=[25,25,25]):
                                 return False
                         else:
                                 mtickets[tt[0][agind]] -= 1
-                                
+
                                 if [tt[0][agind],ag] in U[st]:
                                         I[agind] = ag
                                         #pass
@@ -78,10 +78,10 @@ I = [30]
 nn = SP.search(I,limitexp = 2000)
 tend = time.process_time()
 print("%.1fms"%((tend-tinit)*1000))
-if validatepath(nn,I,U):   
+if validatepath(nn,I,U):
         print("path")
         print(nn)
-        plotpath(nn,coords)     
+        plotpath(nn,coords)
 else:
         print("invalid path")
 
@@ -129,9 +129,9 @@ if validatepath(nn,I,U):
         plotpath(nn,coords)
 else:
         print("invalid path")
-        
+
 print("\n(4 val) Exercise 4 - Three agents, Limits")
-print("Init [30,40,109] Goal [61,60,71]")
+print("Init [30,40,109] Goal [63,61,70]")
 SP = SearchProblem(goal = [63,61,70], model = U, auxheur=coords)
 tinit = time.process_time()
 I = [30,40,109]
@@ -146,7 +146,7 @@ else:
         print("invalid path")
 
 print("\n(4 val) Exercise 5 - Three agents, Limits, Any-Order")
-print("Init [30,40,109] Goal [61,60,71]")
+print("Init [30,40,109] Goal [63,61,70]")
 SP = SearchProblem(goal = [63,61,70], model = U, auxheur=coords)
 tinit = time.process_time()
 I = [30,40,109]
@@ -159,8 +159,6 @@ if validatepath(nn,I,U, tickets = [5,20,2]):
         plotpath(nn,coords)
 else:
         print("invalid path")
-        
+
 tendtotal = time.process_time()
 print("Total time %.1fms"%((tendtotal-tinittotal)*1000))
-
-

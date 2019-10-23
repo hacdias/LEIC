@@ -2,22 +2,25 @@ import math
 import pickle
 import time
 import itertools
-from functools import reduce
 
-def heuristic (auxheur, src, dst):
-  sum = 0
+def heuristic_aux (heur, src, dst):
+  m = 0
   for (s, d) in zip(src, dst):
-    x = auxheur[d - 1][0] - auxheur[s - 1][0]
-    y = auxheur[d - 1][1] - auxheur[s - 1][1]
-    sum += x ** 2 + y ** 2
-  return sum
+    m = max(m, heur[d][s])
+  return m
+
+def heuristic(heur, src, dst_lst):
+  maxs = []
+  for dst in dst_lst:
+    maxs.append(heuristic_aux(heur, src, dst))
+  return min(maxs)
 
 class State():
-  def __init__(self, path, tickets, goal, auxheur):
+  def __init__(self, path, tickets, goals, heur):
     self.path = path
     self.tickets = tickets
     self.depth = len(path)
-    self.heuristic = heuristic(auxheur, path[-1][1], goal)
+    self.heuristic = heuristic(heur, path[-1][1], goals)
 
   def __gt__(self, other):
     return self.depth + self.heuristic > other.depth + other.heuristic
@@ -31,50 +34,68 @@ class State():
   def __le__(self, other):
     return self.depth + self.heuristic <= other.depth + other.heuristic
 
-  #def __eq__(self, other):
-    #return self.tickets == other.tickets and self.depth == other.depth
-
   def isValid(self):
     return all(x >= 0 for x in self.tickets)
 
-  def isGoal(self, goal):
+  def isGoal(self, goals, anyorder):
     # IF 5, check any order
-    return self.path[-1][1] == goal
+    if anyorder:
+      for goal in goals:
+        if self.path[-1][1] == goal:
+          return True
+      return False
+    else:
+      return self.path[-1][1] == goals[0]
 
-  def expand(self, pos, goal, auxheur):
+  def expand(self, pos, goals, heur):
     newPath = self.path.copy()
     newPath.append(pos)
 
     newTickets = self.tickets.copy()
     for t in pos[0]:
       newTickets[t] -= 1
-    return State(newPath, newTickets, goal, auxheur)
+    return State(newPath, newTickets, goals, heur)
 
 class SearchProblem:
   def __init__(self, goal, model, auxheur = []):
     self.goal = goal
     self.model = model
     self.auxheur = auxheur
+    self.bfs()
+
+  def bfs(self):
+    heur = {}
+
+    for goal in self.goal:
+      heur[goal] = {goal: 0}
+      queue = [(goal, 0)]
+      #levels = []
+      while queue:
+        vertex, level = queue.pop(0)
+        for node in self.model[vertex]:
+          if node[1] not in heur[goal]:
+            heur[goal][node[1]] = level + 1
+            queue.append((node[1], level + 1))
+    self.heur = heur
 
   def search(self, init, limitexp = 2000, limitdepth = 10, tickets = [math.inf, math.inf, math.inf], anyorder=False):
-    opened = [State([[[], init.copy()]], tickets.copy(), self.goal, self.auxheur)]
-    openedTwo = [init.copy()]
+    goals = []
+    if anyorder:
+      goals = [list(elem) for elem in list(itertools.permutations(self.goal))]
+    else:
+      goals.append(self.goal)
+
+    opened = [State([[[], init.copy()]], tickets.copy(), goals, self.heur)]
     closed = []
-    closedTwo = []
 
     while len(opened) > 0:
       opened.sort()
       curr = opened.pop(0)
-      openedTwo.remove(curr.path[-1][1])
       closed.append(curr)
-      closedTwo.append(curr.path[-1][1])
-
-      #print(curr.heuristic + curr.depth)
-      #print(curr.path[-1])
 
       limitexp -= 1
 
-      if curr.isGoal(self.goal) or limitexp == 0:
+      if curr.isGoal(goals, anyorder) or limitexp == 0:
         return curr.path
 
       for tup in itertools.product(*list(self.model[x] for x in curr.path[-1][1])):
@@ -86,7 +107,7 @@ class SearchProblem:
           nextPos[0].append(trans)
           nextPos[1].append(pos)
 
-        move = curr.expand(nextPos, self.goal, self.auxheur)
+        move = curr.expand(nextPos, goals, self.heur)
 
         if not move.isValid():
           continue
@@ -94,14 +115,7 @@ class SearchProblem:
         if move.depth > limitdepth:
           continue
 
-        if move.path[-1][1] in closedTwo:
-          continue
-
-        #if move.path[-1][1] in openedTwo:
-        #  continue
-
-        opened.append(move)
-        openedTwo.append(move.path[-1][1])
+        opened = [move] + opened
 
 def allDifferent (tup):
   for i, l1 in enumerate(tup):
