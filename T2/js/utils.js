@@ -37,14 +37,7 @@ function makeTrans (x, y, z) {
 }
 
 function detectCollisionCubes(object1, object2){
-  // object1.updateMatrixWorld();
-  // object2.updateMatrixWorld();
-
   var box1 = new THREE.Box3().setFromObject(object1)
-  // box1.applyMatrix4(object1.matrixWorld);
-
   var box2 = new THREE.Box3().setFromObject(object2)
-  // box2.applyMatrix4(object2.matrixWorld);
-
   return box1.intersectsBox(box2);
 }
