@@ -58,7 +58,7 @@ function generateCannons () {
 }
 
 function generateBalls () {
-  let initialBalls = getRandomInt(3, 5)
+  let initialBalls = getRandomInt(2, 8)
 
   const MIN_X = -FIELD_WIDTH / 2 + field.position.x + WALLS_DEPTH + BALL_RADIUS
   const MAX_X = FIELD_WIDTH / 2 + field.position.x - BALL_RADIUS

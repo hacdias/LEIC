@@ -58,6 +58,7 @@ class Ball extends THREE.Object3D {
     this.position.add(this.direction.clone().multiplyScalar(this.speed * delta))
     this.setRotationFromAxisAngle(Y_AXIS, calcAngleToRotate(this.direction) + Math.PI / 2)
     this.ball.rotateX(delta * this.speed / this.radius)
+    this.axis.rotateX(delta * this.speed / this.radius)
   }
 
   collidesWith (obj) {
