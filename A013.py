@@ -1,3 +1,4 @@
+# A013, Henrique Dias - 89455, Tiago Gonçalves - 89547
 import math
 import pickle
 import time
