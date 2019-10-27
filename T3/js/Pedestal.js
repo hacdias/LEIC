@@ -1,7 +1,8 @@
-/* global THREE  */
+/* global THREE, Mesh */
+'use strict'
 
 class Pedestal extends THREE.Object3D {
-  constructor ({ height, depth, step}) {
+  constructor ({ height, depth, step }) {
     super()
 
     const bottomL1 = this._buildPart(depth, step, depth)
@@ -10,7 +11,7 @@ class Pedestal extends THREE.Object3D {
 
     bottomL2.position.y = step
     bottomL3.position.y = step * 2
-    
+
     const pillar = this._buildPart(depth - 3 * step, height - 6 * step, depth - 3 * step)
     pillar.position.y = height / 2 - step / 2
 
@@ -21,7 +22,7 @@ class Pedestal extends THREE.Object3D {
     topL1.position.y = height - step * 3
     topL2.position.y = height - step * 2
     topL3.position.y = height - step
-    
+
     this.add(bottomL1)
     this.add(bottomL2)
     this.add(bottomL3)
@@ -33,10 +34,8 @@ class Pedestal extends THREE.Object3D {
 
   _buildPart (height, width, depth) {
     const geometry = new THREE.BoxGeometry(height, width, depth)
-    const material = new THREE.MeshBasicMaterial({
+    return new Mesh(geometry, {
       color: 0xBABABA
     })
-
-    return new THREE.Mesh(geometry, material)
   }
 }

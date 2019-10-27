@@ -1,3 +1,6 @@
+/* global THREE, Painting, Mesh */
+'use strict'
+
 class Frame extends THREE.Object3D {
   constructor ({ width, height, depth }) {
     super()
@@ -10,23 +13,11 @@ class Frame extends THREE.Object3D {
     painting.position.x = 2
 
     const geometry = new THREE.BoxGeometry(depth, height, width)
-    const material = new THREE.MeshBasicMaterial({
+    const frame = new Mesh(geometry, {
       color: 0xd4af37
     })
-
-    const frame = new THREE.Mesh(geometry, material)
-
 
     this.add(frame)
     this.add(painting)
-  }
-
-  _makeBox (width, height, depth) {
-    const geometry = new THREE.BoxGeometry(width, height, depth)
-    const material = new THREE.MeshBasicMaterial({
-      color: 0xd4af37
-    })
-
-    return new THREE.Mesh(geometry, material)
   }
 }

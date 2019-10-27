@@ -1,3 +1,5 @@
+/* global THREE */
+'use strict'
 
 const SQUARE_SIZE = 5
 
@@ -13,11 +15,10 @@ class Painting extends THREE.Object3D {
     this.height = height
 
     const geometry = new THREE.BoxGeometry(1, height, width)
-    const material = new THREE.MeshBasicMaterial({
+    const bg = new Mesh(geometry, {
       color: 0x999999
     })
 
-    const bg = new THREE.Mesh(geometry, material)
     this.add(bg)
 
     for (let i = -width / 2 + SQUARE_SIZE / 2; i <= width / 2 - SQUARE_SIZE / 2; i += SQUARE_SIZE + space) {
@@ -32,10 +33,10 @@ class Painting extends THREE.Object3D {
     for (let i = 1; i < widthSquares; i++) {
       for (let j = 1; j < heightSquares; j++) {
         const circle = this._makeWhiteCircle(Math.sqrt(2 * (space / 2) ** 2))
-    
+
         circle.position.z = (-width / 2 - space / 2) + i * (SQUARE_SIZE + space)
         circle.position.y = (-height / 2 - space / 2) + j * (SQUARE_SIZE + space)
-    
+
         this.add(circle)
       }
     }
@@ -43,17 +44,17 @@ class Painting extends THREE.Object3D {
 
   _makeBlackSquare (dim) {
     const geometry = new THREE.BoxGeometry(1, dim, dim)
-    const material = new THREE.MeshBasicMaterial({
+    const material = {
       color: 0x000000
-    })
+    }
 
-    return new THREE.Mesh(geometry, material)
+    return new Mesh(geometry, material)
   }
- 
+
   _makeWhiteCircle (rad) {
-    const geometry = new THREE.CylinderGeometry( rad, rad, 1, 32 );
-    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-    const mesh = new THREE.Mesh( geometry, material )
+    const geometry = new THREE.CylinderGeometry(rad, rad, 1, 32)
+    const material = { color: 0xffffff }
+    const mesh = new Mesh(geometry, material)
     mesh.rotation.z = Math.PI / 2
     return mesh
   }
