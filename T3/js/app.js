@@ -2,13 +2,12 @@
 'use strict'
 
 const flags = {
-  camera: 1,
+  camera: 2,
   spotlights: []
 }
 
 const ASPECT_RATIO = 16 / 9
-const PLANE_H = 150
-const DIAG_UNIT = Math.sqrt(0.5)
+const PLANE_H = 100
 
 var scene, renderer
 var spotlights = new Array(4)
@@ -22,10 +21,18 @@ function createScene () {
   scene.add(room)
 
   const pedestal = new Pedestal({ height: 40, depth: 15, step: 2})
-  pedestal.position.y = 2
-  pedestal.position.x = 30
-
+  pedestal.position.set(30, 2, -30)
   scene.add(pedestal)
+
+  const frame = new Frame({ width: 40, height: 46.5, depth: 2 })
+  frame.position.set(-48, 50, 20)
+  scene.add(frame)
+
+  /* let global_light = new THREE.DirectionalLight(0xFFFFFF, 1);
+  global_light.position.set(150, 150, 150); 
+  global_light.lookAt(0, 0, 0);
+
+  scene.add(global_light);*/
 }
 
 function getCameraSizes () {
@@ -82,7 +89,7 @@ function updatePerspectiveCamera (cam) {
 
 function createCamera () {
   cameras[0] = createPerspectiveCamera({ position: [100, 50, 100], lookAt: [0, 50, 0] })
-  cameras[1] = createOrtographicCamera({ position: [150, 150, 150], lookAt: [0, 50, 0] })
+  cameras[1] = createOrtographicCamera({ position: [0, 50, 0], lookAt: [-50, 50, 0] })
 
   scene.add(cameras[0])
   scene.add(cameras[1])
