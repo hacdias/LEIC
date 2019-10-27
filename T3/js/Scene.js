@@ -74,6 +74,9 @@ class Scene extends THREE.Scene {
     this.pedestal.position.set(30, 2, -30)
     this.add(this.pedestal)
 
+    this.icosahedron = new Icosahedron()
+    this.add(this.icosahedron)
+
     this.frame = new Frame({ width: 40, height: 46.5, depth: 2 })
     this.frame.position.set(-48, 50, 20)
     this.add(this.frame)
