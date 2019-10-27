@@ -87,12 +87,12 @@ class Scene extends THREE.Scene {
       this.add(spotlights[i])
     }
 
-    spotlights[0].position.set(0, 50, 100)
-    spotlights[1].position.set(100, 50, 0)
+    spotlights[0].position.set(0, 100, 100)
+    spotlights[1].position.set(100, 100, 0)
     spotlights[2].position.set(0, 110, 0)
-    spotlights[3].position.set(50, 50, 50)
+    spotlights[3].position.set(50, 100, 50)
 
-    spotlights.forEach(s => s.lookAt(0, 50, 0))
+    spotlights.forEach(s => s.lookAt(0, 0, 0))
 
     this.spotlights = spotlights
   }
@@ -116,7 +116,7 @@ class Scene extends THREE.Scene {
 
   _makeCameras () {
     this.cameras = new Array(2)
-    this.cameras[0] = createPerspectiveCamera({ position: [150, 150, 150], lookAt: [0, 50, 0] })
+    this.cameras[0] = createPerspectiveCamera({ position: [100, 100, 100], lookAt: [0, 50, 0] })
     this.cameras[1] = createOrtographicCamera({ position: [0, 50, 0], lookAt: [-50, 50, 0] })
 
     this.add(this.cameras[0])

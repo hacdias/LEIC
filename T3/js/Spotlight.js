@@ -5,7 +5,7 @@ class Spotlight extends THREE.Object3D {
   constructor () {
     super()
 
-    this.light = new THREE.SpotLight(0xffffff, 1, 100, Math.PI / 2, 0, 1)
+    this.light = new THREE.SpotLight(0xffffff, 1, 100, Math.PI, 0, 1)
     this.light.castShadow = true
 
     this.light.shadow.mapSize.width = 1024
@@ -29,6 +29,7 @@ class Spotlight extends THREE.Object3D {
 
     group.add(sphere)
     group.add(cone)
+    group.rotation.x = -Math.PI / 2
     return group
   }
 
