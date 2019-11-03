@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <sys/wait.h> 
+#include <sys/wait.h>
 #include <errno.h>
 #include "../lib/util.h"
 #include "../lib/net.h"
@@ -297,13 +297,13 @@ int handleTCP (TCPConn *conn) {
     writeTCP(fd, "ERR\n", 4);
     free(cmd);
     close(fd);
-    return -1;
+    exit(1);
   }
 
   printf("TCP/IP %s %s\n", inet_ntoa(clientAddr.sin_addr), cmd);
   free(cmd);
   close(fd);
-  return 0;
+  exit(0);
 }
 
 int handleReg (UDPConn *conn, struct sockaddr_in addr, char *buffer) {
