@@ -38,6 +38,7 @@ function animate () {
 
 function init () {
   renderer = new THREE.WebGLRenderer({ antialias: true })
+  renderer.shadowMap.enabled = true
   renderer.setSize(window.innerWidth, window.innerHeight)
 
   document.body.append(renderer.domElement)

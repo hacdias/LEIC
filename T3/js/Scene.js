@@ -91,18 +91,19 @@ class Scene extends THREE.Scene {
       this.add(spotlights[i])
     }
 
-    spotlights[0].position.set(0, 100, 100)
-    spotlights[1].position.set(100, 100, 0)
+    spotlights[0].position.set(0, 50, 100)
+    spotlights[1].position.set(100, 50, -20)
     spotlights[2].position.set(0, 150, 0)
-    spotlights[3].position.set(50, 100, 50)
+    spotlights[3].position.set(50, 50, 50)
 
     spotlights.forEach(s => s.lookAt(0, 0, 0))
+    spotlights[1].lookAt(-50, 50, 50)
 
     this.spotlights = spotlights
   }
 
   _makeDirectionalLight () {
-    this.globalLight = new THREE.DirectionalLight(0xFFFFFF, 1)
+    this.globalLight = new THREE.DirectionalLight(0xFFFFFF, 0.5)
     this.globalLight.position.set(100, 50, 100)
     this.globalLight.lookAt(0, 0, 0)
 

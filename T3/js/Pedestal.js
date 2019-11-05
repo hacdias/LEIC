@@ -30,12 +30,17 @@ class Pedestal extends THREE.Object3D {
     this.add(topL1)
     this.add(topL2)
     this.add(topL3)
+
+    this.castShadow = true
   }
 
   _buildPart (height, width, depth) {
     const geometry = new THREE.BoxGeometry(height, width, depth)
-    return new Mesh(geometry, {
+    const mesh = new Mesh(geometry, {
       color: 0xBABABA
     })
+
+    mesh.castShadow = true
+    return mesh
   }
 }
