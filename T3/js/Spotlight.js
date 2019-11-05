@@ -5,7 +5,7 @@ class Spotlight extends THREE.Object3D {
   constructor () {
     super()
 
-    this.light = new THREE.SpotLight(0xffffff, 1, 100, Math.PI, 0, 1)
+    this.light = new THREE.SpotLight(0xffffff, 1, 150, Math.PI, 0, 1)
     this.light.castShadow = true
     this.light.shadowDarkness = 0.5
 
