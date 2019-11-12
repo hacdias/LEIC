@@ -60,6 +60,7 @@ class Scene extends THREE.Scene {
   constructor () {
     super()
 
+    this.clock = new THREE.Clock()
     this._makeObjects()
     this._makeDirectionalLight()
     this._makePointLight()
@@ -69,9 +70,12 @@ class Scene extends THREE.Scene {
   _makeObjects () {
     this.chess = new Chess()
     this.add(this.chess)
+
     this.die = new Die()
-    this.die.position.y = 10
     this.add(this.die)
+
+    this.ball = new Ball()
+    this.add(this.ball)
   }
 
   _makeDirectionalLight () {
@@ -116,7 +120,10 @@ class Scene extends THREE.Scene {
   }
 
   animate () {
-    this.die.animate()
+    const delta = this.clock.getDelta()
+
+    this.die.animate(delta)
+    this.ball.animate(delta)
     this.controls.update()
   }
 

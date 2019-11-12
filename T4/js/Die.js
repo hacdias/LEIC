@@ -20,14 +20,13 @@ class Die extends THREE.Object3D {
         map: text,
         bumpMap: text,
         bumpScale: 1,
-        shininess: 10, 
-        specular: 0xffffff,
-        color: 0xffffff
+        shininess: 10
       }))
     )
 
     mesh.rotation.x = Math.PI / 4
     mesh.rotation.z = Math.PI / 4
+    mesh.position.y = dimensions - 1
     mesh.castShadow = true
 
     this.mesh = mesh
@@ -35,6 +34,6 @@ class Die extends THREE.Object3D {
   }
 
   animate () {
-    this.rotation.y += Math.PI / 360
+   this.rotation.y += Math.PI / 360
   }
 }
