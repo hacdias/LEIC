@@ -61,10 +61,11 @@ class Scene extends THREE.Scene {
     super()
 
     this.clock = new THREE.Clock()
+    this.isPaused = false
     this._makeObjects()
     this._makeDirectionalLight()
     this._makePointLight()
-    this._makeCameras()
+    this._makeCamera()
   }
 
   _makeObjects () {
@@ -103,59 +104,57 @@ class Scene extends THREE.Scene {
     this.add(this.pointLight)
   }
 
-  _makeCameras () {
-    this.cameras = new Array(2)
-    this.cameras[0] = createPerspectiveCamera({ position: [0, 50, 50], lookAt: [0, 0, 0] })
-    this.cameras[1] = createOrtographicCamera({ position: [0, 50, 0], lookAt: [0, 0, 0] })
+  _makeCamera () {
+    this.camera= createPerspectiveCamera({ position: [0, 50, 50], lookAt: [0, 0, 0] })
+    this.controls = new THREE.OrbitControls (this.camera, renderer.domElement)
 
-    this.controls = new THREE.OrbitControls (this.cameras[0], renderer.domElement)
-
-    this.add(this.cameras[0])
-    this.add(this.cameras[1])
+    this.add(this.camera)
   }
 
   resize () {
-    updatePerspectiveCamera(this.cameras[0])
-    updateOrtographicCamera(this.cameras[1])
+    updatePerspectiveCamera(this.camera)
   }
 
   animate () {
     const delta = this.clock.getDelta()
 
-    this.die.animate(delta)
-    this.ball.animate(delta)
-    this.controls.update()
+    if (!this.isPaused) {
+      this.die.animate(delta)
+      this.ball.animate(delta)
+      this.controls.update()
+    }
   }
 
   toggleLight () {
+    if (this.isPaused) return
     this.traverse(node => {
       if (node instanceof Mesh) node.toggleLight()
     })
   }
 
   toggleDirectionalLight () {
+    if (this.isPaused) return
     this.directionalLight.visible = !this.directionalLight.visible
   }
 
   togglePointLight () {
+    if (this.isPaused) return
     this.pointLight.visible = !this.pointLight.visible
   }
 
   toggleWireframe () {
-    this.traverse(node => {
-      if (node instanceof Mesh) node.toggleWireframe()
-    })
+    if (this.isPaused) return
+    this.die.mesh.toggleWireframe()
+    this.ball.mesh.toggleWireframe()
+    this.chess.mesh.toggleWireframe()
   }
 
   toggleBall () {
+    if (this.isPaused) return
     this.ball.toggleAcceleration()
   }
 
   togglePause () {
-    // TODO
-  }
-
-  reset () {
-    // TODO: only if paused
+    this.isPaused = !this.isPaused
   }
 }

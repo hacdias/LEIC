@@ -2,7 +2,6 @@
 'use strict'
 
 let flags = {
-  camera: 0,
   toggleLight: false,
   toggleDirectionalLight: false,
   togglePointLight: false,
@@ -12,7 +11,7 @@ let flags = {
   reset: false
 }
 
-var scene, renderer
+var scene, pauseScene, renderer, activeScene
 
 function animate () {
   requestAnimationFrame(animate)
@@ -20,6 +19,7 @@ function animate () {
   if (flags.resize) {
     renderer.setSize(window.innerWidth, window.innerHeight)
     scene.resize()
+    pauseScene.resize()
   }
 
   scene.animate()
@@ -28,8 +28,20 @@ function animate () {
   if (flags.togglePointLight) scene.togglePointLight()
   if (flags.toggleWireframe) scene.toggleWireframe()
   if (flags.toggleBall) scene.toggleBall()
-  if (flags.togglePause) scene.togglePause()
-  if (flags.reset) scene.reset()
+
+  if (flags.togglePause) {
+    if (activeScene === scene) {
+      activeScene = pauseScene
+    } else {
+      activeScene = scene
+    }
+    scene.togglePause()
+  }
+
+  if (flags.reset && activeScene === pauseScene) {
+    scene = new Scene()
+    activeScene = scene
+  }
 
   flags = {
     ...flags,
@@ -42,7 +54,7 @@ function animate () {
     reset: false
   }
 
-  renderer.render(scene, scene.cameras[flags.camera])
+  renderer.render(activeScene, activeScene.camera)
 }
 
 function init () {
@@ -53,6 +65,9 @@ function init () {
   document.body.append(renderer.domElement)
 
   scene = new Scene()
+  pauseScene = new PauseScene()
+
+  activeScene = scene
   animate()
 }
 
@@ -61,13 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 document.addEventListener('keyup', event => {
-  switch (event.key) {
-    case '1':
-    case '2':
-      flags.camera = parseInt(event.key) - 1
-      return
-  }
-
   switch (event.code) {
     case 'KeyL':
       flags.toggleLight = true

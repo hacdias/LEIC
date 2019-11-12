@@ -27,7 +27,13 @@ class Mesh extends THREE.Mesh {
 
   toggleWireframe () {
     for (const key in this.materials) {
-      this.materials[key].wireframe = !this.materials[key].wireframe
+      if (Array.isArray(this.materials[key])) {
+        this.materials[key].forEach(m => {
+          m.wireframe = !m.wireframe
+        })
+      } else {
+        this.materials[key].wireframe = !this.materials[key].wireframe
+      }
     }
   }
 }

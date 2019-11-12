@@ -2,9 +2,10 @@ class Chess extends THREE.Object3D {
   constructor (dimension = 100) {
     super()
 
-    const texture = new THREE.TextureLoader().load('./assets/chess.jpg')
+    const texture = new THREE.TextureLoader().load('./assets/chess.png')
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
     texture.repeat.set(2, 2)
+
     const bumps = new THREE.TextureLoader().load('./assets/wood-bump.jpg')
     bumps.wrapS = bumps.wrapT = THREE.RepeatWrapping
     bumps.repeat.set(2, 2)
@@ -13,7 +14,7 @@ class Chess extends THREE.Object3D {
     geo.computeFaceNormals()
     geo.computeVertexNormals()
 
-    const mesh = new Mesh(geo, {
+    this.mesh = new Mesh(geo, {
       wireframe: false,
       map: texture
     }, {
@@ -22,7 +23,7 @@ class Chess extends THREE.Object3D {
       bumpScale: 0.15
     })
 
-    mesh.receiveShadow = true;
-    this.add(mesh)
+    this.mesh.receiveShadow = true
+    this.add(this.mesh)
   }
 }
