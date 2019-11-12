@@ -1,7 +1,7 @@
 const LIMIT_VEL = Math.PI
 
 class Ball extends THREE.Object3D {
-  constructor (radius = 5, distanceFromCenter = 30) {
+  constructor (radius = 5, distanceFromCenter = 35) {
     super()
     this.radius = radius
     this.distanceFromCenter = distanceFromCenter
@@ -14,7 +14,7 @@ class Ball extends THREE.Object3D {
     const texture = loader.load('./assets/mona.jpg')
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 
-    this.acceleration = 1
+    this.acceleration = 0.5
     this.angle = 0
     this.velocity = 0
 
