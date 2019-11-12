@@ -59,4 +59,8 @@ class Ball extends THREE.Object3D {
     this.position.x = this.distanceFromCenter * Math.cos(this.angle)
     this.position.z = this.distanceFromCenter * Math.sin(this.angle)
   }
+
+  toggleAcceleration () {
+    this.acceleration *= -1
+  }
 }

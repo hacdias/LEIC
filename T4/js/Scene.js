@@ -148,7 +148,7 @@ class Scene extends THREE.Scene {
   }
 
   toggleBall () {
-    // TODO
+    this.ball.toggleAcceleration()
   }
 
   togglePause () {
