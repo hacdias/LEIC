@@ -1,3 +1,6 @@
+/* global THREE */
+'use strict'
+
 const LIMIT_VEL = Math.PI
 
 class Ball extends THREE.Object3D {

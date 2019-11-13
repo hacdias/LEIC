@@ -56,7 +56,7 @@ function updatePerspectiveCamera (cam) {
   cam.updateProjectionMatrix()
 }
 
-class Scene extends THREE.Scene {
+class MainScene extends THREE.Scene {
   constructor () {
     super()
 

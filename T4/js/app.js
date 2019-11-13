@@ -1,4 +1,4 @@
-/* global THREE, Scene */
+/* global THREE, MainScene, PauseScene */
 'use strict'
 
 let flags = {
@@ -39,7 +39,7 @@ function animate () {
   }
 
   if (flags.reset && activeScene === pauseScene) {
-    scene = new Scene()
+    scene = new MainScene()
     activeScene = scene
   }
 
@@ -64,7 +64,7 @@ function init () {
 
   document.body.append(renderer.domElement)
 
-  scene = new Scene()
+  scene = new MainScene()
   pauseScene = new PauseScene()
 
   activeScene = scene

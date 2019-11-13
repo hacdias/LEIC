@@ -1,3 +1,5 @@
+/* global THREE */
+'use strict'
 
 class PauseScene extends THREE.Scene {
   constructor() {

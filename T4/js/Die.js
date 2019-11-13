@@ -1,3 +1,6 @@
+/* global THREE */
+'use strict'
+
 class Die extends THREE.Object3D {
   constructor (dimensions = 10) {
     super()
@@ -9,19 +12,26 @@ class Die extends THREE.Object3D {
     const loader = new THREE.TextureLoader()
     const textures = [1, 2, 3, 4, 5, 6].map(i => ({
       map: loader.load(`./assets/dice-${i}.png`),
-      bumpMap: loader.load(`./assets/dice-bump-${i}.png`)
+      bumpMap: loader.load(`./assets/dice-bump-${i}.png`),
+      alphaMap: loader.load(`./assets/dice-alpha-${i}.png`)
     }))
 
     const mesh = new Mesh(
       geo,
-      textures.map(({ map }) => ({
+      textures.map(({ map, alphaMap }) => ({
         wireframe: false,
-        map
+        map,
+        side: THREE.DoubleSide,
+        transparent: true,
+        alphaMap
       })),
-      textures.map(({ map, bumpMap }) => ({
+      textures.map(({ map, bumpMap, alphaMap }) => ({
         wireframe: false,
         map,
         bumpMap,
+        side: THREE.DoubleSide,
+        transparent: true,
+        alphaMap,
         bumpScale: 2,
         shininess: 10
       }))

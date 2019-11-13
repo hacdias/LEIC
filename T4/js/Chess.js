@@ -1,3 +1,6 @@
+/* global THREE */
+'use strict'
+
 class Chess extends THREE.Object3D {
   constructor (dimension = 100) {
     super()
