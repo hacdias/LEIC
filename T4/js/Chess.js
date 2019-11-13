@@ -6,7 +6,7 @@ class Chess extends THREE.Object3D {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
     texture.repeat.set(2, 2)
 
-    const bumps = new THREE.TextureLoader().load('./assets/wood-bump.jpg')
+    const bumps = new THREE.TextureLoader().load('./assets/wood-bump.png')
     bumps.wrapS = bumps.wrapT = THREE.RepeatWrapping
     bumps.repeat.set(2, 2)
 

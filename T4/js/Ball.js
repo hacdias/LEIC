@@ -11,7 +11,7 @@ class Ball extends THREE.Object3D {
     geo.computeVertexNormals()
 
     const loader = new THREE.TextureLoader()
-    const texture = loader.load('./assets/mona.jpg')
+    const texture = loader.load('./assets/lena.png')
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 
     this.acceleration = 0.5
@@ -26,7 +26,7 @@ class Ball extends THREE.Object3D {
       },
       {
         shininess: 5,
-        specular: 0xffffff,
+        specular: 0x000000,
         color: 0xffffff,
         wireframe: false,
         map: texture

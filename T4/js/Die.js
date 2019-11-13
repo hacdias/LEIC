@@ -7,19 +7,22 @@ class Die extends THREE.Object3D {
     geo.computeVertexNormals()
 
     const loader = new THREE.TextureLoader()
-    const textures = [1, 2, 3, 4, 5, 6].map(i => loader.load(`./assets/dice-${i}.png`))
+    const textures = [1, 2, 3, 4, 5, 6].map(i => ({
+      map: loader.load(`./assets/dice-${i}.png`),
+      bumpMap: loader.load(`./assets/dice-bump-${i}.png`)
+    }))
 
     const mesh = new Mesh(
       geo,
-      textures.map(text => ({
+      textures.map(({ map }) => ({
         wireframe: false,
-        map: text
+        map
       })),
-      textures.map(text => ({
+      textures.map(({ map, bumpMap }) => ({
         wireframe: false,
-        map: text,
-        bumpMap: text,
-        bumpScale: 1,
+        map,
+        bumpMap,
+        bumpScale: 2,
         shininess: 10
       }))
     )
