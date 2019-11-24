@@ -65,6 +65,6 @@ FROM (SELECT email, COUNT(nome) AS nlocais
 WHERE nlocais = (SELECT COUNT(*)
 	FROM local_publico
 	WHERE latitude > 39.336775)
-;
+ORDER BY email;
 
 --4

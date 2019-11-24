@@ -91,5 +91,5 @@ CREATE TABLE correcao (
     anomalia_id SERIAL NOT NULL,
     PRIMARY KEY (email, nro, anomalia_id),
     FOREIGN KEY (email, nro) REFERENCES proposta_correcao(email, nro),
-    FOREIGN KEY (anomalia_id) REFERENCES anomalia(id)
+    FOREIGN KEY (anomalia_id) REFERENCES incidencia(anomalia_id)
 );
