@@ -1,8 +1,12 @@
---1 ?? DÚVIDA COMO RELACIONAR ANOMALIA COM LOCAL PÚBLICO--
-    SELECT lp.name 
-    FROM anomalia AS a  NATURAL JOIN local_publico AS lp
-    WHERE GROUP BY name 
-        HAVING COUNT(anomalia) > 1
+--1
+SELECT latitude, longitude
+FROM (SELECT id AS item_id, latitude, longitude
+    FROM item) AS i NATURAL JOIN
+    (SELECT id AS anomalia_id
+    FROM anomalia) AS a NATURAL JOIN
+    (SELECT item_id, anomalia_id
+    FROM incidencia) AS inc
+ORDER BY latitude, longitude;
 
 --2 --???
     SELECT email
