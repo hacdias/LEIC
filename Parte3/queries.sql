@@ -20,15 +20,30 @@ HAVING COUNT (*) >= ALL (
 	GROUP BY latitude, longitude
 )
 
---2 --???
-    SELECT email
-    FROM anomalia NATURAL JOIN utilizador_regular NATURAL JOIN proposta_correcao
-    WHERE DATE(data_hora) = '1-1-2019' TO '31-5-2019',
-        GROUP BY email
-        HAVING COUNT(anomalia) > 1 
+--2 --COMO POR 1st SEMESTRE?
+SELECT email
+FROM (SELECT email AS e
+    FROM utilizador) AS user NATURAL JOIN
+    (SELECT id AS anomalia_id
+	FROM anomalia) AS a NATURAL JOIN
+	(SELECT anomalia_id
+	FROM incidencia) AS inc
+WHERE YEAR('2019')
+GROUP BY email
+HAVING COUNT (*) >= ALL (
+	SELECT COUNT(*)
+	FROM (SELECT email AS e
+        FROM utilizador) AS user NATURAL JOIN
+        (SELECT id AS anomalia_id
+		FROM anomalia) AS a NATURAL JOIN
+		(SELECT anomalia_id
+		FROM incidencia) AS inc
+	GROUP BY email
+
 
 
 --3
+
 
 
 
