@@ -83,3 +83,34 @@ function removeItem ($id) {
   $result = $db->prepare($sql);
   $result->execute([':id' => $id]);
 }
+
+function getAnomalies () {
+  return getTable("anomalia", ["id, zona, imagem, lingua, ts, descricao, tem_anomalia_redacao"]);
+}
+
+function insertAnomaly ($descricao, $localizacao, $latitude, $longitude) {
+  return insert("anomalia", [
+    "zona" => $zona,
+    "imagem" => $imagem,
+    "lingua" => $lingua,
+    "ts" => $ts,
+    "descricao" => $descricao,
+    "tem_anomalia_redacao" => $tem_anomalia_redacao
+  ]);
+}
+
+function removeAnomaly ($id) {
+  $db = getDB();
+
+  $sql = "DELETE FROM anomalia WHERE id = :id;";
+  $result = $db->prepare($sql);
+  $result->execute([':id' => $id]);
+}
+
+function getRegularUsers () {
+  return getTable("utilizador_regular", ["email"]);
+}
+
+function getQualifiedUsers () {
+  return getTable("utilizador_qualificado", ["email"]);
+}
