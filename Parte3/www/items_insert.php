@@ -10,6 +10,6 @@
     $latitude = $_REQUEST['latitude'];
     $longitude = $_REQUEST['longitude'];
     insertItem($descricao, $localizacao, $latitude, $longitude); ?>
-  <p>Item '<?= $name ?>' adicionado com sucesso. Será redirecionado dentro de 5 segundos.</p>
+  <p>Item '<?= $descricao ?>' adicionado com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

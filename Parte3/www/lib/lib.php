@@ -75,3 +75,11 @@ function insertItem ($descricao, $localizacao, $latitude, $longitude) {
     "longitude" => $longitude
   ]);
 }
+
+function removeItem ($id) {
+  $db = getDB();
+
+  $sql = "DELETE FROM item WHERE id = :id;";
+  $result = $db->prepare($sql);
+  $result->execute([':id' => $id]);
+}

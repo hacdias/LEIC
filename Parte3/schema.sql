@@ -53,23 +53,23 @@ CREATE TABLE anomalia (
 );
 
 CREATE TABLE anomalia_traducao (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY,
     zona2 BOX NOT NULL,
     lingua2 VARCHAR NOT NULL,
     FOREIGN KEY (id) REFERENCES anomalia(id)
 );
 
 CREATE TABLE duplicado (
-    item1 SERIAL NOT NULL,
-    item2 SERIAL NOT NULL CHECK (item1 < item2),
+    item1 INT NOT NULL,
+    item2 INT NOT NULL CHECK (item1 < item2),
     PRIMARY KEY(item1, item2),
     FOREIGN KEY (item1) REFERENCES item(id),
     FOREIGN KEY (item2) REFERENCES item(id)
 );
 
 CREATE TABLE incidencia (
-    anomalia_id SERIAL NOT NULL PRIMARY KEY,
-    item_id SERIAL NOT NULL,
+    anomalia_id INT NOT NULL PRIMARY KEY,
+    item_id INT NOT NULL,
     email VARCHAR NOT NULL,
     FOREIGN KEY (anomalia_id) REFERENCES anomalia(id),
     FOREIGN KEY (item_id) REFERENCES item(id),
@@ -88,7 +88,7 @@ CREATE TABLE proposta_correcao (
 CREATE TABLE correcao (
     email VARCHAR NOT NULL,
     nro INT NOT NULL,
-    anomalia_id SERIAL NOT NULL,
+    anomalia_id INT NOT NULL,
     PRIMARY KEY (email, nro, anomalia_id),
     FOREIGN KEY (email, nro) REFERENCES proposta_correcao(email, nro),
     FOREIGN KEY (anomalia_id) REFERENCES incidencia(anomalia_id)

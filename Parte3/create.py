@@ -40,32 +40,32 @@ iterations = 100
 
 print("\n-- Populate Item")
 for i in range(iterations):
-    print("INSERT INTO item(id, descricao, localizacao, latitude, longitude) VALUES (" + str(i) + ", 'Descricao" + 
-            str(i) + "', 'Localizacao" + str(i) + "', " + 
+    print("INSERT INTO item(descricao, localizacao, latitude, longitude) VALUES ('Descricao" + 
+            str(i + 1) + "', 'Localizacao" + str(i) + "', " + 
             str(locaisPublicos[i][0]) + ", " + str(locaisPublicos[i][1]) + ");")
 
 print("\n-- Populate Anomalia")
 for i in range(iterations):
     box = str(-i) + ", " + str(-i) + ", " + str(i + 1) + ", " + str(i + 1)
-    print("INSERT INTO anomalia(id, zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES (" + str(i) + ", '" +
+    print("INSERT INTO anomalia(zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('" +
         box + "', '1', 'Lingua" + str(i) + "', '" + randomDate(startDate) + "', 'Descricao" + str(i) + "', " + str(i % 2 == 0) + ");")
 
 print("\n-- Populate Anomalia Traducao")
 for i in range(0, iterations, 3):
     box = str(-i) + ", " + str(-i) + ", " + str(i + 1) + ", " + str(i + 1)
     print("INSERT INTO anomalia_traducao(id, zona2, lingua2) VALUES (" +
-        str(i) + ", '" + box + "', 'Lingua" + str(i) + "');")
+        str(i + 1) + ", '" + box + "', 'Lingua" + str(i) + "');")
 
 items = []
 print("\n-- Populates Duplicado")
 for i in range(iterations):
     item2 = randrange(5, 100)
-    item1 = randrange(0, item2)
+    item1 = randrange(1, item2)
     newItem = [item1, item2]
 
     while(newItem in items):
         item2 = randrange(5, 100)
-        item1 = randrange(0, item2)
+        item1 = randrange(1, item2)
         newItem = [item1, item2]
     
     items.append(newItem)
@@ -74,12 +74,12 @@ for i in range(iterations):
         str(item1) + ", " + str(item2) + ");")
 
 print("\n-- Populates Incidencia")
-for i in range(0, iterations, 2):
-    itemID = randrange(100)
-    email = randrange(100)
+for i in range(0, iterations):
+    itemID = randrange(1, 100)
+    email = randrange(1, 100)
 
-    print("INSERT INTO Incidencia(anomalia_id, item_id, email) VALUES (" +
-        str(i) + ", " + str(itemID) + ", 'Email" + str(email) + "');")
+    print("INSERT INTO incidencia(anomalia_id, item_id, email) VALUES (" +
+        str(i + 1) + ", " + str(itemID) + ", 'Email" + str(email) + "');")
 
 propostasCorrecao = []
 print("\n-- Populate Proposta de Correcao")
@@ -94,4 +94,4 @@ print("\n-- Populate Correcao")
 for i in range(0, len(propostasCorrecao), randrange(2) + 1):
 
     print("INSERT INTO correcao(email, nro, anomalia_id) VALUES ('" +
-            propostasCorrecao[i][0] + "', " + str(propostasCorrecao[i][1]) + ", " + str(randrange(100)) + ");")
+            propostasCorrecao[i][0] + "', " + str(propostasCorrecao[i][1]) + ", " + str(randrange(1, 100)) + ");")

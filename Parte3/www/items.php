@@ -28,7 +28,7 @@
         <td><?=$row['localizacao']?></td>
         <td><?=$row['latitude']?></td>
         <td><?=$row['longitude']?></td>
-        <td><a href="./items_remove.php?name=<?=$row['id']?>">Remover</a></td>
+        <td><a href="./items_remove.php?id=<?=$row['id']?>">Remover</a></td>
       </tr>
     <?php endforeach; ?>
   </table>
