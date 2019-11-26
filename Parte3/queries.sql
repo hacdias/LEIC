@@ -9,8 +9,8 @@ FROM (SELECT id AS item_id, latitude, longitude
 	(SELECT latitude, longitude, nome
 	FROM local_publico) AS lp
 GROUP BY nome
-HAVING COUNT (*) >= ALL (
-	SELECT COUNT(*)
+HAVING COUNT (anomalia_id) >= ALL (
+	SELECT COUNT(anomalia_id)
 	FROM (SELECT id AS item_id, latitude, longitude
 		FROM item) AS i NATURAL JOIN
 		(SELECT id AS anomalia_id
@@ -33,8 +33,8 @@ FROM (SELECT email
 	FROM anomalia_traducao) AS at
 WHERE ts BETWEEN '2019-01-01 00:00:00' AND '2019-06-30 23:59:59'
 GROUP BY email
-HAVING COUNT (*) >= ALL (
-	SELECT count(*)
+HAVING COUNT (anomalia_id) >= ALL (
+	SELECT COUNT(anomalia_id)
 	FROM (SELECT email
 		FROM utilizador_regular) AS u NATURAL JOIN
 		(SELECT anomalia_id
@@ -73,7 +73,7 @@ FROM (SELECT anomalia_id, item_id, email
 	FROM incidencia) AS inc NATURAL JOIN
 	(SELECT id AS anomalia_id
 	FROM anomalia
-	WHERE extract(year from ts) = 2013) AS a NATURAL JOIN
+	WHERE extract(year from ts) = extract(year from NOW())) AS a NATURAL JOIN
 	(SELECT id AS item_id, latitude, longitude
 	FROM item
 	WHERE latitude < 39.336775) AS i

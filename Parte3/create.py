@@ -29,12 +29,12 @@ for i in range(1, 50, 2):
         regular_users[-1][0] + "');")
 
 
-iterations = 50
+iterations = 25
 publicLocals = []
 counter = 0
 print("\n-- Populate Local Publico")
-for latitude in range(-iterations, iterations, randrange(1, 10)):
-    for longitude in range(-iterations, iterations, randrange(1, 10)):
+for latitude in range(-iterations, iterations, randrange(7, 10)):
+    for longitude in range(-iterations, iterations, randrange(7, 10)):
         publicLocals.append([latitude, longitude, 'LocalPublico' + str(counter)])
         print("INSERT INTO local_publico(latitude, longitude, nome) VALUES (" + 
             str(publicLocals[-1][0]) + ", " + str(publicLocals[-1][1]) + ", '" + publicLocals[-1][2] + "');")
