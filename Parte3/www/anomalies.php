@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
 <body>
-  <?php $anomalies = getAnomalies(); ?>
+  <?php $anomalies = getAnomalies();?>
 
   <form method="GET" action="./anomalies_insert.php">
     <h2>Nova Anomalia</h2>
@@ -12,6 +12,15 @@
     <input type="text" name="descricao" placeholder="Descrição" />
     <input type="text" name="tem_anomalia_redacao" placeholder="True / False" />
     <input type="submit" value="Criar" />
+  </form>
+
+  <form method="GET" action="./anomalies_between_locals.php">
+    <h2>Anomalias entre:</h2>
+    <input type="number" min="-90" max="90" name="latitude1" placeholder="Latitude 1" />
+    <input type="number" min="-180" max="180" name="longitude1" placeholder="Longitude 1" />
+    <input type="number" min="-90" max="90" name="latitude2" placeholder="Latitude 2" />
+    <input type="number" min="-180" max="180" name="longitude2" placeholder="Longitude 2" />
+    <input type="submit" value="Procurar" />
   </form>
 
   <table>

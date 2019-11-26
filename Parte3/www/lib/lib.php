@@ -114,3 +114,22 @@ function getRegularUsers () {
 function getQualifiedUsers () {
   return getTable("utilizador_qualificado", ["email"]);
 }
+
+function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {
+  $db = getDB();
+
+  $sql = "SELECT item_id, anomalia_id, email, latitude, longitude, nome
+  FROM incidencia NATURAL JOIN 
+    (SELECT latitude, longitude, nome
+    FROM local_publico) AS lp NATURAL JOIN
+    (SELECT id AS item_id, latitude, longitude
+    FROM item
+    WHERE latitude BETWEEN :latitude1 AND :latitude2
+      AND longitude BETWEEN :longitude1 AND :longitude2) AS i
+  ORDER BY anomalia_id;";
+
+  $result = $db->prepare($sql);
+  $result->execute([':latitude1' => $latitude1, ':latitude2' => $latitude2, ':longitude1' => $longitude1, ':longitude2' => $longitude2]);
+
+  return $result;
+}
