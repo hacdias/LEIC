@@ -12,7 +12,7 @@
     <label>Utilizador</label>
     <select name="user">
       <?php foreach ($users as $row): ?>
-        <option value="<?=$row['email']?>,<?=$row['nro']?>"><?=$row['email']?>,<?=$row['nro']?></option>
+        <option value="<?=$row['email']?>"><?=$row['email']?></option>
       <?php endforeach; ?>
     </select>
     <br>

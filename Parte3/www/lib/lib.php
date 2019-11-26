@@ -165,11 +165,24 @@ function removeCorrection ($email, $nro, $anomaly) {
 }
 
 function getCorrectionProposals () {
-  return getTable("proposta_correcao", ["data_hora", "nro", "email", "texto"]);
+  return getTable("proposta_de_correcao", ["data_hora", "nro", "email", "texto"]);
 }
 
-function insertCorrectionProposal ($email, $nro, $datetime, $text) {
-  return insert("proposta_correcao", [
+function insertCorrectionProposal ($email, $datetime, $text) {
+  $db = getDB();
+
+  $sql = "SELECT max(nro) FROM proposta_de_correcao WHERE email = :email;";
+  $result = $db->prepare($sql);
+  $result->execute([':email' => $email]);
+
+  $nro = $result->fetch()['max'];
+  if ($nro == null) {
+    $nro = 0;
+  } else {
+    $nro = $nro + 1;
+  }
+
+  return insert("proposta_de_correcao", [
     "texto" => $text,
     "data_hora" => $datetime,
     "nro" => $nro,
@@ -180,7 +193,7 @@ function insertCorrectionProposal ($email, $nro, $datetime, $text) {
 function removeCorrectionProposal ($email, $nro) {
   $db = getDB();
 
-  $sql = "DELETE FROM proposta_correcao WHERE email = :email AND nro = :nro";
+  $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
   $result = $db->prepare($sql);
   $result->execute([':email' => $email, ':nro' => $nro]);
 }

@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS correcao CASCADE;
-DROP TABLE IF EXISTS proposta_correcao CASCADE;
+DROP TABLE IF EXISTS proposta_de_correcao CASCADE;
 DROP TABLE IF EXISTS incidencia CASCADE;
 DROP TABLE IF EXISTS duplicado CASCADE;
 DROP TABLE IF EXISTS anomalia_traducao CASCADE;
@@ -76,7 +76,7 @@ CREATE TABLE incidencia (
     FOREIGN KEY (email) REFERENCES utilizador(email)
 );
 
-CREATE TABLE proposta_correcao (
+CREATE TABLE proposta_de_correcao (
     email VARCHAR NOT NULL,
     nro INT NOT NULL,
     data_hora TIMESTAMP NOT NULL,
@@ -90,6 +90,6 @@ CREATE TABLE correcao (
     nro INT NOT NULL,
     anomalia_id INT NOT NULL,
     PRIMARY KEY (email, nro, anomalia_id),
-    FOREIGN KEY (email, nro) REFERENCES proposta_correcao(email, nro),
+    FOREIGN KEY (email, nro) REFERENCES proposta_de_correcao(email, nro),
     FOREIGN KEY (anomalia_id) REFERENCES incidencia(anomalia_id)
 );

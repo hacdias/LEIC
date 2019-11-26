@@ -5,11 +5,11 @@
 </head>
 <body>
   <?php
-    $user = explode(",", $_REQUEST['user']);
+    $user = $_REQUEST['user'];
     $date = $_REQUEST['date'];
     $time = $_REQUEST['time'];
     $text = $_REQUEST['text'];
-    insertCorrectionProposal($user[0], $user[1], $date . ' ' . $time, $text); ?>
+    insertCorrectionProposal($user, $date . ' ' . $time, $text); ?>
   <p>Proposta de correções adicionada com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

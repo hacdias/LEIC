@@ -87,7 +87,7 @@ for i in range(0, iterations, 2):
 
     for x in range(randrange(5)):
         propostasCorrecao.append(['Email' + str(i), x])
-        print("INSERT INTO proposta_correcao(email, nro, data_hora, texto) VALUES ('Email" +
+        print("INSERT INTO proposta_de_correcao(email, nro, data_hora, texto) VALUES ('Email" +
             str(i) + "', " + str(x) + ", '" + randomDate(startDate) + "', 'Texto" + str(i) + "');")
 
 print("\n-- Populate Correcao")
