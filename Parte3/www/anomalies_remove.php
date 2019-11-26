@@ -6,7 +6,7 @@
 <body>
   <?php
     $id = $_REQUEST['id'];
-    $locals = removeAnomaly($id); ?>
+    removeAnomaly($id); ?>
   <p>Anomalia com id '<?= $id ?>' removida com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

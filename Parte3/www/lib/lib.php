@@ -18,7 +18,13 @@ function getTable ($table, $what) {
   $result = $db->prepare($sql);
   $result->execute();
 
-  return $result;
+  $arr = [];
+
+  foreach ($result as $key => $value) {
+    $arr[$key] = $value;
+  }
+
+  return $arr;
 }
 
 function insert ($table, $values) {
@@ -47,12 +53,12 @@ function getLocals () {
   return getTable("local_publico", ["nome", "latitude", "longitude"]);
 }
 
-function removeLocal ($name) {
+function removeLocal ($latitude, $longitude) {
   $db = getDB();
 
-  $sql = "DELETE FROM local_publico WHERE nome = :name;";
+  $sql = "DELETE FROM local_publico WHERE latitude = :latitude AND longitude = :longitude;";
   $result = $db->prepare($sql);
-  $result->execute([':name' => $name]);
+  $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
 }
 
 function insertLocal ($name, $latitude, $longitude) {
@@ -88,7 +94,7 @@ function getAnomalies () {
   return getTable("anomalia", ["id, zona, imagem, lingua, ts, descricao, tem_anomalia_redacao"]);
 }
 
-function insertAnomaly ($descricao, $localizacao, $latitude, $longitude) {
+function insertAnomaly ($zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao) {
   return insert("anomalia", [
     "zona" => $zona,
     "imagem" => $imagem,
@@ -96,6 +102,21 @@ function insertAnomaly ($descricao, $localizacao, $latitude, $longitude) {
     "ts" => $ts,
     "descricao" => $descricao,
     "tem_anomalia_redacao" => $tem_anomalia_redacao
+  ]);
+}
+
+function insertDuplicate ($item1, $item2) {
+  return insert("duplicado", [
+    "item1" => $item1,
+    "item2" => $item2
+  ]);
+}
+
+function insertIncidence ($anomaly, $item, $email) {
+  return insert("incidencia", [
+    "anomalia_id" => $anomaly,
+    "item_id" => $item,
+    "email" => $email
   ]);
 }
 
@@ -115,11 +136,60 @@ function getQualifiedUsers () {
   return getTable("utilizador_qualificado", ["email"]);
 }
 
+function getUsers () {
+  return getTable("utilizador", ["email"]);
+}
+
+function getIncidences () {
+  return getTable("incidencia", ["anomalia_id"]);
+}
+
+function getCorrections () {
+  return getTable("correcao", ["email", "nro", "anomalia_id"]);
+}
+
+function insertCorrection ($email, $nro, $anomaly) {
+  return insert("correcao", [
+    "anomalia_id" => $anomaly,
+    "nro" => $nro,
+    "email" => $email
+  ]);
+}
+
+function removeCorrection ($email, $nro, $anomaly) {
+  $db = getDB();
+
+  $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id = :anomaly;";
+  $result = $db->prepare($sql);
+  $result->execute([':email' => $email, ':nro' => $nro, ':anomaly' => $anomaly]);
+}
+
+function getCorrectionProposals () {
+  return getTable("proposta_correcao", ["data_hora", "nro", "email", "texto"]);
+}
+
+function insertCorrectionProposal ($email, $nro, $datetime, $text) {
+  return insert("proposta_correcao", [
+    "texto" => $text,
+    "data_hora" => $datetime,
+    "nro" => $nro,
+    "email" => $email
+  ]);
+}
+
+function removeCorrectionProposal ($email, $nro) {
+  $db = getDB();
+
+  $sql = "DELETE FROM proposta_correcao WHERE email = :email AND nro = :nro";
+  $result = $db->prepare($sql);
+  $result->execute([':email' => $email, ':nro' => $nro]);
+}
+
 function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {
   $db = getDB();
 
   $sql = "SELECT item_id, anomalia_id, email, latitude, longitude, nome
-  FROM incidencia NATURAL JOIN 
+  FROM incidencia NATURAL JOIN
     (SELECT latitude, longitude, nome
     FROM local_publico) AS lp NATURAL JOIN
     (SELECT id AS item_id, latitude, longitude

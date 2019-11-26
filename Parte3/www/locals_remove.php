@@ -6,7 +6,9 @@
 <body>
   <?php
     $name = $_REQUEST['name'];
-    $locals = removeLocal($name); ?>
+    $latitude = $_REQUEST['latitude'];
+    $longitude = $_REQUEST['longitude'];
+    $locals = removeLocal($latitude, $longitude); ?>
   <p>Local '<?= $name ?>' removido com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

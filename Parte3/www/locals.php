@@ -23,7 +23,7 @@
         <td><?=$row['nome']?></td>
         <td><?=$row['latitude']?></td>
         <td><?=$row['longitude']?></td>
-        <td><a href="./locals_remove.php?name=<?=$row['nome']?>">Remover</a></td>
+        <td><a href="./locals_remove.php?name=<?=$row['nome']?>&latitude=<?=$row['latitude']?>&longitude=<?=$row['longitude']?>">Remover</a></td>
       </tr>
     <?php endforeach; ?>
   </table>

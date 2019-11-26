@@ -2,11 +2,10 @@
 <html>
 <body>
     <?php
-    $latitude1 = $_REQUEST['latitude1'];
-    $longitude1 = $_REQUEST['longitude1'];
-    $latitude2 = $_REQUEST['latitude2'];
-    $longitude2 = $_REQUEST['longitude2'];
-    $anomalies = getAnomaliesBetween($latitude1, $longitude1, $latitude2, $longitude2); 
+    $local1 = explode(",", $_REQUEST['local1']);
+    $local2 = explode(",", $_REQUEST['local2']);
+
+    $anomalies = getAnomaliesBetween($local1[0], $local1[1], $local2[0], $local2[1]); 
     ?>
 
   <table>
