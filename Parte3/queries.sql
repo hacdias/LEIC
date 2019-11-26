@@ -67,4 +67,17 @@ WHERE nlocais = (SELECT COUNT(*)
 	WHERE latitude > 39.336775)
 ORDER BY email;
 
---4
+--4 Needs better input and testing!
+SELECT email, anomalia_id
+FROM (SELECT anomalia_id, item_id, email
+	FROM incidencia) AS inc NATURAL JOIN
+	(SELECT id AS anomalia_id
+	FROM anomalia
+	WHERE extract(year from ts) = 2013) AS a NATURAL JOIN
+	(SELECT id AS item_id, latitude, longitude
+	FROM item
+	WHERE latitude < 39.336775) AS i
+WHERE (email, anomalia_id) NOT IN (
+	SELECT email, anomalia_id
+	FROM correcao
+	);
