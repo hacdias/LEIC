@@ -48,7 +48,7 @@ HAVING COUNT (anomalia_id) >= ALL (
 )
 ORDER BY email;
 
---3 - Needs better confirmation! And for that a more random popualtion of DB's
+--3
 SELECT email
 FROM (SELECT email, COUNT(nome) AS nlocais
 	FROM (SELECT anomalia_id, item_id, email
@@ -67,7 +67,7 @@ WHERE nlocais = (SELECT COUNT(*)
 	WHERE latitude > 39.336775)
 ORDER BY email;
 
---4 Needs better input and testing!
+--4
 SELECT email
 FROM (SELECT anomalia_id, item_id, email
 	FROM incidencia) AS inc NATURAL JOIN
