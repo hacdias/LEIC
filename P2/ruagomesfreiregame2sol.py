@@ -33,11 +33,13 @@ class LearningAgent:
   # returns
   # a - the index to the action in aa
   def selectactiontoexecute(self, st, aa):
-    maxQ = -math.inf
+    maxQ = self.qlst[st][0]
     a = 0
-    for i in range(0, len(aa)):
-      if self.qlst[st][i] >= maxQ:
-        maxQ = self.qlst[st][i]
+    if (len(self.qlst[st]) != len(aa)):
+      self.qlst[st] = self.qlst[st][0:len(aa)]
+    for i, q in enumerate(self.qlst[st]):
+      if q >= maxQ:
+        maxQ = q
         a = i
     return a
 
