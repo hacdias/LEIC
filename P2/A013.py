@@ -1,5 +1,5 @@
+# A013, Henrique Dias - 89455, Tiago Gonçalves - 89547
 import random
-import math
 
 # LearningAgent to implement
 # no knowledge about the environment can be used
