@@ -4,6 +4,7 @@
   <title>Duplicates</title>
 </head>
 <body>
+  <p><a href="./index.php">← Página incial</a></p>
   <?php $items = getItems(); ?>
 
   <form method="GET" action="./duplicates_insert.php">

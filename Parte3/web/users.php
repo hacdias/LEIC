@@ -1,6 +1,7 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
 <body>
+  <p><a href="./index.php">← Página incial</a></p>
   <?php $users = getRegularUsers(); ?>
 
   <table style="float: left">

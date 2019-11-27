@@ -9,7 +9,16 @@
     $localizacao = $_REQUEST['localizacao'];
     $latitude = $_REQUEST['latitude'];
     $longitude = $_REQUEST['longitude'];
-    insertItem($descricao, $localizacao, $latitude, $longitude); ?>
-  <p>Item '<?= $descricao ?>' adicionado com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      insertItem($descricao, $localizacao, $latitude, $longitude); 
+      echo "<p>Item '$descricao ' adicionado com sucesso.</p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+
+    ?>
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

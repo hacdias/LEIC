@@ -6,7 +6,15 @@
 <body>
   <?php
     $id = $_REQUEST['id'];
-    removeAnomaly($id); ?>
-  <p>Anomalia com id '<?= $id ?>' removida com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      removeAnomaly($id);
+      echo "<p>Anomalia com id $id removida com sucesso.</p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+  ?>
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

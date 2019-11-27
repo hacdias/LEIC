@@ -19,8 +19,13 @@
     }
 
     if ($item1 != $item2) {
-      insertDuplicate($item1, $item2);
-      echo "<p>Items " . $item1 . " e " . $item2 . " marcados como duplicados.</p>";
+      try {
+        insertDuplicate($item1, $item2);
+        echo "<p>Items " . $item1 . " e " . $item2 . " marcados como duplicados.</p>";
+      } catch (PDOException $e) {
+        echo "<p>Ocorreu um erro:</p>";
+        echo "<p style='color:red'>$e;</p>";
+      }
     }
   ?>
   <p>Será redirecionado dentro de 5 segundos.</p>

@@ -11,11 +11,12 @@
 
     try {
       removeCorrection($email, $nro, $anomaly);
-      echo "<p>Correção e a sua proposta removidas com sucesso. Será redirecionado dentro de 5 segundos.</p>";
+      echo "<p>Correção e a sua proposta removidas com sucesso.</p>";
     } catch (PDOException $e) {
       echo "<p>Ocorreu um erro:</p>";
       echo "<p style='color:red'>$e;</p>";
     }
   ?>
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

@@ -4,6 +4,7 @@
   <title>Incidência</title>
 </head>
 <body>
+  <p><a href="./index.php">← Página incial</a></p>
   <?php $users = getUsers(); ?>
   <?php $items = getItems(); ?>
   <?php $anomalies = getAnomalies(); ?>

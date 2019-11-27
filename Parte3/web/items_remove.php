@@ -6,7 +6,16 @@
 <body>
   <?php
     $id = $_REQUEST['id'];
-    $locals = removeItem($id); ?>
-  <p>Item com id '<?= $id ?>' removido com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      removeItem($id);
+      echo "<p>Item com id $id removido com sucesso.</p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+
+    ?>
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

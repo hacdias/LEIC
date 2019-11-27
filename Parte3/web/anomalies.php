@@ -4,6 +4,8 @@
   <title>Anomalias</title>
 </head>
 <body>
+  <p><a href="./index.php">← Página incial</a></p>
+
   <form method="GET" action="./anomalies_insert.php">
     <h2>Nova Anomalia</h2>
     <input type="text" name="zona" placeholder="Zona x1, y1, x2, y2" />

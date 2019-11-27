@@ -2,7 +2,7 @@
 <html>
 <body>
   <?php $items = getItems(); ?>
-
+  <p><a href="./index.php">← Página incial</a></p>
   <form method="GET" action="./items_insert.php">
     <h2>Novo Item</h2>
     <input type="text" name="descricao" placeholder="Descrição" />

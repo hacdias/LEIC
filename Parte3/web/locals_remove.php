@@ -8,7 +8,16 @@
     $name = $_REQUEST['name'];
     $latitude = $_REQUEST['latitude'];
     $longitude = $_REQUEST['longitude'];
-    $locals = removeLocal($latitude, $longitude); ?>
-  <p>Local '<?= $name ?>' removido com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      removeLocal($latitude, $longitude);
+      echo "<p>Local $name  removido com sucesso. </p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+    ?>
+
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

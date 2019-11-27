@@ -8,7 +8,15 @@
     $name = $_REQUEST['name'];
     $latitude = $_REQUEST['latitude'];
     $longitude = $_REQUEST['longitude'];
-    insertLocal($name, $latitude, $longitude); ?>
-  <p>Local '<?= $name ?>' adicionado com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      insertLocal($name, $latitude, $longitude);
+      echo "<p>Local $name adicionado com sucesso. </p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+  ?>
+  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

@@ -1,6 +1,7 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
 <body>
+  <p><a href="./index.php">← Página incial</a></p>
   <?php $locals = getLocals(); ?>
 
   <form method="GET" action="./locals_insert.php">
