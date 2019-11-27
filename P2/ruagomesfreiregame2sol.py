@@ -49,6 +49,6 @@ class LearningAgent:
   # a - the index to the action taken
   # r - reward obtained
   def learn(self, ost, nst, a, r):
-    alpha = 0.1
+    alpha = 0.5 # good idea?
     gamma = 0.9
     self.qlst[ost][a] = self.qlst[ost][a] + alpha * (r + gamma * max(self.qlst[nst]) - self.qlst[ost][a])
