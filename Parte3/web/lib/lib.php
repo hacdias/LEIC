@@ -94,6 +94,45 @@ function getAnomalies () {
   return getTable("anomalia", ["id, zona, imagem, lingua, ts, descricao, tem_anomalia_redacao"]);
 }
 
+function getAnomaliesAround ($latitude, $longitude, $dlatitude, $dlongitude) {
+  $latMin = $latitude - $dlatitude;
+  $latMax = $latitude + $dlatitude;
+  $lonMin = $longitude - $dlongitude;
+  $lonMax = $longitude + $dlongitude;
+
+  $sql = "SELECT anomalia_id AS id, zona, imagem, lingua, descricao, ts, tem_anomalia_redacao
+    FROM incidencia NATURAL JOIN
+      (SELECT latitude, longitude, nome
+      FROM local_publico) AS lp NATURAL JOIN
+    (SELECT id AS anomalia_id, ts, zona, imagem, lingua, descricao, tem_anomalia_redacao
+    FROM anomalia
+    WHERE NOW() - ts <= interval '3 months'
+      AND NOW() - ts >= interval '0 seconds') AS a NATURAL JOIN
+      (SELECT id AS item_id, latitude, longitude
+      FROM item
+      WHERE latitude BETWEEN :latmin AND :latmax
+        AND longitude BETWEEN :lonmin AND :lonmax) AS i
+    ORDER BY anomalia_id;";
+    
+
+  $db = getDB();
+  $result = $db->prepare($sql);
+  $result->execute([
+    ':latmin' => $latMin,
+    ':latmax' => $latMax,
+    ':lonmin' => $lonMin,
+    ':lonmax' => $lonMax
+  ]);
+
+  $arr = [];
+
+  foreach ($result as $key => $value) {
+    $arr[$key] = $value;
+  }
+
+  return $arr;
+}
+
 function insertAnomaly ($zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao) {
   return insert("anomalia", [
     "zona" => $zona,
@@ -201,15 +240,17 @@ function removeCorrectionProposal ($email, $nro) {
 function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {
   $db = getDB();
 
-  $sql = "SELECT item_id, anomalia_id, email, latitude, longitude, nome
+  $sql = "SELECT anomalia_id AS id, ts, zona, imagem, lingua, descricao, tem_anomalia_redacao
   FROM incidencia NATURAL JOIN
     (SELECT latitude, longitude, nome
     FROM local_publico) AS lp NATURAL JOIN
+    (SELECT id AS anomalia_id, ts, zona, imagem, lingua, descricao, tem_anomalia_redacao
+    FROM anomalia) AS a NATURAL JOIN
     (SELECT id AS item_id, latitude, longitude
     FROM item
     WHERE latitude BETWEEN :latitude1 AND :latitude2
       AND longitude BETWEEN :longitude1 AND :longitude2) AS i
-  ORDER BY anomalia_id;";
+  ORDER BY id;";
 
   $result = $db->prepare($sql);
   $result->execute([':latitude1' => $latitude1, ':latitude2' => $latitude2, ':longitude1' => $longitude1, ':longitude2' => $longitude2]);
