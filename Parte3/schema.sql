@@ -10,6 +10,58 @@ DROP TABLE IF EXISTS utilizador_qualificado CASCADE;
 DROP TABLE IF EXISTS utilizador_regular CASCADE;
 DROP TABLE IF EXISTS utilizador CASCADE;
 
+CREATE OR REPLACE FUNCTION
+utilizador_nao_qualificado (email_utilizador VARCHAR)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+	RETURN NOT EXISTS (
+        SELECT email
+        FROM utilizador_qualificado
+        WHERE email = email_utilizador
+    );
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION
+utilizador_nao_regular (email_utilizador VARCHAR)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+	RETURN NOT EXISTS (
+        SELECT email
+        FROM utilizador_regular
+        WHERE email = email_utilizador
+    );
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION
+lingua_nao_repetida (idAnomalia INT, lingua2 VARCHAR)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+	RETURN NOT EXISTS (
+        SELECT *
+        FROM anomalia
+        WHERE id = idAnomalia AND lingua = lingua2
+    );
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION
+caixa_nao_sobrepoe (idAnomalia INT, zona2 BOX)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+	RETURN NOT EXISTS (
+        SELECT *
+        FROM anomalia
+        WHERE id = idAnomalia AND zona && zona2
+    );
+END;
+$$ LANGUAGE PLPGSQL;
+
 CREATE TABLE utilizador
 (
     email VARCHAR NOT NULL PRIMARY KEY,
@@ -17,7 +69,7 @@ CREATE TABLE utilizador
 );
 
 CREATE TABLE utilizador_regular (
-    email VARCHAR NOT NULL PRIMARY KEY,
+    email VARCHAR NOT NULL PRIMARY KEY CHECK (utilizador_nao_qualificado(email)),
     FOREIGN KEY (email) REFERENCES utilizador(email)
 );
 
@@ -54,8 +106,8 @@ CREATE TABLE anomalia (
 
 CREATE TABLE anomalia_traducao (
     id INT PRIMARY KEY,
-    zona2 BOX NOT NULL,
-    lingua2 VARCHAR NOT NULL,
+    zona2 BOX NOT NULL CHECK(caixa_nao_sobrepoe(id, zona2)),
+    lingua2 VARCHAR NOT NULL CHECK(lingua_nao_repetida(id, lingua2)),
     FOREIGN KEY (id) REFERENCES anomalia(id)
 );
 

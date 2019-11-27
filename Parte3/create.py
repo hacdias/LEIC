@@ -10,21 +10,21 @@ startDate = datetime.datetime(2018, 1, 1, 00, 00)
 users = []
 print("-- Populate Utilizador")
 for i in range(50):
-    users.append(['Email' + str(i), 'password' + str(i)])
+    users.append(['Email' + str(i + 1), 'password' + str(i + 1)])
     print("INSERT INTO utilizador(email, password) VALUES ('" + 
         users[i][0] + "', '" + users[i][1] + "');")
 
 qualified_users = []
 print("\n-- Populate Utilizador Qualificado")
 for i in range(0, 50, 2):
-    qualified_users.append(['Email' + str(i)])
+    qualified_users.append(['Email' + str(i + 1)])
     print("INSERT INTO utilizador_qualificado(email) VALUES ('" + 
         qualified_users[-1][0] + "');")
 
 regular_users = []
 print("\n-- Populate Utilizador Regular")
 for i in range(1, 50, 2):
-    regular_users.append(['Email' + str(i)])
+    regular_users.append(['Email' + str(i + 1)])
     print("INSERT INTO utilizador_regular(email) VALUES ('" + 
         regular_users[-1][0] + "');")
 
@@ -51,7 +51,7 @@ for i in range(30):
 anomalies = []
 print("\n-- Populate Anomalia")
 for i in range(25):
-    box = str(- randrange(0, 20)) + ", " + str(- randrange(0, 20)) + ", " + str(randrange(1, 20)) + ", " + str(randrange(1, 20))
+    box = str(- randrange(11, 20)) + ", " + str(- randrange(11, 20)) + ", " + str(- randrange(1, 10)) + ", " + str(- randrange(1, 10))
     anomalies.append([box, '1', 'Lingua' + str(i + 1), randomDate(startDate), 'Descricao' + str(i + 1), randrange(0, 2) % 2 ])
     print("INSERT INTO anomalia(zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('" +
         anomalies[i][0] + "', '" + anomalies[i][1] + "', '" + anomalies[i][2] + "', '" + anomalies[i][3] + "', '" + anomalies[i][4] + "', '" + str(anomalies[i][5]) + "');")
@@ -59,8 +59,8 @@ for i in range(25):
 anomalies_traduction = []
 print("\n-- Populate Anomalia Traducao")
 for i in range(1, len(anomalies), randrange(1, 3)):
-    box = str(- randrange(0, 20)) + ", " + str(- randrange(0, 20)) + ", " + str(randrange(1, 20)) + ", " + str(randrange(1, 20))
-    anomalies_traduction.append([i, box, 'Lingua' + str(i)])
+    box = str(randrange(11, 20)) + ", " + str(randrange(11, 20)) + ", " + str(randrange(1, 10)) + ", " + str(randrange(1, 10))
+    anomalies_traduction.append([i, box, 'Lingua' + str(len(anomalies) + i)])
     print("INSERT INTO anomalia_traducao(id, zona2, lingua2) VALUES (" +
         str(anomalies_traduction[-1][0]) + ", '" + anomalies_traduction[-1][1] + "', '" + anomalies_traduction[-1][2] + "');")
 
