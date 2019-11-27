@@ -68,7 +68,7 @@ WHERE nlocais = (SELECT COUNT(*)
 ORDER BY email;
 
 --4 Needs better input and testing!
-SELECT email, anomalia_id
+SELECT email
 FROM (SELECT anomalia_id, item_id, email
 	FROM incidencia) AS inc NATURAL JOIN
 	(SELECT id AS anomalia_id

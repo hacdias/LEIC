@@ -29,12 +29,11 @@ for i in range(1, 50, 2):
         regular_users[-1][0] + "');")
 
 
-iterations = 25
 publicLocals = []
 counter = 0
 print("\n-- Populate Local Publico")
-for latitude in range(-iterations, iterations, randrange(7, 10)):
-    for longitude in range(-iterations, iterations, randrange(7, 10)):
+for latitude in range(-25, 50, randrange(7, 10)):
+    for longitude in range(-25, 10, randrange(7, 10)):
         publicLocals.append([latitude, longitude, 'LocalPublico' + str(counter)])
         print("INSERT INTO local_publico(latitude, longitude, nome) VALUES (" + 
             str(publicLocals[-1][0]) + ", " + str(publicLocals[-1][1]) + ", '" + publicLocals[-1][2] + "');")
@@ -106,3 +105,28 @@ for i in range(0, len(correction_proposals)):
     corrections.append([correction_proposals[i][0], correction_proposals[i][1], randrange(1, len(anomalies) + 1)])
     print("INSERT INTO correcao(email, nro, anomalia_id) VALUES ('" +
             corrections[-1][0] + "', " + str(corrections[-1][1]) + ", " + str(corrections[-1][2]) + ");")
+
+print("\n-- Ensure 3rd SQL Query")
+items_3rd = []
+print("INSERT INTO utilizador(email, password) VALUES ('OTalEmail', 'passpass');")
+for i in range(0, len(publicLocals)):
+    if (publicLocals[i][0] > 39.336775):
+        items_3rd.append(['Descricao' + str(i), 'Localizacao' + str(i), publicLocals[i][0], publicLocals[i][1]])
+        print("INSERT INTO item(descricao, localizacao, latitude, longitude) VALUES ('" + 
+            items_3rd[-1][0] + "', '" + items_3rd[-1][1] + "', " + str(items_3rd[-1][2]) + ", " + str(items_3rd[-1][3]) + ");")
+
+anomalies_3rd = []
+for i in range(0, len(items_3rd)):
+    box = str(- randrange(11, 20)) + ", " + str(- randrange(11, 20)) + ", " + str(- randrange(1, 10)) + ", " + str(- randrange(1, 10))
+    anomalies_3rd.append([box, '1', 'Lingua' + str(i + 1), '2019-11-11 11:11:11', 'Descricao' + str(i + 1), randrange(0, 2) % 2 ])
+    print("INSERT INTO anomalia(zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('" +
+        anomalies_3rd[i][0] + "', '" + anomalies_3rd[i][1] + "', '" + anomalies_3rd[i][2] + "', '" + anomalies_3rd[i][3] + "', '" + anomalies_3rd[i][4] + "', '" + str(anomalies_3rd[i][5]) + "');")
+
+incidences_3rd = []
+for i in range(0, len(anomalies_3rd)):
+    itemID = len(items) + i + 1
+    email = "OTalEmail"
+
+    incidences_3rd.append([len(anomalies) + i + 1, itemID, email])
+    print("INSERT INTO incidencia(anomalia_id, item_id, email) VALUES (" +
+        str(incidences_3rd[i][0]) + ", " + str(incidences_3rd[i][1]) + ", '" + incidences_3rd[i][2] + "');")
