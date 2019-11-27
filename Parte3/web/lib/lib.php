@@ -29,6 +29,7 @@ function getTable ($table, $what) {
 
 function insert ($table, $values) {
   $db = getDB();
+  $db->beginTransaction();
 
   $columns = array_keys($values);
   $vars = array_map(function ($column) {
@@ -47,6 +48,7 @@ function insert ($table, $values) {
   }
 
   $result->execute($toExecute);
+  $db->commit();
 }
 
 function getLocals () {
@@ -55,10 +57,13 @@ function getLocals () {
 
 function removeLocal ($latitude, $longitude) {
   $db = getDB();
+  $db->beginTransaction();
 
   $sql = "DELETE FROM local_publico WHERE latitude = :latitude AND longitude = :longitude;";
   $result = $db->prepare($sql);
   $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
+
+  $db->commit();
 }
 
 function insertLocal ($name, $latitude, $longitude) {
@@ -84,10 +89,13 @@ function insertItem ($descricao, $localizacao, $latitude, $longitude) {
 
 function removeItem ($id) {
   $db = getDB();
+  $db->beginTransaction();
 
   $sql = "DELETE FROM item WHERE id = :id;";
   $result = $db->prepare($sql);
   $result->execute([':id' => $id]);
+
+  $db->commit();
 }
 
 function getAnomalies () {
@@ -161,10 +169,13 @@ function insertIncidence ($anomaly, $item, $email) {
 
 function removeAnomaly ($id) {
   $db = getDB();
+  $db->beginTransaction();
 
   $sql = "DELETE FROM anomalia WHERE id = :id;";
   $result = $db->prepare($sql);
   $result->execute([':id' => $id]);
+
+  $db->commit();
 }
 
 function getRegularUsers () {
@@ -201,7 +212,6 @@ function getCorrections () {
 
 function removeCorrection ($email, $nro, $anomaly) {
   $db = getDB();
-
   $db->beginTransaction();
 
   $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id = :anomaly;";
@@ -221,7 +231,6 @@ function getCorrectionProposals () {
 
 function insertCorrection ($email, $anomaly, $text) {
   $db = getDB();
-
   $db->beginTransaction();
 
   $sql = "SELECT max(nro) FROM proposta_de_correcao WHERE email = :email;";
@@ -253,10 +262,13 @@ function insertCorrection ($email, $anomaly, $text) {
 
 function editCorrectionProposal ($email, $nro, $text) {
   $db = getDB();
+  $db->beginTransaction();
 
   $sql = "UPDATE proposta_de_correcao SET texto = :texto, data_hora = NOW() WHERE email = :email AND nro = :nro;";
   $result = $db->prepare($sql);
   $result->execute([':email' => $email, ':nro' => $nro, ':texto' => $text]);
+
+  $db->commit();
 }
 
 function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {

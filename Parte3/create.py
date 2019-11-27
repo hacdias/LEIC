@@ -2,10 +2,10 @@ from random import randrange
 import datetime
 
 def randomDate(start):
-    randomDate = start + datetime.timedelta(minutes=randrange(60 * 24 * 365 * 3))
+    randomDate = start + datetime.timedelta(minutes=randrange(60 * 24 * 365 * 2))
     return randomDate.strftime("%Y/%m/%d %H:%M:%S")
 
-startDate = datetime.datetime(2018, 9, 20, 13, 00)
+startDate = datetime.datetime(2018, 1, 1, 00, 00)
 
 users = []
 print("-- Populate Utilizador")
@@ -102,7 +102,7 @@ for i in range(0, len(qualified_users), randrange(1, 3)):
 
 corrections = []
 print("\n-- Populate Correcao")
-for i in range(0, len(correction_proposals), randrange(2) + 1):
+for i in range(0, len(correction_proposals)):
     corrections.append([correction_proposals[i][0], correction_proposals[i][1], randrange(1, len(anomalies) + 1)])
     print("INSERT INTO correcao(email, nro, anomalia_id) VALUES ('" +
             corrections[-1][0] + "', " + str(corrections[-1][1]) + ", " + str(corrections[-1][2]) + ");")

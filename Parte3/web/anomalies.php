@@ -64,7 +64,7 @@
   </form>
 
   <?php
-    $type = $_REQUEST['type'];
+    $type = @($_REQUEST['type']);
     $anomalies = [];
 
     if ($type == 'between') {
