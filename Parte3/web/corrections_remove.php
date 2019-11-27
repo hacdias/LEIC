@@ -8,7 +8,14 @@
     $email = $_REQUEST['email'];
     $nro = $_REQUEST['nro'];
     $anomaly = $_REQUEST['anomaly'];
-    removeCorrection($email, $nro, $anomaly); ?>
-  <p>Correção removida com sucesso. Será redirecionado dentro de 5 segundos.</p>
+
+    try {
+      removeCorrection($email, $nro, $anomaly);
+      echo "<p>Correção e a sua proposta removidas com sucesso. Será redirecionado dentro de 5 segundos.</p>";
+    } catch (PDOException $e) {
+      echo "<p>Ocorreu um erro:</p>";
+      echo "<p style='color:red'>$e;</p>";
+    }
+  ?>
 </body>
 </html>

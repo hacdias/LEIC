@@ -113,7 +113,7 @@ function getAnomaliesAround ($latitude, $longitude, $dlatitude, $dlongitude) {
       WHERE latitude BETWEEN :latmin AND :latmax
         AND longitude BETWEEN :lonmin AND :lonmax) AS i
     ORDER BY anomalia_id;";
-    
+
 
   $db = getDB();
   $result = $db->prepare($sql);
@@ -184,31 +184,45 @@ function getIncidences () {
 }
 
 function getCorrections () {
-  return getTable("correcao", ["email", "nro", "anomalia_id"]);
-}
+  $db = getDB();
 
-function insertCorrection ($email, $nro, $anomaly) {
-  return insert("correcao", [
-    "anomalia_id" => $anomaly,
-    "nro" => $nro,
-    "email" => $email
-  ]);
+  $sql = "SELECT email, nro, anomalia_id, texto, data_hora FROM correcao NATURAL JOIN proposta_de_correcao;";
+  $result = $db->prepare($sql);
+  $result->execute();
+
+  $arr = [];
+
+  foreach ($result as $key => $value) {
+    $arr[$key] = $value;
+  }
+
+  return $arr;
 }
 
 function removeCorrection ($email, $nro, $anomaly) {
   $db = getDB();
 
+  $db->beginTransaction();
+
   $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id = :anomaly;";
   $result = $db->prepare($sql);
   $result->execute([':email' => $email, ':nro' => $nro, ':anomaly' => $anomaly]);
+
+  $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
+  $result = $db->prepare($sql);
+  $result->execute([':email' => $email, ':nro' => $nro]);
+
+  $db->commit();
 }
 
 function getCorrectionProposals () {
   return getTable("proposta_de_correcao", ["data_hora", "nro", "email", "texto"]);
 }
 
-function insertCorrectionProposal ($email, $datetime, $text) {
+function insertCorrection ($email, $anomaly, $text) {
   $db = getDB();
+
+  $db->beginTransaction();
 
   $sql = "SELECT max(nro) FROM proposta_de_correcao WHERE email = :email;";
   $result = $db->prepare($sql);
@@ -221,20 +235,28 @@ function insertCorrectionProposal ($email, $datetime, $text) {
     $nro = $nro + 1;
   }
 
-  return insert("proposta_de_correcao", [
+  insert("proposta_de_correcao", [
     "texto" => $text,
-    "data_hora" => $datetime,
+    "data_hora" => date(DATE_RFC2822),
     "nro" => $nro,
     "email" => $email
   ]);
+
+  insert("correcao", [
+    "anomalia_id" => $anomaly,
+    "nro" => $nro,
+    "email" => $email
+  ]);
+
+  $db->commit();
 }
 
-function removeCorrectionProposal ($email, $nro) {
+function editCorrectionProposal ($email, $nro, $text) {
   $db = getDB();
 
-  $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
+  $sql = "UPDATE proposta_de_correcao SET texto = :texto, data_hora = NOW() WHERE email = :email AND nro = :nro;";
   $result = $db->prepare($sql);
-  $result->execute([':email' => $email, ':nro' => $nro]);
+  $result->execute([':email' => $email, ':nro' => $nro, ':texto' => $text]);
 }
 
 function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {

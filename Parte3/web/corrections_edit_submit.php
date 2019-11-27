@@ -7,7 +7,8 @@
   <?php
     $email = $_REQUEST['email'];
     $nro = $_REQUEST['nro'];
-    removeCorrectionProposal($email, $nro); ?>
-  <p>Proposta de correção removida com sucesso. Será redirecionado dentro de 5 segundos.</p>
+    $text = $_REQUEST['text'];
+    editCorrectionProposal($email, $nro, $text); ?>
+  <p>Correção e proposta editada com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

@@ -5,9 +5,10 @@
 </head>
 <body>
   <?php
+    $user = $_REQUEST['user'];
     $anomaly = $_REQUEST['anomaly'];
-    $proposal = explode(",", $_REQUEST['proposal']);
-    insertCorrection($proposal[0], $proposal[1], $anomaly); ?>
-  <p>Correção adicionada com sucesso. Será redirecionado dentro de 5 segundos.</p>
+    $text = $_REQUEST['text'];
+    insertCorrection($user, $anomaly, $text); ?>
+  <p>Correção e proposta de correção adicionadas com sucesso. Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

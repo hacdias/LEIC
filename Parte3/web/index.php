@@ -10,8 +10,7 @@
     <li><a href="./users.php">Utilizadores</a></li>
     <li><a href="./duplicates.php">Duplicados</a></li>
     <li><a href="./incidences.php">Incidências</a></li>
-    <li><a href="./corrections.php">Correções</a></li>
-    <li><a href="./correction_proposals.php">Propostas de Correção</a></li>
+    <li><a href="./corrections.php">Correções e Propostas</a></li>
   </ul>
 </body>
 </html>
