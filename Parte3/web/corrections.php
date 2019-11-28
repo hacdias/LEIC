@@ -7,10 +7,21 @@
   <p><a href="./index.php">← Página incial</a></p>
 
   <?php
-    $corrections = getCorrections();
-    $users = getQualifiedUsers();
-    $correctionProposal = getCorrectionProposals();
-    $incidences = getIncidences();
+    $corrections = [];
+    $users = [];
+    $correctionProposal = [];
+    $incidences = [];
+
+    try {
+      $corrections = getCorrections();
+      $users = getQualifiedUsers();
+      $correctionProposal = getCorrectionProposals();
+      $incidences = getIncidences();
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter os dados.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
+    }
   ?>
 
   <form method="GET" action="./corrections_insert.php">

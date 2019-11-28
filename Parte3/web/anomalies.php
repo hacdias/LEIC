@@ -22,7 +22,16 @@
 
   <form method="GET">
     <h2>Anomalias entre locais públicos</h2>
-    <?php $locals = getLocals(); ?>
+    <?php
+    $locals = [];
+    
+    try {
+      $locals = getLocals();
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter os locais.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
+    } ?>
 
     <input type="hidden" name="type" value="locals" />
 
@@ -51,8 +60,6 @@
 
   <form method="GET">
     <h2>Anomalias entre</h2>
-    <?php $locals = getLocals(); ?>
-
     <input type="hidden" name="type" value="between" />
 
     <input required type="number" min="-90" max="90" name="latitude" placeholder="Latitude" />
@@ -68,23 +75,29 @@
     $type = @($_REQUEST['type']);
     $anomalies = [];
 
-    if ($type == 'between') {
-      $latitude = $_REQUEST['latitude'];
-      $longitude = $_REQUEST['longitude'];
-      $dlatitude = $_REQUEST['dlatitude'];
-      $dlongitude = $_REQUEST['dlongitude'];
-
-      echo "<h2>Anomalias em ($latitude, $longitude) ± 𝚫($dlatitude, $dlongitude) <a href='./anomalies.php'><button>Limpar</button></a></h2>";
-      $anomalies = getAnomaliesAround($latitude, $longitude, $dlatitude, $dlongitude);
-    } else if ($type == 'locals') {
-      $local1 = explode(",", $_REQUEST['local1']);
-      $local2 = explode(",", $_REQUEST['local2']);
-
-      echo "<h2>Anomalias entre ($local1[0], $local1[1]) e  ($local2[0], $local2[1]) <a href='./anomalies.php'><button>Limpar</button></a></h2>";
-      $anomalies = getAnomaliesBetween($local1[0], $local1[1], $local2[0], $local2[1]); 
-    } else {
-      $anomalies = getAnomalies();
-      echo "<h2>Anomalias</h2>";
+    try {
+      if ($type == 'between') {
+        $latitude = $_REQUEST['latitude'];
+        $longitude = $_REQUEST['longitude'];
+        $dlatitude = $_REQUEST['dlatitude'];
+        $dlongitude = $_REQUEST['dlongitude'];
+  
+        echo "<h2>Anomalias em ($latitude, $longitude) ± 𝚫($dlatitude, $dlongitude) <a href='./anomalies.php'><button>Limpar</button></a></h2>";
+        $anomalies = getAnomaliesAround($latitude, $longitude, $dlatitude, $dlongitude);
+      } else if ($type == 'locals') {
+        $local1 = explode(",", $_REQUEST['local1']);
+        $local2 = explode(",", $_REQUEST['local2']);
+  
+        echo "<h2>Anomalias entre ($local1[0], $local1[1]) e  ($local2[0], $local2[1]) <a href='./anomalies.php'><button>Limpar</button></a></h2>";
+        $anomalies = getAnomaliesBetween($local1[0], $local1[1], $local2[0], $local2[1]); 
+      } else {
+        $anomalies = getAnomalies();
+        echo "<h2>Anomalias</h2>";
+      }
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter as anomalias.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
     }
   ?>
 

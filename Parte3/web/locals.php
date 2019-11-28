@@ -5,7 +5,17 @@
   </head>
 <body>
   <p><a href="./index.php">← Página incial</a></p>
-  <?php $locals = getLocals(); ?>
+  <?php
+    $locals = [];
+
+    try {
+      $locals = getLocals();
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter os locais.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
+    }
+  ?>
 
   <form method="GET" action="./locals_insert.php">
     <h2>Novo Local</h2>
