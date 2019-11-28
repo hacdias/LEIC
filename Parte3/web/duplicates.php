@@ -23,7 +23,7 @@
     <label>Item 1</label>
     <select name="item1">
       <?php foreach ($items as $row): ?>
-        <option value="<?=$row['id']?>"><?=$row['descricao']?></option>
+        <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
     </select>
     <br>
@@ -31,9 +31,10 @@
     <label>Item 2</label>
     <select name="item2">
       <?php foreach ($items as $row): ?>
-        <option value="<?=$row['id']?>"><?=$row['descricao']?></option>
+        <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
     </select>
+    <br>
     <br>
 
     <input type="submit" value="Marcar Duplicado">

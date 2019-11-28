@@ -34,6 +34,7 @@
       <?php endforeach; ?>
     </select>
     <br>
+    <br>
 
     <label>Incidência</label>
     <select name="anomaly">
@@ -42,8 +43,13 @@
       <?php endforeach; ?>
     </select>
     <br>
+    <br>
 
+    <label>Texto</label>
+    <br>
     <textarea name="text"></textarea>
+    <br>
+    <br>
 
     <input type="submit" value="Criar" />
   </form>

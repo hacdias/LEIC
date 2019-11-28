@@ -27,17 +27,19 @@
     <label>Anomalia</label>
     <select name="anomaly">
       <?php foreach ($anomalies as $row): ?>
-        <option value="<?=$row['id']?>"><?=$row['descricao']?></option>
+        <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
     </select>
+    <br>
     <br>
 
     <label>Item</label>
     <select name="item">
       <?php foreach ($items as $row): ?>
-        <option value="<?=$row['id']?>"><?=$row['descricao']?></option>
+        <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
     </select>
+    <br>
     <br>
 
     <label>Utilizador</label>
@@ -46,6 +48,7 @@
         <option value="<?=$row['email']?>"><?=$row['email']?></option>
       <?php endforeach; ?> 
     </select>
+    <br>
     <br>
 
     <input type="submit" value="Criar incidência">

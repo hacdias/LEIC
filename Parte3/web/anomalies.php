@@ -40,7 +40,7 @@
       <select name="local1" id="local1">
         <option selected>Escolha...</option>
         <?php foreach ($locals as $row): ?>
-        <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> <?=$row['latitude']?>, <?=$row['longitude']?></option>
+        <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> (<?=$row['latitude']?>, <?=$row['longitude']?>)</option>
        <?php endforeach; ?>
       </select>
     </div>
@@ -50,10 +50,11 @@
       <select name="local2" id="local2">
         <option selected>Escolha...</option>
         <?php foreach ($locals as $row): ?>
-        <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> <?=$row['latitude']?>, <?=$row['longitude']?></option>
+        <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> (<?=$row['latitude']?>, <?=$row['longitude']?>)</option>
        <?php endforeach; ?>
       </select>
     </div>
+    <br>
 
     <input type="submit" value="Procurar" />
   </form>
