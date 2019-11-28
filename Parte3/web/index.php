@@ -1,6 +1,7 @@
 <html>
 <head>
   <title>Projeto de BD</title>
+  <meta char="UTF-8">
 </head>
 <body>
   <ul>

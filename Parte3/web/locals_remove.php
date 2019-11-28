@@ -1,6 +1,7 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
 <head>
+  <meta char="UTF-8">
   <meta http-equiv="Refresh" content="5; url=./locals.php" />
 </head>
 <body>

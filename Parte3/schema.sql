@@ -70,12 +70,12 @@ CREATE TABLE utilizador
 
 CREATE TABLE utilizador_regular (
     email VARCHAR NOT NULL PRIMARY KEY CHECK (utilizador_nao_qualificado(email)),
-    FOREIGN KEY (email) REFERENCES utilizador(email)
+    FOREIGN KEY (email) REFERENCES utilizador(email) ON DELETE CASCADE
 );
 
 CREATE TABLE utilizador_qualificado (
     email VARCHAR NOT NULL PRIMARY KEY,
-    FOREIGN KEY (email) REFERENCES utilizador(email)
+    FOREIGN KEY (email) REFERENCES utilizador(email) ON DELETE CASCADE
 );
 
 CREATE TABLE local_publico (
@@ -91,7 +91,7 @@ CREATE TABLE item (
     localizacao VARCHAR NOT NULL,
     latitude FLOAT NOT NULL,
     longitude FLOAT NOT NULL,
-    FOREIGN KEY (latitude, longitude) REFERENCES local_publico(latitude, longitude)
+    FOREIGN KEY (latitude, longitude) REFERENCES local_publico(latitude, longitude) ON DELETE CASCADE
 );
 
 CREATE TABLE anomalia (
@@ -108,24 +108,24 @@ CREATE TABLE anomalia_traducao (
     id INT PRIMARY KEY,
     zona2 BOX NOT NULL CHECK(caixa_nao_sobrepoe(id, zona2)),
     lingua2 VARCHAR NOT NULL CHECK(lingua_nao_repetida(id, lingua2)),
-    FOREIGN KEY (id) REFERENCES anomalia(id)
+    FOREIGN KEY (id) REFERENCES anomalia(id) ON DELETE CASCADE
 );
 
 CREATE TABLE duplicado (
     item1 INT NOT NULL,
     item2 INT NOT NULL CHECK (item1 < item2),
     PRIMARY KEY(item1, item2),
-    FOREIGN KEY (item1) REFERENCES item(id),
-    FOREIGN KEY (item2) REFERENCES item(id)
+    FOREIGN KEY (item1) REFERENCES item(id) ON DELETE CASCADE,
+    FOREIGN KEY (item2) REFERENCES item(id) ON DELETE CASCADE
 );
 
 CREATE TABLE incidencia (
     anomalia_id INT NOT NULL PRIMARY KEY,
     item_id INT NOT NULL,
     email VARCHAR NOT NULL,
-    FOREIGN KEY (anomalia_id) REFERENCES anomalia(id),
-    FOREIGN KEY (item_id) REFERENCES item(id),
-    FOREIGN KEY (email) REFERENCES utilizador(email)
+    FOREIGN KEY (anomalia_id) REFERENCES anomalia(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES item(id) ON DELETE CASCADE,
+    FOREIGN KEY (email) REFERENCES utilizador(email) ON DELETE CASCADE
 );
 
 CREATE TABLE proposta_de_correcao (
@@ -134,7 +134,7 @@ CREATE TABLE proposta_de_correcao (
     data_hora TIMESTAMP NOT NULL,
     texto VARCHAR NOT NULL,
     PRIMARY KEY (email, nro),
-    FOREIGN KEY (email) REFERENCES utilizador_qualificado(email)
+    FOREIGN KEY (email) REFERENCES utilizador_qualificado(email) ON DELETE CASCADE
 );
 
 CREATE TABLE correcao (
@@ -142,6 +142,6 @@ CREATE TABLE correcao (
     nro INT NOT NULL,
     anomalia_id INT NOT NULL,
     PRIMARY KEY (email, nro, anomalia_id),
-    FOREIGN KEY (email, nro) REFERENCES proposta_de_correcao(email, nro),
-    FOREIGN KEY (anomalia_id) REFERENCES incidencia(anomalia_id)
+    FOREIGN KEY (email, nro) REFERENCES proposta_de_correcao(email, nro) ON DELETE CASCADE,
+    FOREIGN KEY (anomalia_id) REFERENCES incidencia(anomalia_id) ON DELETE CASCADE
 );

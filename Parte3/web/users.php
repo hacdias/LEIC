@@ -1,5 +1,8 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
+  <head>
+    <meta char="UTF-8">
+  </head>
 <body>
   <p><a href="./index.php">← Página incial</a></p>
   <?php $users = getRegularUsers(); ?>

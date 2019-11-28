@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Anomalias</title>
+  <meta char="UTF-8">
 </head>
 <body>
   <p><a href="./index.php">← Página incial</a></p>
