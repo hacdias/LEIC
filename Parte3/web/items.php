@@ -1,8 +1,19 @@
 <?php require __DIR__ . '/lib/lib.php'; ?>
 <html>
 <body>
-  <?php $items = getItems(); ?>
   <p><a href="./index.php">← Página incial</a></p>
+  <?php
+    $items = [];
+
+    try {
+      $items = getItems();
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter os items.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
+    }
+  ?>
+
   <form method="GET" action="./items_insert.php">
     <h2>Novo Item</h2>
     <input type="text" name="descricao" placeholder="Descrição" />

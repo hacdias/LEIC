@@ -5,9 +5,22 @@
 </head>
 <body>
   <p><a href="./index.php">← Página incial</a></p>
-  <?php $users = getUsers(); ?>
-  <?php $items = getItems(); ?>
-  <?php $anomalies = getAnomalies(); ?>
+
+  <?php
+    $items = [];
+    $users = [];
+    $anomalies = [];
+
+    try {
+      $users = getUsers();
+      $items = getItems();
+      $anomalies = getAnomalies();
+    } catch (PDOException $e) {
+      echo "<p>Não foi possível obter os dados.</p>";
+      echo "<p style='color:red'>$e;</p></body></html>";
+      die(1);
+    }
+  ?>
 
   <form method="GET" action="./incidences_insert.php">
     <label>Anomalia</label>

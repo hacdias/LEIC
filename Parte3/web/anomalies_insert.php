@@ -10,7 +10,7 @@
     $lingua = $_REQUEST['lingua'];
     $ts = $_REQUEST['date'] . ' ' . $_REQUEST['time'];
     $descricao = $_REQUEST['descricao'];
-    $tem_anomalia_redacao = $_REQUEST['tem_anomalia_redacao'] == 'on';
+    $tem_anomalia_redacao = $_REQUEST['tem_anomalia_redacao'] == 'on' ? 'True' : 'False';
 
     try {
       insertAnomaly($zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao);
