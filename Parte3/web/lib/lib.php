@@ -1,18 +1,15 @@
 <?php
 
-function getDB () {
-  $host = "db.ist.utl.pt";
-  $user ="ist189535";
-  $password = "kkha7371";
-  $dbname = $user;
+$host = "db.ist.utl.pt";
+$user ="ist189535";
+$password = "kkha7371";
+$dbname = $user;
 
-  $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-  $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  return $db;
-}
+$db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 function getTable ($table, $what) {
-  $db = getDB();
+  global $db;
 
   $sql = "SELECT " . join(", ", $what) . " FROM " . $table . ";";
   $result = $db->prepare($sql);
@@ -28,9 +25,8 @@ function getTable ($table, $what) {
 }
 
 function insert ($table, $values) {
-  $db = getDB();
-  $db->beginTransaction();
-
+  global $db;
+  
   $columns = array_keys($values);
   $vars = array_map(function ($column) {
     return ":" . $column;
@@ -48,7 +44,6 @@ function insert ($table, $values) {
   }
 
   $result->execute($toExecute);
-  $db->commit();
 }
 
 function getLocals () {
@@ -56,22 +51,28 @@ function getLocals () {
 }
 
 function removeLocal ($latitude, $longitude) {
-  $db = getDB();
-  $db->beginTransaction();
-
+  global $db;
+  
   $sql = "DELETE FROM local_publico WHERE latitude = :latitude AND longitude = :longitude;";
   $result = $db->prepare($sql);
   $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
-
-  $db->commit();
 }
 
 function insertLocal ($name, $latitude, $longitude) {
-  return insert("local_publico", [
-    "nome" => $name,
-    "latitude" => $latitude,
-    "longitude" => $longitude
-  ]);
+  global $db;
+  $db->beginTransaction();
+
+  try {
+    insert("local_publico", [
+      "nome" => $name,
+      "latitude" => $latitude,
+      "longitude" => $longitude
+    ]);
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function getItems () {
@@ -79,23 +80,29 @@ function getItems () {
 }
 
 function insertItem ($descricao, $localizacao, $latitude, $longitude) {
-  return insert("item", [
-    "descricao" => $descricao,
-    "localizacao" => $localizacao,
-    "latitude" => $latitude,
-    "longitude" => $longitude
-  ]);
+  global $db;
+  $db->beginTransaction();
+
+  try {
+    insert("item", [
+      "descricao" => $descricao,
+      "localizacao" => $localizacao,
+      "latitude" => $latitude,
+      "longitude" => $longitude
+    ]);
+
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function removeItem ($id) {
-  $db = getDB();
-  $db->beginTransaction();
-
+  global $db;
   $sql = "DELETE FROM item WHERE id = :id;";
   $result = $db->prepare($sql);
   $result->execute([':id' => $id]);
-
-  $db->commit();
 }
 
 function getAnomalies () {
@@ -103,6 +110,7 @@ function getAnomalies () {
 }
 
 function getAnomaliesAround ($latitude, $longitude, $dlatitude, $dlongitude) {
+  global $db;
   $latMin = $latitude - $dlatitude;
   $latMax = $latitude + $dlatitude;
   $lonMin = $longitude - $dlongitude;
@@ -123,7 +131,7 @@ function getAnomaliesAround ($latitude, $longitude, $dlatitude, $dlongitude) {
     ORDER BY anomalia_id;";
 
 
-  $db = getDB();
+  
   $result = $db->prepare($sql);
   $result->execute([
     ':latmin' => $latMin,
@@ -142,40 +150,72 @@ function getAnomaliesAround ($latitude, $longitude, $dlatitude, $dlongitude) {
 }
 
 function insertAnomaly ($zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao) {
-  return insert("anomalia", [
-    "zona" => $zona,
-    "imagem" => $imagem,
-    "lingua" => $lingua,
-    "ts" => $ts,
-    "descricao" => $descricao,
-    "tem_anomalia_redacao" => $tem_anomalia_redacao
-  ]);
+  global $db;
+  $db->beginTransaction();
+
+  try {
+    insert("anomalia", [
+      "zona" => $zona,
+      "imagem" => $imagem,
+      "lingua" => $lingua,
+      "ts" => $ts,
+      "descricao" => $descricao,
+      "tem_anomalia_redacao" => $tem_anomalia_redacao
+    ]);
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function insertDuplicate ($item1, $item2) {
-  return insert("duplicado", [
-    "item1" => $item1,
-    "item2" => $item2
-  ]);
+  global $db;
+  $db->beginTransaction();
+
+  try {
+    insert("duplicado", [
+      "item1" => $item1,
+      "item2" => $item2
+    ]);
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function insertIncidence ($anomaly, $item, $email) {
-  return insert("incidencia", [
-    "anomalia_id" => $anomaly,
-    "item_id" => $item,
-    "email" => $email
-  ]);
+  global $db;
+  $db->beginTransaction();
+
+  try {
+    insert("incidencia", [
+      "anomalia_id" => $anomaly,
+      "item_id" => $item,
+      "email" => $email
+    ]);
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function removeAnomaly ($id) {
-  $db = getDB();
+  global $db;
   $db->beginTransaction();
 
-  $sql = "DELETE FROM anomalia WHERE id = :id;";
-  $result = $db->prepare($sql);
-  $result->execute([':id' => $id]);
+  try {
+    $sql = "DELETE FROM anomalia WHERE id = :id;";
+    $result = $db->prepare($sql);
+    $result->execute([':id' => $id]);
 
-  $db->commit();
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function getRegularUsers () {
@@ -195,8 +235,7 @@ function getIncidences () {
 }
 
 function getCorrections () {
-  $db = getDB();
-
+  global $db;
   $sql = "SELECT email, nro, anomalia_id, texto, data_hora FROM correcao NATURAL JOIN proposta_de_correcao;";
   $result = $db->prepare($sql);
   $result->execute();
@@ -211,18 +250,23 @@ function getCorrections () {
 }
 
 function removeCorrection ($email, $nro, $anomaly) {
-  $db = getDB();
+  global $db;
   $db->beginTransaction();
 
-  $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id = :anomaly;";
-  $result = $db->prepare($sql);
-  $result->execute([':email' => $email, ':nro' => $nro, ':anomaly' => $anomaly]);
+  try {
+    $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id = :anomaly;";
+    $result = $db->prepare($sql);
+    $result->execute([':email' => $email, ':nro' => $nro, ':anomaly' => $anomaly]);
 
-  $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
-  $result = $db->prepare($sql);
-  $result->execute([':email' => $email, ':nro' => $nro]);
+    $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
+    $result = $db->prepare($sql);
+    $result->execute([':email' => $email, ':nro' => $nro]);
 
-  $db->commit();
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function getCorrectionProposals () {
@@ -230,50 +274,60 @@ function getCorrectionProposals () {
 }
 
 function insertCorrection ($email, $anomaly, $text) {
-  $db = getDB();
+  global $db;
   $db->beginTransaction();
 
-  $sql = "SELECT max(nro) FROM proposta_de_correcao WHERE email = :email;";
-  $result = $db->prepare($sql);
-  $result->execute([':email' => $email]);
+  try {
+    $sql = "SELECT max(nro) FROM proposta_de_correcao WHERE email = :email;";
+    $result = $db->prepare($sql);
+    $result->execute([':email' => $email]);
 
-  $nro = $result->fetch()['max'];
-  if ($nro == null) {
-    $nro = 0;
-  } else {
-    $nro = $nro + 1;
+    $nro = $result->fetch()['max'];
+    if ($nro == null) {
+      $nro = 0;
+    } else {
+      $nro = $nro + 1;
+    }
+    
+
+    insert("proposta_de_correcao", [
+      "texto" => $text,
+      "data_hora" => date(DATE_RFC2822),
+      "nro" => $nro,
+      "email" => $email
+    ]);
+
+    insert("correcao", [
+      "anomalia_id" => $anomaly,
+      "nro" => $nro,
+      "email" => $email
+    ]);
+
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
   }
-
-  insert("proposta_de_correcao", [
-    "texto" => $text,
-    "data_hora" => date(DATE_RFC2822),
-    "nro" => $nro,
-    "email" => $email
-  ]);
-
-  insert("correcao", [
-    "anomalia_id" => $anomaly,
-    "nro" => $nro,
-    "email" => $email
-  ]);
-
-  $db->commit();
 }
 
 function editCorrectionProposal ($email, $nro, $text) {
-  $db = getDB();
+  global $db;
   $db->beginTransaction();
 
-  $sql = "UPDATE proposta_de_correcao SET texto = :texto, data_hora = NOW() WHERE email = :email AND nro = :nro;";
-  $result = $db->prepare($sql);
-  $result->execute([':email' => $email, ':nro' => $nro, ':texto' => $text]);
+  try {
+    $sql = "UPDATE proposta_de_correcao SET texto = :texto, data_hora = NOW() WHERE email = :email AND nro = :nro;";
+    $result = $db->prepare($sql);
+    $result->execute([':email' => $email, ':nro' => $nro, ':texto' => $text]);
 
-  $db->commit();
+    $db->commit();
+  } catch (PDOException $e) {
+    $db->rollBack();
+    throw $e;
+  }
 }
 
 function getAnomaliesBetween ($latitude1, $longitude1, $latitude2, $longitude2) {
-  $db = getDB();
-
+  global $db;
   $sql = "SELECT anomalia_id AS id, ts, zona, imagem, lingua, descricao, tem_anomalia_redacao
   FROM incidencia NATURAL JOIN
     (SELECT latitude, longitude, nome
