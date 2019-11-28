@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Refresh" content="5; url=./corrections.php" />
-  <meta char="UTF-8">
+  <meta charset="UTF-8">
 </head>
 <body>
   <?php
