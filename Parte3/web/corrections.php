@@ -1,4 +1,12 @@
-<?php require __DIR__ . '/lib.php'; ?>
+<?php 
+  try {
+    require __DIR__ . '/lib.php';
+   } catch (PDOException $e) {
+    echo "<p style='color:red'>Não foi possível ligar à base de dados!</p>";
+    die(1);
+   }
+?>
+
 <html>
 <head>
   <meta charset="UTF-8">
@@ -19,7 +27,7 @@
       $incidences = getIncidences();
     } catch (PDOException $e) {
       echo "<p>Não foi possível obter os dados.</p>";
-      echo "<p style='color:red'>$e;</p></body></html>";
+      echo "<p style='color:red'>$e->getMessage();</p></body></html>";
       die(1);
     }
   ?>
