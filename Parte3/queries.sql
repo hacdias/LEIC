@@ -25,25 +25,25 @@ ORDER BY nome;
 SELECT email
 FROM (SELECT email
 	FROM utilizador_regular) AS u NATURAL JOIN
-	(SELECT anomalia_id
+	(SELECT anomalia_id, email
 	FROM incidencia) AS inc NATURAL JOIN
 	(SELECT id AS anomalia_id, ts
-	FROM anomalia) AS a NATURAL JOIN
+	FROM anomalia
+	WHERE ts BETWEEN '2019-01-01 00:00:00' AND '2019-06-30 23:59:59') AS a NATURAL JOIN
 	(SELECT id AS anomalia_id
 	FROM anomalia_traducao) AS at
-WHERE ts BETWEEN '2019-01-01 00:00:00' AND '2019-06-30 23:59:59'
 GROUP BY email
 HAVING COUNT (anomalia_id) >= ALL (
 	SELECT COUNT(anomalia_id)
 	FROM (SELECT email
 		FROM utilizador_regular) AS u NATURAL JOIN
-		(SELECT anomalia_id
+		(SELECT anomalia_id, email
 		FROM incidencia) AS inc NATURAL JOIN
 		(SELECT id AS anomalia_id, ts
-		FROM anomalia) AS a NATURAL JOIN
+		FROM anomalia
+		WHERE ts BETWEEN '2019-01-01 00:00:00' AND '2019-06-30 23:59:59') AS a NATURAL JOIN
 		(SELECT id AS anomalia_id
 		FROM anomalia_traducao) AS at
-	WHERE ts BETWEEN '2019-01-01 00:00:00' AND '2019-06-30 23:59:59'
 	GROUP BY email
 )
 ORDER BY email;
