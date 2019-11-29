@@ -1,10 +1,10 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
-  <meta http-equiv="Refresh" content="5; url=./duplicates.php" />
   <meta charset="UTF-8">
 </head>
 <body>
+  <p><a href="./duplicates.php">← Página anterior</a></p>
   <?php
     $item1 = $_REQUEST['item1'];
     $item2 = $_REQUEST['item2'];
@@ -29,6 +29,5 @@
       }
     }
   ?>
-  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

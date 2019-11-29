@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -19,10 +19,10 @@
 
   <form method="GET" action="./items_insert.php">
     <h2>Novo Item</h2>
-    <input type="text" name="descricao" placeholder="Descrição" />
-    <input type="text" name="localizacao" placeholder="Localização" />
-    <input type="number" min="-90" max="90" name="latitude" placeholder="Latitude" />
-    <input type="number" min="-180" max="180" name="longitude" placeholder="Longitude" />
+    <input required type="text" name="descricao" placeholder="Descrição" />
+    <input required type="text" name="localizacao" placeholder="Localização" />
+    <input required type="number" min="-90" max="90" name="latitude" placeholder="Latitude" />
+    <input required type="number" min="-180" max="180" name="longitude" placeholder="Longitude" />
     <input type="submit" value="Criar" />
   </form>
 

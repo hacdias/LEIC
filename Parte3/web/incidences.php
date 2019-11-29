@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
   <title>Incidência</title>
@@ -25,7 +25,7 @@
 
   <form method="GET" action="./incidences_insert.php">
     <label>Anomalia</label>
-    <select name="anomaly">
+    <select required name="anomaly">
       <?php foreach ($anomalies as $row): ?>
         <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
@@ -34,7 +34,7 @@
     <br>
 
     <label>Item</label>
-    <select name="item">
+    <select required name="item">
       <?php foreach ($items as $row): ?>
         <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
@@ -43,7 +43,7 @@
     <br>
 
     <label>Utilizador</label>
-    <select name="email">
+    <select required name="email">
       <?php foreach ($users as $row): ?>
         <option value="<?=$row['email']?>"><?=$row['email']?></option>
       <?php endforeach; ?> 

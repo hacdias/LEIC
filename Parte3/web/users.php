@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
   <head>
     <meta charset="UTF-8">

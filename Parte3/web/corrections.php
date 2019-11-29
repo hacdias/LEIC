@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -28,7 +28,7 @@
     <h2>Nova Correção & Proposta de Correção</h2>
 
     <label>Utilizador</label>
-    <select name="user">
+    <select required name="user">
       <?php foreach ($users as $row): ?>
         <option value="<?=$row['email']?>"><?=$row['email']?></option>
       <?php endforeach; ?>
@@ -37,7 +37,7 @@
     <br>
 
     <label>Incidência</label>
-    <select name="anomaly">
+    <select required name="anomaly">
       <?php foreach ($incidences as $row): ?>
         <option value="<?=$row['anomalia_id']?>"><?=$row['anomalia_id']?></option>
       <?php endforeach; ?>
@@ -47,7 +47,7 @@
 
     <label>Texto</label>
     <br>
-    <textarea name="text"></textarea>
+    <textarea required name="text"></textarea>
     <br>
     <br>
 

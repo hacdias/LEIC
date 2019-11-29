@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
   <title>Duplicates</title>
@@ -21,7 +21,7 @@
 
   <form method="GET" action="./duplicates_insert.php">
     <label>Item 1</label>
-    <select name="item1">
+    <select required name="item1">
       <?php foreach ($items as $row): ?>
         <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 
@@ -29,7 +29,7 @@
     <br>
 
     <label>Item 2</label>
-    <select name="item2">
+    <select required name="item2">
       <?php foreach ($items as $row): ?>
         <option value="<?=$row['id']?>">ID: <?=$row['id']?> - <?=$row['descricao']?></option>
       <?php endforeach; ?> 

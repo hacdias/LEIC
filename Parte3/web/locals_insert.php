@@ -1,10 +1,10 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Refresh" content="5; url=./locals.php" />
 </head>
 <body>
+  <p><a href="./locals.php">← Página anterior</a></p>
   <?php
     $name = $_REQUEST['name'];
     $latitude = $_REQUEST['latitude'];
@@ -18,6 +18,5 @@
       echo "<p style='color:red'>$e;</p>";
     }
   ?>
-  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

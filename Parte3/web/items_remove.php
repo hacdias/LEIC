@@ -1,10 +1,10 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>   
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Refresh" content="5; url=./items.php" />
 </head>
 <body>
+  <p><a href="./items.php">← Página anterior</a></p>
   <?php
     $id = $_REQUEST['id'];
 
@@ -17,6 +17,5 @@
     }
 
     ?>
-  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

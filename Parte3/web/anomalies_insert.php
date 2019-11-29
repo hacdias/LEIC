@@ -1,10 +1,10 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
-  <meta http-equiv="Refresh" content="5; url=./anomalies.php" />
   <meta charset="UTF-8">
 </head>
 <body>
+  <p><a href="./anomalies.php">← Página anterior</a></p>
   <?php
     $zona = $_REQUEST['zona'];
     $imagem = $_REQUEST['imagem'];
@@ -21,6 +21,5 @@
       echo "<p style='color:red'>$e;</p>";
     }
   ?>
-  <p>Será redirecionado dentro de 5 segundos.</p>
 </body>
 </html>

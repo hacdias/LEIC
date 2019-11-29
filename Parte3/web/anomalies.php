@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/lib/lib.php'; ?>
+<?php require __DIR__ . '/lib.php'; ?>
 <html>
 <head>
   <title>Anomalias</title>
@@ -9,12 +9,12 @@
 
   <form method="GET" action="./anomalies_insert.php">
     <h2>Nova Anomalia</h2>
-    <input type="text" name="zona" placeholder="Zona x1, y1, x2, y2" />
-    <input type="text" name="imagem" placeholder="Imagem (bits)" />
-    <input type="text" name="lingua" placeholder="Lingua" />
-    <input type="date" name="date" />
-    <input type="time" name="time" />
-    <input type="text" name="descricao" placeholder="Descrição" />
+    <input required type="text" name="zona" placeholder="Zona x1, y1, x2, y2" />
+    <input required type="text" name="imagem" placeholder="Imagem (bits)" />
+    <input required type="text" name="lingua" placeholder="Lingua" />
+    <input required type="date" name="date" />
+    <input required type="time" name="time" />
+    <input required type="text" name="descricao" placeholder="Descrição" />
     <input type="checkbox" name="tem_anomalia_redacao" />
     <label for="exampleCheck1">Tem anomalia de redação</label>
     <input type="submit" value="Criar" />
@@ -37,8 +37,8 @@
 
     <div>
       <label for="local1">Local 1</label>
-      <select name="local1" id="local1">
-        <option selected>Escolha...</option>
+      <select required name="local1" id="local1">
+        <option selected disabled>Escolha...</option>
         <?php foreach ($locals as $row): ?>
         <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> (<?=$row['latitude']?>, <?=$row['longitude']?>)</option>
        <?php endforeach; ?>
@@ -47,8 +47,8 @@
 
     <div>
       <label for="local2">Local 2</label>
-      <select name="local2" id="local2">
-        <option selected>Escolha...</option>
+      <select required name="local2" id="local2">
+        <option selected disabled>Escolha...</option>
         <?php foreach ($locals as $row): ?>
         <option value="<?=$row['latitude']?>,<?=$row['longitude']?>"><?=$row['nome']?> (<?=$row['latitude']?>, <?=$row['longitude']?>)</option>
        <?php endforeach; ?>
