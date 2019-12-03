@@ -1,21 +1,31 @@
---1
-CREATE INDEX data_hora_index on proposta_de_correcao(data_hora) 
+-- 1
+-- 1.1
 
-DROP INDEX data_hora_index
+CREATE INDEX data_hora_index ON proposta_de_correcao
+    USING BTREE(data_hora);
 
+-- 1.2
 
---2
-CREATE INDEX email_incidencia_index on incidencia(anomalia_id) 
-    using hash
+CREATE INDEX data_hora_index ON proposta_de_correcao
+    USING BTREE(data_hora);
 
-DROP INDEX email_incidencia_index
+-- 2
+CREATE INDEX email_incidencia_index ON incidencia 
+    USING HASH(anomalia_id);
 
---3
-CREATE INDEX email_correcao_index on correcao(anomalia_id) 
-    using btree
+-- 3
+-- 3.1
 
-DROP INDEX email_correcao_index
+CREATE INDEX email_correcao_index ON correcao 
+    USING BTREE(anomalia_id);
 
---4(Multiple key access(?))
+-- 3.2
 
+CREATE INDEX email_correcao_index ON correcao
+    USING BTREE(anomalia_id);
 
+-- 4
+
+CREATE INDEX anomalia_timestamp ON anomalia(ts)
+    USING BTREE
+    WHERE tem_anomalia_redacao = True;
