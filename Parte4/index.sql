@@ -20,9 +20,6 @@ CREATE INDEX email_correcao_index ON correcao
 
 -- 4
 
-CREATE INDEX anomalia_timestamp ON anomalia USING BTREE(ts)
-    WHERE tem_anomalia_redacao = True;
-
-CREATE INDEX anomalia_pattern ON anomalia USING BTREE(lingua)
+CREATE INDEX anomalia_timestamp ON anomalia USING BTREE(ts, lingua)
     WHERE tem_anomalia_redacao = True;
 
