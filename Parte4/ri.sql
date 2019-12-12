@@ -16,17 +16,13 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
-DROP TRIGGER IF EXISTS caixa_nao_sobrepoe_insert ON anomalia_traducao;
-DROP TRIGGER IF EXISTS caixa_nao_sobrepoe_update ON anomalia_traducao;
 
-CREATE TRIGGER caixa_nao_sobrepoe_insert BEFORE INSERT ON anomalia_traducao
-FOR EACH ROW EXECUTE PROCEDURE caixa_nao_sobrepoe_procedure();
+DROP TRIGGER IF EXISTS caixa_nao_sobrepoe ON anomalia_traducao;
 
-CREATE TRIGGER caixa_nao_sobrepoe_update BEFORE UPDATE ON anomalia_traducao
+CREATE TRIGGER caixa_nao_sobrepoe BEFORE INSERT OR UPDATE ON anomalia_traducao
 FOR EACH ROW EXECUTE PROCEDURE caixa_nao_sobrepoe_procedure();
 
 -- RI-4
--- TODO: ver
 
 CREATE OR REPLACE FUNCTION
 check_utilizador_procedure ()
@@ -50,7 +46,8 @@ $$ LANGUAGE PLPGSQL;
 
 DROP TRIGGER IF EXISTS check_utilizador ON utilizador;
 
-CREATE TRIGGER check_utilizador AFTER INSERT ON utilizador
+CREATE CONSTRAINT TRIGGER check_utilizador AFTER INSERT OR UPDATE OR DELETE ON utilizador
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE PROCEDURE check_utilizador_procedure();
 
 -- RI-5
@@ -73,7 +70,7 @@ $$ LANGUAGE PLPGSQL;
 
 DROP TRIGGER IF EXISTS check_utilizador_qualificado ON utilizador_qualificado;
 
-CREATE TRIGGER check_utilizador_qualificado BEFORE INSERT ON utilizador_qualificado
+CREATE TRIGGER check_utilizador_qualificado BEFORE INSERT OR UPDATE ON utilizador_qualificado
 FOR EACH ROW EXECUTE PROCEDURE check_utilizador_qualificado_procedure();
 
 -- RI-6
@@ -96,5 +93,5 @@ $$ LANGUAGE PLPGSQL;
 
 DROP TRIGGER IF EXISTS check_utilizador_regular ON utilizador_regular;
 
-CREATE TRIGGER check_utilizador_regular BEFORE INSERT ON utilizador_regular
+CREATE TRIGGER check_utilizador_regular BEFORE INSERT OR UPDATE ON utilizador_regular
 FOR EACH ROW EXECUTE PROCEDURE check_utilizador_regular_procedure();
