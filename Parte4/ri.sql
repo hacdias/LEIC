@@ -1,7 +1,23 @@
 -- RI-1
 
 CREATE OR REPLACE FUNCTION
-caixa_nao_sobrepoe_procedure ()
+caixa1_nao_sobrepoe_procedure ()
+RETURNS TRIGGER
+AS $$
+BEGIN
+	IF (EXISTS (
+      SELECT *
+      FROM anomalia_traducao
+      WHERE id = new.id AND zona2 && new.zona
+    )) THEN
+      RAISE EXCEPTION 'A zona 1 sobrepõe-se a outra zona.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION
+caixa2_nao_sobrepoe_procedure ()
 RETURNS TRIGGER
 AS $$
 BEGIN
@@ -16,11 +32,14 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+DROP TRIGGER IF EXISTS caixa_nao_sobrepoe_zona1 ON anomalia;
+DROP TRIGGER IF EXISTS caixa_nao_sobrepoe_zona2 ON anomalia_traducao;
 
-DROP TRIGGER IF EXISTS caixa_nao_sobrepoe ON anomalia_traducao;
+CREATE TRIGGER caixa_nao_sobrepoe_zona1 BEFORE UPDATE ON anomalia
+FOR EACH ROW EXECUTE PROCEDURE caixa1_nao_sobrepoe_procedure();
 
-CREATE TRIGGER caixa_nao_sobrepoe BEFORE INSERT OR UPDATE ON anomalia_traducao
-FOR EACH ROW EXECUTE PROCEDURE caixa_nao_sobrepoe_procedure();
+CREATE TRIGGER caixa_nao_sobrepoe_zona2 BEFORE INSERT OR UPDATE ON anomalia_traducao
+FOR EACH ROW EXECUTE PROCEDURE caixa2_nao_sobrepoe_procedure();
 
 -- RI-4
 
