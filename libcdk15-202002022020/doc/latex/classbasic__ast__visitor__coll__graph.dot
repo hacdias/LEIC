@@ -1,0 +1,6 @@
+digraph "basic_ast_visitor"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{basic_ast_visitor\n|# _debug\l|+ ~basic_ast_visitor()\l+ do_add_node()\l+ do_and_node()\l+ do_assignment_node()\l+ do_data_node()\l+ do_div_node()\l+ do_double_node()\l+ do_eq_node()\l+ do_ge_node()\l+ do_gt_node()\land 15 more...\l# basic_ast_visitor()\l# os()\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+}
