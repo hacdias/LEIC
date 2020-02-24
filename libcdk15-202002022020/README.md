@@ -1,2 +1,0 @@
-# libcdk
-Compiler Development Kit
