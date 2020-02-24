@@ -11,10 +11,15 @@
 // don't change this
 #define yyerror LexerError
 %}
-%x X_STRING
+%x X_STRING X_COMMENT
 %%
 
-"--".*                 ; /* ignore comments */
+"//".*                 ; /* ignore comments */
+
+"/*"                   yy_push_state(X_COMMENT);
+<X_COMMENT>"/*"        yy_push_state(X_COMMENT);
+<X_COMMENT>"*/"        yy_pop_state();
+<X_COMMENT>.           ;
 
 ">="                   return tGE; 
 "<="                   return tLE; 
