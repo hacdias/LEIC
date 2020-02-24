@@ -4,17 +4,17 @@ MAKEOPTS += ROOT=$(ROOT)
 
 LANGUAGE = og
 
-.PHONY: all clean build-src examples test
+.PHONY: all clean build examples test
 all: $(LANGUAGE)
 
-$(LANGUAGE): build-src
+$(LANGUAGE): build
 	cp src/$(LANGUAGE) .
 
-build-src:
+build:
 	$(MAKE) -C src $(MAKEOPTS) ast/all.h ast/visitor_decls.h # to work with multiple jobs
 	$(MAKE) -C src $(MAKEOPTS) all
 
-examples: build-src
+examples: build
 	$(MAKE) -C examples $(MAKEOPTS) all
 
 test: examples
