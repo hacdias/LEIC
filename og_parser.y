@@ -61,7 +61,7 @@ list : stmt	     { $$ = new cdk::sequence_node(LINE, $1); }
 
 stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1); }
      | tWRITE exps ';'                  { $$ = new og::write_node(LINE, $2); }
-     | tWRITELN exps ';'                { /* TODO */ }
+     | tWRITELN exps ';'                { $$ = new og::writeln_node(LINE, $2); }
      | tBREAK ';'                       { /* TODO */ }
      | tCONTINUE ';'                    { /* TODO */ }
      | tRETURN ';'                      { /* TODO */ }

@@ -166,6 +166,10 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
   // node->argument()->accept(this, lvl + 2);
 }
 
+void og::type_checker::do_writeln_node(og::writeln_node * const node, int lvl) {
+  // TODO
+}
+
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_read_node(og::read_node *const node, int lvl) {
