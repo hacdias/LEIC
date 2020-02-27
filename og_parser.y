@@ -43,7 +43,7 @@
 %left '*' '/' '%'
 %nonassoc tUNARY
 
-%type <node> stmt program var cond after_cond
+%type <node> stmt program var if elif
 %type <sequence> list exps vars ids
 %type <expression> expr
 %type <lvalue> lval
@@ -70,16 +70,17 @@ stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1)
      | tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
      | tFOR '(' vars ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
      | '{' list '}'                     { $$ = $2; }
-     | cond                             { $$ = $1; }
+     | if                               { $$ = $1; }
      ;
 
-after_cond : tELIF expr tTHEN stmt                     { $$ = new og::if_node(LINE, $2, $4); }
-     | after_cond tELIF expr tTHEN stmt %prec tIFX     { $$ = new og::if_node(LINE, $3, $5); }
-     | after_cond tELIF expr tTHEN stmt tELSE stmt     { $$ = new og::if_else_node(LINE, $3, $5, $7); }
+elif : tELIF expr tTHEN stmt %prec tIFX      { $$ = new og::if_node(LINE, $2, $4); }
+     | tELIF expr tTHEN stmt tELSE stmt      { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+     | tELIF expr elif                       { $$ = new og::if_node(LINE, $2, $3); }
      ;
 
-cond : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
-     | tIF expr tTHEN stmt after_cond        { $$ = new og::if_else_node(LINE, $2, $4, $5); }
+if   : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
+     | tIF expr tTHEN stmt tELSE stmt        { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+     | tIF expr tTHEN stmt elif              { $$ = new og::if_else_node(LINE, $2, $4, $5); }
      ;
 
 exps : expr                                  { $$ = new cdk::sequence_node(LINE, $1);     }
