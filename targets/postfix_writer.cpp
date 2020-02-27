@@ -273,3 +273,9 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
   node->elseblock()->accept(this, lvl + 2);
   _pf.LABEL(mklbl(lbl1 = lbl2));
 }
+
+//---------------------------------------------------------------------------
+
+void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
+  // TODO
+}

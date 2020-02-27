@@ -36,6 +36,7 @@ static std::ostringstream sstr;
 "read"                 return tREAD; 
 "begin"                return tBEGIN; 
 "end"                  return tEND; 
+"return"               return tRETURN;
 
 [A-Za-z][A-Za-z0-9_]*  yylval.s = new std::string(yytext); return tIDENTIFIER;
 
