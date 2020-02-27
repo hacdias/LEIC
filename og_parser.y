@@ -64,8 +64,8 @@ stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1)
      | tWRITELN exps ';'                { $$ = new og::writeln_node(LINE, $2); }
      | tBREAK ';'                       { $$ = new og::break_node(LINE); }
      | tCONTINUE ';'                    { $$ = new og::continue_node(LINE); }
-     | tRETURN ';'                      { /* TODO */ }
-     | tRETURN expr ';'                 { $$ = new og::return_node(LINE, $2); }
+     | tRETURN ';'                      { $$ = new og::return_node(LINE);}
+     | tRETURN expr ';'                 { $$ = new og::return_value_node(LINE, $2); }
      | tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
      | tFOR '(' vars ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
      | '{' list '}'                     { $$ = $2; }
