@@ -31,6 +31,7 @@
 %token tIF tTHEN tELIF tELSE tFOR tDO tFOR tDO tWRITE tWRITELN
 
 %nonassoc tIFX
+%nonassoc tELIF
 %nonassoc tELSE
 
 %right '='
@@ -73,11 +74,11 @@ stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1)
      ;
 
 after_cond : tELIF expr tTHEN stmt                     { $$ = new og::if_node(LINE, $2, $4); }
-     | after_cond tELIF expr tTHEN stmt                { $$ = new og::if_node(LINE, $3, $5); }
+     | after_cond tELIF expr tTHEN stmt %prec tIFX     { $$ = new og::if_node(LINE, $3, $5); }
      | after_cond tELIF expr tTHEN stmt tELSE stmt     { $$ = new og::if_else_node(LINE, $3, $5, $7); }
      ;
 
-cond : tIF expr tTHEN stmt                   { $$ = new og::if_node(LINE, $2, $4); }
+cond : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
      | tIF expr tTHEN stmt after_cond        { $$ = new og::if_else_node(LINE, $2, $4, $5); }
      ;
 
