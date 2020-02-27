@@ -42,7 +42,7 @@
 %left '*' '/' '%'
 %nonassoc tUNARY
 
-%type <node> stmt program var cond rec_cond
+%type <node> stmt program var cond after_cond
 %type <sequence> list exps vars ids
 %type <expression> expr
 %type <lvalue> lval
@@ -72,13 +72,13 @@ stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1)
      | cond                             { $$ = $1; }
      ;
 
-rec_cond: tELIF expr tTHEN stmt         { $$ = new og::if_node(LINE, $2, $4); }
-     | rec_cond tELIF expr tTHEN stmt   { /* TODO */ }
+after_cond : tELIF expr tTHEN stmt                     { $$ = new og::if_node(LINE, $2, $4); }
+     | after_cond tELIF expr tTHEN stmt                { $$ = new og::if_node(LINE, $3, $5); }
+     | after_cond tELIF expr tTHEN stmt tELSE stmt     { $$ = new og::if_else_node(LINE, $3, $5, $7); }
      ;
 
-cond : tIF expr tTHEN stmt                         { $$ = new og::if_node(LINE, $2, $4); }
-     | tIF expr tTHEN stmt rec_cond                { /* TODO */ }
-     | tIF expr tTHEN stmt rec_cond tELSE stmt     { /* TODO */ }
+cond : tIF expr tTHEN stmt                   { $$ = new og::if_node(LINE, $2, $4); }
+     | tIF expr tTHEN stmt after_cond        { $$ = new og::if_else_node(LINE, $2, $4, $5); }
      ;
 
 exps : expr                                  { $$ = new cdk::sequence_node(LINE, $1);     }
