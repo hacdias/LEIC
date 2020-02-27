@@ -199,3 +199,9 @@ void og::type_checker::do_if_else_node(og::if_else_node *const node, int lvl) {
 void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_id_node(og::id_node *const node, int lvl) {
+  // TODO
+}

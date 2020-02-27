@@ -281,3 +281,9 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::postfix_writer::do_id_node(og::id_node *const node, int lvl) {
+  // TODO
+}
