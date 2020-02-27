@@ -209,3 +209,16 @@ void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
 void og::type_checker::do_id_node(og::id_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_break_node(og::break_node *const node, int lvl) {
+  // TODO
+}
+
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_continue_node(og::continue_node *const node, int lvl) {
+  // TODO
+}

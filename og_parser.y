@@ -62,8 +62,8 @@ list : stmt	     { $$ = new cdk::sequence_node(LINE, $1); }
 stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1); }
      | tWRITE exps ';'                  { $$ = new og::write_node(LINE, $2); }
      | tWRITELN exps ';'                { $$ = new og::writeln_node(LINE, $2); }
-     | tBREAK ';'                       { /* TODO */ }
-     | tCONTINUE ';'                    { /* TODO */ }
+     | tBREAK ';'                       { $$ = new og::break_node(LINE); }
+     | tCONTINUE ';'                    { $$ = new og::continue_node(LINE); }
      | tRETURN ';'                      { /* TODO */ }
      | tRETURN expr ';'                 { $$ = new og::return_node(LINE, $2); }
      | tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
