@@ -181,6 +181,10 @@ void og::type_checker::do_while_node(og::while_node *const node, int lvl) {
   node->condition()->accept(this, lvl + 4);
 }
 
+void og::type_checker::do_for_node(og::for_node *const node, int lvl) {
+  // TODO
+}
+
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_if_node(og::if_node *const node, int lvl) {
