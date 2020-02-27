@@ -177,12 +177,10 @@ void og::type_checker::do_read_node(og::read_node *const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void og::type_checker::do_while_node(og::while_node *const node, int lvl) {
-  node->condition()->accept(this, lvl + 4);
-}
-
 void og::type_checker::do_for_node(og::for_node *const node, int lvl) {
   // TODO
+  // THIS WAS WHILE'S CODE
+  // node->condition()->accept(this, lvl + 4);
 }
 
 //---------------------------------------------------------------------------
