@@ -34,6 +34,9 @@
 %nonassoc tELSE
 
 %right '='
+%left tOR
+%left tAND
+%nonassoc '~'
 %left tGE tLE tEQ tNE '>' '<'
 %left '+' '-'
 %left '*' '/' '%'
