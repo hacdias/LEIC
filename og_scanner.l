@@ -29,6 +29,9 @@ static std::ostringstream sstr;
 "=="                  return tEQ;
 "!="                  return tNE;
 
+"&&"                  return tAND;
+"||"                  return tOR;
+
 "auto"                return tAUTO;
 "int"                 return tINT;
 "real"                return tREAL;
