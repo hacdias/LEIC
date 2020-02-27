@@ -69,11 +69,11 @@ stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1)
      | cond                             { $$ = $1; }
      ;
 
-rec_cond: tELIF expr tTHEN stmt         { $$ = new cdk::if_node(LINE, $2, $4); }
+rec_cond: tELIF expr tTHEN stmt         { $$ = new og::if_node(LINE, $2, $4); }
      | rec_cond tELIF expr tTHEN stmt   { /* TODO */ }
      ;
 
-cond : tIF expr tTHEN stmt                         { $$ = new cdk::if_node(LINE, $2, $4); }
+cond : tIF expr tTHEN stmt                         { $$ = new og::if_node(LINE, $2, $4); }
      | tIF expr tTHEN stmt rec_cond                { /* TODO */ }
      | tIF expr tTHEN stmt rec_cond tELSE stmt     { /* TODO */ }
      ;
