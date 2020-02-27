@@ -98,8 +98,12 @@ ids  : lval                                  { $$ = new cdk::sequence_node(LINE,
 
 expr : tINT                                  { $$ = new cdk::integer_node(LINE, $1); }
      | tSTRING                               { $$ = new cdk::string_node(LINE, $1); }
-     | tREAL                                 { $$ = new cdk::double_node(LINE, $1); }
+     | tREAL                                 { $$ = new cdk::double_node(LINE, $1);       }
      | '-' expr %prec tUNARY                 { $$ = new cdk::neg_node(LINE, $2); }
+     | '+' expr %prec tUNARY                 { /* TODO: $$ = og::id_node(LINE, $2); */ }
+     | '~' expr                              { $$ = new cdk::not_node(LINE, $2); }
+     | expr tAND expr	                    { $$ = new cdk::and_node(LINE, $1, $3); }
+     | expr tOR expr	                    { $$ = new cdk::or_node(LINE, $1, $3); }
      | expr '+' expr	                    { $$ = new cdk::add_node(LINE, $1, $3); }
      | expr '-' expr	                    { $$ = new cdk::sub_node(LINE, $1, $3); }
      | expr '*' expr	                    { $$ = new cdk::mul_node(LINE, $1, $3); }
