@@ -87,7 +87,7 @@ static std::ostringstream sstr;
   }
 
 ([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+) {
-    sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 16));
+    sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 10));
     yylval.r = strtod(sstr.str().c_str(), nullptr);
     sstr.str("");
     if (errno == ERANGE) yyerror("real overflow");
