@@ -101,13 +101,8 @@ prop : tPUBLIC
      | tREQUIRE
      ;
 
-func : prop typeauto lval vars block
-     | typeauto lval vars block
-     | typeauto lval vars
-     | typeauto lval block
-     | prop typeauto lval block
-     | prop typeauto block
-     | prop typeauto lval
+func : optprop type tIDENTIFIER optvars optblock
+     | optprop tAUTO tIDENTIFIER optvars optblock
      ;
 
 proc : tPROCEDURE lval
@@ -117,12 +112,6 @@ proc : tPROCEDURE lval
      | prop tPROCEDURE lval vars
      | prop tPROCEDURE lval vars block
      ;
-
-typeauto : type
-         | type typeauto
-         | auto
-         | auto typeauto
-         ;
 
 type : tINT
      | tREAL
@@ -224,5 +213,30 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
 
 lval : tIDENTIFIER                           { $$ = new cdk::variable_node(LINE, $1); }
      ;
+
+/*
+*             [ optional ]
+*/
+/*
+optexprs : /*empty*/
+         | exprs
+         ;
+
+optvars : /*empty*/
+         | vars
+         ;
+
+optblock : /*empty*/
+         | block
+         ;
+
+optprop : /*empy*/
+        | tPUBLIC
+        | tREQUIRE
+        ;
+*/
+
+
+          
 
 %%
