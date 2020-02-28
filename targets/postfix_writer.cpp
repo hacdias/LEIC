@@ -309,3 +309,9 @@ void og::postfix_writer::do_break_node(og::break_node *const node, int lvl) {
 void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::postfix_writer::do_var_node(og::var_node *const node, int lvl) {
+  // TODO
+}
