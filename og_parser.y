@@ -42,146 +42,89 @@
 %left '*' '/' '%'
 %nonassoc tUNARY
 
-%type <node> stmt program var if elif
-%type <sequence> list exps vars ids
+%type <node> inst program var icond iiter elif func proc inst decl
+%type <sequence> exps vars ids decls insts block
+%type <sequence> optexps optvars optdecls optinsts optblock
 %type <expression> expr
 %type <lvalue> lval
+%type <i> optpublic optprop
 
 %{
 //-- The rules below will be included in yyparse, the main parsing function.
 %}
 %%
 
-
-
-
-program : list { compiler->ast(new og::program_node(LINE, $1)); }
+program : decls { compiler->ast(new og::program_node(LINE, $1)); }
         ;
 
-list : stmt	     { $$ = new cdk::sequence_node(LINE, $1); }
-	   | list stmt { $$ = new cdk::sequence_node(LINE, $2, $1); }
-	   ;
+decls : decl             { $$ = new cdk::sequence_node(LINE, $1); }
+      | decl decls       { $$ = new cdk::sequence_node(LINE, $1, $2); }
+      ;
 
-stmt : expr ';'                         { $$ = new og::evaluation_node(LINE, $1); }
-     | tWRITE exps ';'                  { $$ = new og::write_node(LINE, $2); }
-     | tWRITELN exps ';'                { $$ = new og::writeln_node(LINE, $2); }
-     | tBREAK ';'                       { $$ = new og::break_node(LINE); }
-     | tCONTINUE ';'                    { $$ = new og::continue_node(LINE); }
-     | tRETURN ';'                      { $$ = new og::return_node(LINE);}
-     | tRETURN expr ';'                 { $$ = new og::return_value_node(LINE, $2); }
-     | tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
-     | tFOR '(' vars ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
-     | '{' list '}'                     { $$ = $2; }
-     | if                               { $$ = $1; }
+decl : var ";"           { $$ = $1; }
+     | func              { $$ = $1; }
+     | proc              { $$ = $1; }
      ;
 
-elif : tELIF expr tTHEN stmt %prec tIFX      { $$ = new og::if_node(LINE, $2, $4); }
-     | tELIF expr tTHEN stmt tELSE stmt      { $$ = new og::if_else_node(LINE, $2, $4, $6); }
-     | tELIF expr elif                       { $$ = new og::if_node(LINE, $2, $3); }
+var  : optprop type tIDENTIFIER                   { /* TODO */ }
+     | optprop type tIDENTIFIER '=' expr          { /* TODO */ }
+     | optpublic tTPAUTO ids '=' exps             { /* TODO */ }
      ;
 
-if   : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
-     | tIF expr tTHEN stmt tELSE stmt        { $$ = new og::if_else_node(LINE, $2, $4, $6); }
-     | tIF expr tTHEN stmt elif              { $$ = new og::if_else_node(LINE, $2, $4, $5); }
+func : optprop type tIDENTIFIER '(' optvars ')' optblock    { /* TODO */ }
+     | optprop tAUTO tIDENTIFIER optvars optblock           { /* TODO */ }
+     ;
+
+proc : optprop tPROCEDURE tIDENTIFIER '(' optvars ')' optblock   { /* TODO */ }
      ;
 
 exps : expr                                  { $$ = new cdk::sequence_node(LINE, $1);     }
 	| exps ',' expr                         { $$ = new cdk::sequence_node(LINE, $3, $1); }
 	;
 
-/*
+type : tTPINT
+     | tTPREAL
+     | tTPSTRING
+     | tTPPTR '<' type '>'
+     | tTPPTR '<' tTPAUTO '>'
+     ;
 
-fd : decls
-
-decls : decl
-      | decl decls
+block : '{' optdecls optinsts '}'            { $$ = new cdk::sequence_node(LINE, $2, $3); }
       ;
 
-prop : tPUBLIC
-     | tREQUIRE
-     ;
-
-func : optprop type tIDENTIFIER optvars optblock
-     | optprop tAUTO tIDENTIFIER optvars optblock
-     ;
-
-proc : tPROCEDURE lval
-     | tPROCEDURE lval vars
-     | tPROCEDURE lval vars block
-     | prop tPROCEDURE lval
-     | prop tPROCEDURE lval vars
-     | prop tPROCEDURE lval vars block
-     ;
-
-type : tINT
-     | tREAL
-     | tSTRING
-     | tTPPTR "<" typeauto ">"
-
-block : "{" "}"
-      | "{" decls"}"
-      | "{" insts "}"
-      | "{" decls insts "}"
+insts : inst                                 { $$ = new cdk::sequence_node(LINE, $1); }
+      | inst insts                           { $$ = new cdk::sequence_node(LINE, $1, $2); }
       ;
 
-decl : var ";"
-     | func
-     | proc
+inst : expr ';'                              { $$ = new og::evaluation_node(LINE, $1); }
+     | tWRITE exps ';'                       { $$ = new og::write_node(LINE, $2); }
+     | tWRITELN exps ';'                     { $$ = new og::writeln_node(LINE, $2); }
+     | tBREAK                                { $$ = new og::break_node(LINE); }
+     | tCONTINUE                             { $$ = new og::continue_node(LINE); }
+     | tRETURN ';'                           { $$ = new og::return_node(LINE);}
+     | tRETURN expr ';'                      { $$ = new og::return_value_node(LINE, $2); }
+     | icond                                 { $$ = $1; }
+     | iiter                                 { $$ = $1; }
+     | block                                 { $$ = $1; }
      ;
 
-insts : inst
-      | inst insts
-      ;
-
-inst : expr ";"
-     | tWRITE exprs ";"
-     | tWRITELN exprs ";"
-     | next exprs ";"
-     | next ";"
-     | icond
-     | iiter
-     | block
-     ;
-      
-next : tBREAK
-     | tCONTINUE
-     | tRETURN
-     ;
-
-elif : tELIF expr tTHEN stmt %prec tIFX      { $$ = new og::if_node(LINE, $2, $4); }
-     | tELIF expr tTHEN stmt tELSE stmt      { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+elif : tELIF expr tTHEN inst %prec tIFX      { $$ = new og::if_node(LINE, $2, $4); }
+     | tELIF expr tTHEN inst tELSE inst      { $$ = new og::if_else_node(LINE, $2, $4, $6); }
      | tELIF expr elif                       { $$ = new og::if_node(LINE, $2, $3); }
      ;
 
-icond : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
-      | tIF expr tTHEN stmt tELSE stmt        { $$ = new og::if_else_node(LINE, $2, $4, $6); }
-      | tIF expr tTHEN stmt elif              { $$ = new og::if_else_node(LINE, $2, $4, $5); }
+icond : tIF expr tTHEN inst %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
+      | tIF expr tTHEN inst tELSE inst        { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+      | tIF expr tTHEN inst elif              { $$ = new og::if_else_node(LINE, $2, $4, $5); }
       ;
 
-iiter : tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
-      | tFOR '(' vars ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
+iiter : tFOR optvars ';' optexps ';' optexps tDO optblock { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
+      | tFOR optexps ';' optexps ';' optexps tDO optblock { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
       ;
-
-
-exprs : expr
-      | expr "," exprs
-      ;
-
-*/
 
 vars : var                                   { $$ = new cdk::sequence_node(LINE, $1);     }
 	| vars ',' var                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
 	;
-
-var  : 
-    /*
-       lval
-     | prop lval
-     | lval "=" expr
-     | prop lval "=" expr
-     
-    */
-     ;
 
 ids  : lval                                  { $$ = new cdk::sequence_node(LINE, $1);     }
      | ids ',' lval                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
@@ -207,6 +150,7 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
      | expr tNE expr	                    { $$ = new cdk::ne_node(LINE, $1, $3); }
      | expr tEQ expr	                    { $$ = new cdk::eq_node(LINE, $1, $3); }
      | '(' expr ')'                          { $$ = $2; }
+     | '[' expr ']'                          { /* TODO */ }
      | lval                                  { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
      | lval '=' expr                         { $$ = new cdk::assignment_node(LINE, $1, $3); }
      ;
@@ -217,26 +161,34 @@ lval : tIDENTIFIER                           { $$ = new cdk::variable_node(LINE,
 /*
 *             [ optional ]
 */
-/*
-optexprs : /*empty*/
-         | exprs
-         ;
 
-optvars : /*empty*/
-         | vars
-         ;
+optvars : /* empty */    { $$ = nullptr; }
+     | vars              { $$ = $1; }
+     ;
 
-optblock : /*empty*/
-         | block
-         ;
+optexps : /* empty */    { $$ = nullptr; }
+     | exps              { $$ = $1; }
+     ;
 
-optprop : /*empy*/
-        | tPUBLIC
-        | tREQUIRE
-        ;
-*/
+optblock : /*empty*/     { $$ = nullptr; }
+     | block             { $$ = $1; }
+     ;
 
+optinsts : /* empty */   { $$ = nullptr; }
+     | insts             { $$ = $1; }
+     ;
 
-          
+optdecls : /* empty */   { $$ = nullptr; }
+     | decls             { $$ = $1; }
+     ;
+
+optpublic: /* empty */   { $$ = 0; }
+     | tPUBLIC           { $$ = 1; }
+     ;
+
+optprop : /* empty */    { $$ = 0; }
+     | tPUBLIC           { $$ = 1; }
+     | tREQUIRE          { $$ = 2; }
+     ;
 
 %%
