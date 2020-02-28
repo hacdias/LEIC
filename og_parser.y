@@ -79,21 +79,21 @@ proc : optprop tPROCEDURE tIDENTIFIER '(' optvars ')' optblock   { /* TODO */ }
      ;
 
 exps : expr                                  { $$ = new cdk::sequence_node(LINE, $1);     }
-	| exps ',' expr                         { $$ = new cdk::sequence_node(LINE, $3, $1); }
-	;
+     | exps ',' expr                         { $$ = new cdk::sequence_node(LINE, $3, $1); }
+     ;
 
-type : tTPINT
-     | tTPREAL
-     | tTPSTRING
-     | tTPPTR '<' type '>'
-     | tTPPTR '<' tTPAUTO '>'
+type : tTPINT                                { /* TODO */ }
+     | tTPREAL                               { /* TODO */ }
+     | tTPSTRING                             { /* TODO */ }
+     | tTPPTR '<' type '>'                   { /* TODO */ }
+     | tTPPTR '<' tTPAUTO '>'                { /* TODO */ }
      ;
 
 block : '{' optdecls optinsts '}'            { $$ = new cdk::sequence_node(LINE, $2, $3); }
       ;
 
 insts : inst                                 { $$ = new cdk::sequence_node(LINE, $1); }
-      | inst insts                           { $$ = new cdk::sequence_node(LINE, $1, $2); }
+      | insts inst                            { $$ = new cdk::sequence_node(LINE, $2, $1); }
       ;
 
 inst : expr ';'                              { $$ = new og::evaluation_node(LINE, $1); }
@@ -123,8 +123,8 @@ iiter : tFOR optvars ';' optexps ';' optexps tDO optblock { $$ = new og::for_nod
       ;
 
 vars : var                                   { $$ = new cdk::sequence_node(LINE, $1);     }
-	| vars ',' var                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
-	;
+     | vars ',' var                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
+     ;
 
 ids  : lval                                  { $$ = new cdk::sequence_node(LINE, $1);     }
      | ids ',' lval                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
