@@ -72,7 +72,7 @@ var  : optprop type tIDENTIFIER                   { /* TODO */ }
      ;
 
 func : optprop type tIDENTIFIER '(' optvars ')' optblock    { /* TODO */ }
-     | optprop tAUTO tIDENTIFIER optvars optblock           { /* TODO */ }
+     | optprop tTPAUTO tIDENTIFIER optvars optblock         { /* TODO */ }
      ;
 
 proc : optprop tPROCEDURE tIDENTIFIER '(' optvars ')' optblock   { /* TODO */ }
