@@ -15,13 +15,12 @@ namespace og {
     int _prop;
     cdk::basic_type *_type;
     std::string _identifier;
-    bool _eq;
     cdk::expression_node *_expression;
 
   public:
 
-    inline var_node(int lineno, int prop, cdk::basic_type *type, std::string identifier, bool eq, cdk::expression_node *expression) :
-        cdk::basic_node(lineno), _type(type), _identifier(identifier), _eq(eq), _expression(expression) {
+    inline var_node(int lineno, int prop, cdk::basic_type *type, std::string identifier, cdk::expression_node *expression) :
+        cdk::basic_node(lineno), _type(type), _identifier(identifier), _expression(expression) {
     }
 
   public:
@@ -35,10 +34,6 @@ namespace og {
 
     inline std::string& identifier() {
       return _identifier;
-    }
-
-    inline bool eq() {
-      return _eq;
     }
 
     inline cdk::expression_node * expression() {
