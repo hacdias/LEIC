@@ -23,7 +23,7 @@
 %token <i> tINT
 %token <s> tIDENTIFIER tSTRING
 %token <r> tREAL
-%token tTPTR tTINT tTSTRING tTREAL tTAUTO
+%token tTPPTR tTPINT tTPSTRING tTPREAL tTPAUTO
 %token tPUBLIC tREQUIRE
 %token tSIZEOF tNULLPTR tPROCEDURE
 %token tBREAK tCONTINUE tRETURN tINPUT
@@ -51,6 +51,9 @@
 //-- The rules below will be included in yyparse, the main parsing function.
 %}
 %%
+
+
+
 
 program : list { compiler->ast(new og::program_node(LINE, $1)); }
         ;
@@ -124,7 +127,7 @@ typeauto : type
 type : tINT
      | tREAL
      | tSTRING
-     | tTPTR "<" typeauto ">"
+     | tTPPTR "<" typeauto ">"
 
 block : "{" "}"
       | "{" decls"}"

@@ -32,11 +32,11 @@ static std::ostringstream sstr;
 "&&"                  return tAND;
 "||"                  return tOR;
 
-"auto"                return tTAUTO;
-"int"                 return tTINT;
-"real"                return tTREAL;
-"string"              return tTSTRING;
-"ptr"                 return tTPTR;
+"auto"                return tTPAUTO;
+"int"                 return tTPINT;
+"real"                return tTPREAL;
+"string"              return tTPSTRING;
+"ptr"                 return tTPPTR;
 
 "public"              return tPUBLIC;
 "require"             return tREQUIRE;
