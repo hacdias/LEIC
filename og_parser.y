@@ -87,12 +87,110 @@ exps : expr                                  { $$ = new cdk::sequence_node(LINE,
 	| exps ',' expr                         { $$ = new cdk::sequence_node(LINE, $3, $1); }
 	;
 
-var  :
+/*
+
+fd : decls
+
+decls : decl
+      | decl decls
+      ;
+
+prop : tPUBLIC
+     | tREQUIRE
      ;
+
+func : prop typeauto lval vars block
+     | typeauto lval vars block
+     | typeauto lval vars
+     | typeauto lval block
+     | prop typeauto lval block
+     | prop typeauto block
+     | prop typeauto lval
+     ;
+
+proc : tPROCEDURE lval
+     | tPROCEDURE lval vars
+     | tPROCEDURE lval vars block
+     | prop tPROCEDURE lval
+     | prop tPROCEDURE lval vars
+     | prop tPROCEDURE lval vars block
+     ;
+
+typeauto : type
+         | type typeauto
+         | auto
+         | auto typeauto
+         ;
+
+type : tINT
+     | tREAL
+     | tSTRING
+     | tPTR "<" typeauto ">"
+
+block : "{" "}"
+      | "{" decls"}"
+      | "{" insts "}"
+      | "{" decls insts "}"
+      ;
+
+decl : var ";"
+     | func
+     | proc
+     ;
+
+insts : inst
+      | inst insts
+      ;
+
+inst : expr ";"
+     | tWRITE exprs ";"
+     | tWRITELN exprs ";"
+     | next exprs ";"
+     | next ";"
+     | icond
+     | iiter
+     | block
+     ;
+      
+next : tBREAK
+     | tCONTINUE
+     | tRETURN
+     ;
+
+elif : tELIF expr tTHEN stmt %prec tIFX      { $$ = new og::if_node(LINE, $2, $4); }
+     | tELIF expr tTHEN stmt tELSE stmt      { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+     | tELIF expr elif                       { $$ = new og::if_node(LINE, $2, $3); }
+     ;
+
+icond : tIF expr tTHEN stmt %prec tIFX        { $$ = new og::if_node(LINE, $2, $4); }
+      | tIF expr tTHEN stmt tELSE stmt        { $$ = new og::if_else_node(LINE, $2, $4, $6); }
+      | tIF expr tTHEN stmt elif              { $$ = new og::if_else_node(LINE, $2, $4, $5); }
+      ;
+
+iiter : tFOR '(' exps ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
+      | tFOR '(' vars ';' exps ';' exps ') tDO' stmt { $$ = new og::for_node(LINE, $3, $5, $7, $9); }
+      ;
+
+
+exprs : expr
+      | expr "," exprs
+      ;
+
+*/
 
 vars : var                                   { $$ = new cdk::sequence_node(LINE, $1);     }
 	| vars ',' var                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
 	;
+
+var  : 
+    /*
+       lval
+     | prop lval
+     | lval "=" expr
+     | prop lval "=" expr
+     
+    */
+     ;
 
 ids  : lval                                  { $$ = new cdk::sequence_node(LINE, $1);     }
      | ids ',' lval                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
