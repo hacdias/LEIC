@@ -32,11 +32,12 @@ static std::ostringstream sstr;
 "&&"                  return tAND;
 "||"                  return tOR;
 
-"auto"                return tAUTO;
-"int"                 return tINT;
-"real"                return tREAL;
-"string"              return tSTRING;
-"ptr"                 return tPTR;
+"auto"                return tTAUTO;
+"int"                 return tTINT;
+"real"                return tTREAL;
+"string"              return tTSTRING;
+"ptr"                 return tTPTR;
+
 "public"              return tPUBLIC;
 "require"             return tREQUIRE;
 "sizeof"              return tSIZEOF;
@@ -72,12 +73,26 @@ static std::ostringstream sstr;
     sstr.str("");
   }
 
-<X_STRING>\n           yyerror("newline in string");
+<X_STRING>\n            yyerror("newline in string");
 <X_INVALSTRING>\"       yy_pop_state(); yy_pop_state(); return tSTRING;
 <X_INVALSTRING>\\\"     ;
 <X_INVALSTRING>.        ;
 
-[0-9]+                 yylval.i = strtol(yytext, nullptr, 10); return tINT;
+[0-9]+                   yylval.i = strtol(yytext, nullptr, 10); return tINT;
+
+0x[0-9A-Fa-f]+  {
+    yylval.i = strtoul(yytext, nullptr, 16);
+    if (errno == ERANGE) yyerror("int overflow");
+    return tINT;
+  }
+
+([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+) {
+    sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 16));
+    yylval.r = strtod(sstr.str().c_str(), nullptr);
+    sstr.str("");
+    if (errno == ERANGE) yyerror("real overflow");
+    return tREAL;
+  }
 
 [-()<>=+*/%;{}.]       return *yytext;
 
