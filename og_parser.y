@@ -59,7 +59,7 @@ program : decls { compiler->ast(new og::program_node(LINE, $1)); }
         ;
 
 decls : decl             { $$ = new cdk::sequence_node(LINE, $1); }
-      | decl decls       { $$ = new cdk::sequence_node(LINE, $1, $2); }
+      | decls decl       { $$ = new cdk::sequence_node(LINE, $2, $1); }
       ;
 
 decl : var ";"           { $$ = $1; }
