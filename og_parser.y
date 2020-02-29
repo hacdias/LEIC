@@ -18,6 +18,7 @@
   cdk::sequence_node    *sequence;
   cdk::expression_node  *expression;    /* expression nodes */
   cdk::lvalue_node      *lvalue;
+  cdk::basic_type       *type;          /* a type */
 };
 
 %token <i> tINT
@@ -42,15 +43,17 @@
 %left '*' '/' '%'
 %nonassoc tUNARY
 
-%type <node> inst program var icond iiter elif func proc inst decl typeauto type
+%type <node> inst program var icond iiter elif func proc inst decl
 %type <sequence> exps vars ids decls insts block args
 %type <expression> expr
 %type <lvalue> lval
+%type <type> type typeauto
 
 %{
 //-- The rules below will be included in yyparse, the main parsing function.
 %}
 %%
+
 
 program : decls { compiler->ast(new og::program_node(LINE, $1)); }
         ;
@@ -102,10 +105,10 @@ typeauto: type                               { /* TODO */ }
      | tTPAUTO                               { /* TODO */ }
      ;
 
-type : tTPINT                                { /* TODO */ }
-     | tTPREAL                               { /* TODO */ }
-     | tTPSTRING                             { /* TODO */ }
-     | tTPPTR '<' type '>'                   { /* TODO */ }
+type : tTPINT                                { new cdk::primitive_type(4, cdk::TYPE_INT); }
+     | tTPREAL                               { new cdk::primitive_type(8, cdk::TYPE_DOUBLE); }
+     | tTPSTRING                             { new cdk::primitive_type(4, cdk::TYPE_STRING); }
+     | tTPPTR '<' type '>'                   { new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>($3)); }
      | tTPPTR '<' tTPAUTO '>'                { /* TODO */ }
      ;
 
