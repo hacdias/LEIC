@@ -86,7 +86,7 @@ static std::ostringstream sstr;
     return tINT;
   }
 
-([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+) {
+((([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))([eE][0-9]*)*)|([0-9]+[eE][0-9]+) {
     sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 10));
     yylval.r = strtod(sstr.str().c_str(), nullptr);
     sstr.str("");
@@ -94,7 +94,7 @@ static std::ostringstream sstr;
     return tREAL;
   }
 
-[-()<>=+*/%;{}.@]       return *yytext;
+[-()[\]<>=+*/%;{}.,@?]    return *yytext;
 
 [ \t\n]+               ; /* ignore whitespace */
 

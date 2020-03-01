@@ -28,9 +28,9 @@
 %token tPUBLIC tREQUIRE
 %token tSIZEOF tNULLPTR tPROCEDURE
 %token tBREAK tCONTINUE tRETURN tINPUT
-%token tIF tTHEN tELIF tELSE tFOR tDO tFOR tDO tWRITE tWRITELN
+%token tIF tTHEN tELIF tELSE tFOR tDO tWRITE tWRITELN
 
-%nonassoc tIFX
+%nonassoc tIFX tBLOCKX
 %nonassoc tELIF
 %nonassoc tELSE
 
@@ -42,19 +42,19 @@
 %left '+' '-'
 %left '*' '/' '%'
 %nonassoc tUNARY
-%nonassoc '(' '['
+%nonassoc '(' '[' '{'
 
+%type <s> strings
 %type <node> inst program var icond iiter elif func proc inst decl
-%type <sequence> exps vars ids decls insts block args
+%type <sequence> exps vars decls insts block args
 %type <expression> expr
 %type <lvalue> lval
-%type <type> type typeauto
+%type <type> type
 
 %{
 //-- The rules below will be included in yyparse, the main parsing function.
 %}
 %%
-
 
 program : decls { compiler->ast(new og::program_node(LINE, $1)); }
         ;
@@ -78,20 +78,30 @@ var  :              type tIDENTIFIER                                  { /* TODO 
      | tPUBLIC      tTPAUTO ids '=' exps                              { /* TODO */ }
      ;
 
-func :              typeauto tIDENTIFIER '(' args ')'                 { /* TODO */ }
-     | tPUBLIC      typeauto tIDENTIFIER '(' args ')'                 { /* TODO */ }
-     | tREQUIRE     typeauto tIDENTIFIER '(' args ')'                 { /* TODO */ }
-     |              typeauto tIDENTIFIER '(' args ')' block           { /* TODO */ }
-     | tPUBLIC      typeauto tIDENTIFIER '(' args ')' block           { /* TODO */ }
-     | tREQUIRE     typeauto tIDENTIFIER '(' args ')' block           { /* TODO */ }
+ids  : tIDENTIFIER                                                    { /* TODO */ }
+     | ids ',' tIDENTIFIER                                            { /* TODO */ }
      ;
 
-proc :              tPROCEDURE tIDENTIFIER '(' args ')'               { /* TODO */ }
-     | tPUBLIC      tPROCEDURE tIDENTIFIER '(' args ')'               { /* TODO */ }
-     | tREQUIRE     tPROCEDURE tIDENTIFIER '(' args ')'               { /* TODO */ }
-     |              tPROCEDURE tIDENTIFIER '(' args ')' block         { /* TODO */ }
-     | tPUBLIC      tPROCEDURE tIDENTIFIER '(' args ')' block         { /* TODO */ }
-     | tREQUIRE     tPROCEDURE tIDENTIFIER '(' args ')' block         { /* TODO */ }
+func :              type     tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     | tPUBLIC      type     tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     | tREQUIRE     type     tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     |              type     tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     | tPUBLIC      type     tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     | tREQUIRE     type     tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     |              tTPAUTO  tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     | tPUBLIC      tTPAUTO  tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     | tREQUIRE     tTPAUTO  tIDENTIFIER '(' args ')' %prec tBLOCKX        { /* TODO */ }
+     |              tTPAUTO  tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     | tPUBLIC      tTPAUTO  tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     | tREQUIRE     tTPAUTO  tIDENTIFIER '(' args ')' block                { /* TODO */ }
+     ;
+
+proc :              tPROCEDURE tIDENTIFIER '(' args ')' %prec tBLOCKX      { /* TODO */ }
+     | tPUBLIC      tPROCEDURE tIDENTIFIER '(' args ')' %prec tBLOCKX      { /* TODO */ }
+     | tREQUIRE     tPROCEDURE tIDENTIFIER '(' args ')' %prec tBLOCKX      { /* TODO */ }
+     |              tPROCEDURE tIDENTIFIER '(' args ')' block              { /* TODO */ }
+     | tPUBLIC      tPROCEDURE tIDENTIFIER '(' args ')' block              { /* TODO */ }
+     | tREQUIRE     tPROCEDURE tIDENTIFIER '(' args ')' block              { /* TODO */ }
      ;
 
 args : /* empty */  { $$ = nullptr; }
@@ -100,10 +110,6 @@ args : /* empty */  { $$ = nullptr; }
 
 exps : expr                                  { $$ = new cdk::sequence_node(LINE, $1);     }
      | exps ',' expr                         { $$ = new cdk::sequence_node(LINE, $3, $1); }
-     ;
-
-typeauto: type                               { /* TODO */ }
-     | tTPAUTO                               { /* TODO */ }
      ;
 
 type : tTPINT                                { new cdk::primitive_type(4, cdk::TYPE_INT); }
@@ -126,10 +132,11 @@ insts : inst                                 { $$ = new cdk::sequence_node(LINE,
 inst : expr ';'                              { $$ = new og::evaluation_node(LINE, $1); }
      | tWRITE exps ';'                       { $$ = new og::write_node(LINE, $2); }
      | tWRITELN exps ';'                     { $$ = new og::writeln_node(LINE, $2); }
+     | tSIZEOF '(' exps ')'                  { /* TODO */ }
      | tBREAK                                { $$ = new og::break_node(LINE); }
      | tCONTINUE                             { $$ = new og::continue_node(LINE); }
      | tRETURN ';'                           { $$ = new og::return_node(LINE);}
-     | tRETURN expr ';'                      { $$ = new og::return_value_node(LINE, $2); }
+     | tRETURN exps ';'                      { $$ = new og::return_value_node(LINE, $2); }
      | icond                                 { $$ = $1; }
      | iiter                                 { $$ = $1; }
      | block                                 { $$ = $1; }
@@ -153,19 +160,21 @@ iiter : tFOR exps   ';' exps  ';' exps  tDO inst       { $$ = new og::for_node(L
       | tFOR        ';' exps  ';'       tDO inst       { $$ = new og::for_node(LINE, nullptr, $3, nullptr, $6); }
       | tFOR        ';'       ';' exps  tDO inst       { $$ = new og::for_node(LINE, nullptr, nullptr, $4, $6); }
       | tFOR        ';'       ';'       tDO inst       { $$ = new og::for_node(LINE, nullptr, nullptr, nullptr, $5); }
+      | tFOR vars   ';' exps  ';' exps  tDO inst       { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
+      | tFOR vars   ';' exps  ';'       tDO inst       { $$ = new og::for_node(LINE, $2, $4, nullptr, $7); }
+      | tFOR vars   ';'       ';' exps  tDO inst       { $$ = new og::for_node(LINE, $2, nullptr, $5, $7); }
+      | tFOR vars   ';'       ';'       tDO inst       { $$ = new og::for_node(LINE, $2, nullptr, nullptr, $6); }
       ;
 
 vars : var                                   { $$ = new cdk::sequence_node(LINE, $1);     }
      | vars ',' var                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
      ;
 
-ids  : lval                                  { $$ = new cdk::sequence_node(LINE, $1);     }
-     | ids ',' lval                          { $$ = new cdk::sequence_node(LINE, $3, $1); }
-     ;
-
 expr : tINT                                  { $$ = new cdk::integer_node(LINE, $1); }
-     | tSTRING                               { $$ = new cdk::string_node(LINE, $1); }
+     | strings                               { $$ = new cdk::string_node(LINE, $1); }
      | tREAL                                 { $$ = new cdk::double_node(LINE, $1); }
+     | tNULLPTR                              { /* TODO: NULLPTR */ }
+     | tINPUT                                { /* TODO */ }
      | '-' expr %prec tUNARY                 { $$ = new cdk::neg_node(LINE, $2); }
      | '+' expr %prec tUNARY                 { $$ = new og::id_node(LINE, $2); }
      | '~' expr                              { $$ = new cdk::not_node(LINE, $2); }
@@ -185,6 +194,7 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
      | '(' expr ')'                          { $$ = $2; }
      | '[' expr ']'                          { /* TODO */ }
      | lval                                  { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
+     | lval '?'                              { /* TODO: returns pointer */ }
      | lval '=' expr                         { $$ = new cdk::assignment_node(LINE, $1, $3); }
      | tIDENTIFIER '(' exps ')'              { /* TODO: func call with args */ }
      | tIDENTIFIER '(' ')'                   { /* TODO: func call no args */ }
@@ -192,7 +202,11 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
 
 lval : tIDENTIFIER                           { $$ = new cdk::variable_node(LINE, $1); }
      | expr '[' expr ']'                     { /* TODO: ponteiro index */ }
-     | tIDENTIFIER '@' '[' tINT ']'          { /* TODO: tuplo index */ }
+     | tIDENTIFIER '@' tINT                  { /* TODO: tuplo index */ }
      ;
+
+strings : tSTRING                            { $$ = $1; }
+        | strings tSTRING                    { $$ = new std::string(*$1 + *$2); }
+        ;
 
 %%
