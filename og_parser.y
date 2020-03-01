@@ -132,7 +132,6 @@ insts : inst                                 { $$ = new cdk::sequence_node(LINE,
 inst : expr ';'                              { $$ = new og::evaluation_node(LINE, $1); }
      | tWRITE exps ';'                       { $$ = new og::write_node(LINE, $2); }
      | tWRITELN exps ';'                     { $$ = new og::writeln_node(LINE, $2); }
-     | tSIZEOF '(' exps ')'                  { /* TODO */ }
      | tBREAK                                { $$ = new og::break_node(LINE); }
      | tCONTINUE                             { $$ = new og::continue_node(LINE); }
      | tRETURN ';'                           { $$ = new og::return_node(LINE);}
@@ -175,6 +174,7 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
      | tREAL                                 { $$ = new cdk::double_node(LINE, $1); }
      | tNULLPTR                              { /* TODO: NULLPTR */ }
      | tINPUT                                { /* TODO */ }
+     | tSIZEOF '(' exps ')'                  { /* TODO */ }
      | '-' expr %prec tUNARY                 { $$ = new cdk::neg_node(LINE, $2); }
      | '+' expr %prec tUNARY                 { $$ = new og::id_node(LINE, $2); }
      | '~' expr                              { $$ = new cdk::not_node(LINE, $2); }
