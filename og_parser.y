@@ -42,6 +42,7 @@
 %left '+' '-'
 %left '*' '/' '%'
 %nonassoc tUNARY
+%nonassoc '(' '['
 
 %type <node> inst program var icond iiter elif func proc inst decl
 %type <sequence> exps vars ids decls insts block args
@@ -185,9 +186,13 @@ expr : tINT                                  { $$ = new cdk::integer_node(LINE, 
      | '[' expr ']'                          { /* TODO */ }
      | lval                                  { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
      | lval '=' expr                         { $$ = new cdk::assignment_node(LINE, $1, $3); }
+     | tIDENTIFIER '(' exps ')'              { /* TODO: func call with args */ }
+     | tIDENTIFIER '(' ')'                   { /* TODO: func call no args */ }
      ;
 
 lval : tIDENTIFIER                           { $$ = new cdk::variable_node(LINE, $1); }
+     | expr '[' expr ']'                     { /* TODO: ponteiro index */ }
+     | tIDENTIFIER '@' '[' tINT ']'          { /* TODO: tuplo index */ }
      ;
 
 %%

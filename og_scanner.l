@@ -94,7 +94,7 @@ static std::ostringstream sstr;
     return tREAL;
   }
 
-[-()<>=+*/%;{}.]       return *yytext;
+[-()<>=+*/%;{}.@]       return *yytext;
 
 [ \t\n]+               ; /* ignore whitespace */
 
