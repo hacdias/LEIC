@@ -230,6 +230,6 @@ void og::type_checker::do_continue_node(og::continue_node *const node, int lvl) 
 
 //---------------------------------------------------------------------------
 
-void og::type_checker::do_var_node(og::var_node *const node, int lvl) {
+void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) {
   // TODO
 }
