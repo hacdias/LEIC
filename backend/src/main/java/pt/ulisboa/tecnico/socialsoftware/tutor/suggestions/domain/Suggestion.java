@@ -19,7 +19,6 @@ public class Suggestion {
     @Column(unique=true, nullable = false)
     private Integer key;
 
-    @Column(nullable=false)
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User student;
@@ -41,6 +40,17 @@ public class Suggestion {
 
     public void setQuestion(Question question) {
         this.question = question;
+    }
+
+    @Basic
+    private Boolean approved;
+
+    public Boolean getApproved() {
+        return approved;
+    }
+
+    public void setApproved(Boolean approved) {
+        this.approved = approved;
     }
 }
 
