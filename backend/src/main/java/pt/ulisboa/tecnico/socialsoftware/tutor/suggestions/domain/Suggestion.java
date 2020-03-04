@@ -16,8 +16,16 @@ public class Suggestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    public Integer getId() {
+        return id;
+    }
+
     @Column(unique=true, nullable = false)
     private Integer key;
+
+    public Integer getKey() {
+        return key;
+    }
 
     @ManyToOne
     @JoinColumn(name = "user_id")
