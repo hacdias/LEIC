@@ -1,4 +1,4 @@
-package test.groovy.pt.ulisboa.tecnico.socialsoftware.tutor.query.service
+package groovy.pt.ulisboa.tecnico.socialsoftware.tutor.query.service
 
 import spock.lang.Specification
 
