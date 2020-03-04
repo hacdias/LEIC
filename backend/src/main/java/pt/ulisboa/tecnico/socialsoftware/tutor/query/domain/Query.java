@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -30,7 +29,7 @@ public class Query {
     @JoinColumn(name = "user_id")
     private User student;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "question_id")
     private Question question;
 }
