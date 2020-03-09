@@ -1,4 +1,4 @@
-package groovy.pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.service
 
 import spock.lang.Specification
 
