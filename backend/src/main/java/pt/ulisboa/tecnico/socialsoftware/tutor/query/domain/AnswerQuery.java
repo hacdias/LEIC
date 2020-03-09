@@ -26,7 +26,7 @@ public class AnswerQuery {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User teacher;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -52,9 +52,9 @@ public class AnswerQuery {
 
     public void setQuery(Query query) { this.query = query; }
 
-    public User getUser() { return user; }
+    public User getTeacher() { return teacher; }
 
-    public void setUser(User user) { this.user = user; }
+    public void setTeacher(User teacher) { this.teacher = teacher; }
 
     public LocalDateTime getCreationDate() { return creationDate; }
 

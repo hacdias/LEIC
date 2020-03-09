@@ -90,10 +90,12 @@ class UpdateQueryTest extends Specification {
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
         question.addQuery(query)
+        query.setStudent(student)
+        student.addQuery(query)
         queryRepository.save(query)
     }
 
-    def "update a query with a new title"() {
+    def "update a query with new information"() {
         given: "create a query"
         def queryDTO = new QueryDto(query)
         queryDTO.setTitle(NEW_QUERY_TITLE)

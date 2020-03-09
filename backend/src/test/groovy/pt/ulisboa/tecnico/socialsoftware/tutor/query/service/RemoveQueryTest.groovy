@@ -96,6 +96,8 @@ class RemoveQueryTest extends Specification {
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
         question.addQuery(query)
+        query.setStudent(student)
+        student.addQuery(query)
         queryRepository.save(query)
     }
 
