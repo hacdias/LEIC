@@ -32,4 +32,9 @@ public class CreateTournamentTest extends Specification {
         expect: false
     }
 
+    def "student creates tournament"() {
+        expect: false
+    }
+
 }
+
