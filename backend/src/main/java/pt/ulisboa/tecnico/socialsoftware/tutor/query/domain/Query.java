@@ -1,9 +1,13 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -25,11 +29,59 @@ public class Query {
 
     private String title;
 
-    @ManyToOne
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
+
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User student;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "question_id")
     private Question question;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "query", fetch = FetchType.EAGER, orphanRemoval=true)
+    private List<AnswerQuery> answers = new ArrayList<>();
+
+    public Query() {
+    }
+
+    public Query(Question question, User user, QueryDto queryDto) {
+    }
+
+    public Integer getId() { return id; }
+
+    public void setId(Integer id) { this.id = id;}
+
+    public Integer getKey() { return key;}
+
+    public void setKey(Integer key) { this.key = key;}
+
+    public String getContent() { return content;}
+
+    public void setContent(String content) { this.content = content;}
+
+    public String getTitle() { return title;}
+
+    public void setTitle(String title) { this.title = title;}
+
+    public LocalDateTime getCreationDate() { return creationDate;}
+
+    public void setCreationDate(LocalDateTime creationDate) { this.creationDate = creationDate;}
+
+    public User getStudent() { return student;}
+
+    public void setStudent(User student) { this.student = student;}
+
+    public Question getQuestion() { return question;}
+
+    public void setQuestion(Question question) { this.question = question;}
+
+    public List<AnswerQuery> getAnswers() { return answers;}
+
+    public void setAnswers(List<AnswerQuery> answers) { this.answers = answers;}
+
+    public void addAnswer(AnswerQuery answer) {
+        answers.add(answer);
+    }
 }
