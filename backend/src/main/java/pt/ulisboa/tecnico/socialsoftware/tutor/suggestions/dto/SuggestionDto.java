@@ -5,13 +5,14 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class SuggestionDto implements Serializable {
     private Integer id;
     private Integer key;
     private Boolean approved;
-    private UserDto student;
-    private QuestionDto question;
+    private String creationDate;
 
     public SuggestionDto () {
     }
@@ -20,8 +21,10 @@ public class SuggestionDto implements Serializable {
         this.id = suggestion.getId();
         this.key = suggestion.getKey();
         this.approved = suggestion.getApproved();
-        this.student = new UserDto(suggestion.getStudent());
-        this.question = new QuestionDto(suggestion.getQuestion());
+
+        if (suggestion.getCreationDate() != null) {
+            this.creationDate = suggestion.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        }
     }
 
     public Integer getId() {
@@ -48,20 +51,12 @@ public class SuggestionDto implements Serializable {
         this.approved = approved;
     }
 
-    public UserDto getStudent() {
-        return student;
+    public String getCreationDate() {
+        return creationDate;
     }
 
-    public void setStudent(UserDto student) {
-        this.student = student;
-    }
-
-    public QuestionDto getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(QuestionDto question) {
-        this.question = question;
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override
@@ -70,8 +65,7 @@ public class SuggestionDto implements Serializable {
                 "id=" + id +
                 ", key=" + key +
                 ", approved=" + approved +
-                ", student=" + student +
-                ", question=" + question +
+                ", creationDate='" + creationDate + '\'' +
                 '}';
     }
 }
