@@ -1,12 +1,12 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.StudentDto;
 
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class QueryDto implements Serializable {
@@ -14,8 +14,6 @@ public class QueryDto implements Serializable {
     private Integer key;
     private String title;
     private String content;
-    private StudentDto student;
-    private QuestionDto question;
     private List<AnswerQueryDto> answers = new ArrayList<>();
     private String creationDate = null;
 
@@ -23,6 +21,14 @@ public class QueryDto implements Serializable {
     }
 
     public QueryDto(Query query) {
+        this.id = query.getId();
+        this.key = query.getKey();
+        this.title = query.getTitle();
+        this.content = query.getContent();
+        this.answers = query.getAnswers().stream().map(AnswerQueryDto::new).collect(Collectors.toList());
+
+        if (query.getCreationDate() != null)
+            this.creationDate = query.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public Integer getId() { return id; }
@@ -40,14 +46,6 @@ public class QueryDto implements Serializable {
     public String getContent() { return content; }
 
     public void setContent(String content) { this.content = content; }
-
-    public StudentDto getStudent() { return student; }
-
-    public void setStudent(StudentDto student) { this.student = student; }
-
-    public QuestionDto getQuestion() { return question; }
-
-    public void setQuestion(QuestionDto question) { this.question = question; }
 
     public List<AnswerQueryDto> getAnswers() { return answers; }
 

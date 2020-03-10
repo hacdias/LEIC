@@ -8,4 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 @Repository
 @Transactional
 public interface QueryRepository extends JpaRepository<Query, Integer> {
+    @org.springframework.data.jpa.repository.Query
+            (value = "SELECT MAX(key) FROM queries", nativeQuery = true)
+    Integer getMaxQueryNumber();
 }

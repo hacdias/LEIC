@@ -35,6 +35,7 @@ class RemoveQueryTest extends Specification {
     public static final String TEACHER_USERNAME = "Teacher Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
+    public static final String ANSWER_QUERY_CONTENT = 'answer query content'
 
     @Autowired
     QueryService queryService
@@ -113,8 +114,11 @@ class RemoveQueryTest extends Specification {
         given: "a query with answers"
         def answer = new AnswerQuery()
         answer.setKey(1)
+        answer.setContent(ANSWER_QUERY_CONTENT)
         answer.setQuery(query)
+        answer.setTeacher(teacher)
         query.addAnswer(answer)
+        teacher.addAnswer(answer)
         answerQueryRepository.save(answer)
 
         when:

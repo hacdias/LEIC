@@ -328,5 +328,6 @@ public class Question {
     }
 
     public void addQuery(Query query) {
+        this.queries.add(query);
     }
 }

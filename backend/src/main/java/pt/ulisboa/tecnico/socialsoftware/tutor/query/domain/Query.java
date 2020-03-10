@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.AnswerQueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -46,7 +47,21 @@ public class Query {
     public Query() {
     }
 
-    public Query(Question question, User user, QueryDto queryDto) {
+    public Query(Question question, User student, QueryDto queryDto) {
+        this.title = queryDto.getTitle();
+        this.key = queryDto.getKey();
+        this.content = queryDto.getContent();
+
+        this.question = question;
+        question.addQuery(this);
+        this.student = student;
+        student.addQuery(this);
+
+        for (AnswerQueryDto answerDto : queryDto.getAnswers()) {
+            AnswerQuery answer = new AnswerQuery(answerDto);
+            this.answers.add(answer);
+            answer.setQuery(this);
+        }
     }
 
     public Integer getId() { return id; }
@@ -83,5 +98,17 @@ public class Query {
 
     public void addAnswer(AnswerQuery answer) {
         answers.add(answer);
+    }
+
+    public void update(QueryDto queryDto) {
+        setTitle(queryDto.getTitle());
+        setContent(queryDto.getContent());
+    }
+
+    public void remove() {
+        getQuestion().getQueries().remove(this);
+        question = null;
+        getStudent().getQueries().remove(this);
+        student = null;
     }
 }

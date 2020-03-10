@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.AnswerQueryRepository
@@ -31,10 +32,13 @@ class UpdateQueryTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String STUDENT_NAME = "Student Name"
     public static final String STUDENT_USERNAME = "Student Username"
+    public static final String TEACHER_NAME = "Teacher Name"
+    public static final String TEACHER_USERNAME = "Teacher Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
     public static final String NEW_QUERY_TITLE = 'new query title'
     public static final String NEW_QUERY_CONTENT = 'new query content'
+    public static final String ANSWER_QUERY_CONTENT = 'answer query content'
 
     @Autowired
     QueryService queryService
@@ -62,6 +66,7 @@ class UpdateQueryTest extends Specification {
     def question
     def student
     def query
+    def teacher
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -93,6 +98,11 @@ class UpdateQueryTest extends Specification {
         query.setStudent(student)
         student.addQuery(query)
         queryRepository.save(query)
+
+        teacher = new User(TEACHER_NAME, TEACHER_USERNAME, 2, User.Role.TEACHER)
+        teacher.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(teacher)
+        userRepository.save(teacher)
     }
 
     def "update a query with new information"() {
@@ -123,6 +133,15 @@ class UpdateQueryTest extends Specification {
         def queryDTO = new QueryDto(query)
         queryDTO.setTitle(NEW_QUERY_TITLE)
         queryDTO.setContent(NEW_QUERY_CONTENT)
+        and: "answer to the the query"
+        def answer = new AnswerQuery()
+        answer.setKey(1)
+        answer.setContent(ANSWER_QUERY_CONTENT)
+        answer.setQuery(query)
+        answer.setTeacher(teacher)
+        query.addAnswer(answer)
+        teacher.addAnswer(answer)
+        answerQueryRepository.save(answer)
 
         when:
         queryService.updateQuery(query.getId(), queryDTO)

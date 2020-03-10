@@ -34,7 +34,6 @@ class CreateAnswerTest extends Specification {
     public static final String TEACHER_USERNAME = "Teacher Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
-    public static final String ANSWER_QUERY_TITLE = 'answer query title'
     public static final String ANSWER_QUERY_CONTENT = 'answer query content'
 
     @Autowired
