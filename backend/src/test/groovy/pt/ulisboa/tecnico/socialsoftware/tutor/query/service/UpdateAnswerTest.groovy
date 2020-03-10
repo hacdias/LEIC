@@ -12,7 +12,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.AnswerQueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.AnswerQueryDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.AnswerQueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question

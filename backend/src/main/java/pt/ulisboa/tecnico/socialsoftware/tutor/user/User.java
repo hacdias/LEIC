@@ -362,6 +362,8 @@ public class User implements UserDetails {
 
     public List<Query> getQueries() { return queries; }
 
+    public List<AnswerQuery> getQueryAnswers() { return queryAnswers; }
+
     @Override
     public String toString() {
         return "User{" +

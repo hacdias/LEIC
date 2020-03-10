@@ -121,7 +121,7 @@ class CreateAnswerTest extends Specification {
         result.getTeacher().getName() == TEACHER_NAME
         result.getTeacher().getUsername() == TEACHER_USERNAME
         query.getAnswers().contains(result)
-        teacher.getQueries().contains(result)
+        teacher.getQueryAnswers().contains(result)
     }
 
     @TestConfiguration

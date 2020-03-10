@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.query.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery;
 
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 
 public class AnswerQueryDto implements Serializable {
     private Integer id;
@@ -14,6 +15,12 @@ public class AnswerQueryDto implements Serializable {
     }
 
     public AnswerQueryDto(AnswerQuery answerQuery) {
+        this.id = answerQuery.getId();
+        this.key = answerQuery.getKey();
+        this.content = answerQuery.getContent();
+
+        if (answerQuery.getCreationDate() != null)
+            this.creationDate = answerQuery.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public Integer getId() { return id; }

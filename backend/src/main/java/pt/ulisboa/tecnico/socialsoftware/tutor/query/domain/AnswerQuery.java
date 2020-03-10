@@ -33,7 +33,13 @@ public class AnswerQuery {
 
     public AnswerQuery(){}
 
-    public AnswerQuery(AnswerQueryDto answerQuery) {
+    public AnswerQuery(Query query, User teacher, AnswerQueryDto answerQuery) {
+        this.key = answerQuery.getKey();
+        this.content = answerQuery.getContent();
+        this.query = query;
+        query.addAnswer(this);
+        this.teacher = teacher;
+        teacher.addAnswer(this);
     }
 
     public String getContent() { return content; }
@@ -59,4 +65,15 @@ public class AnswerQuery {
     public LocalDateTime getCreationDate() { return creationDate; }
 
     public void setCreationDate(LocalDateTime creationDate) { this.creationDate = creationDate; }
+
+    public void update(AnswerQueryDto answerQueryDto) {
+        setContent(answerQueryDto.getContent());
+    }
+
+    public void remove() {
+        getQuery().getAnswers().remove(this);
+        query = null;
+        getTeacher().getQueryAnswers().remove(this);
+        teacher = null;
+    }
 }
