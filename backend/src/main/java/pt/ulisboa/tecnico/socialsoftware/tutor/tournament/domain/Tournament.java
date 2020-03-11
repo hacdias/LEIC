@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 //------------External Imports------------
+import java.util.Set;
+import java.util.HashSet;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,12 +11,13 @@ import java.time.format.DateTimeFormatter;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 
 
 @Entity
 @Table(
-        name = "Tournament",
-        indexes = {@Index(name = "Tournament_idx", columnList = "key")
+        name = "tournaments",
+        indexes = {@Index(name = "tournaments_indx_0", columnList = "key")
         })
 
 public class Tournament {
@@ -25,6 +28,10 @@ public class Tournament {
 
     @Column(unique=true, nullable = false)
     private Integer key;
+
+    @ManyToOne(fetch = FetchType.LAZY)          //TO DO: check fetch type
+    @JoinColumn(name = "user_id")
+    private User student;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -40,22 +47,26 @@ public class Tournament {
 
     private Integer numberQuestions;
 
-    //TO DO: missing something about topics
-
-    //TO DO: misisng @something_to_something
-    //@JoinColumn(name = "course_execution_id")
-    //private CourseExecution courseExecution;      
-
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.LAZY)
+    public Set<Topic> topics = new HashSet<>();
+    
+    @ManyToOne
+    @JoinColumn(name = "course_execution_id")
+    private CourseExecution courseExecution;      
+    
     public Tournament() {}
 
-    public Tournament(TournamentDto tournamentDto) {
+    public Tournament(User student, TournamentDto tournamentDto) {
 
-        this.key = tournamentDto.getKey();
+        this.key = tournamentDto.getKey();        
+        this.student = student;
+        student.addCreatedTournament(this);
         this.creationDate = tournamentDto.getCreationDateDate();
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
         this.numberQuestions = tournamentDto.getNumberQuestions();
+        this.topics = tournamentDto.getTopics();                //TO DO: check
     }
 
     public Integer getId() {
@@ -72,6 +83,14 @@ public class Tournament {
 
     public void setKey(Integer key) {
         this.key = key;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
     }
 
     public LocalDateTime getCreationDate() {
@@ -117,7 +136,14 @@ public class Tournament {
         this.numberQuestions = numberQuestions;
     }
 
-    //TO DO: missing something about topics
+    public Set<Topic> getTopics() {                //TO DO: check
+        return topics;
+    }
+
+    public void setTopics(Set<Topic> topics) {                //TO DO: check
+        this.topics = topics;
+    }
+
 /*
     public CourseExecution getCourseExecution() {
         return courseExecution;
@@ -125,7 +151,7 @@ public class Tournament {
 
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
-        //courseExecution.addTournament(this);      TO DO: add function to course execution           
+        courseExecution.addTournament(this);
     }*/
 
     @Override

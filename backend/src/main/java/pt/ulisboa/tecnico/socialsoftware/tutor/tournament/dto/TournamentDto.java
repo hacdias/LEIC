@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
 //------------External Imports------------
+import java.util.Set;
+import java.util.HashSet;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,18 +12,20 @@ import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 
 
 public class TournamentDto implements Serializable {
 
     private Integer id;
     private Integer key;
+    private User student;
     private String creationDate = null;
     private String availableDate = null;
     private String conclusionDate = null;
     private String title;
     private Integer numberQuestions;
-    //TO DO: missing something about topics
+    public Set<Topic> topics = new HashSet<>();                //TO DO: check
 
     @Transient
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -31,8 +35,10 @@ public class TournamentDto implements Serializable {
     public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
+        this.student = tournament.getStudent();
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
+        this.topics = tournament.getTopics();                //TO DO: check
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -60,6 +66,14 @@ public class TournamentDto implements Serializable {
 
     public String getCreationDate() {
         return creationDate;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
     }
 
     public void setCreationDate(String creationDate) {
@@ -117,6 +131,14 @@ public class TournamentDto implements Serializable {
             return null;
         }
         return LocalDateTime.parse(getConclusionDate(), formatter);
+    }
+
+    public Set<Topic> getTopics() {                //TO DO: check
+        return topics;
+    }
+
+    public void setTopics(Set<Topic> topics) {                //TO DO: check
+        this.topics = topics;
     }
 
     @Override

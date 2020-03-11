@@ -14,14 +14,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 //--------Internal Imports--------
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
-
-
-
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 @Service
 public class TournamentService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CourseExecutionRepository courseExecutionRepository;
 
     @Autowired
     private TournamentRepository tournamentRepository;  
@@ -38,14 +48,25 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
-        //TO DO: executionId will probably be necessary
+    public TournamentDto createTournament(Integer executionId, Integer studentId, TournamentDto tournamentDto) {
+        
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
+        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+
+        if (student.getRole() != User.Role.STUDENT) {
+            //throw new TutorException(USER_NOT_STUDENT, studentId);  TO DO: Add exception
+        }
+
+        if (!student.getCourseExecutions().contains(courseExecution)) {
+            throw new TutorException(USER_NOT_ENROLLED, student.getUsername());     //TO DO: check exception
+        }
 
         if (tournamentDto.getKey() == null) {
             tournamentDto.setKey(getMaxTournamentKey() + 1);
         }
-        Tournament tournament = new Tournament(tournamentDto);
-        //tournament.setCourseExecution(courseExecution);  TO DO: executionId will probably be necessary
+
+        Tournament tournament = new Tournament(student, tournamentDto);
+        //tournament.setCourseExecution(courseExecution);
 
         if (tournamentDto.getCreationDate() == null) {
             tournament.setCreationDate(LocalDateTime.now());
