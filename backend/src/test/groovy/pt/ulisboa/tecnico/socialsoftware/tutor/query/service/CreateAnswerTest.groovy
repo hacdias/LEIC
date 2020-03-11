@@ -104,7 +104,6 @@ class CreateAnswerTest extends Specification {
     def "create an answer to a query"() {
         given: "a answerQueryDTO"
         def answerQueryDTO = new AnswerQueryDto()
-        answerQueryDTO.setKey(1)
         answerQueryDTO.setContent(ANSWER_QUERY_CONTENT)
 
         when:

@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -8,6 +9,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
 @Table(
@@ -47,6 +50,8 @@ public class Query {
     }
 
     public Query(Question question, User student, QueryDto queryDto) {
+        checkQueryConsistent(queryDto);
+
         this.title = queryDto.getTitle();
         this.key = queryDto.getKey();
         this.content = queryDto.getContent();
@@ -94,14 +99,47 @@ public class Query {
     }
 
     public void update(QueryDto queryDto) {
+        checkQueryConsistent(queryDto);
+
         setTitle(queryDto.getTitle());
         setContent(queryDto.getContent());
     }
 
     public void remove() {
+        canRemove();
+
         getQuestion().getQueries().remove(this);
         question = null;
         getStudent().getQueries().remove(this);
         student = null;
+    }
+
+    private void canRemove() {
+        if (!getAnswers().isEmpty()) {
+            throw new TutorException(QUERY_IS_ANSWERED, id);
+        }
+    }
+
+    private void checkQueryConsistent(QueryDto queryDto) {
+
+        if (queryDto.getTitle() == null || queryDto.getContent() == null ||
+                queryDto.getTitle().trim().length() == 0 ||
+                queryDto.getContent().trim().length() == 0) {
+            throw new TutorException(QUERY_MISSING_DATA);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Query{" +
+                "id=" + id +
+                ", key=" + key +
+                ", content='" + content + '\'' +
+                ", title='" + title + '\'' +
+                ", creationDate=" + creationDate +
+                ", student=" + student +
+                ", question=" + question +
+                ", answers=" + answers +
+                '}';
     }
 }

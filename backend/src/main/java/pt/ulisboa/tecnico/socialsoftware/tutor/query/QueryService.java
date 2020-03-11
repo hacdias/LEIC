@@ -6,12 +6,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -19,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -54,6 +58,21 @@ public class QueryService {
             queryDto.setKey(maxQueryNumber + 1);
         }
 
+        Boolean userAnswered = false;
+        Set<QuizAnswer> quizAnswers = student.getQuizAnswers();
+        for (QuizAnswer quizAnswer : quizAnswers) {
+            for (QuestionAnswer questionAnswer : quizAnswer.getQuestionAnswers()) {
+                QuizQuestion quizQuestion = questionAnswer.getQuizQuestion();
+                Question answeredQuestion = quizQuestion.getQuestion();
+
+                if (answeredQuestion == question) userAnswered = true;
+            }
+        }
+
+        if (!userAnswered) {
+            throw new TutorException(QUESTION_NOT_ANSWERED);
+        }
+
         Query query = new Query(question, student, queryDto);
         query.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(query);
@@ -66,8 +85,6 @@ public class QueryService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void removeQuery(Integer queryId) {
         Query query = queryRepository.findById(queryId).orElseThrow(() -> new TutorException(QUERY_NOT_FOUND, queryId));
-        if (query.getAnswers().size() != 0)
-            throw new TutorException(QUERY_IS_ANSWERED);
 
         query.remove();
         entityManager.remove(query);

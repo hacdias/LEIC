@@ -54,4 +54,16 @@ public class QueryDto implements Serializable {
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
+
+    @Override
+    public String toString() {
+        return "QueryDto{" +
+                "id=" + id +
+                ", key=" + key +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", answers=" + answers +
+                ", creationDate='" + creationDate + '\'' +
+                '}';
+    }
 }

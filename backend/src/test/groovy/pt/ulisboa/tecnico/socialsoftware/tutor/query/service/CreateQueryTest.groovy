@@ -4,15 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -29,6 +39,8 @@ class CreateQueryTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String USER_NAME = "Student Name"
     public static final String USER_USERNAME = "Student Username"
+    public static final String USER_NAME_2 = "Student 2 Name"
+    public static final String USER_USERNAME_2 = "Student 2 Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
     public static final String QUERY_TITLE_2 = 'query title 2'
@@ -47,6 +59,15 @@ class CreateQueryTest extends Specification {
     QuestionRepository questionRepository
 
     @Autowired
+    QuizQuestionRepository quizQuestionRepository
+
+    @Autowired
+    QuizAnswerRepository quizAnswerRepository
+
+    @Autowired
+    QuestionAnswerRepository questionAnswerRepository
+
+    @Autowired
     UserRepository userRepository
 
     @Autowired
@@ -58,6 +79,8 @@ class CreateQueryTest extends Specification {
     def question
     def question2
     def student
+    def quizQuestion
+    def quizQuestion2
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -89,12 +112,33 @@ class CreateQueryTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
+        quizQuestion = new QuizQuestion()
+        quizQuestion.setQuestion(question)
+        question.addQuizQuestion(quizQuestion)
+        quizQuestionRepository.save(quizQuestion)
+
+        quizQuestion2 = new QuizQuestion()
+        quizQuestion2.setQuestion(question2)
+        question2.addQuizQuestion(quizQuestion2)
+        quizQuestionRepository.save(quizQuestion2)
     }
 
     def "create a query with a title and a description"() {
-        given: "a queryDTO"
+        given: "answer to the question by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student)
+        student.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "a queryDTO"
         def queryDTO = new QueryDto()
-        queryDTO.setKey(1)
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
 
@@ -117,14 +161,32 @@ class CreateQueryTest extends Specification {
     }
 
     def "create two queries on different questions"() {
-        given: "a queryDTO"
+        given: "answer to the question by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student)
+        student.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        def questionAnswer2 = new QuestionAnswer()
+        questionAnswer2.setQuizAnswer(quizAnswer)
+        questionAnswer2.setQuizQuestion(quizQuestion2)
+        quizAnswer.addQuestionAnswer(questionAnswer2)
+        quizQuestion2.addQuestionAnswer(questionAnswer2)
+        questionAnswerRepository.save(questionAnswer2)
+
+        and: "a queryDTO"
         def queryDTO1 = new QueryDto()
-        queryDTO1.setKey(1)
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
-        queryDTO2.setKey(2)
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
 
@@ -164,14 +226,25 @@ class CreateQueryTest extends Specification {
     }
 
     def "create two queries on same question"() {
-        given: "a queryDTO"
+        given: "answer to the question by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student)
+        student.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "a queryDTO"
         def queryDTO1 = new QueryDto()
-        queryDTO1.setKey(1)
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
-        queryDTO2.setKey(2)
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
 
@@ -208,6 +281,53 @@ class CreateQueryTest extends Specification {
         result2.getStudent().getUsername() == USER_USERNAME
         question.getQueries().contains(result2)
         student.getQueries().contains(result2)
+    }
+
+    def "not a student creates a query"() {
+        given: "user not student"
+        def user = new User(USER_NAME_2, USER_USERNAME_2, 2, User.Role.TEACHER)
+        user.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(user)
+        userRepository.save(user)
+
+        and: "answer to the question by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser()
+        user.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "a queryDTO"
+        def queryDTO = new QueryDto()
+        queryDTO.setTitle(QUERY_TITLE)
+        queryDTO.setContent(QUERY_CONTENT)
+
+        when:
+        queryService.createQuery(question.getId(), user.getId(), queryDTO)
+
+        then: "exception User not a student"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_STUDENT
+    }
+
+    def "student didn't answer question"() {
+        given: "a queryDTO"
+        def queryDTO = new QueryDto()
+        queryDTO.setTitle(QUERY_TITLE)
+        queryDTO.setContent(QUERY_CONTENT)
+
+        when:
+        queryService.createQuery(question.getId(), student.getId(), queryDTO)
+
+        then: "exception User didn't answer question"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_ANSWERED
     }
 
     @TestConfiguration

@@ -56,6 +56,8 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
     QUERY_IS_ANSWERED("Query already has at least an answer"),
+    QUERY_MISSING_DATA("Missing information for query"),
+    QUESTION_NOT_ANSWERED("Question wasn't answered"),
     USER_NOT_STUDENT("User with id %d is not a student"),
     USER_NOT_TEACHER("User with id %d is not a teacher"),
 

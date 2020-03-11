@@ -151,6 +151,20 @@ class UpdateQueryTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.QUERY_IS_ANSWERED
     }
 
+    def "update a query with missing information"() {
+        given: "create a query"
+        def queryDTO = new QueryDto(query)
+        queryDTO.setTitle("")
+        queryDTO.setContent(NEW_QUERY_CONTENT)
+
+        when:
+        queryService.updateQuery(query.getId(), queryDTO)
+
+        then: "exception query is missing data is thrown "
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUERY_MISSING_DATA
+    }
+
     @TestConfiguration
     static class QueryServiceImplTestContextConfiguration {
 
