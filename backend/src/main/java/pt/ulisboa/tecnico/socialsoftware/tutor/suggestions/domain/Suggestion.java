@@ -2,17 +2,14 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUESTION_IS_USED_IN_QUIZ;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SUGGESTION_ALREADY_APPROVED;
 
 @Entity
@@ -125,6 +122,19 @@ public class Suggestion {
         getQuestion().remove();
         student = null;
         question = null;
+    }
+
+    @Override
+    public String toString() {
+        return "Suggestion{" +
+                "id=" + id +
+                ", key=" + key +
+                ", student=" + student +
+                ", question=" + question +
+                ", suggestionReviews=" + suggestionReviews +
+                ", approved=" + approved +
+                ", creationDate=" + creationDate +
+                '}';
     }
 }
 
