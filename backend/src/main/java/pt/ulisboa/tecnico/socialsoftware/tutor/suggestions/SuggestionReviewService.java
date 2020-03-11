@@ -6,15 +6,10 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionReviewDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
@@ -75,6 +70,7 @@ public class SuggestionReviewService {
                 .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_REVIEW_NOT_FOUND, suggestionReviewId));
 
         suggestionReview.setJustification(suggestionReviewDto.getJustification());
+        suggestionReview.setApproved(suggestionReviewDto.getApproved());
         if (!suggestionReview.getSuggestion().getApproved() && suggestionReview.getApproved()) {
             suggestionReview.getSuggestion().setApproved(suggestionReviewDto.getApproved());
         }
