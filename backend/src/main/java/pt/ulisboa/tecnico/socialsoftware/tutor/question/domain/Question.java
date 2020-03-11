@@ -6,6 +6,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -68,6 +69,10 @@ public class Question {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "question", orphanRemoval = true)
+    @JoinColumn(name = "suggestion_id")
+    private Suggestion suggestion;
 
     public Question() {
     }
@@ -200,6 +205,14 @@ public class Question {
 
     public void addTopic(Topic topic) {
         topics.add(topic);
+    }
+
+    public Suggestion getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(Suggestion suggestion) {
+        this.suggestion = suggestion;
     }
 
     public void remove() {
