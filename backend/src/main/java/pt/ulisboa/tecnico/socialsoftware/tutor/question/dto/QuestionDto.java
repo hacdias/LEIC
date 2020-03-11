@@ -181,14 +181,6 @@ public class QuestionDto implements Serializable {
         this.sequence = sequence;
     }
 
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public List<Query> getQueries() { return queries; }
 
     public void setQueries(List<Query> queries) { this.queries = queries; }
