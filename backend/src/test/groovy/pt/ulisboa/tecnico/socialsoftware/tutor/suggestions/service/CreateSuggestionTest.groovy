@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
@@ -54,6 +55,7 @@ class CreateSuggestionTest extends Specification {
     def course
     def courseExecution
     def student
+    def question
 
     def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -66,25 +68,31 @@ class CreateSuggestionTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)
-    }
 
-    def "create suggestion with user and question"() {
-        given: "a questionDto"
         def questionDto = new QuestionDto()
         questionDto.setKey(1)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.AVAILABLE.name())
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
 
-        and: "a suggestionDto"
+        question = new Question(course, questionDto)
+        questionRepository.save(question)
+    }
+
+    def "create suggestion with user and question"() {
+        given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
-        suggestionDto.setStudent(new UserDto(student))
         suggestionDto.setApproved(false)
-        suggestionDto.setQuestion(questionDto)
 
         when:
-        suggestionService.createSuggestion(suggestionDto)
+        suggestionService.createSuggestion(student.getId(), question.getId(), suggestionDto)
 
         then: "the correct suggestion is inside the repository"
         suggestionRepository.count() == 1L
@@ -97,48 +105,32 @@ class CreateSuggestionTest extends Specification {
         result.getStudent().getUsername() == STUDENT_USERNAME
     }
 
-    def "create suggestion without user" () {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-
-        and: "a suggestionDto"
+    def "create suggestion with invalid user" () {
+        given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
-        suggestionDto.setQuestion(questionDto)
 
         when:
-        suggestionService.createSuggestion(suggestionDto)
+        suggestionService.createSuggestion(student.getId() + 1, question.getId(), suggestionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.SUGGESTION_MUST_HAVE_USER
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
     }
 
-    def "create suggestion without question"() {
-        given: "a questionDto"
-        def questionDto = new QuestionDto()
-        questionDto.setKey(1)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
-
-        and: "a suggestionDto"
+    def "create suggestion with invalid question"() {
+        given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
-        suggestionDto.setStudent(new UserDto(student))
 
         when:
-        suggestionService.createSuggestion(suggestionDto)
+        suggestionService.createSuggestion(student.getId(), question.getId() + 1, suggestionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.SUGGESTION_MUST_HAVE_QUESTION
+        exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_FOUND
     }
 
     @TestConfiguration

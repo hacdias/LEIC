@@ -7,6 +7,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -72,6 +73,10 @@ public class Question {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "question", orphanRemoval=true)
     private List<Query> queries = new ArrayList<>();
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "question", orphanRemoval = true)
+    @JoinColumn(name = "suggestion_id")
+    private Suggestion suggestion;
 
     public Question() {
     }
@@ -207,6 +212,14 @@ public class Question {
     }
 
     public List<Query> getQueries() { return queries; }
+    
+    public Suggestion getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(Suggestion suggestion) {
+        this.suggestion = suggestion;
+    }
 
     public void remove() {
         canRemove();
