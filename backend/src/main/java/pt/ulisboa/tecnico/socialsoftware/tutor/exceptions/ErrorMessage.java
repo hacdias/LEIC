@@ -60,7 +60,11 @@ public enum ErrorMessage {
     USER_NOT_TEACHER("User with id %d is not a teacher"),
 
     ACCESS_DENIED("You do not have permission to view this resource"),
-    CANNOT_OPEN_FILE("Cannot open file");
+    CANNOT_OPEN_FILE("Cannot open file"),
+
+    SUGGESTION_ALREADY_APPROVED("The suggestion was already approved."),
+    SUGGESTION_MUST_HAVE_USER("The suggestion requires an user."),
+    SUGGESTION_MUST_HAVE_QUESTION("The suggestion requires a question.");
 
     public final String label;
 

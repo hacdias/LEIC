@@ -16,20 +16,35 @@ public class Suggestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique=true, nullable = false)
+    private Integer key;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User student;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    @Basic
+    private Boolean approved;
+
     public Integer getId() {
         return id;
     }
 
-    @Column(unique=true, nullable = false)
-    private Integer key;
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getKey() {
         return key;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User student;
+    public void setKey(Integer key) {
+        this.key = key;
+    }
 
     public User getStudent() {
         return student;
@@ -39,9 +54,6 @@ public class Suggestion {
         this.student = student;
     }
 
-    @OneToOne
-    private Question question;
-
     public Question getQuestion() {
         return question;
     }
@@ -49,9 +61,6 @@ public class Suggestion {
     public void setQuestion(Question question) {
         this.question = question;
     }
-
-    @Basic
-    private Boolean approved;
 
     public Boolean getApproved() {
         return approved;

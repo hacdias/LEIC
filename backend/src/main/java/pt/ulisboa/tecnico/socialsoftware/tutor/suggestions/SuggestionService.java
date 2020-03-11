@@ -1,27 +1,43 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
 
+import java.sql.SQLException;
+
+@Service
 public class SuggestionService {
 
     @Autowired
-    private QuestionService questionService;
+    private SuggestionRepository suggestionRepository;
 
-
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public SuggestionDto createSuggestion(SuggestionDto suggestionDto) {
-        // TODO
         return null;
     }
 
-    public SuggestionDto updateSuggestion(Integer suggestionid, SuggestionDto suggestionDto) {
-        // TODO
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
+    public SuggestionDto updateSuggestion(Integer suggestionId, SuggestionDto suggestionDto) {
         return null;
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
     public void removeSuggestion(Integer suggestionId) {
-        // TODO
+        // EMPTY
     }
 }
