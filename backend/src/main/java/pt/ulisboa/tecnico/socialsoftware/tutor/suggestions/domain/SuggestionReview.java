@@ -95,4 +95,10 @@ public class SuggestionReview {
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
+
+    public void remove() {
+        getTeacher().getSuggestionReviews().remove(this);
+        teacher = null;
+        suggestion = null;
+    }
 }

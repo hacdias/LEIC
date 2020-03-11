@@ -80,7 +80,7 @@ class CreateSuggestionReviewTest extends Specification {
 
         question = new Question()
         question.setKey(1)
-        question.setContent(QUESTION_TITLE)
+        question.setTitle(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
         question.setNumberOfAnswers(2)
