@@ -9,6 +9,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUESTION_IS_USED_IN_QUIZ;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SUGGESTION_ALREADY_APPROVED;
@@ -30,6 +32,9 @@ public class Suggestion {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "question_id")
     private Question question;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "suggestion", fetch= FetchType.LAZY, orphanRemoval = true)
+    private Set<SuggestionReview> suggestionReviews = new HashSet<>();
 
     @Column(name = "approved")
     private Boolean approved;
@@ -78,6 +83,14 @@ public class Suggestion {
 
     public void setQuestion(Question question) {
         this.question = question;
+    }
+
+    public Set<SuggestionReview> getSuggestionReviews() {
+        return suggestionReviews;
+    }
+
+    public void addSuggestionReview(SuggestionReview suggestionReview) {
+        this.suggestionReviews.add(suggestionReview);
     }
 
     public Boolean getApproved() {

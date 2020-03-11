@@ -42,8 +42,8 @@ class RemoveSuggestionTest extends Specification {
     @Autowired
     SuggestionRepository suggestionRepository
 
-   @Autowired
-   SuggestionService suggestionService
+    @Autowired
+    SuggestionService suggestionService
 
     @Autowired
     UserRepository userRepository
