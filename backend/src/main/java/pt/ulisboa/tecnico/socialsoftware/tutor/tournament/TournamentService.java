@@ -20,10 +20,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+
 @Service
 public class TournamentService {
 
@@ -50,15 +50,15 @@ public class TournamentService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TournamentDto createTournament(Integer executionId, Integer studentId, TournamentDto tournamentDto) {
         
-        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
-        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND, executionId));
 
         if (student.getRole() != User.Role.STUDENT) {
-            //throw new TutorException(USER_NOT_STUDENT, studentId);  TO DO: Add exception
+            throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
         }
 
         if (!student.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(USER_NOT_ENROLLED, student.getUsername());     //TO DO: check exception
+            throw new TutorException(ErrorMessage.USER_NOT_ENROLLED, student.getUsername());     //TO DO: check exception
         }
 
         if (tournamentDto.getKey() == null) {
@@ -66,7 +66,7 @@ public class TournamentService {
         }
 
         Tournament tournament = new Tournament(student, tournamentDto);
-        //tournament.setCourseExecution(courseExecution);
+        tournament.setCourseExecution(courseExecution);
 
         if (tournamentDto.getCreationDate() == null) {
             tournament.setCreationDate(LocalDateTime.now());

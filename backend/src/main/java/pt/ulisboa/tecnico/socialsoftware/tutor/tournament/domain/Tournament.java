@@ -69,7 +69,9 @@ public class Tournament {
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
         this.numberQuestions = tournamentDto.getNumberQuestions();
-        this.topics = tournamentDto.getTopics();       
+        this.topics = tournamentDto.getTopics();
+        getTopics().forEach(topic -> topic.addTournament(this));   
+
     }
 
     public Integer getId() {
