@@ -107,7 +107,7 @@ class CreateSuggestionReviewTest extends Specification {
         when:
         suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
 
-        then: "the correct suggestion review is inside the repository"
+        then: "the suggestion review is inside the repository, approved and with justification"
 
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
@@ -121,6 +121,30 @@ class CreateSuggestionReviewTest extends Specification {
         result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
         result.getSuggestion().getApproved()
         result.getApproved()
+        result.getJustification() == SUGGESTION_REVIEW_JUSTIFICATION
+    }
+
+    def "suggestion is rejected with no justification"() {
+        def suggestionReviewDto = new SuggestionReviewDto()
+        suggestionReviewDto.setKey(1)
+        suggestionReviewDto.approved = false
+
+        when:
+        suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
+
+        then: "the suggestion review is inside the repository, rejected and with no justification"
+        def result = suggestionReviewRepository.findAll().get(0)
+        result.getId() != null
+        result.getKey() == 1
+        result.getTeacher().getName() == TEACHER_NAME
+        result.getTeacher().getUsername() == TEACHER_USERNAME
+        result.getSuggestion().getQuestion().getTitle() == QUESTION_TITLE
+        result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
+        result.getSuggestion().getStudent().getName() == STUDENT_NAME
+        result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
+        !result.getSuggestion().getApproved()
+        !result.getApproved()
+        result.getJustification() == null
     }
 
     @TestConfiguration
