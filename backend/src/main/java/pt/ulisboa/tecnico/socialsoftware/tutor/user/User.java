@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
@@ -64,6 +66,12 @@ public class User implements UserDetails {
 
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval=true)
+    private List<Query> queries = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", orphanRemoval=true)
+    private List<AnswerQuery> queryAnswers = new ArrayList<>();
 
     public User() {
     }
@@ -356,6 +364,14 @@ public class User implements UserDetails {
         this.courseExecutions.add(course);
     }
 
+    public void addQuery (Query query) { this.queries.add(query); }
+
+    public void addAnswer (AnswerQuery answerQuery) { this.queryAnswers.add(answerQuery); }
+
+    public List<Query> getQueries() { return queries; }
+
+    public List<AnswerQuery> getQueryAnswers() { return queryAnswers; }
+    
     public Set<Suggestion> getSuggestions() {
         return suggestions;
     }
