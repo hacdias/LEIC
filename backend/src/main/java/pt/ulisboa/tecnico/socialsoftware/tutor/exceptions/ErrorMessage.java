@@ -12,6 +12,8 @@ public enum ErrorMessage {
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with name %d"),
+    QUERY_NOT_FOUND("Query not found with id %d"),
+    ANSWER_QUERY_NOT_FOUND("Answer query not found with id %d"),
 
     COURSE_NOT_FOUND("Course not found with name %s"),
     COURSE_NAME_IS_EMPTY("The course name is empty"),
@@ -53,6 +55,13 @@ public enum ErrorMessage {
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
+    QUERY_IS_ANSWERED("Query already has at least an answer"),
+    QUERY_MISSING_DATA("Missing information for query"),
+    ANSWER_QUERY_MISSING_DATA("Missing information to answer query"),
+    QUESTION_NOT_ANSWERED("Question wasn't answered"),
+    TEACHER_NOT_IN_COURSE( "Teacher wasn't in course"),
+    USER_NOT_STUDENT("User with id %d is not a student"),
+    USER_NOT_TEACHER("User with id %d is not a teacher"),
 
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),

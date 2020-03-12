@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
@@ -28,6 +29,7 @@ public class QuestionDto implements Serializable {
     private ImageDto image;
     private List<TopicDto> topics = new ArrayList<>();
     private Integer sequence;
+    private List<Query> queries = new ArrayList<>();
 
     public QuestionDto() {
     }
@@ -50,6 +52,7 @@ public class QuestionDto implements Serializable {
         this.status = question.getStatus().name();
         this.options = question.getOptions().stream().map(OptionDto::new).collect(Collectors.toList());
         this.topics = question.getTopics().stream().sorted(Comparator.comparing(Topic::getName)).map(TopicDto::new).collect(Collectors.toList());
+        this.queries = question.getQueries();
 
         if (question.getImage() != null)
             this.image = new ImageDto(question.getImage());
@@ -177,6 +180,10 @@ public class QuestionDto implements Serializable {
     public void setSequence(Integer sequence) {
         this.sequence = sequence;
     }
+
+    public List<Query> getQueries() { return queries; }
+
+    public void setQueries(List<Query> queries) { this.queries = queries; }
 
     @Override
     public String toString() {
