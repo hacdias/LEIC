@@ -29,7 +29,7 @@ public class Tournament {
     @Column(unique=true, nullable = false)
     private Integer key;
 
-    @ManyToOne(fetch = FetchType.LAZY)          //TO DO: check fetch type
+    @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "user_id")
     private User student;
 
@@ -45,6 +45,7 @@ public class Tournament {
     @Column(nullable = false)
     private String title = "Title";
 
+    @Column(name = "number_questions")
     private Integer numberQuestions;
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.LAZY)
@@ -66,7 +67,7 @@ public class Tournament {
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
         this.numberQuestions = tournamentDto.getNumberQuestions();
-        this.topics = tournamentDto.getTopics();                //TO DO: check
+        this.topics = tournamentDto.getTopics();       
     }
 
     public Integer getId() {
@@ -136,15 +137,14 @@ public class Tournament {
         this.numberQuestions = numberQuestions;
     }
 
-    public Set<Topic> getTopics() {                //TO DO: check
+    public Set<Topic> getTopics() {              
         return topics;
     }
 
-    public void setTopics(Set<Topic> topics) {                //TO DO: check
+    public void setTopics(Set<Topic> topics) {            
         this.topics = topics;
     }
 
-/*
     public CourseExecution getCourseExecution() {
         return courseExecution;
     }
@@ -152,7 +152,7 @@ public class Tournament {
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
         courseExecution.addTournament(this);
-    }*/
+    }
 
     @Override
     public String toString() {
