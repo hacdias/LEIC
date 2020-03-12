@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 // ------------Internal Imports------------
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
@@ -173,15 +175,15 @@ public class Tournament {
         }
     }
 
-    /*
     public void remove() {
-        checkCanChange();
+        //checkCanChange(); TO DO: MAYBE NECESSARY
+        student.getCreatedTournaments().remove(this);
+        student= null;
+
+        getTopics().forEach(topic -> topic.getTournaments().remove(this));
+        getTopics().clear();
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
     }
-    
-    TO DO: it is probably relevant to implement this function/method
-    */   
-
 }

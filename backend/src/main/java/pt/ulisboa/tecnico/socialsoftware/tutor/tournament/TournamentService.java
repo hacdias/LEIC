@@ -83,9 +83,13 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeTournament(Integer tournamentId) {
-        //TO DO: implement
+    public void removeTournament(Integer tournamentId) { //TO DO MENSAGEM DE ERRO
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.ACCESS_DENIED, tournamentId));
+
+        tournament.remove();
+        entityManager.remove(tournament);
     }
+
 
     @Retryable(
             value = { SQLException.class },

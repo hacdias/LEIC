@@ -16,44 +16,41 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
+
 
 
 
 @DataJpaTest
-class RemoveTournamentTest extends Specification{
+class RemoveTournamentTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
-    public static final String QUESTION_TITLE = 'a question title'
-    public static final String QUESTION_CONTENT = 'a question content'
-    public static final String OPTION_CONTENT = "option id content"
+    public static final String STUDENT_ID = "option id content"
     public static final String STUDENT_NAME = "Anonymous User"
     public static final String STUDENT_USERNAME = "anon"
-}
 
-@Autowired
-CourseRepository courseRepository
+    @Autowired
+    CourseRepository courseRepository
 
-@Autowired
-CourseExecutionRepository courseExecutionRepository
+    @Autowired
+    CourseExecutionRepository courseExecutionRepository
 
-@Autowired
-TournamentExecutionRepository tournamentExecutionRepository
+    @Autowired
+    TournamentRepository tournamentRepository
 
-@Autowired
-TournamentService tournamentService
+    @Autowired
+    TournamentService tournamentService
 
-@Autowired
-UserRepository userRepository
+    @Autowired
+    UserRepository userRepository
 
-def course
-def courseExecution
-def student
-def tournament
-
+    def course
+    def courseExecution
+    def student
+    def tournament
 
     def setup() {
 
@@ -68,24 +65,13 @@ def tournament
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
-
-        tournament = new Tournamet()
+        tournament = new Tournament()
         tournament.setKey(1)
         tournament.setStudent(student)
         tournament.setCourseExecution(courseExecution)
+        courseExecution.addTournament(tournament)
+
         tournamentRepository.save(tournament)
-    }
-
-    def "remove a tournament that is already concluded"() {
-        given: "an close tournament"
-        tournament.setCreated(true)
-        tournamentRepository.save(tournament)
-
-        when:
-        tournamentService.removeTournament(tournament.getId())
-
-        then: "the tournament is removed"
-        TournamentRepository.count() == 0L
     }
 
     def "remove a tournament"() {
@@ -93,13 +79,14 @@ def tournament
         tournamentService.removeTournament(tournament.getId())
 
         then: "the tournament is removed"
-        TournamentRepository.count() == 0L
+        tournamentRepository.count() == 0L
     }
 
-@TestConfiguration
-static class TournamentServiceImplTestContextConfiguration {
-    @Bean
-    TournamentService tournamentService(){
-        return new TournamentService()
+    @TestConfiguration
+    static class TournamentServiceImplTestContextConfiguration {
+        @Bean
+        TournamentService tournamentService() {
+            return new TournamentService()
+        }
     }
 }
