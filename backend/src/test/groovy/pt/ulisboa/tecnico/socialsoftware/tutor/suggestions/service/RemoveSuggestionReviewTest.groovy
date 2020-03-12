@@ -101,7 +101,7 @@ class RemoveSuggestionReviewTest extends Specification {
         suggestionReview.setKey(1)
         suggestionReview.setTeacher(teacher)
         suggestionReview.setSuggestion(suggestion)
-        suggestionReview.setApproved(true)
+        suggestionReview.setApproved(false)
         suggestionReview.setJustification(SUGGESTION_REVIEW_JUSTIFICATION)
         suggestionReviewRepository.save(suggestionReview)
     }

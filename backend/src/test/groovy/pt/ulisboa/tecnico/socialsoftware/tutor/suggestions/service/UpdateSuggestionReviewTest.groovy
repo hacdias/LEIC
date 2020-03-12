@@ -103,12 +103,12 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReview.setKey(1)
         suggestionReview.setTeacher(teacher)
         suggestionReview.setSuggestion(suggestion)
-        suggestionReview.setApproved(true)
+        suggestionReview.setApproved(false)
         suggestionReview.setJustification(SUGGESTION_REVIEW_JUSTIFICATION)
         suggestionReviewRepository.save(suggestionReview)
     }
     
-    def "dont change suggestion approval and change justification"() {
+    def "dont change suggestion review approval and change justification"() {
         given: "an updated SuggestionReviewDto"
         def suggestionReviewDto = new SuggestionReviewDto(suggestionReview)
         suggestionReviewDto.setJustification(CHANGED_SUGGESTION_REVIEW_JUSTIFICATION)
@@ -122,6 +122,40 @@ class UpdateSuggestionReviewTest extends Specification {
         result.getId() != null
         result.getKey() == 1
         result.getJustification() == CHANGED_SUGGESTION_REVIEW_JUSTIFICATION
+    }
+
+    def "change suggestion review approval to approved when suggestion is still rejected"() {
+        given: "an updated SuggestionReviewDto"
+        def suggestionReviewDto = new SuggestionReviewDto(suggestionReview)
+        suggestionReviewDto.setApproved(true)
+
+        when:
+        suggestionReviewService.updateSuggestionReview(suggestionReview.getId(), suggestionReviewDto)
+
+        then: "suggestion review and suggestion must be approved"
+        suggestionReviewRepository.count() == 1L
+        def result = suggestionReviewRepository.findAll().get(0)
+        result.getId() != null
+        result.getKey() == 1
+        suggestionReview.getSuggestion().getApproved()
+        suggestionReview.getApproved()
+    }
+
+    def "change suggestion review approval to rejected when suggestion is already approved"() {
+        given: "an updated SuggestionReviewDto"
+        suggestion.setApproved(true)
+        def suggestionReviewDto = new SuggestionReviewDto(suggestionReview)
+
+        when:
+        suggestionReviewService.updateSuggestionReview(suggestionReview.getId(), suggestionReviewDto)
+
+        then: "suggestion review must be rejected and suggestion must be approved"
+        suggestionReviewRepository.count() == 1L
+        def result = suggestionReviewRepository.findAll().get(0)
+        result.getId() != null
+        result.getKey() == 1
+        suggestionReview.getSuggestion().getApproved()
+        !suggestionReview.getApproved()
     }
 
     @TestConfiguration
