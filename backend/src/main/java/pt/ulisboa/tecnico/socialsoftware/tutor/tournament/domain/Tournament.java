@@ -21,7 +21,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
         name = "tournaments",
         indexes = {@Index(name = "tournaments_indx_0", columnList = "key")
         })
-
 public class Tournament {
 
     @Id
@@ -53,6 +52,9 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
+    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    public Set<User> enrolledStudents = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "course_execution_id")
     private CourseExecution courseExecution;      
@@ -61,17 +63,16 @@ public class Tournament {
 
     public Tournament(User student, TournamentDto tournamentDto) {
 
-        this.key = tournamentDto.getKey();        
-        this.student = student;
-        student.addCreatedTournament(this);
+        this.key = tournamentDto.getKey();
         this.creationDate = tournamentDto.getCreationDateDate();
+        this.numberQuestions = tournamentDto.getNumberQuestions();
+
+        setStudent(student);
+        addEnrolledStudent(student);
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
-        this.numberQuestions = tournamentDto.getNumberQuestions();
-        this.topics = tournamentDto.getTopics();
-        getTopics().forEach(topic -> topic.addTournament(this));   
-
+        setTopics(tournamentDto.getTopics());
     }
 
     public Integer getId() {
@@ -96,6 +97,7 @@ public class Tournament {
 
     public void setStudent(User student) {
         this.student = student;
+        student.addCreatedTournament(this);
     }
 
     public LocalDateTime getCreationDate() {
@@ -147,6 +149,7 @@ public class Tournament {
 
     public void setTopics(Set<Topic> topics) {            
         this.topics = topics;
+        topics.forEach(topic -> topic.addTournament(this));   
     }
 
     public CourseExecution getCourseExecution() {
@@ -158,16 +161,28 @@ public class Tournament {
         courseExecution.addTournament(this);
     }
 
+    public Set<User> getEnrolledStudents() {
+        return enrolledStudents;
+    }
+
+    public void addEnrolledStudent(User student) {
+        this.enrolledStudents.add(student);
+        student.addEnrolledTournament(this);
+    }
+
     @Override
     public String toString() {
         return "Tournament{" +
                 "id=" + id +
                 "key=" + key +
+                "student=" + student +
                 ", creationDate=" + creationDate +
                 ", availableDate=" + availableDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
                 ", numberQuestions='" + numberQuestions + '\'' +
+                ", topics='" + topics + '\'' +
+                ", enrolledStudents='" + enrolledStudents + '\'' +
                 '}';
     }
 

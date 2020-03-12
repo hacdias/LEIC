@@ -68,7 +68,9 @@ public enum ErrorMessage {
 
     SUGGESTION_ALREADY_APPROVED("The suggestion was already approved."),
     SUGGESTION_NOT_FOUND("Suggestion not found."),
-    SUGGESTION_REVIEW_NOT_FOUND("Suggestion review not found.");
+    SUGGESTION_REVIEW_NOT_FOUND("Suggestion review not found."),
+
+    TOURNAMENT_NOT_FOUND("Tournament not found.");
 
     public final String label;
 
