@@ -57,7 +57,9 @@ public enum ErrorMessage {
 
     QUERY_IS_ANSWERED("Query already has at least an answer"),
     QUERY_MISSING_DATA("Missing information for query"),
+    ANSWER_QUERY_MISSING_DATA("Missing information to answer query"),
     QUESTION_NOT_ANSWERED("Question wasn't answered"),
+    TEACHER_NOT_IN_COURSE( "Teacher wasn't in course"),
     USER_NOT_STUDENT("User with id %d is not a student"),
     USER_NOT_TEACHER("User with id %d is not a teacher"),
 

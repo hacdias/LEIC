@@ -38,4 +38,14 @@ public class AnswerQueryDto implements Serializable {
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
+
+    @Override
+    public String toString() {
+        return "AnswerQueryDto{" +
+                "id=" + id +
+                ", key=" + key +
+                ", content='" + content + '\'' +
+                ", creationDate='" + creationDate + '\'' +
+                '}';
+    }
 }

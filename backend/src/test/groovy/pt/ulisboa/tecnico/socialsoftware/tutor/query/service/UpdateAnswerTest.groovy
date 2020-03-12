@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.AnswerQueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
@@ -131,6 +133,19 @@ class UpdateAnswerTest extends Specification {
         result.getCreationDate() == answerQuery.getCreationDate()
         result.getQuery() == answerQuery.getQuery()
         result.getKey() == answerQuery.getKey()
+    }
+
+    def "update a query with missing information"() {
+        given: "create a answer query"
+        def answerQueryDTO = new AnswerQueryDto(answerQuery)
+        answerQueryDTO.setContent("")
+
+        when:
+        answerQueryService.updateAnswerQuery(answerQuery.getId(), answerQueryDTO)
+
+        then: "exception query is missing data is thrown "
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.ANSWER_QUERY_MISSING_DATA
     }
 
     @TestConfiguration

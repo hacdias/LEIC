@@ -6,12 +6,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.AnswerQueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.AnswerQueryRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -52,6 +55,17 @@ public class AnswerQueryService {
             int maxAnswerQueryNumber = answerQueryRepository.getMaxAnswerQueryNumber() != null ?
                     answerQueryRepository.getMaxAnswerQueryNumber() : 0;
             answerQueryDto.setKey(maxAnswerQueryNumber + 1);
+        }
+
+        Boolean teacherTeaches = false;
+        Question question = query.getQuestion();
+        Course course = question.getCourse();
+        for (CourseExecution courseExecution : teacher.getCourseExecutions()) {
+            if (courseExecution.getCourse() == course) teacherTeaches = true;
+        }
+
+        if (!teacherTeaches) {
+            throw new TutorException(TEACHER_NOT_IN_COURSE);
         }
 
         AnswerQuery answerQuery = new AnswerQuery(query, teacher, answerQueryDto);
