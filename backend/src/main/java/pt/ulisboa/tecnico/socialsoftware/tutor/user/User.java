@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -63,6 +64,12 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<SuggestionReview> suggestionReviews = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval = true)
+    private Set<Tournament> createdTournaments = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+    private Set<Tournament> enrolledTournaments = new HashSet<>();
 
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
@@ -386,6 +393,22 @@ public class User implements UserDetails {
 
     public void addSuggestionReview(SuggestionReview suggestionReview) {
         this.suggestionReviews.add(suggestionReview);
+    }
+    
+    public Set<Tournament> getCreatedTournaments() {
+        return createdTournaments;
+    }
+
+    public void addCreatedTournament(Tournament tournament) {
+        this.createdTournaments.add(tournament);
+    }
+
+    public Set<Tournament> getEnrolledTournaments() {
+        return enrolledTournaments;
+    }
+
+    public void addEnrolledTournament(Tournament tournament) {
+        this.enrolledTournaments.add(tournament);
     }
 
     @Override
