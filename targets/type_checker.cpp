@@ -239,3 +239,9 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 void og::type_checker::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_malloc_node(og::malloc_node *const node, int lvl) {
+  // TODO
+}

@@ -207,7 +207,7 @@ expr      : tINT                                                 { $$ = new cdk:
           | expr tNE expr                                        { $$ = new cdk::ne_node(LINE, $1, $3); }
           | expr tEQ expr                                        { $$ = new cdk::eq_node(LINE, $1, $3); }
           | '(' expr ')'                                         { $$ = $2; }
-          | '[' expr ']'                                         { /* TODO: $$ = new cdk::malloc_node(LINE, $2); */ }
+          | '[' expr ']'                                         { $$ = new og::malloc_node(LINE, $2); }
           | lval                                                 { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
           | lval '?'                                             { /* TODO: $$ = new cdk::memaddr_node(LINE, $1); */ }
           | lval '=' expr                                        { $$ = new cdk::assignment_node(LINE, $1, $3); }
