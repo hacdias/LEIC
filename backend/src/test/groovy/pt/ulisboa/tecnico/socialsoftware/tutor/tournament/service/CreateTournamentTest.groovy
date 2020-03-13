@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
+//-----------Internal Imports-----------
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -68,7 +68,9 @@ public class CreateTournamentTest extends Specification {
     def formatter
     def topic
     def topic2
-
+    def topicDto
+    def topicDto2
+    
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
@@ -79,15 +81,16 @@ public class CreateTournamentTest extends Specification {
         courseExecutionRepository.save(courseExecution)
         
         topic = new Topic()
-        topic.setId(1)
         topic.setName(TOPIC_NAME)
         topicRepository.save(topic)
 
+        topicDto = new TopicDto(topic)
+
         topic2 = new Topic()
-        topic2.setId(2)
         topic2.setName(TOPIC_NAME2)
         topicRepository.save(topic2)
                
+        topicDto2 = new TopicDto(topic2)
 
         creationDate = LocalDateTime.now()
         availableDate = LocalDateTime.now()
@@ -100,9 +103,6 @@ public class CreateTournamentTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)    
-
-        and: "a topicDto"
-        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
@@ -142,10 +142,6 @@ public class CreateTournamentTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)    
-
-        and: "two topicDtos"
-        def topicDto = new TopicDto(topicRepository.findAll().get(0))
-        def topicDto2 = new TopicDto(topicRepository.findAll().get(1))
         
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
@@ -190,9 +186,6 @@ public class CreateTournamentTest extends Specification {
         courseExecution.getUsers().add(teacher)
         userRepository.save(teacher)    
 
-        and: "a topicDto"
-        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
-
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
         tournamentDto.setKey(1)
@@ -216,10 +209,7 @@ public class CreateTournamentTest extends Specification {
         def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
-        userRepository.save(student)    
-
-        and: "a topicDto"
-        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
+        userRepository.save(student)      
 
         and: "two tournamentDtos"
         def tournamentDto = new TournamentDto()
@@ -294,6 +284,30 @@ public class CreateTournamentTest extends Specification {
         AVAILABLE_DATE    | null               | 1   | TOURNAMENT_TITLE    || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
         AVAILABLE_DATE    | CONCLUSION_DATE    | 0   | TOURNAMENT_TITLE    || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
         AVAILABLE_DATE    | CONCLUSION_DATE    | 1   | "   "               || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+    }
+
+    def "invalid input: no topic selected"() {
+        given: "a student"
+        def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        userRepository.save(student)    
+
+        and: "a tournamentDto"
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setKey(1)
+        tournamentDto.setStudent(student)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setNumberQuestions(1)
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        
+        when:
+        tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOPIC_NOT_SELECTED
     }
 
     @TestConfiguration

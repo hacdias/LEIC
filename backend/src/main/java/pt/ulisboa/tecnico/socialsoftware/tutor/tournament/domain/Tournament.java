@@ -53,7 +53,7 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments",  fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)      //TO DO: check if it is enrolledTournaments 
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)  
     public Set<User> enrolledStudents = new HashSet<>();
 
     @ManyToOne
@@ -63,7 +63,6 @@ public class Tournament {
     public Tournament() {}
 
     public Tournament(User student, TournamentDto tournamentDto) {
-
         this.key = tournamentDto.getKey();
         this.creationDate = tournamentDto.getCreationDateDate();
 

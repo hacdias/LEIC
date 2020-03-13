@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 
+
 public class TournamentDto implements Serializable {
 
     private Integer id;
@@ -139,11 +140,11 @@ public class TournamentDto implements Serializable {
         return LocalDateTime.parse(getConclusionDate(), formatter);
     }
 
-    public Set<TopicDto> getTopics() {                //TO DO: check
+    public Set<TopicDto> getTopics() {         
         return topics;
     }
 
-    public void setTopics(Set<TopicDto> topics) {                //TO DO: check
+    public void setTopics(Set<TopicDto> topics) {           
         this.topics = topics;
     }
 

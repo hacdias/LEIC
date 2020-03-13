@@ -27,6 +27,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 
+
 @Service
 public class TournamentService {
 
@@ -64,7 +65,7 @@ public class TournamentService {
         }
 
         if (!student.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(ErrorMessage.USER_NOT_ENROLLED, student.getUsername());     //TO DO: check exception
+            throw new TutorException(ErrorMessage.USER_NOT_ENROLLED, student.getUsername()); 
         }
 
         if (tournamentDto.getKey() == null) {
@@ -74,13 +75,15 @@ public class TournamentService {
         Tournament tournament = new Tournament(student, tournamentDto);
         tournament.setCourseExecution(courseExecution);
 
-        if (tournamentDto.getTopics() != null) {
+        if (tournamentDto.getTopics().size() != 0) {
             for (TopicDto topicDto : tournamentDto.getTopics()) {
                 Topic topic = topicRepository.findById(topicDto.getId())
                         .orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()));
                 tournament.addTopic(topic);
             }
-        } //else throw exception, needs to have at least one topic, probably will test in invalid inputs test
+        } else {
+            throw new TutorException(ErrorMessage.TOPIC_NOT_SELECTED); 
+        }
 
         if (tournamentDto.getCreationDate() == null) {
             tournament.setCreationDate(LocalDateTime.now());
@@ -102,7 +105,7 @@ public class TournamentService {
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
 
         if (student.getRole() != User.Role.STUDENT) {
-            throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId); //TO DO: check
+            throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
         }
 
         if (!student.getEnrolledTournaments().contains(tournament)) {
