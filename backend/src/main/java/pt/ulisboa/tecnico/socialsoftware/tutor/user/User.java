@@ -68,6 +68,9 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY)
+    private Set<Tournament> enrolledTournaments = new HashSet<>();
+
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
@@ -391,13 +394,21 @@ public class User implements UserDetails {
     public void addSuggestionReview(SuggestionReview suggestionReview) {
         this.suggestionReviews.add(suggestionReview);
     }
-
+    
     public Set<Tournament> getCreatedTournaments() {
         return createdTournaments;
     }
 
     public void addCreatedTournament(Tournament tournament) {
         this.createdTournaments.add(tournament);
+    }
+
+    public Set<Tournament> getEnrolledTournaments() {
+        return enrolledTournaments;
+    }
+
+    public void addEnrolledTournament(Tournament tournament) {
+        this.enrolledTournaments.add(tournament);
     }
 
     @Override
@@ -420,6 +431,8 @@ public class User implements UserDetails {
                 ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
                 ", creationDate=" + creationDate +
                 ", courseExecutions=" + courseExecutions +
+                ", createdTournaments=" + createdTournaments +
+                ", enrolledTournaments=" + enrolledTournaments +
                 '}';
     }
 

@@ -83,20 +83,25 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeTournament(Integer tournamentId) { //TO DO MENSAGEM DE ERRO
-        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.ACCESS_DENIED, tournamentId));
+    public void removeTournament(Integer tournamentId) { 
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
 
         tournament.remove();
         entityManager.remove(tournament);
     }
 
-
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto updateTournament(Integer tournamentId, TournamentDto tournamentDto) {
-        //TO DO: implement
-        return null;
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void addEnrolledStudentToTournament(Integer studentId, Integer tournamentId) { 
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        if (student.getRole() != User.Role.STUDENT) {
+            throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
+        }
+        
+        tournament.addEnrolledStudent(student);
     }
 }

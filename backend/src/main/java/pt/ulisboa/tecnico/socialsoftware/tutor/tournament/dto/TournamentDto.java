@@ -25,10 +25,10 @@ public class TournamentDto implements Serializable {
     private String conclusionDate = null;
     private String title;
     private Integer numberQuestions;
-    public Set<Topic> topics = new HashSet<>();                //TO DO: check
+    public Set<Topic> topics = new HashSet<>();  //TO DO: change to TopicDto              //TO DO: check
 
     @Transient
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public TournamentDto() {}
 
@@ -64,10 +64,6 @@ public class TournamentDto implements Serializable {
         this.key = key;
     }
 
-    public String getCreationDate() {
-        return creationDate;
-    }
-
     public User getStudent() {
         return student;
     }
@@ -78,6 +74,10 @@ public class TournamentDto implements Serializable {
 
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
     }
 
     public String getAvailableDate() {
@@ -139,6 +139,10 @@ public class TournamentDto implements Serializable {
 
     public void setTopics(Set<Topic> topics) {                //TO DO: check
         this.topics = topics;
+    }
+
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
     }
 
     @Override
