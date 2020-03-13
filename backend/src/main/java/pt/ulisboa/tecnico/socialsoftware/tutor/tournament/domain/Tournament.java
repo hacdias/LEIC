@@ -221,7 +221,6 @@ public class Tournament {
     }
 
     public void remove() {
-        //checkCanChange(); TO DO: MAYBE NECESSARY
         student.getCreatedTournaments().remove(this);
         student= null;
 
