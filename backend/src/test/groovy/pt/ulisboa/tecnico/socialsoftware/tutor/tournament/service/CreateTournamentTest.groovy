@@ -161,7 +161,6 @@ public class CreateTournamentTest extends Specification {
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
 
         then:
-        tournamentRepository.findAll() == null
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result.getId() != null
