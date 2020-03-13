@@ -127,14 +127,6 @@ void og::xml_writer::do_assignment_node(cdk::assignment_node * const node, int l
 
 //---------------------------------------------------------------------------
 
-void og::xml_writer::do_program_node(og::program_node * const node, int lvl) {
-  openTag(node, lvl);
-  node->statements()->accept(this, lvl + 4);
-  closeTag(node, lvl);
-}
-
-//---------------------------------------------------------------------------
-
 void og::xml_writer::do_evaluation_node(og::evaluation_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   openTag(node, lvl);
@@ -273,5 +265,10 @@ void og::xml_writer::do_block_node(og::block_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
-  // TODO
+  // TODO; this was from program
+  /*
+  openTag(node, lvl);
+  node->statements()->accept(this, lvl + 4);
+  closeTag(node, lvl);
+  */
 }
