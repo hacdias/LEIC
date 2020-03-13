@@ -21,6 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @DataJpaTest
 class UpdateQueryTest extends Specification {
@@ -151,18 +152,26 @@ class UpdateQueryTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.QUERY_IS_ANSWERED
     }
 
+    @Unroll("invalid arguments: content=#content | title=#title || errorMessage=#errorMessage ")
     def "update a query with missing information"() {
         given: "create a query"
         def queryDTO = new QueryDto(query)
-        queryDTO.setTitle("")
-        queryDTO.setContent(NEW_QUERY_CONTENT)
+        queryDTO.setTitle(title)
+        queryDTO.setContent(content)
 
         when:
         queryService.updateQuery(query.getId(), queryDTO)
 
         then: "exception query is missing data is thrown "
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.QUERY_MISSING_DATA
+        exception.getErrorMessage() == errorMessage
+
+        where:
+        content                         | title                                 || errorMessage
+        null                            | NEW_QUERY_TITLE                       || ErrorMessage.QUERY_MISSING_DATA
+        "  "                            | NEW_QUERY_TITLE                       || ErrorMessage.QUERY_MISSING_DATA
+        NEW_QUERY_CONTENT               | null                                  || ErrorMessage.QUERY_MISSING_DATA
+        NEW_QUERY_CONTENT               | "  "                                  || ErrorMessage.QUERY_MISSING_DATA
     }
 
     @TestConfiguration
