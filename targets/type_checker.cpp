@@ -259,3 +259,9 @@ void og::type_checker::do_block_node(og::block_node *const node, int lvl) {
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
+  // TODO
+}

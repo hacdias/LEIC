@@ -272,3 +272,9 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
   closeTag(node, lvl);
   */
 }
+
+//---------------------------------------------------------------------------
+
+void og::xml_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
+  // TODO
+}
