@@ -74,10 +74,9 @@ public class TournamentService {
         Tournament tournament = new Tournament(student, tournamentDto);
         tournament.setCourseExecution(courseExecution);
 
-        Topic topic;
         if (tournamentDto.getTopics() != null) {
             for (TopicDto topicDto : tournamentDto.getTopics()) {
-                topic = topicRepository.findById(topicDto.getId())
+                Topic topic = topicRepository.findById(topicDto.getId())
                         .orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()));
                 tournament.addTopic(topic);
             }

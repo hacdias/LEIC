@@ -35,6 +35,7 @@ public class CreateTournamentTest extends Specification {
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String TOPIC_NAME = 'TOPIC 1'
+    public static final String TOPIC_NAME2 = 'TOPIC 2'
     public static final String USER_NAME = "User"
     public static final String USER_USERNAME = "Username"
     public static final String TOURNAMENT_TITLE = "TOURNAMENT 1"
@@ -64,7 +65,7 @@ public class CreateTournamentTest extends Specification {
     def conclusionDate
     def formatter
     def topic
-    def topicDto
+    def topic2
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -80,7 +81,11 @@ public class CreateTournamentTest extends Specification {
         topic.setName(TOPIC_NAME)
         topicRepository.save(topic)
 
-        topicDto = new TopicDto(topic)        
+        topic2 = new Topic()
+        topic2.setId(2)
+        topic2.setName(TOPIC_NAME2)
+        topicRepository.save(topic2)
+               
 
         creationDate = LocalDateTime.now()
         availableDate = LocalDateTime.now()
@@ -93,6 +98,9 @@ public class CreateTournamentTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)    
+
+        and: "a topicDto"
+        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
@@ -110,9 +118,9 @@ public class CreateTournamentTest extends Specification {
         then:
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
-        result == null
         result.getId() != null
         result.getKey() == 1
+        result.getStudent().getId() == student.getId()
         result.getStudent().getName() == USER_NAME
         result.getStudent().getUsername() == USER_USERNAME
         result.getCreationDate() != null
@@ -126,12 +134,63 @@ public class CreateTournamentTest extends Specification {
         courseExecution.getTournaments().contains(result)
     }
 
+    def "student creates a tournament with two topics and two questions"() {
+        given: "a student"
+        def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        userRepository.save(student)    
+
+        and: "two topicDtos"
+        def topicDto = new TopicDto(topicRepository.findAll().get(0))
+        def topicDto2 = new TopicDto(topicRepository.findAll().get(1))
+        
+        and: "a tournamentDto"
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setKey(1)
+        tournamentDto.setStudent(student)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setNumberQuestions(2)
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.addTopic(topicDto)
+        tournamentDto.addTopic(topicDto2)
+        
+        
+        when:
+        tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
+
+        then:
+        tournamentRepository.findAll() == null
+        tournamentRepository.count() == 1L
+        def result = tournamentRepository.findAll().get(0)
+        result.getId() != null
+        result.getKey() == 1
+        result.getStudent().getName() == USER_NAME
+        result.getStudent().getUsername() == USER_USERNAME
+        result.getCreationDate() != null
+        result.getAvailableDate().format(formatter) == availableDate.format(formatter)
+        result.getConclusionDate().format(formatter) == conclusionDate.format(formatter)
+        result.getTitle() == TOURNAMENT_TITLE
+        result.getNumberQuestions() == 2
+        result.getTopics().contains(topic)
+        result.getTopics().contains(topic2)
+        topicRepository.count() == 2L
+        topicRepository.findAll().get(0).getTournaments().contains(result)
+        topicRepository.findAll().get(1).getTournaments().contains(result)
+        student.getCreatedTournaments().contains(result)
+        courseExecution.getTournaments().contains(result)
+    }
+
     def "teacher tries to create tournament"() {
         given: "a teacher"
         def teacher = new User(USER_NAME, USER_USERNAME, 1, User.Role.TEACHER)
         teacher.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(teacher)
         userRepository.save(teacher)    
+
+        and: "a topicDto"
+        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
