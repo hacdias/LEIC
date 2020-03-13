@@ -257,3 +257,9 @@ void og::xml_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
 void og::xml_writer::do_malloc_node(og::malloc_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::xml_writer::do_memaddr_node(og::memaddr_node *const node, int lvl) {
+  // TODO
+}

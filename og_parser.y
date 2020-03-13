@@ -209,7 +209,7 @@ expr      : tINT                                                 { $$ = new cdk:
           | '(' expr ')'                                         { $$ = $2; }
           | '[' expr ']'                                         { $$ = new og::malloc_node(LINE, $2); }
           | lval                                                 { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
-          | lval '?'                                             { /* TODO: $$ = new cdk::memaddr_node(LINE, $1); */ }
+          | lval '?'                                             { $$ = new og::memaddr_node(LINE, $1); }
           | lval '=' expr                                        { $$ = new cdk::assignment_node(LINE, $1, $3); }
           | tIDENTIFIER '(' ')'                                  { /* TODO: $$ = new og::func_call_node(LINE, $1, new cdk::sequence_node(LINE)); */ }
           | tIDENTIFIER '(' exps ')'                             { /* TODO: $$ = new og::func_call_node(LINE, $1, $3); */ }
