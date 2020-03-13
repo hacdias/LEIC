@@ -14,9 +14,6 @@ namespace og {
     cdk::sequence_node *_end;
     cdk::basic_node *_block;
 
-    // TODO: Esta instrução tem comportamento idêntico ao da instrução for em C. Na zona de declaração de variáveis,
-    // apenas pode ser usada uma declaração auto, devendo ser, nesse caso, a única.
-
   public:
     inline for_node(int lineno, cdk::sequence_node *init, cdk::sequence_node *condition, cdk::sequence_node *end, cdk::basic_node *block) :
         basic_node(lineno), _init(init), _condition(condition), _end(end), _block(block) {
