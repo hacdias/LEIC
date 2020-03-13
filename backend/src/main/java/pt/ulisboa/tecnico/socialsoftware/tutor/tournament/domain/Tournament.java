@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
 
 @Entity
@@ -22,7 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
         indexes = {@Index(name = "tournaments_indx_0", columnList = "key")
         })
 public class Tournament {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -49,10 +50,10 @@ public class Tournament {
     @Column(name = "number_questions")
     private Integer numberQuestions;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments",  fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
-    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)  
     public Set<User> enrolledStudents = new HashSet<>();
 
     @ManyToOne
@@ -62,17 +63,15 @@ public class Tournament {
     public Tournament() {}
 
     public Tournament(User student, TournamentDto tournamentDto) {
-
         this.key = tournamentDto.getKey();
         this.creationDate = tournamentDto.getCreationDateDate();
-        this.numberQuestions = tournamentDto.getNumberQuestions();
 
+        setNumberQuestions(tournamentDto.getNumberQuestions());
         setStudent(student);
         addEnrolledStudent(student);
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
-        setTopics(tournamentDto.getTopics());
     }
 
     public Integer getId() {
@@ -113,7 +112,7 @@ public class Tournament {
     }
 
     public void setAvailableDate(LocalDateTime availableDate) {
-        //checkAvailableDate(availableDate);           TO DO: make a decent check function
+        checkAvailableDate(availableDate);     
         this.availableDate = availableDate;
     }
 
@@ -122,7 +121,7 @@ public class Tournament {
     }
 
     public void setConclusionDate(LocalDateTime conclusionDate) {
-        //checkConclusionDate(conclusionDate);          TO DO: make a decent check function
+        checkConclusionDate(conclusionDate);         
         this.conclusionDate = conclusionDate;
     }    
 
@@ -140,6 +139,7 @@ public class Tournament {
     }
 
     public void setNumberQuestions(Integer numberQuestions) {
+        checkNumberQuestions(numberQuestions);
         this.numberQuestions = numberQuestions;
     }
 
@@ -170,25 +170,53 @@ public class Tournament {
         student.addEnrolledTournament(this);
     }
 
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
+        topic.addTournament(this);
+    }
+
     @Override
     public String toString() {
         return "Tournament{" +
                 "id=" + id +
                 "key=" + key +
-                "student=" + student +
+                "student=" + student.getName() +
                 ", creationDate=" + creationDate +
                 ", availableDate=" + availableDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
                 ", numberQuestions='" + numberQuestions + '\'' +
                 ", topics='" + topics + '\'' +
-                ", enrolledStudents='" + enrolledStudents + '\'' +
                 '}';
     }
 
     private void checkTitle(String title) {
         if (title == null || title.trim().length() == 0) {
-            //throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Title");  TO DO: add exception to TutorException
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Title");
+        }
+    }
+
+    private void checkNumberQuestions(Integer numberQuestions) {
+        if (numberQuestions < 1) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Number of questions");
+        }
+    }
+
+    private void checkAvailableDate(LocalDateTime availableDate) {
+        if (availableDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+        if (this.availableDate != null && this.conclusionDate != null && conclusionDate.isBefore(availableDate)) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+    }
+
+    private void checkConclusionDate(LocalDateTime conclusionDate) {
+        if (conclusionDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+        if (this.availableDate != null && this.conclusionDate != null && conclusionDate.isBefore(availableDate)) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
         }
     }
 
@@ -199,6 +227,9 @@ public class Tournament {
 
         getTopics().forEach(topic -> topic.getTournaments().remove(this));
         getTopics().clear();
+
+        getEnrolledStudents().forEach(student -> student.getEnrolledTournaments().remove(this));
+        getEnrolledStudents().clear();
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;

@@ -71,7 +71,11 @@ public enum ErrorMessage {
     SUGGESTION_NOT_FOUND("Suggestion not found."),
     SUGGESTION_REVIEW_NOT_FOUND("Suggestion review not found."),
 
-    TOURNAMENT_NOT_FOUND("Tournament not found.");
+    TOURNAMENT_NOT_FOUND("Tournament not found."),
+    STUDENT_NOT_ENROLLED("The student %d is not enrolled in tournament %d"),
+    STUDENT_NOT_CREATOR("The student %d is not creator of tournament %d"),
+    TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
+    TOPIC_NOT_SELECTED("No topic selected.");
 
     public final String label;
 

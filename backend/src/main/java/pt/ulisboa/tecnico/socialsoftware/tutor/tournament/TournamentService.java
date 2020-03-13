@@ -23,6 +23,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+
 
 @Service
 public class TournamentService {
@@ -35,6 +39,9 @@ public class TournamentService {
 
     @Autowired
     private TournamentRepository tournamentRepository;  
+    
+    @Autowired
+    private TopicRepository topicRepository;  
 
     @PersistenceContext
     EntityManager entityManager;
@@ -58,7 +65,7 @@ public class TournamentService {
         }
 
         if (!student.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(ErrorMessage.USER_NOT_ENROLLED, student.getUsername());     //TO DO: check exception
+            throw new TutorException(ErrorMessage.USER_NOT_ENROLLED, student.getUsername()); 
         }
 
         if (tournamentDto.getKey() == null) {
@@ -67,6 +74,16 @@ public class TournamentService {
 
         Tournament tournament = new Tournament(student, tournamentDto);
         tournament.setCourseExecution(courseExecution);
+
+        if (tournamentDto.getTopics().size() != 0) {
+            for (TopicDto topicDto : tournamentDto.getTopics()) {
+                Topic topic = topicRepository.findById(topicDto.getId())
+                        .orElseThrow(() -> new TutorException(ErrorMessage.TOPIC_NOT_FOUND, topicDto.getId()));
+                tournament.addTopic(topic);
+            }
+        } else {
+            throw new TutorException(ErrorMessage.TOPIC_NOT_SELECTED); 
+        }
 
         if (tournamentDto.getCreationDate() == null) {
             tournament.setCreationDate(LocalDateTime.now());
@@ -83,8 +100,21 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeTournament(Integer tournamentId) { 
+    public void removeTournament(Integer studentId, Integer tournamentId) { 
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        if (student.getRole() != User.Role.STUDENT) {
+            throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
+        }
+
+        if (!student.getEnrolledTournaments().contains(tournament)) {
+            throw new TutorException(ErrorMessage.STUDENT_NOT_ENROLLED, studentId, tournamentId);
+        }
+
+        if (tournament.getStudent() != student) {
+            throw new TutorException(ErrorMessage.STUDENT_NOT_CREATOR, studentId, tournamentId);
+        }
 
         tournament.remove();
         entityManager.remove(tournament);
