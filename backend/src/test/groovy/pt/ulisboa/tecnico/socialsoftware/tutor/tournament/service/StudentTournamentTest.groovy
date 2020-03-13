@@ -39,6 +39,8 @@ public class StudentTournamentTest extends Specification {
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String USER_NAME = "User"
     public static final String USER_USERNAME = "Username"
+    public static final String USER_NAME2 = "User2"
+    public static final String USER_USERNAME2 = "Username2"
     public static final String TOURNAMENT_TITLE = "TOURNAMENT 1"
 
     @Autowired
@@ -58,7 +60,6 @@ public class StudentTournamentTest extends Specification {
 
     def course
     def courseExecution
-    def student
     def tournament
     
     def setup() {
@@ -78,7 +79,7 @@ public class StudentTournamentTest extends Specification {
 
     }
 
-    def "students enrolls in tournament" () {
+    def "student enrolls in tournament" () {
         given: "a student"
         def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
         student.getCourseExecutions().add(courseExecution)
@@ -93,6 +94,31 @@ public class StudentTournamentTest extends Specification {
         student.getEnrolledTournaments().contains(result)
         result.getEnrolledStudents().contains(student)
 
+    }
+
+    def "two students enroll in tournament" () {
+        given: "two student"
+        def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        userRepository.save(student)
+
+        def student2 = new User(USER_NAME2, USER_USERNAME2, 2, User.Role.STUDENT)
+        student2.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student2)
+        userRepository.save(student2)
+
+        when:
+        tournamentService.addEnrolledStudentToTournament(student.getId(), tournament.getId())
+        tournamentService.addEnrolledStudentToTournament(student2.getId(), tournament.getId())
+
+        then: "students are enrolled in tournament"
+        def result = tournamentRepository.findAll().get(0)
+        result.getEnrolledStudents().size() == 2
+        result.getEnrolledStudents().contains(student)
+        result.getEnrolledStudents().contains(student2)
+        student.getEnrolledTournaments().contains(result)
+        student2.getEnrolledTournaments().contains(result)
     }
 
     def "teacher tries to enroll in tournament" () {

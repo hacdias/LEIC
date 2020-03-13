@@ -211,7 +211,57 @@ public class CreateTournamentTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.USER_NOT_STUDENT
     }
 
-    def "invalid arguments: availableDate=#available_Date | conclusionDate=#conclusion_Date | title=#title | numberQuestions=#n || errorMessage=#errorMessage"() {
+    def "student creates two tournaments"() {
+        given: "a student"
+        def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        userRepository.save(student)    
+
+        and: "a topicDto"
+        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
+
+        and: "two tournamentDtos"
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setKey(1)
+        tournamentDto.setStudent(student)
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setNumberQuestions(1)
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.addTopic(topicDto)
+        
+        def tournamentDto2 = new TournamentDto()
+        tournamentDto2.setKey(2)
+        tournamentDto2.setStudent(student)
+        tournamentDto2.setTitle(TOURNAMENT_TITLE)
+        tournamentDto2.setNumberQuestions(1)
+        tournamentDto2.setAvailableDate(availableDate.format(formatter))
+        tournamentDto2.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto2.addTopic(topicDto)
+
+        when:
+        tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
+        tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto2)
+
+        then:
+        tournamentRepository.count() == 2L
+        def result = tournamentRepository.findAll().get(0)
+        def result1 = tournamentRepository.findAll().get(1)
+        result.getKey() == 1
+        result.getStudent().getId() == student.getId()
+        result1.getKey() == 2
+        result1.getStudent().getId() == student.getId()
+        result.getTopics().contains(topic)
+        topicRepository.findAll().get(0).getTournaments().contains(result)
+        student.getCreatedTournaments().contains(result)
+        courseExecution.getTournaments().contains(result)
+        topicRepository.findAll().get(0).getTournaments().contains(result1)
+        student.getCreatedTournaments().contains(result1)
+        courseExecution.getTournaments().contains(result1)
+    }
+
+    def "invalid inputs: availableDate=#available_Date | conclusionDate=#conclusion_Date | title=#title | numberQuestions=#n || errorMessage=#errorMessage"() {
         given: "a student"
         def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
         student.getCourseExecutions().add(courseExecution)
