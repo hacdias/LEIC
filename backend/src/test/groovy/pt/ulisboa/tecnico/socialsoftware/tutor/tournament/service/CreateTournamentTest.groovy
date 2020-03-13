@@ -25,6 +25,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 
 
@@ -63,6 +64,7 @@ public class CreateTournamentTest extends Specification {
     def conclusionDate
     def formatter
     def topic
+    def topicDto
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -74,8 +76,11 @@ public class CreateTournamentTest extends Specification {
         courseExecutionRepository.save(courseExecution)
         
         topic = new Topic()
+        topic.setId(1)
         topic.setName(TOPIC_NAME)
         topicRepository.save(topic)
+
+        topicDto = new TopicDto(topic)        
 
         creationDate = LocalDateTime.now()
         availableDate = LocalDateTime.now()
@@ -97,7 +102,7 @@ public class CreateTournamentTest extends Specification {
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentDto.addTopic(topic)
+        tournamentDto.addTopic(topicDto)
         
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
@@ -105,6 +110,7 @@ public class CreateTournamentTest extends Specification {
         then:
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
+        result == null
         result.getId() != null
         result.getKey() == 1
         result.getStudent().getName() == USER_NAME
@@ -115,7 +121,7 @@ public class CreateTournamentTest extends Specification {
         result.getTitle() == TOURNAMENT_TITLE
         result.getNumberQuestions() == 1
         result.getTopics().contains(topic)
-        topic.getTournaments().contains(result)
+        topicRepository.findAll().get(0).getTournaments().contains(result)
         student.getCreatedTournaments().contains(result)
         courseExecution.getTournaments().contains(result)
     }
@@ -135,7 +141,7 @@ public class CreateTournamentTest extends Specification {
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentDto.addTopic(topic)
+        tournamentDto.addTopic(topicDto)
 
         when:
         tournamentService.createTournament(courseExecution.getId(), teacher.getId(), tournamentDto)
