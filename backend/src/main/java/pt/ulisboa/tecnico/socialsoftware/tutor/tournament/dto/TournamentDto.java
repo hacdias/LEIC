@@ -12,8 +12,8 @@ import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
-
 
 public class TournamentDto implements Serializable {
 
@@ -25,7 +25,7 @@ public class TournamentDto implements Serializable {
     private String conclusionDate = null;
     private String title;
     private Integer numberQuestions;
-    public Set<Topic> topics = new HashSet<>();  //TO DO: change to TopicDto              //TO DO: check
+    public Set<TopicDto> topics = new HashSet<>();
 
     @Transient
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -38,7 +38,6 @@ public class TournamentDto implements Serializable {
         this.student = tournament.getStudent();
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
-        this.topics = tournament.getTopics();                //TO DO: check
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -46,6 +45,13 @@ public class TournamentDto implements Serializable {
             this.availableDate = tournament.getAvailableDate().format(formatter);
         if (tournament.getConclusionDate() != null)
             this.conclusionDate = tournament.getConclusionDate().format(formatter);
+
+        if (tournament.getTopics() != null) {
+            for (Topic topic: tournament.getTopics()) {
+                TopicDto topicDto = new TopicDto(topic);
+                addTopic(topicDto);
+            }
+        } 
     }
 
     public Integer getId() {
@@ -133,15 +139,15 @@ public class TournamentDto implements Serializable {
         return LocalDateTime.parse(getConclusionDate(), formatter);
     }
 
-    public Set<Topic> getTopics() {                //TO DO: check
+    public Set<TopicDto> getTopics() {                //TO DO: check
         return topics;
     }
 
-    public void setTopics(Set<Topic> topics) {                //TO DO: check
+    public void setTopics(Set<TopicDto> topics) {                //TO DO: check
         this.topics = topics;
     }
 
-    public void addTopic(Topic topic) {
+    public void addTopic(TopicDto topic) {
         this.topics.add(topic);
     }
 
