@@ -39,6 +39,8 @@ public class CreateTournamentTest extends Specification {
     public static final String USER_NAME = "User"
     public static final String USER_USERNAME = "Username"
     public static final String TOURNAMENT_TITLE = "TOURNAMENT 1"
+    public static final String AVAILABLE_DATE = "2021-03-01 10:00"
+    public static final String CONCLUSION_DATE = "2021-06-02 11:00"
 
     @Autowired
     CourseRepository courseRepository
@@ -208,8 +210,41 @@ public class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_STUDENT
     }
-    
-    
+
+    def "invalid arguments: availableDate=#available_Date | conclusionDate=#conclusion_Date | title=#title | numberQuestions=#n || errorMessage=#errorMessage"() {
+        given: "a student"
+        def student = new User(USER_NAME, USER_USERNAME, 1, User.Role.STUDENT)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        userRepository.save(student)    
+
+        and: "a topicDto"
+        def topicDto = new TopicDto(topicRepository.findAll().get(0))   
+
+        and: "a tournamentDto"
+        def tournamentDto = new TournamentDto()
+        tournamentDto.setKey(1)
+        tournamentDto.setStudent(student)
+        tournamentDto.setTitle(title)
+        tournamentDto.setNumberQuestions(n)
+        tournamentDto.setAvailableDate(available_Date)
+        tournamentDto.setConclusionDate(conclusion_Date)
+        tournamentDto.addTopic(topicDto)
+
+        when:
+        tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == errorMessage
+
+        where:  
+        available_Date    | conclusion_Date    | n   | title               || errorMessage
+        null              | CONCLUSION_DATE    | 1   | TOURNAMENT_TITLE    || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        AVAILABLE_DATE    | null               | 1   | TOURNAMENT_TITLE    || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        AVAILABLE_DATE    | CONCLUSION_DATE    | 0   | TOURNAMENT_TITLE    || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        AVAILABLE_DATE    | CONCLUSION_DATE    | 1   | "   "               || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+    }
 
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {

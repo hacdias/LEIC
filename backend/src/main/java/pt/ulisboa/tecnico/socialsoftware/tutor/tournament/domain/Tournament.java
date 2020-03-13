@@ -66,8 +66,8 @@ public class Tournament {
 
         this.key = tournamentDto.getKey();
         this.creationDate = tournamentDto.getCreationDateDate();
-        this.numberQuestions = tournamentDto.getNumberQuestions();
 
+        setNumberQuestions(tournamentDto.getNumberQuestions());
         setStudent(student);
         addEnrolledStudent(student);
         setAvailableDate(tournamentDto.getAvailableDateDate());
@@ -113,7 +113,7 @@ public class Tournament {
     }
 
     public void setAvailableDate(LocalDateTime availableDate) {
-        //checkAvailableDate(availableDate);           TO DO: make a decent check function
+        checkAvailableDate(availableDate);     
         this.availableDate = availableDate;
     }
 
@@ -122,7 +122,7 @@ public class Tournament {
     }
 
     public void setConclusionDate(LocalDateTime conclusionDate) {
-        //checkConclusionDate(conclusionDate);          TO DO: make a decent check function
+        checkConclusionDate(conclusionDate);         
         this.conclusionDate = conclusionDate;
     }    
 
@@ -140,6 +140,7 @@ public class Tournament {
     }
 
     public void setNumberQuestions(Integer numberQuestions) {
+        checkNumberQuestions(numberQuestions);
         this.numberQuestions = numberQuestions;
     }
 
@@ -192,7 +193,31 @@ public class Tournament {
 
     private void checkTitle(String title) {
         if (title == null || title.trim().length() == 0) {
-            //throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Title");  TO DO: add exception to TutorException
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Title");
+        }
+    }
+
+    private void checkNumberQuestions(Integer numberQuestions) {
+        if (numberQuestions < 1) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Number of questions");
+        }
+    }
+
+    private void checkAvailableDate(LocalDateTime availableDate) {
+        if (availableDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+        if (this.availableDate != null && this.conclusionDate != null && conclusionDate.isBefore(availableDate)) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+    }
+
+    private void checkConclusionDate(LocalDateTime conclusionDate) {
+        if (conclusionDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+        if (this.availableDate != null && this.conclusionDate != null && conclusionDate.isBefore(availableDate)) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
         }
     }
 
