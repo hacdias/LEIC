@@ -333,3 +333,15 @@ void og::postfix_writer::do_malloc_node(og::malloc_node *const node, int lvl) {
 void og::postfix_writer::do_memaddr_node(og::memaddr_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::postfix_writer::do_block_node(og::block_node *const node, int lvl) {
+  // TODO
+}
+
+//---------------------------------------------------------------------------
+
+void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
+  // TODO
+}

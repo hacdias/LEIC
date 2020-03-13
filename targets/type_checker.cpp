@@ -251,3 +251,15 @@ void og::type_checker::do_malloc_node(og::malloc_node *const node, int lvl) {
 void og::type_checker::do_memaddr_node(og::memaddr_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_block_node(og::block_node *const node, int lvl) {
+  // TODO
+}
+
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
+  // TODO
+}
