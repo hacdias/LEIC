@@ -245,3 +245,9 @@ void og::xml_writer::do_continue_node(og::continue_node *const node, int lvl) {
 void og::xml_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
+
+void og::xml_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
+  // TODO
+}
