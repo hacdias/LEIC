@@ -68,7 +68,7 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch= FetchType.LAZY)
     private Set<Tournament> enrolledTournaments = new HashSet<>();
 
     @ManyToMany
@@ -431,8 +431,6 @@ public class User implements UserDetails {
                 ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
                 ", creationDate=" + creationDate +
                 ", courseExecutions=" + courseExecutions +
-                ", createdTournaments=" + createdTournaments +
-                ", enrolledTournaments=" + enrolledTournaments +
                 '}';
     }
 

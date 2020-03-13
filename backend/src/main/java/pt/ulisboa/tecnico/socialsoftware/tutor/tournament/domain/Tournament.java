@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
 
 @Entity
@@ -22,7 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
         indexes = {@Index(name = "tournaments_indx_0", columnList = "key")
         })
 public class Tournament {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -49,10 +50,10 @@ public class Tournament {
     @Column(name = "number_questions")
     private Integer numberQuestions;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments", fetch=FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments",  fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
-    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)      //TO DO: check if it is enrolledTournaments 
     public Set<User> enrolledStudents = new HashSet<>();
 
     @ManyToOne
@@ -72,7 +73,6 @@ public class Tournament {
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
-        setTopics(tournamentDto.getTopics());
     }
 
     public Integer getId() {
@@ -170,19 +170,23 @@ public class Tournament {
         student.addEnrolledTournament(this);
     }
 
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
+        topic.addTournament(this);
+    }
+
     @Override
     public String toString() {
         return "Tournament{" +
                 "id=" + id +
                 "key=" + key +
-                "student=" + student +
+                "student=" + student.getName() +
                 ", creationDate=" + creationDate +
                 ", availableDate=" + availableDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
                 ", numberQuestions='" + numberQuestions + '\'' +
                 ", topics='" + topics + '\'' +
-                ", enrolledStudents='" + enrolledStudents + '\'' +
                 '}';
     }
 
@@ -199,6 +203,9 @@ public class Tournament {
 
         getTopics().forEach(topic -> topic.getTournaments().remove(this));
         getTopics().clear();
+
+        getEnrolledStudents().forEach(student -> student.getEnrolledTournaments().remove(this));
+        getEnrolledStudents().clear();
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
