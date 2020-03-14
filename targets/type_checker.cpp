@@ -265,3 +265,19 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   // TODO
 }
+
+void og::type_checker::do_input_node(og::input_node *const node, int lvl) {
+  // TODO
+}
+
+void og::type_checker::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
+  // TODO
+}
+
+void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
+  // TODO
+}
+
+void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
+  // TODO
+}

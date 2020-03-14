@@ -278,3 +278,19 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
 void og::xml_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   // TODO
 }
+
+void og::xml_writer::do_input_node(og::input_node *const node, int lvl) {
+  // TODO
+}
+
+void og::xml_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
+  // TODO
+}
+
+void og::xml_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
+  // TODO
+}
+
+void og::xml_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
+  // TODO
+}
