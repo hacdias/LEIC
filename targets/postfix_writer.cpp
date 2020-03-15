@@ -294,7 +294,7 @@ void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) 
 
 //---------------------------------------------------------------------------
 
-void og::postfix_writer::do_malloc_node(og::malloc_node *const node, int lvl) {
+void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
   // TODO
 }
 
