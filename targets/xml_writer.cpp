@@ -148,11 +148,11 @@ void og::xml_writer::do_writeln_node(og::writeln_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void og::xml_writer::do_read_node(og::read_node * const node, int lvl) {
-  ASSERT_SAFE_EXPRESSIONS;
+void og::xml_writer::do_input_node(og::input_node * const node, int lvl) {
+  /* ASSERT_SAFE_EXPRESSIONS;
   openTag(node, lvl);
   node->argument()->accept(this, lvl + 2);
-  closeTag(node, lvl);
+  closeTag(node, lvl); */
 }
 
 //---------------------------------------------------------------------------
@@ -276,10 +276,6 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
-  // TODO
-}
-
-void og::xml_writer::do_input_node(og::input_node *const node, int lvl) {
   // TODO
 }
 

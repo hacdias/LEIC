@@ -168,12 +168,12 @@ void og::type_checker::do_writeln_node(og::writeln_node * const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void og::type_checker::do_read_node(og::read_node *const node, int lvl) {
-  try {
+void og::type_checker::do_input_node(og::input_node *const node, int lvl) {
+  /* try {
     node->argument()->accept(this, lvl);
   } catch (const std::string &id) {
     throw "undeclared variable '" + id + "'";
-  }
+  } */
 }
 
 //---------------------------------------------------------------------------
@@ -263,10 +263,6 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
-  // TODO
-}
-
-void og::type_checker::do_input_node(og::input_node *const node, int lvl) {
   // TODO
 }
 
