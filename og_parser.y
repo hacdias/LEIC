@@ -133,10 +133,10 @@ bvars     : bvar ';'                                             { $$ = new cdk:
           | bvars bvar ';'                                       { $$ = new cdk::sequence_node(LINE, $2, $1); }
           ;
 
-block     : '{' '}'                                              { /* TODO: $$ = new og::block_node(LINE, nullptr, nullptr); */ }
-          | '{' bvars '}'                                        { /* TODO: $$ = new og::block_node(LINE, nullptr, $2); */ }
-          | '{' insts '}'                                        { /* TODO: $$ = new og::block_node(LINE, $2, nullptr); */ }
-          | '{' bvars insts '}'                                  { /* TODO: $$ = new og::block_node(LINE, $2, $3); */ }
+block     : '{' '}'                                              { $$ = new og::block_node(LINE, nullptr, nullptr); }
+          | '{' bvars '}'                                        { $$ = new og::block_node(LINE, nullptr, $2); }
+          | '{' insts '}'                                        { $$ = new og::block_node(LINE, $2, nullptr); }
+          | '{' bvars insts '}'                                  { $$ = new og::block_node(LINE, $2, $3); }
           ;
 
 insts     : inst                                                 { $$ = new cdk::sequence_node(LINE, $1); }
@@ -190,7 +190,7 @@ expr      : tINT                                                 { $$ = new cdk:
           | string                                               { $$ = new cdk::string_node(LINE, $1); }
           | tREAL                                                { $$ = new cdk::double_node(LINE, $1); }
           | tNULLPTR                                             { $$ = new og::nullptr_node(LINE); }
-          | tINPUT                                               { /* TODO: $$ = new og::input_node(LINE); */ }
+          | tINPUT                                               { $$ = new og::input_node(LINE); }
           | tSIZEOF '(' exps ')'                                 { $$ = new og::sizeof_node(LINE, $3); }
           | '-' expr %prec tUNARY                                { $$ = new cdk::neg_node(LINE, $2); }
           | '+' expr %prec tUNARY                                { $$ = new og::id_node(LINE, $2); }
@@ -213,8 +213,8 @@ expr      : tINT                                                 { $$ = new cdk:
           | lval                                                 { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
           | lval '?'                                             { $$ = new og::memaddr_node(LINE, $1); }
           | lval '=' expr                                        { $$ = new cdk::assignment_node(LINE, $1, $3); }
-          | tIDENTIFIER '(' ')'                                  { /* TODO: $$ = new og::func_call_node(LINE, $1, new cdk::sequence_node(LINE)); */ }
-          | tIDENTIFIER '(' exps ')'                             { /* TODO: $$ = new og::func_call_node(LINE, $1, $3); */ }
+          | tIDENTIFIER '(' ')'                                  { $$ = new og::func_call_node(LINE, $1, new cdk::sequence_node(LINE)); }
+          | tIDENTIFIER '(' exps ')'                             { $$ = new og::func_call_node(LINE, $1, $3); }
           ;
 
 exps      : expr                                                 { $$ = new cdk::sequence_node(LINE, $1);     }

@@ -14,8 +14,8 @@ namespace og {
     cdk::sequence_node *_expressions;
 
   public:
-    inline func_call_node(int lineno, std::string &identifier, cdk::sequence_node *expressions) :
-        cdk::basic_node(lineno), _identifier(identifier), _expressions(expressions) {
+    inline func_call_node(int lineno, std::string *identifier, cdk::sequence_node *expressions) :
+        cdk::basic_node(lineno), _identifier(*identifier), _expressions(expressions) {
     }
 
   public:
