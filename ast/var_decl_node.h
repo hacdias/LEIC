@@ -4,17 +4,16 @@
 #include <string>
 #include <cdk/types/basic_type.h>
 #include <cdk/ast/expression_node.h>
-#include <cdk/ast/basic_node.h>
+#include <cdk/ast/typed_node.h>
 
 namespace og {
 
   /**
    * Class for describing variable declation node.
    */
-  class var_decl_node: public cdk::basic_node {
+  class var_decl_node: public cdk::typed_node {
     bool _is_public;
     bool _is_require;
-    cdk::basic_type *_type;
     std::string _identifier;
     cdk::expression_node *_expression;
 
@@ -27,10 +26,6 @@ namespace og {
     }
 
   public:
-    inline cdk::basic_type * type() {
-      return _type;
-    }
-
     inline bool is_public () {
       return _is_public;
     }

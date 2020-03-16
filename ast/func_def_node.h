@@ -10,10 +10,9 @@ namespace og {
   /**
    * Class for describing function definition nodes.
    */
-  class func_def_node: public cdk::basic_node {
+  class func_def_node: public cdk::typed_node {
     bool _is_public;
     bool _is_required;
-    cdk::basic_type *_type;
     std::string _id;
     cdk::sequence_node *_args;
     block_node *_block;
@@ -32,10 +31,6 @@ namespace og {
 
     inline bool is_required() {
       return _is_required;
-    }
-
-    inline cdk::basic_type *type() {
-      return _type;
     }
 
     inline std::string id() {

@@ -9,7 +9,7 @@ namespace og {
   /**
    * Class for describing func_call nodes.
    */
-  class func_call_node: public cdk::basic_node {
+  class func_call_node: public cdk::expression_node {
     std::string _identifier;
     cdk::sequence_node *_expressions;
 
