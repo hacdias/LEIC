@@ -1,7 +1,7 @@
 #ifndef __OG_AST_RETURN_VALUE_NODE_H__
 #define __OG_AST_RETURN_VALUE_NODE_H__
 
-#include <cdk/ast/sequence_node.h>
+#include <cdk/ast/expression_node.h>
 
 namespace og {
 
@@ -9,15 +9,15 @@ namespace og {
    * Class for describing return value nodes.
    */
   class return_value_node: public cdk::basic_node {
-    cdk::sequence_node *_value;
+    cdk::expression_node *_value;
 
   public:
-    inline return_value_node(int lineno, cdk::sequence_node *value) :
+    inline return_value_node(int lineno, cdk::expression_node *value) :
         cdk::basic_node(lineno), _value(value) {
     }
 
   public:
-    inline cdk::sequence_node *value() {
+    inline cdk::expression_node *value() {
       return _value;
     }
 

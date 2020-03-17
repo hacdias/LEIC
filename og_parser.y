@@ -21,6 +21,7 @@
   cdk::lvalue_node            *lvalue;
   cdk::basic_type             *type;        /* a type */
   og::block_node              *block;       /* a block */
+  og::tuple_node              *tuple;       /* a tuple */
 };
 
 %token <i> tINT
@@ -50,6 +51,7 @@
 %type <strings> ids
 %type <node> inst program var icond iiter func proc inst decl param bvar fvar
 %type <sequence> exps decls insts args params bvars fvars_aux fvars
+%type <tuple> tuple
 %type <expression> expr
 %type <lvalue> lval
 %type <type> type
@@ -78,8 +80,8 @@ var       :              type tIDENTIFIER                        { $$ = new og::
           |              type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
           | tPUBLIC      type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, true, false, $2, $3, $5); }
           | tREQUIRE     type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, false, true, $2, $3, $5); }
-          |              tTPAUTO ids '=' exps                    { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
-          | tPUBLIC      tTPAUTO ids '=' exps                    { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
+          |              tTPAUTO ids '=' tuple                   { /* TODO $$ = new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); */ }
+          | tPUBLIC      tTPAUTO ids '=' tuple                   { /* TODO $$ = new og::var_decl_node(LINE, true, false, new cdk::primitive_type(), $3, $5); */ }
           ;
 
 ids       : tIDENTIFIER                                          { $$ = new std::vector<std::string*>(); $$->push_back($1); }
@@ -128,7 +130,7 @@ type      : tTPINT                                               { $$ = new cdk:
 
 bvar      : type tIDENTIFIER                                     { $$ = new og::var_decl_node(LINE, false, false, $1, $2, nullptr); }
           | type tIDENTIFIER '=' expr                            { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
-          | tTPAUTO ids '=' exps                                 { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
+          | tTPAUTO ids '=' exps                                 { /* TODO $$ = new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); */ }
           ;
 
 bvars     : bvar ';'                                             { $$ = new cdk::sequence_node(LINE, $1); }
@@ -146,12 +148,12 @@ insts     : inst                                                 { $$ = new cdk:
           ;
 
 inst      : expr ';'                                             { $$ = new og::evaluation_node(LINE, $1); }
-          | tWRITE exps ';'                                      { $$ = new og::write_node(LINE, $2, false); }
-          | tWRITELN exps ';'                                    { $$ = new og::write_node(LINE, $2, true); }
+          | tWRITE tuple ';'                                     { $$ = new og::write_node(LINE, $2, false); }
+          | tWRITELN tuple ';'                                   { $$ = new og::write_node(LINE, $2, true); }
           | tBREAK                                               { $$ = new og::break_node(LINE); }
           | tCONTINUE                                            { $$ = new og::continue_node(LINE); }
           | tRETURN ';'                                          { $$ = new og::return_node(LINE);}
-          | tRETURN exps ';'                                     { $$ = new og::return_value_node(LINE, $2); }
+          | tRETURN tuple ';'                                    { $$ = new og::return_value_node(LINE, $2); }
           | tIF icond                                            { $$ = $2; }
           | iiter                                                { $$ = $1; }
           | block                                                { $$ = $1; }
@@ -170,7 +172,7 @@ fvars_aux : fvar                                                 { $$ = new cdk:
           | fvars_aux ',' fvar                                   { $$ = new cdk::sequence_node(LINE, $3, $1); }
           ;
 
-fvars     : tTPAUTO ids '=' exps                                 { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
+fvars     : tTPAUTO ids '=' tuple                                { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
           | fvars_aux                                            { $$ = $1; }
           ;
 
@@ -219,8 +221,12 @@ expr      : tINT                                                 { $$ = new cdk:
           | tIDENTIFIER '(' exps ')'                             { $$ = new og::func_call_node(LINE, $1, $3); }
           ;
 
-exps      : expr                                                 { $$ = new cdk::sequence_node(LINE, $1);     }
+exps      : expr                                                 { $$ = new cdk::sequence_node(LINE, $1); }
           | exps ',' expr                                        { $$ = new cdk::sequence_node(LINE, $3, $1); }
+          ;
+
+tuple     : expr                                                 { $$ = new og::tuple_node(LINE, $1); }
+          | tuple ',' expr                                       { $$ = new og::tuple_node(LINE, $3, $1); }
           ;
 
 lval      : tIDENTIFIER                                          { $$ = new cdk::variable_node(LINE, $1); }
