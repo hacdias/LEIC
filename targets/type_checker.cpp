@@ -273,3 +273,7 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
   // TODO
 }
+
+void og::type_checker::do_tuple_node(og::tuple_node *const node, int lvl) {
+  // TODO
+}
