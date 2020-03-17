@@ -17,10 +17,10 @@ namespace og {
 
   public:
     inline func_decl_node(int lineno, bool is_public, bool is_required,
-      cdk::basic_type *type, std::string *id, cdk::sequence_node *args) :
+      cdk::basic_type *tp, std::string *id, cdk::sequence_node *args) :
         cdk::typed_node(lineno), _is_public(is_public), _is_required(is_required),
         _id(*id), _args(args) {
-        _type.reset(type); // TODO: check if best practice
+        type(std::shared_ptr<cdk::basic_type>(tp));
     }
   public:
     inline bool is_public() {

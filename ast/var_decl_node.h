@@ -19,11 +19,11 @@ namespace og {
 
   public:
 
-    inline var_decl_node(int lineno, bool is_public, bool is_require, cdk::basic_type *type,
+    inline var_decl_node(int lineno, bool is_public, bool is_require, cdk::basic_type *tp,
       std::string *identifier, cdk::expression_node *expression) :
         cdk::typed_node(lineno),_is_public(is_public), _is_require(is_require),
         _identifier(*identifier), _expression(expression) {
-        _type.reset(type); // TODO: check if best practice
+        type(std::shared_ptr<cdk::basic_type>(tp));
     }
 
   public:

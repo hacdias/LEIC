@@ -90,12 +90,12 @@ func      :          type     tIDENTIFIER '(' args ')'           { $$ = new og::
           |          type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, $1, $2, $4, $6); }
           | tPUBLIC  type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, $2, $3, $5, $7); }
           | tREQUIRE type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, $2, $3, $5, $7); }
-          |          tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, false, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $2, $4); }
-          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, true, false, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $3, $5); }
-          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, true, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $3, $5); }
-          |          tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $2, $4, $6); }
-          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $3, $5, $7); }
-          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, new cdk::primitive_type(0, cdk::TYPE_UNSPEC), $3, $5, $7); }
+          |          tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); }
+          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, true, false, new cdk::primitive_type(), $3, $5); }
+          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, true, new cdk::primitive_type(), $3, $5); }
+          |          tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, new cdk::primitive_type(), $2, $4, $6); }
+          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, new cdk::primitive_type(), $3, $5, $7); }
+          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, new cdk::primitive_type(), $3, $5, $7); }
           ;
 
 proc      :          tPROCEDURE tIDENTIFIER '(' args ')'         { $$ = new og::func_decl_node(LINE, false, false, new cdk::primitive_type(0, cdk::TYPE_VOID), $2, $4); }
