@@ -14,15 +14,22 @@ namespace og {
   class var_decl_node: public cdk::typed_node {
     bool _is_public;
     bool _is_require;
-    std::string _identifier;
+    std::vector<std::string*> _identifiers;
     cdk::expression_node *_expression;
 
   public:
 
     inline var_decl_node(int lineno, bool is_public, bool is_require, cdk::basic_type *tp,
       std::string *identifier, cdk::expression_node *expression) :
+        var_decl_node(lineno, is_public, is_require, tp, new std::vector<std::string*>(1, identifier), expression)
+        {
+      // EMPTY
+    }
+
+    inline var_decl_node(int lineno, bool is_public, bool is_require, cdk::basic_type *tp,
+      std::vector<std::string*> *identifiers, cdk::expression_node *expression) :
         cdk::typed_node(lineno),_is_public(is_public), _is_require(is_require),
-        _identifier(*identifier), _expression(expression) {
+        _identifiers(*identifiers), _expression(expression) {
         type(std::shared_ptr<cdk::basic_type>(tp));
     }
 
@@ -35,8 +42,8 @@ namespace og {
       return _is_require;
     }
 
-    inline std::string& identifier() {
-      return _identifier;
+    inline std::vector<std::string*> identifiers() {
+      return _identifiers;
     }
 
     inline cdk::expression_node * expression() {
