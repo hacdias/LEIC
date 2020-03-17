@@ -20,8 +20,9 @@ namespace og {
   public:
     inline func_def_node(int lineno, bool is_public, bool is_required,
       cdk::basic_type *type, std::string *id, cdk::sequence_node *args, block_node *block) :
-        cdk::basic_node(lineno), _is_public(is_public), _is_required(is_required),
-        _type(type), _id(*id), _args(args), _block(block) {
+        cdk::typed_node(lineno), _is_public(is_public), _is_required(is_required),
+        _id(*id), _args(args), _block(block) {
+        _type.reset(type); // TODO: check if best practice
     }
 
   public:

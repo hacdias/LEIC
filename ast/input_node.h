@@ -12,7 +12,7 @@ namespace og {
 
   public:
     inline input_node(int lineno) :
-        cdk::basic_node(lineno) {
+        cdk::expression_node(lineno) {
     }
 
   public:

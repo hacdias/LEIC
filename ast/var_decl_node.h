@@ -21,8 +21,9 @@ namespace og {
 
     inline var_decl_node(int lineno, bool is_public, bool is_require, cdk::basic_type *type,
       std::string *identifier, cdk::expression_node *expression) :
-        cdk::basic_node(lineno),_is_public(is_public), _is_require(is_require),  _type(type),
+        cdk::typed_node(lineno),_is_public(is_public), _is_require(is_require),
         _identifier(*identifier), _expression(expression) {
+        _type.reset(type); // TODO: check if best practice
     }
 
   public:
