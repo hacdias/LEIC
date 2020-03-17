@@ -6,7 +6,6 @@
 namespace og {
 
   /**
-   * TODO TODO
    * Class for describing block nodes.
    */
   class block_node: public cdk::basic_node {
