@@ -4,6 +4,7 @@
 // make relevant includes before including the parser's tab file
 #include <string>
 #include <sstream>
+#include <vector>
 #include <cdk/ast/sequence_node.h>
 #include <cdk/ast/expression_node.h>
 #include <cdk/ast/lvalue_node.h>

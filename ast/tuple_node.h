@@ -35,9 +35,11 @@ namespace og {
     cdk::expression_node *node(size_t i) {
       return _nodes[i];
     }
+
     std::vector<cdk::expression_node*> &nodes() {
       return _nodes;
     }
+
     size_t size() {
       return _nodes.size();
     }

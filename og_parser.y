@@ -11,15 +11,16 @@
 %}
 
 %union {
-  int                   i;            /* integer value */
-  double                r;            /* real value */
-  std::string           *s;           /* symbol name or string literal */
-  cdk::basic_node       *node;        /* node pointer */
-  cdk::sequence_node    *sequence;
-  cdk::expression_node  *expression;  /* expression nodes */
-  cdk::lvalue_node      *lvalue;
-  cdk::basic_type       *type;        /* a type */
-  og::block_node        *block;       /* a block */
+  int                         i;            /* integer value */
+  double                      r;            /* real value */
+  std::string                 *s;           /* symbol name or string literal */
+  cdk::basic_node             *node;        /* node pointer */
+  std::vector<std::string*>   *strings;
+  cdk::sequence_node          *sequence;
+  cdk::expression_node        *expression;  /* expression nodes */
+  cdk::lvalue_node            *lvalue;
+  cdk::basic_type             *type;        /* a type */
+  og::block_node              *block;       /* a block */
 };
 
 %token <i> tINT
@@ -46,8 +47,9 @@
 %nonassoc '(' '['
 
 %type <s> string
+%type <strings> ids
 %type <node> inst program var icond iiter func proc inst decl param bvar fvar
-%type <sequence> exps decls insts args params bvars fvars_aux fvars ids
+%type <sequence> exps decls insts args params bvars fvars_aux fvars
 %type <expression> expr
 %type <lvalue> lval
 %type <type> type
@@ -80,8 +82,8 @@ var       :              type tIDENTIFIER                        { $$ = new og::
           | tPUBLIC      tTPAUTO ids '=' exps                    { /* TODO $$ = new og::tuple_node(LINE, ?); */ }
           ;
 
-ids       : tIDENTIFIER                                          { /* TODO: strings vector? */ }
-          | ids ',' tIDENTIFIER                                  { /* TODO: strings vector? */ }
+ids       : tIDENTIFIER                                          { $$ = new std::vector<std::string*>(); $$->push_back($1); }
+          | ids ',' tIDENTIFIER                                  { $1->push_back($3); $$ = $1; }
           ;
 
 func      :          type     tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, false, $1, $2, $4); }
