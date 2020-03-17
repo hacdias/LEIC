@@ -178,13 +178,14 @@ void og::postfix_writer::do_evaluation_node(og::evaluation_node * const node, in
 }
 
 void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
-  /*
-  TODO: this was print code
-  ASSERT_SAFE_EXPRESSIONS;
+  /* ASSERT_SAFE_EXPRESSIONS;
   node->argument()->accept(this, lvl); // determine the value to print
   if (node->argument()->is_typed(cdk::TYPE_INT)) {
     _pf.CALL("printi");
     _pf.TRASH(4); // delete the printed value
+  } else if (node->argument()->type()->name() == basic_type::TYPE_DOUBLE) {
+    _pf.CALL("printd");
+    _pf.TRASH(8); // delete the printed value's address
   } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
     _pf.CALL("prints");
     _pf.TRASH(4); // delete the printed value's address
@@ -192,7 +193,8 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
     std::cerr << "ERROR: CANNOT HAPPEN!" << std::endl;
     exit(1);
   }
-  _pf.CALL("println"); // print a newline */
+
+  if (node->has_newline()) _pf.CALL("println"); // print a newline */
 }
 
 //---------------------------------------------------------------------------
@@ -261,7 +263,8 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_id_node(og::id_node *const node, int lvl) {
-  // TODO
+  ASSERT_SAFE_EXPRESSIONS;
+  node->argument()->accept(this, lvl);
 }
 
 //---------------------------------------------------------------------------
