@@ -211,7 +211,7 @@ expr      : tINT                                                 { $$ = new cdk:
           | '(' expr ')'                                         { $$ = $2; }
           | '[' expr ']'                                         { $$ = new og::mem_alloc_node(LINE, $2); }
           | lval                                                 { $$ = new cdk::rvalue_node(LINE, $1); }  //FIXME
-          | lval '?'                                             { $$ = new og::memaddr_node(LINE, $1); }
+          | lval '?'                                             { $$ = new og::mem_addr_node(LINE, $1); }
           | lval '=' expr                                        { $$ = new cdk::assignment_node(LINE, $1, $3); }
           | tIDENTIFIER '(' ')'                                  { $$ = new og::func_call_node(LINE, $1, new cdk::sequence_node(LINE)); }
           | tIDENTIFIER '(' exps ')'                             { $$ = new og::func_call_node(LINE, $1, $3); }

@@ -296,7 +296,7 @@ void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int l
 
 //---------------------------------------------------------------------------
 
-void og::postfix_writer::do_memaddr_node(og::memaddr_node *const node, int lvl) {
+void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
   // TODO
 }
 
