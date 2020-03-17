@@ -279,6 +279,10 @@ void og::xml_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) 
   // TODO
 }
 
+void og::xml_writer::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
+  // TODO
+}
+
 void og::xml_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
   // TODO
 }

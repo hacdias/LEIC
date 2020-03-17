@@ -222,8 +222,8 @@ exps      : expr                                                 { $$ = new cdk:
           ;
 
 lval      : tIDENTIFIER                                          { $$ = new cdk::variable_node(LINE, $1); }
-          | expr '[' expr ']'                                    { /* TODO: $$ = new og::ptr_index_node(LINE, $1, $3): */ }
-          | tIDENTIFIER '@' tINT                                 { /* TODO: $$ = new og::tuple_index_node(LINE, $1, $3): */ }
+          | expr '[' expr ']'                                    { $$ = new og::ptr_index_node(LINE, $1, $3); }
+          | tIDENTIFIER '@' tINT                                 { $$ = new og::tuple_index_node(LINE, $1, $3); }
           ;
 
 string    : tSTRING                                              { $$ = $1; }
