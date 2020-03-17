@@ -195,10 +195,6 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
   _pf.CALL("println"); // print a newline */
 }
 
-void og::postfix_writer::do_writeln_node(og::writeln_node * const node, int lvl) {
-  // TODO
-}
-
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {

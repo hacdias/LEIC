@@ -10,15 +10,20 @@ namespace og {
    */
   class write_node: public cdk::basic_node {
     cdk::sequence_node *_argument;
+    bool _has_newline;
 
   public:
-    inline write_node(int lineno, cdk::sequence_node *argument) :
-        cdk::basic_node(lineno), _argument(argument) {
+    inline write_node(int lineno, cdk::sequence_node *argument, bool has_newline) :
+        cdk::basic_node(lineno), _argument(argument), _has_newline(has_newline) {
     }
 
   public:
     inline cdk::sequence_node *argument() {
       return _argument;
+    }
+
+    inline bool has_newline() {
+      return _has_newline;
     }
 
     void accept(basic_ast_visitor *sp, int level) {

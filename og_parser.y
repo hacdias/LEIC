@@ -121,7 +121,7 @@ type      : tTPINT                                               { $$ = new cdk:
           | tTPREAL                                              { $$ = new cdk::primitive_type(8, cdk::TYPE_DOUBLE); }
           | tTPSTRING                                            { $$ = new cdk::primitive_type(4, cdk::TYPE_STRING); }
           | tTPPTR '<' type '>'                                  { $$ = new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>($3)); }
-          | tTPPTR '<' tTPAUTO '>'                               { /* TODO $$ = new cdk::reference_type(4, ??); */ }
+          | tTPPTR '<' tTPAUTO '>'                               { $$ = new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>(new cdk::primitive_type())); }
           ;
 
 bvar      : type tIDENTIFIER                                     { $$ = new og::var_decl_node(LINE, false, false, $1, $2, nullptr); }
@@ -144,8 +144,8 @@ insts     : inst                                                 { $$ = new cdk:
           ;
 
 inst      : expr ';'                                             { $$ = new og::evaluation_node(LINE, $1); }
-          | tWRITE exps ';'                                      { $$ = new og::write_node(LINE, $2); }
-          | tWRITELN exps ';'                                    { $$ = new og::writeln_node(LINE, $2); }
+          | tWRITE exps ';'                                      { $$ = new og::write_node(LINE, $2, false); }
+          | tWRITELN exps ';'                                    { $$ = new og::write_node(LINE, $2, true); }
           | tBREAK                                               { $$ = new og::break_node(LINE); }
           | tCONTINUE                                            { $$ = new og::continue_node(LINE); }
           | tRETURN ';'                                          { $$ = new og::return_node(LINE);}

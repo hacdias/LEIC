@@ -142,10 +142,6 @@ void og::xml_writer::do_write_node(og::write_node * const node, int lvl) {
   closeTag(node, lvl); */
 }
 
-void og::xml_writer::do_writeln_node(og::writeln_node * const node, int lvl) {
-  // TODO
-}
-
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_input_node(og::input_node * const node, int lvl) {
