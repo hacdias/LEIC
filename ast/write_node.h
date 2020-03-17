@@ -13,7 +13,7 @@ namespace og {
     bool _has_newline;
 
   public:
-    inline write_node(int lineno, cdk::expression_node *argument, bool has_newline) :
+    inline write_node(int lineno, cdk::expression_node *argument, bool has_newline = false) :
         cdk::basic_node(lineno), _argument(argument), _has_newline(has_newline) {
     }
 
