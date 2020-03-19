@@ -6,6 +6,7 @@ public class TTTGame {
 	private char board[][];
 	private int numPlays = 0;
 	private int nextPlayer = 0;
+	private int playerX = 1;
 	
 	public TTTGame() {
 		this.resetBoard();
@@ -39,7 +40,7 @@ public class TTTGame {
                 return PlayResult.GAME_FINISHED;
 		    }
 	
-		    board[row][column] = (player == 1) ? 'X' : 'O';  /* Insert player symbol */
+		    board[row][column] = (player == playerX) ? 'X' : 'O';  /* Insert player symbol */
 		    nextPlayer = (nextPlayer + 1) % 2;
 		    numPlays++;
 		    return PlayResult.SUCCESS;
@@ -102,5 +103,20 @@ public class TTTGame {
 			{'7', '8', '9'}
 		};
 	}
-	
+
+	public PlayResult trocaSimbolos() {
+		int i, j;
+		for (i = 0; i <= 2; i++) {
+			for (j = 0; j <= 2; j++) {
+				if (board[i][j] == 'X') {
+					board[i][j] = 'O';
+				} else if (board[i][j] == 'O') {
+					board[i][j] = 'X';
+				}
+			}
+		}
+
+		playerX = (playerX + 1) % 2;
+		return PlayResult.SWAPPED;
+	}
 }

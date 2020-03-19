@@ -32,7 +32,7 @@ public class TTTPlayer {
         final String host = args[0];
         final int port = Integer.parseInt(args[1]);
         final String target = host + ":" + port;
-        
+
         String restURL = "http://" + target + "/ttt/game";
         
         playGame(restURL);
@@ -40,13 +40,14 @@ public class TTTPlayer {
     }
 
     private static void playGame(String restURL) {
-    	
+
     	Client client = ClientBuilder.newClient();
-    	
+
     	/* Reset board to play a new game */
     	//client.target(restURL).path("board").path("reset").request().get(String.class);
 
         int player = 0;                              /* Player number - 0 or 1               */
+        int playerX = 1;
         int go = 0;                                  /* Square selection number for turn     */
         int row = 0;                                 /* Row index for a square               */
         int column = 0;                              /* Column index for a square            */
@@ -62,7 +63,7 @@ public class TTTPlayer {
                 System.out.println(client.target(restURL).path("board").request().get(String.class));
 
                 System.out.printf("\nPlayer %d, please enter the number of the square " +
-                        "where you want to place your %c (or 0 to refresh the board): ", player, (player==1)?'X':'O');
+                        "where you want to place your %c (or 0 to refresh the board): ", player, (player==playerX)?'X':'O');
                 System.out.flush();
 
                 go = readPlay();
@@ -72,21 +73,30 @@ public class TTTPlayer {
                     continue;
                 }
 
+                if (go == 20)  {
+                    play_res = client.target(restURL).path("board/swap").request().get(PlayResult.class);
+
+                    if (play_res == PlayResult.SWAPPED) {
+                        playerX = (playerX + 1) % 2;
+                    }
+                    continue;
+                }
+
                 row = --go/3;                                 /* Get row index of square      */
                 column = go%3;                                /* Get column index of square   */
 
-                
+
                 /* Uncomment to use URL parameter to play */
                 /* URL to play is: play/{row}/{column}/{player} */
                 String playString = "play/" +  String.valueOf(row) + '/' + String.valueOf(column) + '/' + String.valueOf(player);
                 play_res = client.target(restURL).path(playString).request().get(PlayResult.class);
-                
+
                 // PlayRequest playRequest = new PlayRequest(row, column, player);
                 /* Response response = client.target(restURL).path("play").request(MediaType.APPLICATION_JSON)
               	      .post(Entity.entity(playRequest, MediaType.APPLICATION_JSON), Response.class); */
                 // play_res = response.readEntity(PlayResult.class);
-                
-                
+
+
                 if (play_res != PlayResult.SUCCESS) {
                     displayResult(play_res);
                 }

@@ -16,11 +16,11 @@ import pt.ulisboa.tecnico.distsys.ttt.contract.PlayResult;
  */
 @Path("game")
 public class TTTResources {
-	
+
 	/**
-	 * 
+	 *
 	 * TTTGame currently being played
-	 * 
+	 *
 	 */
 	static TTTGame game = new TTTGame();
 
@@ -29,21 +29,21 @@ public class TTTResources {
      * to the client as "text/plain" media type.
      *
      * @return Board that will be returned as a text/plain response.
-     */ 
+     */
     @GET
     @Path("board")
     @Produces(MediaType.TEXT_PLAIN)
     public String getBoard() {
     	return game.toString();
     }
-    
-    
+
+
     /**
      * Method handling HTTP GET requests. The returned object will be sent
      * to the client as "text/plain" media type.
      *
      * @return Board that will be returned as a text/plain response.
-     */ 
+     */
     @GET
     @Path("board/reset")
     @Produces(MediaType.TEXT_PLAIN)
@@ -51,8 +51,14 @@ public class TTTResources {
         game.resetBoard();
         return game.toString();
     }
-    
-    /* TODO: checkwinner, play */
+
+    @GET
+    @Path("board/swap")
+    @Produces({MediaType.APPLICATION_JSON})
+    public PlayResult trocaSimbolos() {
+        return game.trocaSimbolos();
+    }
+
 
     @GET
     @Path("board/checkwinner")
