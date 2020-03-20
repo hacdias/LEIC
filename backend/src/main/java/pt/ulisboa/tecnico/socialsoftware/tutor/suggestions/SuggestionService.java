@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -22,6 +25,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SuggestionService {
@@ -31,6 +35,9 @@ public class SuggestionService {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -76,7 +83,10 @@ public class SuggestionService {
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public SuggestionDto findSuggestionById(Integer suggestionId) {
-        return null;
+        Suggestion suggestion = suggestionRepository.findById(suggestionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
+
+        return new SuggestionDto(suggestion);
     }
 
     @Retryable(
@@ -85,7 +95,15 @@ public class SuggestionService {
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<SuggestionDto> findSuggestionsByCourse(Integer courseId) {
-        return null;
+        courseRepository
+                .findById(courseId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
+
+        return suggestionRepository.findAll()
+                .stream()
+                .filter(suggestion -> suggestion.getQuestion().getCourse().getId() == courseId)
+                .map(SuggestionDto::new)
+                .collect(Collectors.toList());
     }
 
     @Retryable(
@@ -94,7 +112,15 @@ public class SuggestionService {
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<SuggestionDto> findSuggestionsByStudent(Integer studentId) {
-        return null;
+        userRepository
+                .findById(studentId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        return suggestionRepository.findAll()
+                .stream()
+                .filter(suggestion -> suggestion.getStudent().getId() == studentId)
+                .map(SuggestionDto::new)
+                .collect(Collectors.toList());
     }
 
     @Retryable(
