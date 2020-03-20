@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.AnswerQueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
@@ -34,6 +36,8 @@ class GetAnswerQueryTest extends Specification {
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
     public static final String ANSWER_QUERY_CONTENT = 'answer query content'
+    public static final Integer QUERY_INVALID_ID = 1024
+    public static final Integer USER_INVALID_ID = 256
 
     @Autowired
     AnswerQueryService answerQueryService
@@ -144,6 +148,24 @@ class GetAnswerQueryTest extends Specification {
         def answerResult = answerQueryDtos.get(0)
         answerResult.getContent() == answerQuery.getContent()
         answerResult.getId() == result.getId()
+    }
+
+    def 'get answers queries by user with invalid id'() {
+        when:
+        def answerQueryDtos = answerQueryService.getAnswersByTeacher(USER_INVALID_ID)
+
+        then: 'exception user not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+    }
+
+    def 'get answers queries by query with invalid id'() {
+        when:
+        def answerQueryDtos = answerQueryService.getAnswersToQuery(QUERY_INVALID_ID)
+
+        then: 'exception query not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUERY_NOT_FOUND
     }
 
     @TestConfiguration

@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.AnswerQueryRepository
@@ -30,6 +32,8 @@ class GetQueryTest extends Specification {
     public static final String STUDENT_USERNAME = "Student Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
+    public static final Integer QUESTION_INVALID_ID = 1024
+    public static final Integer USER_INVALID_ID = 256
 
     @Autowired
     QueryService queryService
@@ -111,7 +115,7 @@ class GetQueryTest extends Specification {
 
     def 'get queries by a student'() {
         when:
-        def queryDtos = queryService.getQueriesByStudent(question.getId())
+        def queryDtos = queryService.getQueriesByStudent(student.getId())
 
         then: 'the query is retrieved'
         queryRepository.count() == 1L
@@ -126,6 +130,24 @@ class GetQueryTest extends Specification {
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+    }
+
+    def 'get queries by user with invalid id'() {
+        when:
+        def queryDtos = queryService.getQueriesByStudent(USER_INVALID_ID)
+
+        then: 'exception user not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+    }
+
+    def 'get queries by question with invalid id'() {
+        when:
+        def queryDtos = queryService.getQueriesToQuestion(QUESTION_INVALID_ID)
+
+        then: 'exception question not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_FOUND
     }
 
     @TestConfiguration

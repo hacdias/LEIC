@@ -22,8 +22,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -108,11 +110,27 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<QueryDto> getQueriesToQuestion(Integer questionId) { return null; }
+    public List<QueryDto> getQueriesToQuestion(Integer questionId) {
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
+
+            return question.getQueries().stream()
+                    .map(QueryDto::new)
+                    .sorted(Comparator.comparing(QueryDto::getCreationDate))
+                    .collect(Collectors.toList());
+    }
 
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<QueryDto> getQueriesByStudent(Integer studentId) { return null; }
+    public List<QueryDto> getQueriesByStudent(Integer studentId) {
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,studentId));
+
+        return student.getQueries().stream()
+                .map(QueryDto::new)
+                .sorted(Comparator.comparing(QueryDto::getCreationDate))
+                .collect(Collectors.toList());
+    }
 }
