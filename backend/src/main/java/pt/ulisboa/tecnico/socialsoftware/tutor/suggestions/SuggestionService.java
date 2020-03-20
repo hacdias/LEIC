@@ -75,7 +75,7 @@ public class SuggestionService {
             backoff = @Backoff(delay = 5000)
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<SuggestionDto> findSuggestionById(Integer suggestionId) {
+    public SuggestionDto findSuggestionById(Integer suggestionId) {
         return null;
     }
 
