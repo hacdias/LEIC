@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class SuggestionService {
@@ -67,6 +68,33 @@ public class SuggestionService {
 
         suggestion.update(suggestionDto);
         return new SuggestionDto(suggestion);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<SuggestionDto> findSuggestionById(Integer suggestionId) {
+        return null;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<SuggestionDto> findSuggestionsByCourse(Integer courseId) {
+        return null;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<SuggestionDto> findSuggestionsByStudent(Integer studentId) {
+        return null;
     }
 
     @Retryable(
