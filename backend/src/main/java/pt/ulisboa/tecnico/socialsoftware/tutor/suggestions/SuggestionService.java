@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -19,6 +20,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -134,5 +136,29 @@ public class SuggestionService {
 
         suggestion.remove();
         entityManager.remove(suggestion);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
+    public CourseDto getSuggestionCourse(Integer suggestionId) {
+        Suggestion suggestion = suggestionRepository
+                .findById(suggestionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
+
+        return new CourseDto(suggestion.getQuestion().getCourse());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
+    public UserDto getSuggestionUser(Integer suggestionId) {
+        Suggestion suggestion = suggestionRepository
+                .findById(suggestionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
+
+        return new UserDto(suggestion.getStudent());
     }
 }
