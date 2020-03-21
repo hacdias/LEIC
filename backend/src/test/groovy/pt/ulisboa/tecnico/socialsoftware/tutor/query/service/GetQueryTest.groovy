@@ -30,8 +30,11 @@ class GetQueryTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String STUDENT_NAME = "Student Name"
     public static final String STUDENT_USERNAME = "Student Username"
+    public static final String TEACHER_NAME = "Teacher Name"
+    public static final String TEACHER_USERNAME = "Teacher Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
+    public static final Integer QUERY_INVALID_ID = 2048
     public static final Integer QUESTION_INVALID_ID = 1024
     public static final Integer USER_INVALID_ID = 256
 
@@ -61,12 +64,15 @@ class GetQueryTest extends Specification {
     def question
     def student
     def query
+    def teacher
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
+        courseExecution.setCourse(course)
+        course.addCourseExecution(courseExecution)
         courseExecutionRepository.save(courseExecution)
 
         question = new Question()
@@ -83,6 +89,11 @@ class GetQueryTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
+        teacher = new User(TEACHER_NAME, TEACHER_USERNAME, 2, User.Role.TEACHER)
+        teacher.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(teacher)
+        userRepository.save(teacher)
+
         query = new Query()
         query.setKey(1)
         query.setTitle(QUERY_TITLE)
@@ -92,6 +103,23 @@ class GetQueryTest extends Specification {
         query.setStudent(student)
         student.addQuery(query)
         queryRepository.save(query)
+    }
+
+    def 'get queries by Id'() {
+        when:
+        def queryDto = queryService.findQueryById(query.getId())
+
+        then: 'the query is retrieved'
+        queryRepository.count() == 1L
+        def result = queryRepository.findAll().get(0)
+        result.getStudent() == student
+        student.getQueries().size() == 1
+        result.getQuestion() == question
+        question.getQueries().size() == 1
+        and: 'the return statement contains one query'
+        queryDto.getTitle() == query.getTitle()
+        queryDto.getContent() == query.getContent()
+        queryDto.getId() == result.getId()
     }
 
     def 'get queries to a question'() {
@@ -132,6 +160,34 @@ class GetQueryTest extends Specification {
         queryResult.getId() == result.getId()
     }
 
+    def 'get queries in teacher courses'() {
+        when:
+        def queryDtos = queryService.getQueriesInTeachersCourse(teacher.getId())
+
+        then: 'the query is retrieved'
+        queryRepository.count() == 1L
+        def result = queryRepository.findAll().get(0)
+        result.getStudent() == student
+        student.getQueries().size() == 1
+        result.getQuestion() == question
+        question.getQueries().size() == 1
+        and: 'the return statement contains one query'
+        queryDtos.size() == 1
+        def queryResult = queryDtos.get(0)
+        queryResult.getTitle() == query.getTitle()
+        queryResult.getContent() == query.getContent()
+        queryResult.getId() == result.getId()
+    }
+
+    def 'get query by id with invalid id'() {
+        when:
+        def queryDto = queryService.findQueryById(QUERY_INVALID_ID)
+
+        then: 'exception user not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUERY_NOT_FOUND
+    }
+
     def 'get queries by user with invalid id'() {
         when:
         def queryDtos = queryService.getQueriesByStudent(USER_INVALID_ID)
@@ -148,6 +204,15 @@ class GetQueryTest extends Specification {
         then: 'exception question not found'
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_FOUND
+    }
+
+    def 'get queries in teacher courses with invalid id'() {
+        when:
+        def queryDtos = queryService.getQueriesInTeachersCourse(USER_INVALID_ID)
+
+        then: 'exception user not found'
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
     }
 
     @TestConfiguration

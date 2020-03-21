@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
@@ -22,9 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -43,6 +43,15 @@ public class QueryService {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public QueryDto findQueryById(Integer queryId) {
+        return queryRepository.findById(queryId).map(QueryDto::new)
+                .orElseThrow(() -> new TutorException(QUERY_NOT_FOUND, queryId));
+    }
 
     @Retryable(
             value = { SQLException.class },
@@ -132,5 +141,29 @@ public class QueryService {
                 .map(QueryDto::new)
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<QueryDto> getQueriesInTeachersCourse(Integer teacherId) {
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,teacherId));
+
+        Set<QueryDto> queriesSet = new HashSet<QueryDto>();
+        for (CourseExecution courseExecution : teacher.getCourseExecutions()) {
+            Course course = courseExecution.getCourse();
+            for (Question question : course.getQuestions()) {
+
+                queriesSet.addAll(question.getQueries().stream()
+                        .map(QueryDto::new)
+                        .collect(Collectors.toSet()));
+            }
+        }
+
+        List<QueryDto> queriesList = new ArrayList<QueryDto>();
+        queriesList.addAll(queriesSet);
+        return queriesList;
     }
 }
