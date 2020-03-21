@@ -26,7 +26,7 @@ public class QueryController {
     }
 
     @GetMapping("/question/{questionId}/queries")
-    @PreAuthorize("hasPermission(#question, 'QUESTION.ACCESS')")
+    @PreAuthorize("hasPermission(#questionId, 'QUESTION.ACCESS')")
     public List<QueryDto> getQueriesToQuestion(@PathVariable int questionId) {
         return this.queryService.getQueriesToQuestion(questionId);
     }
@@ -46,7 +46,7 @@ public class QueryController {
     }
 
     @PostMapping("/question/{questionId}/queries")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'QUESTION.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public QueryDto createQuery(Principal principal, @PathVariable int questionId, @Valid @RequestBody QueryDto queryDto) {
         User student = (User) ((Authentication) principal).getPrincipal();
         return this.queryService.createQuery(questionId, student.getId(), queryDto);
@@ -61,7 +61,7 @@ public class QueryController {
     @DeleteMapping("/queries/{queryId}")
     @PreAuthorize("hasPermission(#queryId, 'QUERY.ACCESS')")
     public ResponseEntity removeQuery(@PathVariable Integer queryId) throws IOException {
-        logger.debug("removeQuestion questionId: {}: ", queryId);
+        logger.debug("removeQuery queryId: {}: ", queryId);
         QueryDto queryDto = queryService.findQueryById(queryId);
         queryService.removeQuery(queryId);
 

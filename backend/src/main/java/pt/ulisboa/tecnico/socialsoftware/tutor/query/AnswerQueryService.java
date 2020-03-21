@@ -47,6 +47,15 @@ public class AnswerQueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public AnswerQueryDto findAnswerQueryById(Integer answerQueryId) {
+        return answerQueryRepository.findById(answerQueryId).map(AnswerQueryDto::new)
+                .orElseThrow(() -> new TutorException(ANSWER_QUERY_NOT_FOUND, answerQueryId));
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public AnswerQueryDto createAnswerQuery(Integer queryId, Integer teacherId, AnswerQueryDto answerQueryDto) {
         Query query = queryRepository.findById(queryId).orElseThrow(() -> new TutorException(QUERY_NOT_FOUND, queryId));
         User teacher = userRepository.findById(teacherId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, teacherId));
