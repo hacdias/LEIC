@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
@@ -55,7 +56,7 @@ class CreateSuggestionTest extends Specification {
     def course
     def courseExecution
     def student
-    def question
+    def questionDto
 
     def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -69,20 +70,17 @@ class CreateSuggestionTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
-        def questionDto = new QuestionDto()
+        questionDto = new QuestionDto()
         questionDto.setKey(1)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setStatus(Question.Status.AVAILABLE.name())
+        questionDto.setStatus(Question.Status.DISABLED.name())
         def optionDto = new OptionDto()
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
         questionDto.setOptions(options)
-
-        question = new Question(course, questionDto)
-        questionRepository.save(question)
     }
 
     def "create suggestion with user and question"() {
@@ -90,9 +88,10 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
+        suggestionDto.setQuestionDto(questionDto)
 
         when:
-        suggestionService.createSuggestion(student.getId(), question.getId(), suggestionDto)
+        suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
 
         then: "the correct suggestion is inside the repository"
         suggestionRepository.count() == 1L
@@ -103,6 +102,8 @@ class CreateSuggestionTest extends Specification {
         result.getQuestion().getContent() == QUESTION_CONTENT
         result.getStudent().getName() == STUDENT_NAME
         result.getStudent().getUsername() == STUDENT_USERNAME
+
+        questionRepository.count() == 1L
     }
 
     def "create suggestion with invalid user" () {
@@ -110,27 +111,29 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
+        suggestionDto.setQuestionDto(questionDto)
 
         when:
-        suggestionService.createSuggestion(student.getId() + 1, question.getId(), suggestionDto)
+        suggestionService.createSuggestion(student.getId() + 1, course.getId(), suggestionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
     }
 
-    def "create suggestion with invalid question"() {
+    def "create suggestion with invalid course"() {
         given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
+        suggestionDto.setQuestionDto(questionDto)
 
         when:
-        suggestionService.createSuggestion(student.getId(), question.getId() + 1, suggestionDto)
+        suggestionService.createSuggestion(student.getId(), course.getId() + 1, suggestionDto)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_FOUND
+        exception.getErrorMessage() == ErrorMessage.COURSE_NOT_FOUND
     }
 
     @TestConfiguration
@@ -139,6 +142,11 @@ class CreateSuggestionTest extends Specification {
         @Bean
         SuggestionService suggestionService() {
             return new SuggestionService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
         }
     }
 }

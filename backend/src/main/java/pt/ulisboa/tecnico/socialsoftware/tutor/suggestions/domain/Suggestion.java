@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -42,12 +43,13 @@ public class Suggestion {
     public Suggestion () {
     }
 
-    public Suggestion (User student, Question question, SuggestionDto suggestionDto) {
+    public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
         this.id = suggestionDto.getId();
         this.key = suggestionDto.getKey();
         this.approved = suggestionDto.getApproved();
         this.student = student;
-        this.question = question;
+        this.question = new Question(course, suggestionDto.getQuestionDto());
+        this.question.setSuggestion(this);
     }
 
     public Integer getId() {

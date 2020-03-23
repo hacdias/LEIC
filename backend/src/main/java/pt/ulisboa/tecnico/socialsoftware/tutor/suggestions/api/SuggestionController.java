@@ -38,12 +38,12 @@ public class SuggestionController {
         return suggestionService.findSuggestionById(suggestionId);
     }
 
-    @PostMapping("/questions/{questionId}/suggestions")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
-    public SuggestionDto createSuggestion(Authentication authentication, @PathVariable int questionId, @Valid @RequestBody SuggestionDto suggestion) {
+    @PostMapping("/courses/{courseId}/suggestions")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public SuggestionDto createSuggestion(Authentication authentication, @PathVariable int courseId, @Valid @RequestBody SuggestionDto suggestion) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
         suggestion.setApproved(false);
-        return suggestionService.createSuggestion(studentId, questionId, suggestion);
+        return suggestionService.createSuggestion(studentId, courseId, suggestion);
     }
 
     @PutMapping("/suggestions/{suggestionId}")

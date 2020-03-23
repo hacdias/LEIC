@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
@@ -44,6 +45,9 @@ public class SuggestionService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private QuestionService questionService;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -51,16 +55,19 @@ public class SuggestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public SuggestionDto createSuggestion(Integer studentId, Integer questionId, SuggestionDto suggestionDto) {
+    public SuggestionDto createSuggestion(Integer studentId, Integer courseId, SuggestionDto suggestionDto) {
         User student = userRepository
                 .findById(studentId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
 
-        Question question = questionRepository
-                .findById(questionId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId));
+        Course course = courseRepository
+                .findById(courseId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
 
-        Suggestion suggestion = new Suggestion(student, question, suggestionDto);
+        // QuestionDto questionDto = questionService.createQuestion(courseId, suggestionDto.getQuestionDto());
+        // suggestionDto.setQuestionDto(questionDto);
+
+        Suggestion suggestion = new Suggestion(student, course, suggestionDto);
         suggestion.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(suggestion);
         return new SuggestionDto(suggestion);
