@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -16,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -39,6 +38,9 @@ public class QueryService {
     private UserRepository userRepository;
 
     @Autowired
+    private QuestionAnswerRepository questionAnswerRepository;
+
+    @Autowired
     private QueryRepository queryRepository;
 
     @PersistenceContext
@@ -57,9 +59,10 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public QueryDto createQuery(Integer questionId, Integer studentId, QueryDto queryDto) {
+    public QueryDto createQuery(Integer questionId, Integer studentId, Integer questionAnswerId, QueryDto queryDto) {
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
+        QuestionAnswer questionAnswer = questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
 
         if (student.getRole() != User.Role.STUDENT)
             throw new TutorException(USER_NOT_STUDENT, studentId);
@@ -70,22 +73,12 @@ public class QueryService {
             queryDto.setKey(maxQueryNumber + 1);
         }
 
-        Boolean userAnswered = false;
-        Set<QuizAnswer> quizAnswers = student.getQuizAnswers();
-        for (QuizAnswer quizAnswer : quizAnswers) {
-            for (QuestionAnswer questionAnswer : quizAnswer.getQuestionAnswers()) {
-                QuizQuestion quizQuestion = questionAnswer.getQuizQuestion();
-                Question answeredQuestion = quizQuestion.getQuestion();
-
-                if (answeredQuestion == question) userAnswered = true;
-            }
-        }
-
-        if (!userAnswered) {
+        if (questionAnswer.getQuizAnswer().getUser().getId() != student.getId()
+                || questionAnswer.getQuizQuestion().getQuestion().getId() != question.getId()) {
             throw new TutorException(QUESTION_NOT_ANSWERED);
         }
 
-        Query query = new Query(question, student, queryDto);
+        Query query = new Query(question, student, questionAnswer, queryDto);
         query.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(query);
         return new QueryDto(query);

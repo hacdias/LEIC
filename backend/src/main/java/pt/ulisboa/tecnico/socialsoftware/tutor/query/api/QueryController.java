@@ -45,11 +45,11 @@ public class QueryController {
         return this.queryService.getQueriesByStudent(teacher.getId());
     }
 
-    @PostMapping("/question/{questionId}/queries")
+    @PostMapping("/question/{questionId}/questionAnswer/{questionAnswerId}/queries")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
-    public QueryDto createQuery(Principal principal, @PathVariable int questionId, @Valid @RequestBody QueryDto queryDto) {
+    public QueryDto createQuery(Principal principal, @PathVariable int questionId, @PathVariable int questionAnswerId, @Valid @RequestBody QueryDto queryDto) {
         User student = (User) ((Authentication) principal).getPrincipal();
-        return this.queryService.createQuery(questionId, student.getId(), queryDto);
+        return this.queryService.createQuery(questionId, student.getId(), questionAnswerId, queryDto);
     }
 
     @PutMapping("/queries/{queryId}")

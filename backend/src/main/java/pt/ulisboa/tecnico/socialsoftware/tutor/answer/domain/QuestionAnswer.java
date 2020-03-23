@@ -1,9 +1,12 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "question_answers")
@@ -22,6 +25,9 @@ public class QuestionAnswer {
     @ManyToOne
     @JoinColumn(name = "quiz_answer_id")
     private QuizAnswer quizAnswer;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question", orphanRemoval=true)
+    private List<Query> queries = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "option_id")
@@ -82,8 +88,6 @@ public class QuestionAnswer {
         this.timeTaken = timeTaken;
     }
 
-
-
     public QuizQuestion getQuizQuestion() {
         return quizQuestion;
     }
@@ -116,13 +120,27 @@ public class QuestionAnswer {
         this.sequence = sequence;
     }
 
+    public List<Query> getQueries() { return queries; }
+
+    public void setQueries(List<Query> queries) {
+        this.queries = queries;
+    }
+
     @Override
     public String toString() {
         return "QuestionAnswer{" +
                 "id=" + id +
                 ", timeTaken=" + timeTaken +
+                ", quizQuestion=" + quizQuestion +
+                ", quizAnswer=" + quizAnswer +
+                ", queries=" + queries +
+                ", option=" + option +
                 ", sequence=" + sequence +
                 '}';
+    }
+
+    public void addQuery(Query query) {
+        this.queries.add(query);
     }
 
     public boolean isCorrect() {
