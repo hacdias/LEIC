@@ -41,6 +41,8 @@ class CreateQueryTest extends Specification {
     public static final String USER_USERNAME = "Student Username"
     public static final String USER_NAME_2 = "Student 2 Name"
     public static final String USER_USERNAME_2 = "Student 2 Username"
+    public static final String USER_NAME_3 = "Not a Student Name"
+    public static final String USER_USERNAME_3 = "Not a Student Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
     public static final String QUERY_TITLE_2 = 'query title 2'
@@ -79,6 +81,7 @@ class CreateQueryTest extends Specification {
     def question
     def question2
     def student
+    def student2
     def quizQuestion
     def quizQuestion2
 
@@ -112,6 +115,11 @@ class CreateQueryTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
+        student2 = new User(USER_NAME_2, USER_USERNAME_2, 2, User.Role.STUDENT)
+        student2.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student2)
+        userRepository.save(student2)
+
         quizQuestion = new QuizQuestion()
         quizQuestion.setQuestion(question)
         question.addQuizQuestion(quizQuestion)
@@ -141,9 +149,10 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
+        queryDTO.setKey(1)
 
         when:
-        queryService.createQuery(question.getId(), student.getId(), queryDTO)
+        queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
 
         then: "the correct query is inside the repository"
         queryRepository.count() == 1L
@@ -185,14 +194,16 @@ class CreateQueryTest extends Specification {
         def queryDTO1 = new QueryDto()
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
+        queryDTO1.setKey(null)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
+        queryDTO2.setKey(null)
 
         when:
-        queryService.createQuery(question.getId(), student.getId(), queryDTO1)
-        queryService.createQuery(question2.getId(), student.getId(), queryDTO2)
+        queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO1)
+        queryService.createQuery(question2.getId(), student.getId(), questionAnswer2.getId(), queryDTO2)
 
         then: "the two queries are inside the repository"
         queryRepository.count() == 2L
@@ -243,14 +254,16 @@ class CreateQueryTest extends Specification {
         def queryDTO1 = new QueryDto()
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
+        queryDTO1.setKey(null)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
+        queryDTO2.setKey(null)
 
         when:
-        queryService.createQuery(question.getId(), student.getId(), queryDTO1)
-        queryService.createQuery(question.getId(), student.getId(), queryDTO2)
+        queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO1)
+        queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO2)
 
         then: "the two queries are inside the repository"
         queryRepository.count() == 2L
@@ -285,7 +298,7 @@ class CreateQueryTest extends Specification {
 
     def "not a student creates a query"() {
         given: "user not student"
-        def user = new User(USER_NAME_2, USER_USERNAME_2, 2, User.Role.TEACHER)
+        def user = new User(USER_NAME_3, USER_USERNAME_3, 3, User.Role.TEACHER)
         user.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(user)
         userRepository.save(user)
@@ -307,9 +320,10 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
+        queryDTO.setKey(null)
 
         when:
-        queryService.createQuery(question.getId(), user.getId(), queryDTO)
+        queryService.createQuery(question.getId(), user.getId(), questionAnswer.getId(), queryDTO)
 
         then: "exception User not a student"
         def exception = thrown(TutorException)
@@ -321,9 +335,51 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
+        queryDTO.setKey(null)
+
+        and: "a question answer not by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student2)
+        student2.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
 
         when:
-        queryService.createQuery(question.getId(), student.getId(), queryDTO)
+        queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
+
+        then: "exception User didn't answer question"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.QUESTION_NOT_ANSWERED
+    }
+
+    def "question answer is not of question"() {
+        given: "a queryDTO"
+        def queryDTO = new QueryDto()
+        queryDTO.setTitle(QUERY_TITLE)
+        queryDTO.setContent(QUERY_CONTENT)
+        queryDTO.setKey(null)
+
+        and: "a question answer not by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student2)
+        student2.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion2)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion2.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        when:
+        queryService.createQuery(question.getId(), student2.getId(), questionAnswer.getId(), queryDTO)
 
         then: "exception User didn't answer question"
         def exception = thrown(TutorException)
