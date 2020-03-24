@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 
-import java.util.List;
-
 @Repository
 @Transactional
 public interface SuggestionRepository extends JpaRepository<Suggestion, Integer> {
+    @Query(value = "SELECT MAX(key) FROM suggestions", nativeQuery = true)
+    Integer getMaxSuggestionNumber();
 }

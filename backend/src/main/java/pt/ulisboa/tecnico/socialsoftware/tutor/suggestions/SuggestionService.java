@@ -13,8 +13,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -37,16 +35,10 @@ public class SuggestionService {
     private SuggestionRepository suggestionRepository;
 
     @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
     private CourseRepository courseRepository;
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private QuestionService questionService;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -64,8 +56,11 @@ public class SuggestionService {
                 .findById(courseId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
 
-        // QuestionDto questionDto = questionService.createQuestion(courseId, suggestionDto.getQuestionDto());
-        // suggestionDto.setQuestionDto(questionDto);
+        if (suggestionDto.getKey() == null) {
+            int maxQueryNumber = suggestionRepository.getMaxSuggestionNumber() != null ?
+                    suggestionRepository.getMaxSuggestionNumber() : 0;
+            suggestionDto.setKey(maxQueryNumber + 1);
+        }
 
         Suggestion suggestion = new Suggestion(student, course, suggestionDto);
         suggestion.setCreationDate(LocalDateTime.now());
