@@ -20,8 +20,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.StudentDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
 
 @DataJpaTest
@@ -88,7 +86,7 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
-        suggestionDto.setQuestionDto(questionDto)
+        suggestionDto.setQuestion(questionDto)
 
         when:
         suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
@@ -111,7 +109,7 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
-        suggestionDto.setQuestionDto(questionDto)
+        suggestionDto.setQuestion(questionDto)
 
         when:
         suggestionService.createSuggestion(student.getId() + 1, course.getId(), suggestionDto)
@@ -126,7 +124,7 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
-        suggestionDto.setQuestionDto(questionDto)
+        suggestionDto.setQuestion(questionDto)
 
         when:
         suggestionService.createSuggestion(student.getId(), course.getId() + 1, suggestionDto)
