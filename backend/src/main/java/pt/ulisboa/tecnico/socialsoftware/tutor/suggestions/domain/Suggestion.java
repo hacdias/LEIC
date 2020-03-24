@@ -48,7 +48,7 @@ public class Suggestion {
         this.key = suggestionDto.getKey();
         this.approved = suggestionDto.getApproved();
         this.student = student;
-        this.question = new Question(course, suggestionDto.getQuestionDto());
+        this.question = new Question(course, suggestionDto.getQuestion());
         this.question.setSuggestion(this);
     }
 

@@ -11,7 +11,7 @@ public class SuggestionDto implements Serializable {
     private Integer key;
     private Boolean approved;
     private String creationDate;
-    private QuestionDto questionDto;
+    private QuestionDto question;
 
     public SuggestionDto () {
     }
@@ -20,7 +20,7 @@ public class SuggestionDto implements Serializable {
         this.id = suggestion.getId();
         this.key = suggestion.getKey();
         this.approved = suggestion.getApproved();
-        this.questionDto = new QuestionDto(suggestion.getQuestion());
+        this.question = new QuestionDto(suggestion.getQuestion());
 
         if (suggestion.getCreationDate() != null) {
             this.creationDate = suggestion.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -59,12 +59,12 @@ public class SuggestionDto implements Serializable {
         this.creationDate = creationDate;
     }
 
-    public QuestionDto getQuestionDto() {
-        return questionDto;
+    public QuestionDto getQuestion() {
+        return question;
     }
 
-    public void setQuestionDto(QuestionDto questionDto) {
-        this.questionDto = questionDto;
+    public void setQuestion(QuestionDto question) {
+        this.question = question;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class SuggestionDto implements Serializable {
                 ", key=" + key +
                 ", approved=" + approved +
                 ", creationDate='" + creationDate + '\'' +
-                ", questionDto=" + questionDto +
+                ", question=" + question +
                 '}';
     }
 }
