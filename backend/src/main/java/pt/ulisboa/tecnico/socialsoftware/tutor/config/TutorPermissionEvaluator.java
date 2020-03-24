@@ -12,11 +12,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionReviewService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.io.Serializable;
 
@@ -98,11 +95,11 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean userIsSuggestionAuthor(String username, int suggestionId) {
-        return suggestionService.getSuggestionUser(suggestionId).getUsername() == username;
+        return suggestionService.getSuggestionUser(suggestionId).getUsername().equals(username);
     }
 
     private boolean userIsSuggestionReviewReceptor(String username, int suggestionReviewId) {
-        return suggestionReviewService.getSuggestionReviewReceptor(suggestionReviewId).getUsername() == username;
+        return suggestionReviewService.getSuggestionReviewReceptor(suggestionReviewId).getUsername().equals(username);
     }
 
     private boolean userHasAnExecutionOfTheCourse(String username, int id) {
