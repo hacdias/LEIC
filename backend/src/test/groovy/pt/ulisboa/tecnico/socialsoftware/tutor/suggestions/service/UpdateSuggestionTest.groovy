@@ -77,7 +77,6 @@ class UpdateSuggestionTest extends Specification {
         questionRepository.save(question)
 
         suggestion = new Suggestion()
-        suggestion.setKey(1)
         suggestion.setStudent(student)
         suggestion.setApproved(false)
         suggestion.setQuestion(question)
@@ -96,7 +95,6 @@ class UpdateSuggestionTest extends Specification {
         suggestionRepository.count() == 1L
         def result = suggestionRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getApproved() == true
     }
 

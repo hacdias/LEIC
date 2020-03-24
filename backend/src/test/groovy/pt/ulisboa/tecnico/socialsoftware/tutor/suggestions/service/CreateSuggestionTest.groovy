@@ -84,7 +84,6 @@ class CreateSuggestionTest extends Specification {
     def "create suggestion with user and question"() {
         given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
-        suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
 
@@ -95,7 +94,6 @@ class CreateSuggestionTest extends Specification {
         suggestionRepository.count() == 1L
         def result = suggestionRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getQuestion().getTitle() == QUESTION_TITLE
         result.getQuestion().getContent() == QUESTION_CONTENT
         result.getStudent().getName() == STUDENT_NAME
@@ -107,7 +105,6 @@ class CreateSuggestionTest extends Specification {
     def "create suggestion with invalid user" () {
         given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
-        suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
 
@@ -122,7 +119,6 @@ class CreateSuggestionTest extends Specification {
     def "create suggestion with invalid course"() {
         given: "a suggestionDto"
         def suggestionDto = new SuggestionDto()
-        suggestionDto.setKey(1)
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
 
