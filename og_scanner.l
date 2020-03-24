@@ -3,102 +3,96 @@
 %{
 // make relevant includes before including the parser's tab file
 #include <string>
-#include <sstream>
 #include <vector>
 #include <cdk/ast/sequence_node.h>
 #include <cdk/ast/expression_node.h>
 #include <cdk/ast/lvalue_node.h>
 #include "og_parser.tab.h"
 
-static std::ostringstream sstr;
-
 // don't change this
 #define yyerror LexerError
 %}
-%x X_STRING X_INVALSTRING X_COMMENT
+%x X_STRING X_ENDSTRING X_COMMENT
 %%
 
-"//".*                 ; /* ignore comments */
+"//".*                        ; /* ignore comments */
 
-"/*"                   yy_push_state(X_COMMENT);
-<X_COMMENT>"/*"        yy_push_state(X_COMMENT);
-<X_COMMENT>"*/"        yy_pop_state();
-<X_COMMENT>.           ;
+"/*"                          yy_push_state(X_COMMENT);
+<X_COMMENT>"/*"               yy_push_state(X_COMMENT);
+<X_COMMENT>"*/"               yy_pop_state();
+<X_COMMENT>.                  ;
 
-">="                  return tGE;
-"<="                  return tLE;
-"=="                  return tEQ;
-"!="                  return tNE;
+">="                          return tGE;
+"<="                          return tLE;
+"=="                          return tEQ;
+"!="                          return tNE;
 
-"&&"                  return tAND;
-"||"                  return tOR;
+"&&"                          return tAND;
+"||"                          return tOR;
 
-"auto"                return tTPAUTO;
-"int"                 return tTPINT;
-"real"                return tTPREAL;
-"string"              return tTPSTRING;
-"ptr"                 return tTPPTR;
+"auto"                        return tTPAUTO;
+"int"                         return tTPINT;
+"real"                        return tTPREAL;
+"string"                      return tTPSTRING;
+"ptr"                         return tTPPTR;
 
-"public"              return tPUBLIC;
-"require"             return tREQUIRE;
-"sizeof"              return tSIZEOF;
-"input"               return tINPUT;
-"nullptr"             return tNULLPTR;
-"procedure"           return tPROCEDURE;
-"break"               return tBREAK;
-"continue"            return tCONTINUE;
-"return"              return tRETURN;
-"if"                  return tIF;
-"then"                return tTHEN;
-"elif"                return tELIF;
-"else"                return tELSE;
-"for"                 return tFOR;
-"do"                  return tDO;
-"write"               return tWRITE;
-"writeln"             return tWRITELN;
+"public"                      return tPUBLIC;
+"require"                     return tREQUIRE;
+"sizeof"                      return tSIZEOF;
+"input"                       return tINPUT;
+"nullptr"                     return tNULLPTR;
+"procedure"                   return tPROCEDURE;
+"break"                       return tBREAK;
+"continue"                    return tCONTINUE;
+"return"                      return tRETURN;
+"if"                          return tIF;
+"then"                        return tTHEN;
+"elif"                        return tELIF;
+"else"                        return tELSE;
+"for"                         return tFOR;
+"do"                          return tDO;
+"write"                       return tWRITE;
+"writeln"                     return tWRITELN;
 
-[A-Za-z][A-Za-z0-9_]*  yylval.s = new std::string(yytext); return tIDENTIFIER;
+[A-Za-z][A-Za-z0-9_]*         yylval.s = new std::string(yytext); return tIDENTIFIER;
 
-\"                     yy_push_state(X_STRING); yylval.s = new std::string("");
-<X_STRING>\"           yy_pop_state(); return tSTRING;
-<X_STRING>\\\"         *yylval.s += yytext + 1;
-<X_STRING>\\\\         *yylval.s += yytext + 1;
-<X_STRING>\\"n"        *yylval.s += '\n';
-<X_STRING>\\"r"        *yylval.s += '\r';
-<X_STRING>\\"t"        *yylval.s += '\t';
-<X_STRING>\\\0         yy_push_state(X_INVALSTRING);
-<X_STRING>.            *yylval.s += yytext;
-<X_STRING>\\[0-9a-fA-F]{1,2}  {
-    sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 16));
-    *yylval.s += sstr.str().c_str();
-    sstr.str("");
-  }
+\"                            yy_push_state(X_STRING); yylval.s = new std::string("");
+<X_STRING>\"                  yy_pop_state(); return tSTRING;
+<X_STRING>\\\"                *yylval.s += yytext + 1;
+<X_STRING>\\\\                *yylval.s += yytext + 1;
+<X_STRING>\\"n"               *yylval.s += '\n';
+<X_STRING>\\"r"               *yylval.s += '\r';
+<X_STRING>\\"t"               *yylval.s += '\t';
+<X_STRING>\\\0                yy_push_state(X_ENDSTRING);
+<X_STRING>.                   *yylval.s += yytext;
+<X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::string(1, strtol(yytext, nullptr, 16));
+<X_STRING>\n                  yyerror("newline in string");
+<X_ENDSTRING>\"               yy_pop_state(); yy_pop_state(); return tSTRING;
+<X_ENDSTRING>\\\"             ;
+<X_ENDSTRING>.                ;
 
-<X_STRING>\n            yyerror("newline in string");
-<X_INVALSTRING>\"       yy_pop_state(); yy_pop_state(); return tSTRING;
-<X_INVALSTRING>\\\"     ;
-<X_INVALSTRING>.        ;
+[0-9]+                        {
+  yylval.i = strtol(yytext, nullptr, 10);
+  if (errno == ERANGE) yyerror("Integer overflow");
+  return tINT;
+}
 
-[0-9]+                   yylval.i = strtol(yytext, nullptr, 10); return tINT;
-
-0x[0-9A-Fa-f]+  {
-    yylval.i = strtoul(yytext, nullptr, 16);
-    if (errno == ERANGE) yyerror("int overflow");
-    return tINT;
-  }
+0x[0-9A-Fa-f]+                {
+  yylval.i = strtol(yytext, nullptr, 16);
+  if (errno == ERANGE) yyerror("Integer overflow");
+  return tINT;
+}
 
 ((([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))([eE][0-9]*)*)|([0-9]+[eE][0-9]+) {
-    sstr << char(strtol(std::string(yytext + 1).c_str(), NULL, 10));
-    yylval.r = strtod(sstr.str().c_str(), nullptr);
-    sstr.str("");
-    if (errno == ERANGE) yyerror("real overflow");
-    return tREAL;
-  }
+  yylval.r = strtod(yytext, nullptr);
+  if (errno == ERANGE) yyerror("Real overflow");
+  return tREAL;
+}
 
-[-()[\]<>=+*/%;{}.,@?]    return *yytext;
+[-()[\]<>=+*/%;{}.,@?]          return *yytext;
 
-[ \t\n]+               ; /* ignore whitespace */
+[ \t\n]+                        ; /* ignore whitespace */
 
-.                      yyerror("Unknown character");
+.                               yyerror("Unknown character");
 
 %%
