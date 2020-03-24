@@ -14,7 +14,12 @@ import java.util.Set;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SUGGESTION_ALREADY_APPROVED;
 
 @Entity
-@Table(name = "suggestions")
+@Table(
+    name = "suggestions",
+    indexes = {
+        @Index(name = "suggestion_indx_0", columnList = "key")
+    }
+)
 public class Suggestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
