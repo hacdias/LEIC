@@ -4,9 +4,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class QueryDto implements Serializable {
@@ -14,7 +11,6 @@ public class QueryDto implements Serializable {
     private Integer key;
     private String title;
     private String content;
-    private List<AnswerQueryDto> answers = new ArrayList<>();
     private String creationDate = null;
 
     public QueryDto() {
@@ -25,7 +21,6 @@ public class QueryDto implements Serializable {
         this.key = query.getKey();
         this.title = query.getTitle();
         this.content = query.getContent();
-        this.answers = query.getAnswers().stream().map(AnswerQueryDto::new).collect(Collectors.toList());
 
         if (query.getCreationDate() != null)
             this.creationDate = query.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -47,10 +42,6 @@ public class QueryDto implements Serializable {
 
     public void setContent(String content) { this.content = content; }
 
-    public List<AnswerQueryDto> getAnswers() { return answers; }
-
-    public void setAnswers(List<AnswerQueryDto> answers) { this.answers = answers; }
-
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
@@ -62,7 +53,6 @@ public class QueryDto implements Serializable {
                 ", key=" + key +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", answers=" + answers +
                 ", creationDate='" + creationDate + '\'' +
                 '}';
     }
