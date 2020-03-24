@@ -231,7 +231,7 @@ tuple     : expr                                                 { $$ = new og::
 
 lval      : tIDENTIFIER                                          { $$ = new cdk::variable_node(LINE, $1); }
           | expr '[' expr ']'                                    { $$ = new og::ptr_index_node(LINE, $1, $3); }
-          | tIDENTIFIER '@' tINT                                 { $$ = new og::tuple_index_node(LINE, $1, $3); }
+          | tIDENTIFIER '@' tINT                                 { $$ = new og::tuple_index_node(LINE, $1, new cdk::integer_node(LINE, $3)); }
           ;
 
 string    : tSTRING                                              { $$ = $1; }

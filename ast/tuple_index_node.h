@@ -1,6 +1,7 @@
 #ifndef __OG_AST_TUPLE_INDEX_NODE_H__
 #define __OG_AST_TUPLE_INDEX_NODE_H__
 
+#include <cdk/ast/integer_node.h>
 #include <cdk/ast/lvalue_node.h>
 
 namespace og {
@@ -10,10 +11,10 @@ namespace og {
    */
   class tuple_index_node: public cdk::lvalue_node {
     std::string _identifier;
-    int _index;
+    cdk::integer_node* _index;
 
   public:
-    inline tuple_index_node(int lineno, std::string *identifier, int index) :
+    inline tuple_index_node(int lineno, std::string *identifier, cdk::integer_node *index) :
         cdk::lvalue_node(lineno), _identifier(*identifier), _index(index) {
     }
 
@@ -22,7 +23,7 @@ namespace og {
       return _identifier;
     }
 
-    inline int index() {
+    inline cdk::integer_node *index() {
       return _index;
     }
 
