@@ -8,19 +8,20 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class UpdateSuggestionTest extends Specification {
+class FindSuggestionTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -43,10 +44,10 @@ class UpdateSuggestionTest extends Specification {
     SuggestionRepository suggestionRepository
 
     @Autowired
-    UserRepository userRepository
+    SuggestionService suggestionService
 
     @Autowired
-    SuggestionService suggestionService
+    UserRepository userRepository
 
     def course
     def courseExecution
@@ -84,20 +85,67 @@ class UpdateSuggestionTest extends Specification {
         suggestionRepository.save(suggestion)
     }
 
-    def "update suggestion to approved"() {
-        given: "an updated suggestion"
-        def suggestionDto = new SuggestionDto(suggestion)
-        suggestionDto.setApproved(true)
+    def "find suggestions for non-existing course"() {
+        when:
+        suggestionService.findSuggestionsByCourse(20)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.COURSE_NOT_FOUND
+    }
+
+    def "find suggestions for existing course"() {
+        when:
+        def suggestions = suggestionService.findSuggestionsByCourse(course.getId())
+
+        then: "one suggestion is retrieved"
+        suggestions.size() == 1
+        suggestions.get(0).getCreationDate() == suggestion.getCreationDate()
+        suggestions.get(0).getId() == suggestion.getId()
+        suggestions.get(0).getApproved() == suggestion.getApproved()
+    }
+
+    def "find suggestions for non-existing user"() {
+        when:
+        suggestionService.findSuggestionsByStudent(20)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+    }
+
+    def "find suggestions for existing user"() {
+        when:
+        def suggestions = suggestionService.findSuggestionsByStudent(student.getId())
+
+        then: "one suggestion is retrieved"
+        suggestions.size() == 1
+        suggestions.get(0).getCreationDate() == suggestion.getCreationDate()
+        suggestions.get(0).getId() == suggestion.getId()
+        suggestions.get(0).getApproved() == suggestion.getApproved()
+    }
+
+    def "find suggestion by id"() {
+        given: "a suggestion"
+        def id = suggestion.getId()
+        def sug
 
         when:
-        suggestionService.updateSuggestion(suggestion.getId(), suggestionDto)
+        sug = suggestionService.findSuggestionById(id)
 
-        then: "the suggested must be approved"
-        suggestionRepository.count() == 1L
-        def result = suggestionRepository.findAll().get(0)
-        result.getId() != null
-        result.getKey() == 1
-        result.getApproved() == true
+        then: "correct suggestion is fetched"
+        sug.getId() == suggestion.getId()
+        sug.getApproved() == suggestion.getApproved()
+        sug.getCreationDate() == suggestion.getCreationDate()
+    }
+
+    def "find suggestion by non-existing id"() {
+        when:
+        suggestionService.findSuggestionById(20)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.SUGGESTION_NOT_FOUND
     }
 
     @TestConfiguration

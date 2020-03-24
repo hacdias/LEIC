@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -13,7 +14,12 @@ import java.util.Set;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SUGGESTION_ALREADY_APPROVED;
 
 @Entity
-@Table(name = "suggestions")
+@Table(
+    name = "suggestions",
+    indexes = {
+        @Index(name = "suggestion_indx_0", columnList = "key")
+    }
+)
 public class Suggestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,12 +48,13 @@ public class Suggestion {
     public Suggestion () {
     }
 
-    public Suggestion (User student, Question question, SuggestionDto suggestionDto) {
+    public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
         this.id = suggestionDto.getId();
         this.key = suggestionDto.getKey();
         this.approved = suggestionDto.getApproved();
         this.student = student;
-        this.question = question;
+        this.question = new Question(course, suggestionDto.getQuestion());
+        this.question.setSuggestion(this);
     }
 
     public Integer getId() {
