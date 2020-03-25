@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
@@ -76,7 +77,6 @@ class UpdateSuggestionTest extends Specification {
         questionRepository.save(question)
 
         suggestion = new Suggestion()
-        suggestion.setKey(1)
         suggestion.setStudent(student)
         suggestion.setApproved(false)
         suggestion.setQuestion(question)
@@ -95,7 +95,6 @@ class UpdateSuggestionTest extends Specification {
         suggestionRepository.count() == 1L
         def result = suggestionRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getApproved() == true
     }
 
@@ -105,6 +104,11 @@ class UpdateSuggestionTest extends Specification {
         @Bean
         SuggestionService suggestionService() {
             return new SuggestionService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
         }
     }
 }

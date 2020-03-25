@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -43,13 +44,17 @@ public class Query {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "question_answer_id")
+    private QuestionAnswer question_answer;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "query", fetch = FetchType.EAGER, orphanRemoval=true)
     private List<AnswerQuery> answers = new ArrayList<>();
 
     public Query() {
     }
 
-    public Query(Question question, User student, QueryDto queryDto) {
+    public Query(Question question, User student, QuestionAnswer question_answer, QueryDto queryDto) {
         checkQueryConsistent(queryDto);
 
         this.title = queryDto.getTitle();
@@ -60,6 +65,8 @@ public class Query {
         question.addQuery(this);
         this.student = student;
         student.addQuery(this);
+        this.question_answer = question_answer;
+        question_answer.addQuery(this);
     }
 
     public Integer getId() { return id; }

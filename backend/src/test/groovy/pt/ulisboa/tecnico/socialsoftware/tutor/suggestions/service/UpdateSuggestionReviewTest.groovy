@@ -93,7 +93,6 @@ class UpdateSuggestionReviewTest extends Specification {
         questionRepository.save(question)
 
         suggestion = new Suggestion()
-        suggestion.setKey(1)
         suggestion.setStudent(student)
         suggestion.setApproved(false)
         suggestion.setQuestion(question)
@@ -136,7 +135,6 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         suggestionReview.getSuggestion().getApproved()
         suggestionReview.getApproved()
     }
@@ -153,7 +151,6 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         suggestionReview.getSuggestion().getApproved()
         !suggestionReview.getApproved()
     }

@@ -91,7 +91,6 @@ class RemoveSuggestionReviewTest extends Specification {
         questionRepository.save(question)
 
         suggestion = new Suggestion()
-        suggestion.setKey(1)
         suggestion.setStudent(student)
         suggestion.setApproved(false)
         suggestion.setQuestion(question)

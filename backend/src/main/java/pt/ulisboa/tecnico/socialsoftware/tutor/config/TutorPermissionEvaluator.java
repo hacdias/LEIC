@@ -10,6 +10,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionReviewService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 
@@ -34,6 +36,12 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private QuizService quizService;
+
+    @Autowired
+    private SuggestionService suggestionService;
+
+    @Autowired
+    private SuggestionReviewService suggestionReviewService;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -71,11 +79,27 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(username, assessmentService.findAssessmentCourseExecution(id).getCourseExecutionId());
                 case "QUIZ.ACCESS":
                     return userHasThisExecution(username, quizService.findQuizCourseExecution(id).getCourseExecutionId());
+                case "SUGGESTION.AUTHOR":
+                    return userIsSuggestionAuthor(username, id);
+                case "SUGGESTION.ACCESS":
+                    return userHasAnExecutionOfTheCourse(username, suggestionService.getSuggestionCourse(id).getCourseId());
+                case "SUGGESTIONREVIEW.RECEPTOR":
+                    return userIsSuggestionReviewReceptor(username, id);
+                case "SUGGESTIONREVIEW.ACCESS":
+                    return userHasAnExecutionOfTheCourse(username, suggestionReviewService.getSuggestionReviewCourse(id).getCourseId());
                 default: return false;
             }
         }
 
         return false;
+    }
+
+    private boolean userIsSuggestionAuthor(String username, int suggestionId) {
+        return suggestionService.getSuggestionUser(suggestionId).getUsername().equals(username);
+    }
+
+    private boolean userIsSuggestionReviewReceptor(String username, int suggestionReviewId) {
+        return suggestionReviewService.getSuggestionReviewReceptor(suggestionReviewId).getUsername().equals(username);
     }
 
     private boolean userHasAnExecutionOfTheCourse(String username, int id) {

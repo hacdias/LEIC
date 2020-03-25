@@ -110,7 +110,7 @@ class CreateAnswerTest extends Specification {
         and: "a answerQueryDTO"
         def answerQueryDTO = new AnswerQueryDto()
         answerQueryDTO.setContent(ANSWER_QUERY_CONTENT)
-        answerQueryDTO.setKey()
+        answerQueryDTO.setKey(1)
 
         when:
         answerQueryService.createAnswerQuery(query.getId(), teacher.getId(), answerQueryDTO)
