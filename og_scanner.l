@@ -58,15 +58,14 @@
 
 \"                            yy_push_state(X_STRING); yylval.s = new std::string("");
 <X_STRING>\"                  yy_pop_state(); return tSTRING;
-<X_STRING>\\\"                *yylval.s += yytext + 1;
-<X_STRING>\\\\                *yylval.s += yytext + 1;
-<X_STRING>\\"n"               *yylval.s += '\n';
-<X_STRING>\\"r"               *yylval.s += '\r';
-<X_STRING>\\"t"               *yylval.s += '\t';
+<X_STRING>\\\"                *yylval.s += "\"";
+<X_STRING>\\\\                *yylval.s += "\\";
+<X_STRING>\\"n"               *yylval.s += "\n";
+<X_STRING>\\"r"               *yylval.s += "\r";
+<X_STRING>\\"t"               *yylval.s += "\t";
 <X_STRING>\\\0                yy_push_state(X_ENDSTRING);
-<X_STRING>.                   *yylval.s += yytext;
+<X_STRING>.|\n                *yylval.s += yytext;
 <X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::string(1, strtol(yytext, nullptr, 16));
-<X_STRING>\n                  yyerror("newline in string");
 <X_ENDSTRING>\"               yy_pop_state(); yy_pop_state(); return tSTRING;
 <X_ENDSTRING>\\\"             ;
 <X_ENDSTRING>.                ;
