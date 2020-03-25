@@ -79,6 +79,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(username, quizService.findQuizCourseExecution(id).getCourseExecutionId());
                 case "QUERY.ALTER":
                     return userCanAlterQuery(username, id);
+                case "QUERY.ACCESS":
+                    return userCanAddAnswerQuery(username, id);
                 default: return false;
             }
         }
@@ -99,6 +101,13 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private boolean userCanAlterQuery(String username, int queryId) {
         Integer studentId = userService.findByUsername(username).getId();
         List<QueryDto> queries = queryService.getQueriesByStudent(studentId);
+        return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
+    }
+
+    private boolean userCanAddAnswerQuery(String username, int queryId) {
+        Integer teacherId = userService.findByUsername(username).getId();
+
+        List<QueryDto> queries = queryService.getQueriesInTeachersCourse(teacherId);
         return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
     }
 
