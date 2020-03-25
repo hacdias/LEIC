@@ -89,10 +89,10 @@
   return tREAL;
 }
 
-[-()[\]<>=+*/%;{}.,@?]          return *yytext;
+[-()[\]<>=+*/%;{}.,@?]        return *yytext;
 
-[ \t\n]+                        ; /* ignore whitespace */
+[ \t\n]+                      ; /* ignore whitespace */
 
-.                               yyerror("Unknown character");
+.                             yyerror("Unknown character");
 
 %%
