@@ -12,8 +12,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
@@ -21,8 +19,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,9 +36,6 @@ public class SuggestionService {
     @Autowired
     private UserRepository userRepository;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
@@ -56,15 +49,9 @@ public class SuggestionService {
                 .findById(courseId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
 
-        if (suggestionDto.getKey() == null) {
-            int maxQueryNumber = suggestionRepository.getMaxSuggestionNumber() != null ?
-                    suggestionRepository.getMaxSuggestionNumber() : 0;
-            suggestionDto.setKey(maxQueryNumber + 1);
-        }
-
         Suggestion suggestion = new Suggestion(student, course, suggestionDto);
         suggestion.setCreationDate(LocalDateTime.now());
-        this.entityManager.persist(suggestion);
+        suggestionRepository.save(suggestion);
         return new SuggestionDto(suggestion);
     }
 
@@ -137,7 +124,7 @@ public class SuggestionService {
                 .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
 
         suggestion.remove();
-        entityManager.remove(suggestion);
+        suggestionRepository.delete(suggestion);
     }
 
     @Retryable(

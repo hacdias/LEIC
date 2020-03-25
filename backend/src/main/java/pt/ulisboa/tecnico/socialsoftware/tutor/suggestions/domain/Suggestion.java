@@ -14,19 +14,11 @@ import java.util.Set;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SUGGESTION_ALREADY_APPROVED;
 
 @Entity
-@Table(
-    name = "suggestions",
-    indexes = {
-        @Index(name = "suggestion_indx_0", columnList = "key")
-    }
-)
+@Table(name = "suggestions")
 public class Suggestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(unique = true, nullable = false)
-    private Integer key;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -50,7 +42,6 @@ public class Suggestion {
 
     public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
         this.id = suggestionDto.getId();
-        this.key = suggestionDto.getKey();
         this.approved = suggestionDto.getApproved();
         this.student = student;
         this.question = new Question(course, suggestionDto.getQuestion());
@@ -63,14 +54,6 @@ public class Suggestion {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getKey() {
-        return key;
-    }
-
-    public void setKey(Integer key) {
-        this.key = key;
     }
 
     public User getStudent() {
@@ -135,7 +118,6 @@ public class Suggestion {
     public String toString() {
         return "Suggestion{" +
                 "id=" + id +
-                ", key=" + key +
                 ", student=" + student +
                 ", question=" + question +
                 ", suggestionReviews=" + suggestionReviews +
