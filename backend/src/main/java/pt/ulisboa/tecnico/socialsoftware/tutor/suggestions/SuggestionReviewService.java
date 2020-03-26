@@ -19,8 +19,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,9 +35,6 @@ public class SuggestionReviewService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @PersistenceContext
-    EntityManager entityManager;
 
     @Retryable(
             value = { SQLException.class },
@@ -61,7 +56,7 @@ public class SuggestionReviewService {
             suggestionReview.getSuggestion().setApproved(suggestionReviewDto.getApproved());
         }
 
-        this.entityManager.persist(suggestionReview);
+        suggestionReviewRepository.save(suggestionReview);
         return new SuggestionReviewDto(suggestionReview);
     }
 
@@ -139,7 +134,7 @@ public class SuggestionReviewService {
                 .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_REVIEW_NOT_FOUND, suggestionReviewId));
 
         suggestionReview.remove();
-        entityManager.remove(suggestionReview);
+        suggestionReviewRepository.delete(suggestionReview);
     }
 
     @Retryable(

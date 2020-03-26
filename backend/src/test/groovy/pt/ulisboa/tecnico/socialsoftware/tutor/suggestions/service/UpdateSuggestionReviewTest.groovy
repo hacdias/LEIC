@@ -99,7 +99,6 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionRepository.save(suggestion)
 
         suggestionReview = new SuggestionReview()
-        suggestionReview.setKey(1)
         suggestionReview.setTeacher(teacher)
         suggestionReview.setSuggestion(suggestion)
         suggestionReview.setApproved(false)
@@ -119,7 +118,6 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getJustification() == CHANGED_SUGGESTION_REVIEW_JUSTIFICATION
     }
 
