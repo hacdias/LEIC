@@ -20,6 +20,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+
 @DataJpaTest
 class GetSuggestionPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
@@ -74,6 +76,7 @@ class GetSuggestionPerformanceTest extends Specification {
             questionDto.setTitle(QUESTION_TITLE)
             questionDto.setContent(QUESTION_CONTENT)
             questionDto.setStatus(Question.Status.DISABLED.name())
+            questionDto.setCreationDate(LocalDateTime.now().format(Course.formatter))
             def optionDto = new OptionDto()
             optionDto.setContent(OPTION_CONTENT)
             optionDto.setCorrect(true)
@@ -84,6 +87,7 @@ class GetSuggestionPerformanceTest extends Specification {
             def suggestionDto = new SuggestionDto()
             suggestionDto.setQuestion(questionDto)
             suggestionDto.setApproved(false)
+            suggestionDto.setCreationDate(questionDto.getCreationDate())
 
             suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
         })
