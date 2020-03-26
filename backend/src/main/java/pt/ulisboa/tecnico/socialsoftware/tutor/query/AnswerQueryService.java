@@ -107,10 +107,12 @@ public class AnswerQueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<AnswerQueryDto> getAnswersToQuery(Integer queryId) {
-        Query query = queryRepository.findById(queryId)
+        queryRepository.findById(queryId)
                 .orElseThrow(() -> new TutorException(QUERY_NOT_FOUND,queryId));
 
-        return query.getAnswers().stream()
+        return answerQueryRepository.findAll()
+                .stream()
+                .filter(answerQuery -> answerQuery.getQuery().getId() == queryId)
                 .map(AnswerQueryDto::new)
                 .sorted(Comparator.comparing(AnswerQueryDto::getCreationDate))
                 .collect(Collectors.toList());
@@ -121,10 +123,12 @@ public class AnswerQueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<AnswerQueryDto> getAnswersByTeacher(Integer teacherId) {
-        User teacher = userRepository.findById(teacherId)
+        userRepository.findById(teacherId)
                 .orElseThrow(() -> new TutorException(USER_NOT_FOUND,teacherId));
 
-        return teacher.getQueryAnswers().stream()
+        return answerQueryRepository.findAll()
+                .stream()
+                .filter(answerQuery -> answerQuery.getTeacher().getId() == teacherId)
                 .map(AnswerQueryDto::new)
                 .sorted(Comparator.comparing(AnswerQueryDto::getCreationDate))
                 .collect(Collectors.toList());
