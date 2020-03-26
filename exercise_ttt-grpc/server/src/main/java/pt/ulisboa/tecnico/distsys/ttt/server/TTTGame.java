@@ -6,6 +6,7 @@ public class TTTGame {
 	private char board[][];
 	private int numPlays = 0;
 	private int nextPlayer = 0;
+	private int plays[];
 	
 	public TTTGame() {
 		board = new char[][] {
@@ -13,6 +14,8 @@ public class TTTGame {
 			{'4', '5', '6'},
 			{'7', '8', '9'}
 		};
+
+		plays = new int[] {0, 0};
 	}
 	
 	@Override
@@ -43,9 +46,10 @@ public class TTTGame {
                 return PlayResult.GAME_FINISHED;
 		    }
 	
-		    board[row][column] = (player == 1) ? 'X' : 'O';  /* Insert player symbol   */
+			board[row][column] = (player == 1) ? 'X' : 'O';  /* Insert player symbol   */
 		    nextPlayer = (nextPlayer + 1) % 2;
-		    numPlays ++;
+			plays[player]++;
+			numPlays ++;
 		    return PlayResult.SUCCESS;
 	    }
 	}
@@ -97,5 +101,9 @@ public class TTTGame {
 	    
 	    return result; 
 
+	}
+
+	public synchronized int info(int player) {
+		return plays[player];
 	}
 }

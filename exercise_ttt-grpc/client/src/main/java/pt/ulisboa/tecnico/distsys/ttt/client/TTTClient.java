@@ -95,6 +95,17 @@ public class TTTClient {
 						continue;
 					}
 
+					if (go == 10) {
+						play_res = PlayResult.GET_INFO;
+						int next_player = (player + 1) % 2;
+						InfoRequest infoRequest = InfoRequest.newBuilder()
+							.setPlayer(next_player).build();
+
+						int plays = stub.info(infoRequest).getPlays();
+						System.out.println("Your adversary played " + plays + " times!");
+						continue;
+					}
+
 					/* Get row index of board. */
 					row = --go / 3;
 					/* Get column index of board. */

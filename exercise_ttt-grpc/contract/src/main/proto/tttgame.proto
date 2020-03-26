@@ -27,6 +27,7 @@ enum PlayResult {
   WRONG_TURN = 3;
   GAME_FINISHED = 4;
   SUCCESS = 5;
+  GET_INFO = 6;
 };
 
 
@@ -49,6 +50,14 @@ message CheckWinnerResponse {
   int32 result = 1;
 }
 
+message InfoRequest {
+  int32 player = 1;
+}
+
+message InfoResponse {
+  int32 plays = 1;
+}
+
 
 // service
 
@@ -56,4 +65,5 @@ service TTT {
   rpc CurrentBoard(CurrentBoardRequest) returns (CurrentBoardResponse);
   rpc Play(PlayRequest) returns (PlayResponse);
   rpc CheckWinner(CheckWinnerRequest) returns (CheckWinnerResponse);
+  rpc Info(InfoRequest) returns (InfoResponse);
 }
