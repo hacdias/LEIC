@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 
 public class SuggestionReviewDto implements Serializable {
     private Integer id;
-    private Integer key;
     private Boolean approved;
     private String justification;
     private String creationDate;
@@ -18,7 +17,6 @@ public class SuggestionReviewDto implements Serializable {
 
     public SuggestionReviewDto (SuggestionReview suggestionReview) {
         this.id = suggestionReview.getId();
-        this.key = suggestionReview.getKey();
         this.approved = suggestionReview.getApproved();
         this.justification = suggestionReview.getJustification();
 
@@ -33,14 +31,6 @@ public class SuggestionReviewDto implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getKey() {
-        return key;
-    }
-
-    public void setKey(Integer key) {
-        this.key = key;
     }
 
     public Boolean getApproved() {
@@ -67,7 +57,6 @@ public class SuggestionReviewDto implements Serializable {
     public String toString() {
         return "SuggestionDto{" +
                 "id=" + id +
-                ", key=" + key +
                 ", approved=" + approved +
                 ", justification=" + justification +
                 ", creationDate='" + creationDate + '\'' +
