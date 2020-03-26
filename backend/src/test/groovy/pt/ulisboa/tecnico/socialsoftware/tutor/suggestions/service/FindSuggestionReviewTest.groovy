@@ -8,19 +8,23 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionReviewService
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionReviewDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class CreateSuggestionReviewTest extends Specification {
+class FindSuggestionReviewTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -60,6 +64,7 @@ class CreateSuggestionReviewTest extends Specification {
     def question
     def teacher
     def suggestion
+    def suggestionReview
 
     def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -80,7 +85,7 @@ class CreateSuggestionReviewTest extends Specification {
 
         question = new Question()
         question.setKey(1)
-        question.setTitle(QUESTION_TITLE)
+        question.setContent(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
         question.setNumberOfAnswers(2)
@@ -94,52 +99,79 @@ class CreateSuggestionReviewTest extends Specification {
         suggestion.setApproved(false)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
+
+        suggestionReview = new SuggestionReview()
+        suggestionReview.setTeacher(teacher)
+        suggestionReview.setSuggestion(suggestion)
+        suggestionReview.setApproved(false)
+        suggestionReview.setJustification(SUGGESTION_REVIEW_JUSTIFICATION)
+        suggestionReviewRepository.save(suggestionReview)
     }
 
-    def "suggestion is approved with justification"() {
-        given: "a suggestion review Dto"
-        def suggestionReviewDto = new SuggestionReviewDto()
-        suggestionReviewDto.approved = true
-        suggestionReviewDto.justification = SUGGESTION_REVIEW_JUSTIFICATION
-
+    def "find suggestion reviews for non-existing suggestion"() {
         when:
-        suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
+        suggestionReviewService.findSuggestionReviewsBySuggestion(100)
 
-        then: "the suggestion review is inside the repository, approved and with justification"
-
-        suggestionReviewRepository.count() == 1L
-        def result = suggestionReviewRepository.findAll().get(0)
-        result.getId() != null
-        result.getTeacher().getName() == TEACHER_NAME
-        result.getTeacher().getUsername() == TEACHER_USERNAME
-        result.getSuggestion().getQuestion().getTitle() == QUESTION_TITLE
-        result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
-        result.getSuggestion().getStudent().getName() == STUDENT_NAME
-        result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        result.getSuggestion().getApproved()
-        result.getApproved()
-        result.getJustification() == SUGGESTION_REVIEW_JUSTIFICATION
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.SUGGESTION_NOT_FOUND
     }
 
-    def "suggestion is rejected with no justification"() {
-        def suggestionReviewDto = new SuggestionReviewDto()
-        suggestionReviewDto.approved = false
+    def "find suggestion reviews for existing suggestion"() {
+        when:
+        def suggestionReviews = suggestionReviewService.findSuggestionReviewsBySuggestion(suggestion.getId())
+
+        then: "one suggestion review is retrieved"
+        suggestionReviews.size() == 1
+        suggestionReviews.get(0).getCreationDate() == suggestionReview.getCreationDate()
+        suggestionReviews.get(0).getId() == suggestionReview.getId()
+        suggestionReviews.get(0).getJustification() == suggestionReview.getJustification()
+        suggestionReviews.get(0).getApproved() == suggestionReview.getApproved()
+    }
+
+    def "find suggestion reviews for non-existing user"() {
+        when:
+        suggestionReviewService.findSuggestionReviewsByTeacher(100)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
+    }
+
+    def "find suggestion reviews for existing user"() {
+        when:
+        def suggestionReviews = suggestionReviewService.findSuggestionReviewsByTeacher(teacher.getId())
+
+        then: "one suggestion is retrieved"
+        suggestionReviews.size() == 1
+        suggestionReviews.get(0).getCreationDate() == suggestionReview.getCreationDate()
+        suggestionReviews.get(0).getId() == suggestionReview.getId()
+        suggestionReviews.get(0).getJustification() == suggestionReview.getJustification()
+        suggestionReviews.get(0).getApproved() == suggestionReview.getApproved()
+    }
+
+    def "find suggestion review by non-existing id"() {
+        when:
+        suggestionReviewService.findSuggestionReviewById(100)
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.SUGGESTION_REVIEW_NOT_FOUND
+    }
+
+    def "find suggestion review by id"() {
+        given: "a suggestion review"
+        def id = suggestionReview.getId()
+        def sr
 
         when:
-        suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
+        sr = suggestionReviewService.findSuggestionReviewById(id)
 
-        then: "the suggestion review is inside the repository, rejected and with no justification"
-        def result = suggestionReviewRepository.findAll().get(0)
-        result.getId() != null
-        result.getTeacher().getName() == TEACHER_NAME
-        result.getTeacher().getUsername() == TEACHER_USERNAME
-        result.getSuggestion().getQuestion().getTitle() == QUESTION_TITLE
-        result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
-        result.getSuggestion().getStudent().getName() == STUDENT_NAME
-        result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        !result.getSuggestion().getApproved()
-        !result.getApproved()
-        result.getJustification() == null
+        then: "correct suggestion is fetched"
+        sr.getCreationDate() == suggestionReview.getCreationDate()
+        sr.getId() == suggestionReview.getId()
+        sr.getJustification() == suggestionReview.getJustification()
+        sr.getApproved() == suggestionReview.getApproved()
     }
 
     @TestConfiguration

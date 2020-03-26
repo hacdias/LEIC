@@ -20,7 +20,7 @@ public class SuggestionReviewController {
     @Autowired
     private SuggestionReviewService suggestionReviewService;
 
-    @GetMapping("suggestions/{suggestionId}/suggestionReviews")
+    @GetMapping("/suggestions/{suggestionId}/suggestionReviews")
     @PreAuthorize("(hasRole('ROLE_STUDENT') and hasPermission(#suggestionId, 'SUGGESTION.AUTHOR')) or" +
             "(hasRole('ROLE_TEACHER') and hasPermission(#suggestionId, 'SUGGESTION.ACCESS'))")
     public List<SuggestionReviewDto> getSuggestionReviewsBySuggestion(@PathVariable Integer suggestionId) {
@@ -41,7 +41,7 @@ public class SuggestionReviewController {
         return suggestionReviewService.findSuggestionReviewById(suggestionReviewId);
     }
 
-    @PostMapping("suggestions/{suggestionId}/suggestionReviews")
+    @PostMapping("/suggestions/{suggestionId}/suggestionReviews")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#suggestionId, 'SUGGESTION.ACCESS')")
     public SuggestionReviewDto createSuggestionReview(Authentication authentication, @PathVariable int suggestionId, @Valid @RequestBody SuggestionReviewDto suggestionReview) {
         Integer teacherId = ((User) authentication.getPrincipal()).getId();
