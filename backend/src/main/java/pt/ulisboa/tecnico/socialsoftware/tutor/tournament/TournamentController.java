@@ -19,6 +19,15 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;  
 
+    @PostMapping("tournaments/{TournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public ResponseEntity addEnrolledStudentToTournament(Authentication authentication, @PathVariable int TournamentId) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+
+        tournamentService.addEnrolledStudentToTournament(studentId, TournamentId);
+
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("/courses/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
