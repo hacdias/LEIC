@@ -45,6 +45,7 @@ public class Suggestion {
         this.approved = suggestionDto.getApproved();
         this.student = student;
         this.question = new Question(course, suggestionDto.getQuestion());
+        this.creationDate = LocalDateTime.parse(suggestionDto.getCreationDate(), Course.formatter);
         this.question.setSuggestion(this);
     }
 
