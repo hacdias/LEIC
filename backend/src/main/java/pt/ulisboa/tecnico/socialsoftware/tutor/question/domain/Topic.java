@@ -31,7 +31,7 @@ public class Topic {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     private Set<Tournament> tournaments = new HashSet<>();
 
     public Topic() {

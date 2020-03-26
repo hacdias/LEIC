@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionReviewServi
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService;
 
 import java.io.Serializable;
 
@@ -42,6 +43,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private SuggestionReviewService suggestionReviewService;
+
+    @Autowired
+    private TournamentService tournamentService;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -87,6 +91,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userIsSuggestionReviewReceptor(username, id);
                 case "SUGGESTIONREVIEW.ACCESS":
                     return userHasAnExecutionOfTheCourse(username, suggestionReviewService.getSuggestionReviewCourse(id).getCourseId());
+                case "TOURNAMENT.CREATOR":
+                    return userIsTournamentCreator(username, id);
                 default: return false;
             }
         }
@@ -110,6 +116,10 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private boolean userHasThisExecution(String username, int id) {
         return userService.getCourseExecutions(username).stream()
                 .anyMatch(course -> course.getCourseExecutionId() == id);
+    }
+
+    private boolean userIsTournamentCreator(String username, int tournamentId) {
+        return tournamentService.getCreator(tournamentId).getUsername() == username;
     }
 
      @Override
