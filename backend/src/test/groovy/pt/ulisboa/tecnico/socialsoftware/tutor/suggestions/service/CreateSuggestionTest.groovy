@@ -22,8 +22,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-import java.time.LocalDateTime
-
 @DataJpaTest
 class CreateSuggestionTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
@@ -75,7 +73,6 @@ class CreateSuggestionTest extends Specification {
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setStatus(Question.Status.DISABLED.name())
-        questionDto.setCreationDate(LocalDateTime.now().format(Course.formatter))
         def optionDto = new OptionDto()
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
@@ -89,7 +86,6 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
-        suggestionDto.setCreationDate(questionDto.getCreationDate())
 
         when:
         suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
@@ -111,7 +107,6 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
-        suggestionDto.setCreationDate(questionDto.getCreationDate())
 
         when:
         suggestionService.createSuggestion(student.getId() + 1, course.getId(), suggestionDto)
@@ -126,7 +121,6 @@ class CreateSuggestionTest extends Specification {
         def suggestionDto = new SuggestionDto()
         suggestionDto.setApproved(false)
         suggestionDto.setQuestion(questionDto)
-        suggestionDto.setCreationDate(questionDto.getCreationDate())
 
         when:
         suggestionService.createSuggestion(student.getId(), course.getId() + 1, suggestionDto)

@@ -49,8 +49,12 @@ public class SuggestionService {
                 .findById(courseId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
 
+        if (suggestionDto.getCreationDate() == null) {
+            suggestionDto.setCreationDate(LocalDateTime.now().format(Course.formatter));
+            suggestionDto.getQuestion().setCreationDate(suggestionDto.getCreationDate());
+        }
+
         Suggestion suggestion = new Suggestion(student, course, suggestionDto);
-        suggestion.setCreationDate(LocalDateTime.now());
         suggestionRepository.save(suggestion);
         return new SuggestionDto(suggestion);
     }

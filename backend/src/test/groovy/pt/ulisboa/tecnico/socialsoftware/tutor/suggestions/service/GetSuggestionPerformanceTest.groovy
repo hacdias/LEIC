@@ -76,7 +76,6 @@ class GetSuggestionPerformanceTest extends Specification {
             questionDto.setTitle(QUESTION_TITLE)
             questionDto.setContent(QUESTION_CONTENT)
             questionDto.setStatus(Question.Status.DISABLED.name())
-            questionDto.setCreationDate(LocalDateTime.now().format(Course.formatter))
             def optionDto = new OptionDto()
             optionDto.setContent(OPTION_CONTENT)
             optionDto.setCorrect(true)
@@ -87,8 +86,6 @@ class GetSuggestionPerformanceTest extends Specification {
             def suggestionDto = new SuggestionDto()
             suggestionDto.setQuestion(questionDto)
             suggestionDto.setApproved(false)
-            suggestionDto.setCreationDate(questionDto.getCreationDate())
-
             suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
         })
 
