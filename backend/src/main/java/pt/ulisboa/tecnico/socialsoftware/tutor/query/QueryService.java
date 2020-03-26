@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
@@ -107,10 +105,12 @@ public class QueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<QueryDto> getQueriesToQuestion(Integer questionId) {
-            Question question = questionRepository.findById(questionId)
+            questionRepository.findById(questionId)
                     .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
 
-            return question.getQueries().stream()
+            return queryRepository.findAll()
+                    .stream()
+                    .filter(query -> query.getQuestion().getId() == questionId)
                     .map(QueryDto::new)
                     .sorted(Comparator.comparing(QueryDto::getCreationDate))
                     .collect(Collectors.toList());
@@ -121,10 +121,12 @@ public class QueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<QueryDto> getQueriesByStudent(Integer studentId) {
-        User student = userRepository.findById(studentId)
+        userRepository.findById(studentId)
                 .orElseThrow(() -> new TutorException(USER_NOT_FOUND,studentId));
 
-        return student.getQueries().stream()
+        return queryRepository.findAll()
+                .stream()
+                .filter(query -> query.getStudent().getId() == studentId)
                 .map(QueryDto::new)
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());
@@ -138,19 +140,15 @@ public class QueryService {
         User teacher = userRepository.findById(teacherId)
                 .orElseThrow(() -> new TutorException(USER_NOT_FOUND,teacherId));
 
-        Set<QueryDto> queriesSet = new HashSet<QueryDto>();
-        for (CourseExecution courseExecution : teacher.getCourseExecutions()) {
-            Course course = courseExecution.getCourse();
-            for (Question question : course.getQuestions()) {
+        List<Integer> teacherCourses = teacher.getCourseExecutions().stream()
+                .map(courseExecution -> courseExecution.getCourse().getId())
+                .collect(Collectors.toList());
 
-                queriesSet.addAll(question.getQueries().stream()
-                        .map(QueryDto::new)
-                        .collect(Collectors.toSet()));
-            }
-        }
-
-        List<QueryDto> queriesList = new ArrayList<QueryDto>();
-        queriesList.addAll(queriesSet);
-        return queriesList;
+        return queryRepository.findAll()
+                .stream()
+                .filter(query ->  teacherCourses.contains(query.getQuestion().getCourse().getId()))
+                .map(QueryDto::new)
+                .sorted(Comparator.comparing(QueryDto::getCreationDate))
+                .collect(Collectors.toList());
     }
 }
