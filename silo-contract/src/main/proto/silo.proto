@@ -3,4 +3,81 @@
 //
 syntax = "proto3";
 package pt.tecnico.sauron.silo.grpc;
+import "google/protobuf/timestamp.proto";
 
+message Coordinates {
+    float latitude = 1;
+    float longitude = 2;
+}
+
+enum ObservationObject {
+    PERSON = 0;
+    CAR = 1;
+};
+
+message Observation {
+    ObservationObject type = 1;
+    string identifier = 2;
+    google.protobuf.Timestamp timestamp = 3;
+}
+
+message Identifier {
+    int64 personIdentifier = 1;
+    string carIdentifier = 2;
+}
+
+message CamJoinRequest {
+    string name = 1;
+    Coordinates coordinates = 2;
+}
+message CamJoinResponse { 
+}
+
+message CamInfoRequest { 
+    string name = 1;
+}
+message CamInfoResponse { 
+    Coordinates coordinates = 1;
+}
+
+message ReportRequest { 
+    string name = 1;
+    repeated Observation observations = 2;
+    repeated string data = 3;
+
+}
+message ReportResponse { 
+}
+
+message TrackRequest { 
+    ObservationObject type = 1;
+    Identifier identifier = 2;
+}
+message TrackResponse { 
+    Observation observation = 1;
+}
+
+message TrackMatchRequest { 
+    ObservationObject type = 1;
+    string partIdentifier = 2;
+}
+message TrackMatchResponse { 
+    Observation observation = 1;
+}
+
+message TraceRequest { 
+    ObservationObject type = 1;
+    Identifier identifier = 2;
+}
+message TraceResponse { 
+    repeated Observation observations = 1;
+}
+
+service Sauron {
+    rpc CamJoin(CamJoinRequest) returns (CamJoinResponse);
+    rpc CamInfo(CamInfoRequest) returns (CamInfoResponse);
+    rpc Report(ReportRequest) returns (ReportResponse);
+    rpc Track(TrackRequest) returns (TrackResponse);
+    rpc TrackMatch(TrackMatchRequest) returns (TrackMatchResponse);
+    rpc Trace(TraceRequest) returns (TraceResponse);
+}
