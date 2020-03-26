@@ -149,7 +149,6 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
-        queryDTO.setKey(1)
 
         when:
         queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
@@ -158,7 +157,6 @@ class CreateQueryTest extends Specification {
         queryRepository.count() == 1L
         def result = queryRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getTitle() == QUERY_TITLE
         result.getContent() == QUERY_CONTENT
         result.getQuestion().getTitle() == QUESTION_TITLE
@@ -194,12 +192,10 @@ class CreateQueryTest extends Specification {
         def queryDTO1 = new QueryDto()
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
-        queryDTO1.setKey(null)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
-        queryDTO2.setKey(null)
 
         when:
         queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO1)
@@ -213,7 +209,6 @@ class CreateQueryTest extends Specification {
 
         and: "the first query is properly saved"
         result1.getId() != null
-        result1.getKey() == 1
         result1.getTitle() == QUERY_TITLE
         result1.getContent() == QUERY_CONTENT
         result1.getQuestion().getTitle() == QUESTION_TITLE
@@ -225,7 +220,6 @@ class CreateQueryTest extends Specification {
 
         and: "the second query is properly saved"
         result2.getId() != null
-        result2.getKey() == 2
         result2.getTitle() == QUERY_TITLE_2
         result2.getContent() == QUERY_CONTENT_2
         result2.getQuestion().getTitle() == QUESTION_TITLE_2
@@ -254,12 +248,10 @@ class CreateQueryTest extends Specification {
         def queryDTO1 = new QueryDto()
         queryDTO1.setTitle(QUERY_TITLE)
         queryDTO1.setContent(QUERY_CONTENT)
-        queryDTO1.setKey(null)
         and: "another queryDTO"
         def queryDTO2 = new QueryDto()
         queryDTO2.setTitle(QUERY_TITLE_2)
         queryDTO2.setContent(QUERY_CONTENT_2)
-        queryDTO2.setKey(null)
 
         when:
         queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO1)
@@ -273,7 +265,6 @@ class CreateQueryTest extends Specification {
 
         and: "the first query is properly saved"
         result1.getId() != null
-        result1.getKey() == 1
         result1.getTitle() == QUERY_TITLE
         result1.getContent() == QUERY_CONTENT
         result1.getQuestion().getTitle() == QUESTION_TITLE
@@ -285,7 +276,6 @@ class CreateQueryTest extends Specification {
 
         and: "the second query is properly saved"
         result2.getId() != null
-        result2.getKey() == 2
         result2.getTitle() == QUERY_TITLE_2
         result2.getContent() == QUERY_CONTENT_2
         result2.getQuestion().getTitle() == QUESTION_TITLE
@@ -320,7 +310,6 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
-        queryDTO.setKey(null)
 
         when:
         queryService.createQuery(question.getId(), user.getId(), questionAnswer.getId(), queryDTO)
@@ -335,7 +324,6 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
-        queryDTO.setKey(null)
 
         and: "a question answer not by student"
         def quizAnswer = new QuizAnswer()
@@ -363,7 +351,6 @@ class CreateQueryTest extends Specification {
         def queryDTO = new QueryDto()
         queryDTO.setTitle(QUERY_TITLE)
         queryDTO.setContent(QUERY_CONTENT)
-        queryDTO.setKey(null)
 
         and: "a question answer not by student"
         def quizAnswer = new QuizAnswer()

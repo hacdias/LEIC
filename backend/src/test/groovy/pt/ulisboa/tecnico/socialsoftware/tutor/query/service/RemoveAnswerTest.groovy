@@ -92,7 +92,6 @@ class RemoveAnswerTest extends Specification{
         userRepository.save(teacher)
 
         query = new Query()
-        query.setKey(1)
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
@@ -102,7 +101,6 @@ class RemoveAnswerTest extends Specification{
         queryRepository.save(query)
 
         answerQuery = new AnswerQuery()
-        answerQuery.setKey(1)
         answerQuery.setContent(ANSWER_QUERY_CONTENT)
         answerQuery.setQuery(query)
         query.addAnswer(answerQuery)

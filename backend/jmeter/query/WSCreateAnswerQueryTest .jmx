@@ -224,8 +224,8 @@ SELECT currval(pg_get_serial_sequence(&apos;question_answers&apos;,&apos;id&apos
         </hashTree>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC - add query" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">INSERT INTO queries (content, creation_date, key, title, question_id, question_answer_id, user_id)
-VALUES (&apos;Query Content&apos;, NOW(), 1, &apos;Query Title&apos;, ${questions_1}, ${demoQuestionAnswer_1}, ${demoStudentId_1});
+          <stringProp name="query">INSERT INTO queries (content, creation_date, title, question_id, question_answer_id, user_id)
+VALUES (&apos;Query Content&apos;, NOW(), &apos;Query Title&apos;, ${questions_1}, ${demoQuestionAnswer_1}, ${demoStudentId_1});
 
 SELECT currval(pg_get_serial_sequence(&apos;queries&apos;,&apos;id&apos;));</stringProp>
           <stringProp name="queryArguments"></stringProp>

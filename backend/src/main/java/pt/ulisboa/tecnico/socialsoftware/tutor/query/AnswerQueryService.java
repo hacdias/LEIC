@@ -63,12 +63,6 @@ public class AnswerQueryService {
         if (teacher.getRole() != User.Role.TEACHER)
             throw new TutorException(USER_NOT_TEACHER, teacherId);
 
-        if (answerQueryDto.getKey() == null) {
-            int maxAnswerQueryNumber = answerQueryRepository.getMaxAnswerQueryNumber() != null ?
-                    answerQueryRepository.getMaxAnswerQueryNumber() : 0;
-            answerQueryDto.setKey(maxAnswerQueryNumber + 1);
-        }
-
         Boolean teacherTeaches = false;
         Question question = query.getQuestion();
         Course course = question.getCourse();

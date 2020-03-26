@@ -92,7 +92,6 @@ class RemoveQueryTest extends Specification {
         userRepository.save(teacher)
 
         query = new Query()
-        query.setKey(1)
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
@@ -113,7 +112,6 @@ class RemoveQueryTest extends Specification {
     def "remove a query that has been answered"() {
         given: "a query with answers"
         def answer = new AnswerQuery()
-        answer.setKey(1)
         answer.setContent(ANSWER_QUERY_CONTENT)
         answer.setQuery(query)
         answer.setTeacher(teacher)

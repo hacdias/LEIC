@@ -67,12 +67,6 @@ public class QueryService {
         if (student.getRole() != User.Role.STUDENT)
             throw new TutorException(USER_NOT_STUDENT, studentId);
 
-        if (queryDto.getKey() == null) {
-            int maxQueryNumber = queryRepository.getMaxQueryNumber() != null ?
-                    queryRepository.getMaxQueryNumber() : 0;
-            queryDto.setKey(maxQueryNumber + 1);
-        }
-
         if (questionAnswer.getQuizAnswer().getUser().getId() != student.getId()
                 || questionAnswer.getQuizQuestion().getQuestion().getId() != question.getId()) {
             throw new TutorException(QUESTION_NOT_ANSWERED);
