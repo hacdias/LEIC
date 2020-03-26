@@ -27,7 +27,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicReposito
 
 
 @DataJpaTest
-public class CreateTournamentTest extends Specification {
+class CreateTournamentTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -103,8 +103,6 @@ public class CreateTournamentTest extends Specification {
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(student)
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
@@ -118,7 +116,6 @@ public class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getStudent().getId() == student.getId()
         result.getStudent().getName() == USER_NAME
         result.getStudent().getUsername() == USER_USERNAME
@@ -142,8 +139,6 @@ public class CreateTournamentTest extends Specification {
         
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(student)
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setNumberQuestions(2)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
@@ -159,7 +154,6 @@ public class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getStudent().getName() == USER_NAME
         result.getStudent().getUsername() == USER_USERNAME
         result.getCreationDate() != null
@@ -185,8 +179,6 @@ public class CreateTournamentTest extends Specification {
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(teacher)
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
@@ -210,8 +202,6 @@ public class CreateTournamentTest extends Specification {
 
         and: "two tournamentDtos"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(student)
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
@@ -219,8 +209,6 @@ public class CreateTournamentTest extends Specification {
         tournamentDto.addTopic(topicDto)
         
         def tournamentDto2 = new TournamentDto()
-        tournamentDto2.setKey(2)
-        tournamentDto2.setStudent(student)
         tournamentDto2.setTitle(TOURNAMENT_TITLE)
         tournamentDto2.setNumberQuestions(1)
         tournamentDto2.setAvailableDate(availableDate.format(formatter))
@@ -235,9 +223,7 @@ public class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 2L
         def result = tournamentRepository.findAll().get(0)
         def result1 = tournamentRepository.findAll().get(1)
-        result.getKey() == 1
         result.getStudent().getId() == student.getId()
-        result1.getKey() == 2
         result1.getStudent().getId() == student.getId()
         result.getTopics().contains(topic)
         topicRepository.findAll().get(0).getTournaments().contains(result)
@@ -260,8 +246,6 @@ public class CreateTournamentTest extends Specification {
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(student)
         tournamentDto.setTitle(title)
         tournamentDto.setNumberQuestions(n)
         tournamentDto.setAvailableDate(available_Date)
@@ -292,8 +276,6 @@ public class CreateTournamentTest extends Specification {
 
         and: "a tournamentDto"
         def tournamentDto = new TournamentDto()
-        tournamentDto.setKey(1)
-        tournamentDto.setStudent(student)
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
