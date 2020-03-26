@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -18,9 +19,6 @@ public class Suggestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(unique = true, nullable = false)
-    private Integer key;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -42,12 +40,13 @@ public class Suggestion {
     public Suggestion () {
     }
 
-    public Suggestion (User student, Question question, SuggestionDto suggestionDto) {
+    public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
         this.id = suggestionDto.getId();
-        this.key = suggestionDto.getKey();
         this.approved = suggestionDto.getApproved();
         this.student = student;
-        this.question = question;
+        this.question = new Question(course, suggestionDto.getQuestion());
+        this.creationDate = LocalDateTime.parse(suggestionDto.getCreationDate(), Course.formatter);
+        this.question.setSuggestion(this);
     }
 
     public Integer getId() {
@@ -56,14 +55,6 @@ public class Suggestion {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getKey() {
-        return key;
-    }
-
-    public void setKey(Integer key) {
-        this.key = key;
     }
 
     public User getStudent() {
@@ -128,7 +119,6 @@ public class Suggestion {
     public String toString() {
         return "Suggestion{" +
                 "id=" + id +
-                ", key=" + key +
                 ", student=" + student +
                 ", question=" + question +
                 ", suggestionReviews=" + suggestionReviews +

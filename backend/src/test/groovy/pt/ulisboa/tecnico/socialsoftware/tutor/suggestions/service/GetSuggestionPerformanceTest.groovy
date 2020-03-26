@@ -8,20 +8,22 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import java.time.LocalDateTime
+
 @DataJpaTest
-class RemoveSuggestionTest extends Specification {
+class GetSuggestionPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -52,9 +54,8 @@ class RemoveSuggestionTest extends Specification {
     def course
     def courseExecution
     def student
-    def suggestion
 
-    def setup() {
+    def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
@@ -65,45 +66,36 @@ class RemoveSuggestionTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)
-
-        def question = new Question()
-        question.setKey(1)
-        question.setContent(QUESTION_TITLE)
-        question.setContent(QUESTION_CONTENT)
-        question.setStatus(Question.Status.AVAILABLE)
-        question.setNumberOfAnswers(2)
-        question.setNumberOfCorrect(1)
-        question.setCourse(course)
-        course.addQuestion(question)
-        questionRepository.save(question)
-
-        suggestion = new Suggestion()
-        suggestion.setStudent(student)
-        suggestion.setApproved(false)
-        suggestion.setQuestion(question)
-        suggestionRepository.save(suggestion)
     }
 
-    def "remove a suggestion for an unapproved question"() {
+    def "create a 1 000 suggestions and fetch them 10 000 times" () {
+        given: "1000 suggestions"
+        1.upto(1000, {
+            def questionDto = new QuestionDto()
+            questionDto.setKey(it as Integer)
+            questionDto.setTitle(QUESTION_TITLE)
+            questionDto.setContent(QUESTION_CONTENT)
+            questionDto.setStatus(Question.Status.DISABLED.name())
+            def optionDto = new OptionDto()
+            optionDto.setContent(OPTION_CONTENT)
+            optionDto.setCorrect(true)
+            def options = new ArrayList<OptionDto>()
+            options.add(optionDto)
+            questionDto.setOptions(options)
+
+            def suggestionDto = new SuggestionDto()
+            suggestionDto.setQuestion(questionDto)
+            suggestionDto.setApproved(false)
+            suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
+        })
+
         when:
-        suggestionService.removeSuggestion(suggestion.getId())
+        1.upto(10000, {
+            suggestionService.findSuggestionsByCourse(course.getId())
+        })
 
-        then: "the question is removed"
-        questionRepository.count() == 0L
-        suggestionRepository.count() == 0L
-    }
-
-    def "remove a suggestion for an approved question" () {
-        given: "an approved suggestion"
-        suggestion.setApproved(true)
-        suggestionRepository.save(suggestion)
-
-        when:
-        suggestionService.removeSuggestion(suggestion.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.SUGGESTION_ALREADY_APPROVED
+        then:
+        true
     }
 
     @TestConfiguration
