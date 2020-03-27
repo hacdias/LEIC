@@ -9,8 +9,6 @@ import java.time.format.DateTimeFormatter;
 
 // ------------Internal Imports------------
 import org.springframework.data.annotation.Transient;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
@@ -19,14 +17,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 public class TournamentDto implements Serializable {
 
     private Integer id;
-    private Integer key;
-    private User student;
     private String creationDate = null;
     private String availableDate = null;
     private String conclusionDate = null;
     private String title;
     private Integer numberQuestions;
-    public Set<TopicDto> topics = new HashSet<>();
+    private Set<TopicDto> topics = new HashSet<>();
 
     @Transient
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -35,8 +31,6 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
-        this.key = tournament.getKey();
-        this.student = tournament.getStudent();
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
 
@@ -61,22 +55,6 @@ public class TournamentDto implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getKey() {
-        return key;
-    }
-
-    public void setKey(Integer key) {
-        this.key = key;
-    }
-
-    public User getStudent() {
-        return student;
-    }
-
-    public void setStudent(User student) {
-        this.student = student;
     }
 
     public void setCreationDate(String creationDate) {
@@ -156,14 +134,10 @@ public class TournamentDto implements Serializable {
     public String toString() {
         return "TournamentDto{" +
                 "id=" + id +
-                "key=" + key +
                 ", creationDate=" + creationDate + '\'' +
                 ", availableDate='" + availableDate + '\'' +
                 ", conclusionDate=" + conclusionDate + '\'' +
-                ", number of questions= " + numberQuestions +
                 ", title=" + title +
-                ", key=" + key +
-                ", formatter=" + formatter +
                 '}';
     }
 }
