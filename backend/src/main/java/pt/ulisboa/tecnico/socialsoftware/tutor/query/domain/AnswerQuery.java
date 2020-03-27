@@ -17,9 +17,6 @@ public class AnswerQuery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique=true, nullable = false)
-    private Integer key;
-
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -37,7 +34,6 @@ public class AnswerQuery {
     public AnswerQuery(){}
 
     public AnswerQuery(Query query, User teacher, AnswerQueryDto answerQuery) {
-        this.key = answerQuery.getKey();
         this.content = answerQuery.getContent();
         this.query = query;
         query.addAnswer(this);
@@ -50,10 +46,6 @@ public class AnswerQuery {
     public void setContent(String content) { this.content = content; }
 
     public Integer getId() { return id; }
-
-    public void setKey(Integer key) { this.key = key; }
-
-    public Integer getKey() { return key; }
 
     public void setId(Integer id) { this.id = id; }
 

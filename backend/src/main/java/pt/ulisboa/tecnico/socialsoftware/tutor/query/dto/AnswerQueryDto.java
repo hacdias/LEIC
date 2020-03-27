@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 
 public class AnswerQueryDto implements Serializable {
     private Integer id;
-    private Integer key;
     private String content;
     private String creationDate = null;
 
@@ -16,7 +15,6 @@ public class AnswerQueryDto implements Serializable {
 
     public AnswerQueryDto(AnswerQuery answerQuery) {
         this.id = answerQuery.getId();
-        this.key = answerQuery.getKey();
         this.content = answerQuery.getContent();
 
         if (answerQuery.getCreationDate() != null)
@@ -26,10 +24,6 @@ public class AnswerQueryDto implements Serializable {
     public Integer getId() { return id; }
 
     public void setId(Integer id) { this.id = id; }
-
-    public Integer getKey() { return key; }
-
-    public void setKey(Integer key) { this.key = key; }
 
     public String getContent() { return content; }
 
@@ -43,7 +37,6 @@ public class AnswerQueryDto implements Serializable {
     public String toString() {
         return "AnswerQueryDto{" +
                 "id=" + id +
-                ", key=" + key +
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 '}';

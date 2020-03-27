@@ -76,7 +76,7 @@ public class User implements UserDetails, DomainEntity {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval=true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval=true)
     private List<Query> queries = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", orphanRemoval=true)

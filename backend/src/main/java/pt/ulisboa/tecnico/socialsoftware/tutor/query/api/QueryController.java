@@ -53,13 +53,13 @@ public class QueryController {
     }
 
     @PutMapping("/queries/{queryId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#queryId, 'QUERY.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#queryId, 'QUERY.ALTER')")
     public QueryDto updateQuery(@PathVariable Integer queryId, @Valid @RequestBody QueryDto queryDto) {
         return this.queryService.updateQuery(queryId, queryDto);
     }
 
     @DeleteMapping("/queries/{queryId}")
-    @PreAuthorize("hasPermission(#queryId, 'QUERY.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#queryId, 'QUERY.ALTER')")
     public ResponseEntity removeQuery(@PathVariable Integer queryId) throws IOException {
         logger.debug("removeQuery queryId: {}: ", queryId);
         QueryDto queryDto = queryService.findQueryById(queryId);

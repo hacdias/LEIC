@@ -14,19 +14,11 @@ import java.util.List;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
-@Table(
-        name = "queries",
-        indexes = {
-                @Index(name = "query_indx_0", columnList = "key")
-        })
-
+@Table(name = "queries")
 public class Query {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(unique=true, nullable = false)
-    private Integer key;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -58,7 +50,6 @@ public class Query {
         checkQueryConsistent(queryDto);
 
         this.title = queryDto.getTitle();
-        this.key = queryDto.getKey();
         this.content = queryDto.getContent();
 
         this.question = question;
@@ -72,10 +63,6 @@ public class Query {
     public Integer getId() { return id; }
 
     public void setId(Integer id) { this.id = id;}
-
-    public Integer getKey() { return key;}
-
-    public void setKey(Integer key) { this.key = key;}
 
     public String getContent() { return content;}
 
@@ -140,7 +127,6 @@ public class Query {
     public String toString() {
         return "Query{" +
                 "id=" + id +
-                ", key=" + key +
                 ", content='" + content + '\'' +
                 ", title='" + title + '\'' +
                 ", creationDate=" + creationDate +

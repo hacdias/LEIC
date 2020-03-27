@@ -90,7 +90,6 @@ class CreateAnswerTest extends Specification {
         userRepository.save(student)
 
         query = new Query()
-        query.setKey(1)
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
@@ -110,7 +109,6 @@ class CreateAnswerTest extends Specification {
         and: "a answerQueryDTO"
         def answerQueryDTO = new AnswerQueryDto()
         answerQueryDTO.setContent(ANSWER_QUERY_CONTENT)
-        answerQueryDTO.setKey(1)
 
         when:
         answerQueryService.createAnswerQuery(query.getId(), teacher.getId(), answerQueryDTO)
@@ -119,7 +117,6 @@ class CreateAnswerTest extends Specification {
         answerQueryRepository.count() == 1L
         def result = answerQueryRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getContent() == ANSWER_QUERY_CONTENT
         result.getQuery().getTitle() == QUERY_TITLE
         result.getQuery().getContent() == QUERY_CONTENT
@@ -139,12 +136,10 @@ class CreateAnswerTest extends Specification {
         and: "a answerQueryDTO"
         def answerQueryDTO = new AnswerQueryDto()
         answerQueryDTO.setContent(ANSWER_QUERY_CONTENT)
-        answerQueryDTO.setKey()
 
         and: "another answerQueryDTO"
         def answerQueryDTO2 = new AnswerQueryDto()
         answerQueryDTO2.setContent(ANSWER_QUERY_CONTENT_2)
-        answerQueryDTO2.setKey()
 
         when:
         answerQueryService.createAnswerQuery(query.getId(), teacher.getId(), answerQueryDTO)
@@ -154,7 +149,6 @@ class CreateAnswerTest extends Specification {
         answerQueryRepository.count() == 2L
         def result = answerQueryRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
         result.getContent() == ANSWER_QUERY_CONTENT
         result.getQuery().getTitle() == QUERY_TITLE
         result.getQuery().getContent() == QUERY_CONTENT
@@ -165,7 +159,6 @@ class CreateAnswerTest extends Specification {
 
         def result2 = answerQueryRepository.findAll().get(1)
         result2.getId() != null
-        result2.getKey() == 2
         result2.getContent() == ANSWER_QUERY_CONTENT_2
         result2.getQuery().getTitle() == QUERY_TITLE
         result2.getQuery().getContent() == QUERY_CONTENT
