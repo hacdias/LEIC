@@ -26,9 +26,13 @@ message Identifier {
     string carIdentifier = 2;
 }
 
-message CamJoinRequest {
+message Camera {
     string name = 1;
     Coordinates coordinates = 2;
+}
+
+message CamJoinRequest {
+    Camera camera = 1;
 }
 message CamJoinResponse { 
 }
