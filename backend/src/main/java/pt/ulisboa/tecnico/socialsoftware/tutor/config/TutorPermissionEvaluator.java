@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import pt.ulisboa.tecnico.socialsoftware.tutor.administration.AdministrationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
@@ -17,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Component
 public class TutorPermissionEvaluator implements PermissionEvaluator {
@@ -37,6 +40,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private QuizService quizService;
+
+    @Autowired
+    private QueryService queryService;
 
     @Autowired
     private SuggestionService suggestionService;
@@ -83,6 +89,10 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(username, assessmentService.findAssessmentCourseExecution(id).getCourseExecutionId());
                 case "QUIZ.ACCESS":
                     return userHasThisExecution(username, quizService.findQuizCourseExecution(id).getCourseExecutionId());
+                case "QUERY.ALTER":
+                    return userCanAlterQuery(username, id);
+                case "QUERY.ACCESS":
+                    return userCanAddAnswerQuery(username, id);
                 case "SUGGESTION.AUTHOR":
                     return userIsSuggestionAuthor(username, id);
                 case "SUGGESTION.ACCESS":
@@ -116,6 +126,19 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private boolean userHasThisExecution(String username, int id) {
         return userService.getCourseExecutions(username).stream()
                 .anyMatch(course -> course.getCourseExecutionId() == id);
+    }
+
+    private boolean userCanAlterQuery(String username, int queryId) {
+        Integer studentId = userService.findByUsername(username).getId();
+        List<QueryDto> queries = queryService.getQueriesByStudent(studentId);
+        return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
+    }
+
+    private boolean userCanAddAnswerQuery(String username, int queryId) {
+        Integer teacherId = userService.findByUsername(username).getId();
+
+        List<QueryDto> queries = queryService.getQueriesInTeachersCourse(teacherId);
+        return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
     }
 
     private boolean userIsTournamentCreator(String username, int tournamentId) {

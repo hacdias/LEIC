@@ -97,7 +97,6 @@ class UpdateAnswerTest extends Specification {
         userRepository.save(teacher)
 
         query = new Query()
-        query.setKey(1)
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
@@ -107,7 +106,6 @@ class UpdateAnswerTest extends Specification {
         queryRepository.save(query)
 
         answerQuery = new AnswerQuery()
-        answerQuery.setKey(1)
         answerQuery.setContent(ANSWER_QUERY_CONTENT)
         answerQuery.setQuery(query)
         answerQuery.setTeacher(teacher)
@@ -133,7 +131,6 @@ class UpdateAnswerTest extends Specification {
         result.getTeacher() == answerQuery.getTeacher()
         result.getCreationDate() == answerQuery.getCreationDate()
         result.getQuery() == answerQuery.getQuery()
-        result.getKey() == answerQuery.getKey()
     }
 
     @Unroll("invalid arguments: content=#content || errorMessage=#errorMessage ")

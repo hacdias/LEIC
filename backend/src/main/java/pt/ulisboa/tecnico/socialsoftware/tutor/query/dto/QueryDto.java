@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 
 public class QueryDto implements Serializable {
     private Integer id;
-    private Integer key;
     private String title;
     private String content;
     private String creationDate = null;
@@ -18,7 +17,6 @@ public class QueryDto implements Serializable {
 
     public QueryDto(Query query) {
         this.id = query.getId();
-        this.key = query.getKey();
         this.title = query.getTitle();
         this.content = query.getContent();
 
@@ -29,10 +27,6 @@ public class QueryDto implements Serializable {
     public Integer getId() { return id; }
 
     public void setId(Integer id) { this.id = id; }
-
-    public Integer getKey() { return key; }
-
-    public void setKey(Integer key) { this.key = key; }
 
     public String getTitle() { return title; }
 
@@ -50,7 +44,6 @@ public class QueryDto implements Serializable {
     public String toString() {
         return "QueryDto{" +
                 "id=" + id +
-                ", key=" + key +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +

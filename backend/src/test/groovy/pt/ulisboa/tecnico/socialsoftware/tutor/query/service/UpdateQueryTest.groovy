@@ -91,7 +91,6 @@ class UpdateQueryTest extends Specification {
         userRepository.save(student)
 
         query = new Query()
-        query.setKey(1)
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
@@ -126,7 +125,6 @@ class UpdateQueryTest extends Specification {
         result.getAnswers() == query.getAnswers()
         result.getCreationDate() == query.getCreationDate()
         result.getQuestion() == query.getQuestion()
-        result.getKey() == query.getKey()
     }
 
     def "update a query with answers"() {
@@ -136,7 +134,6 @@ class UpdateQueryTest extends Specification {
         queryDTO.setContent(NEW_QUERY_CONTENT)
         and: "answer to the the query"
         def answer = new AnswerQuery()
-        answer.setKey(1)
         answer.setContent(ANSWER_QUERY_CONTENT)
         answer.setQuery(query)
         answer.setTeacher(teacher)
