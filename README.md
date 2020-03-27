@@ -6,11 +6,11 @@ Distributed Systems 2019-2020, 2nd semester project
 ## Authors
 
 *(fill-in line below with group identifier e.g. A07 or T22; and then delete this line)*  
-**Group CXX**
+**Group A46**
 
 ### Code identification
 
-In all the source files (including POMs), please replace __CXX__ with your group identifier.  
+In all the source files (including POMs), please replace __A46__ with your group identifier.  
 The group identifier is composed by Campus - A (Alameda) or T (Tagus) - and number - always with two digits.  
 This change is important for code dependency management, to make sure that your code runs using the correct components and not someone else's.
 
@@ -18,11 +18,11 @@ This change is important for code dependency management, to make sure that your 
 
 *(fill-in table below with team members; and then delete this line)*  
 
-| Number | Name              | User                             | Email                               |
-| -------|-------------------|----------------------------------| ------------------------------------|
-| 11111  | Alice Distributed | <https://github.com/AliceUser>   | <mailto:alice@tecnico.ulisboa.pt>   |
-| 22222  | Bob Systems       | <https://github.com/BobUser>     | <mailto:bob@tecnico.ulisboa.pt>     |
-| 33333  | Charlie Rules     | <https://github.com/CharlieUser> | <mailto:charlie@tecnico.ulisboa.pt> |
+| Number | Name              | User                             | Email                                      |
+| -------|-------------------|----------------------------------| ------------------------------------------ |
+| 89455  | Henrique Dias     | <https://github.com/hacdias>     | <mailto:henrique.dias@tecnico.ulisboa.pt>  |
+| 89466  | Isabel Soares     | <https://github.com/isabelSoares>| <mailto:isabel.r.soares@tecnico.ulisboa.pt>|
+| 89535  | Rodrigo Sousa     | <https://github.com/Sousa99>     | <mailto:rodrigo.b.sousa@tecnico.ulisboa.pt>|
 
 ### Task leaders
 
@@ -31,12 +31,12 @@ This change is important for code dependency management, to make sure that your 
 | Task set | To-Do                         | Leader              |
 | ---------|-------------------------------| --------------------|
 | core     | protocol buffers, silo-client | _(whole team)_      |
-| T1       | cam_join, cam_info, eye       | _Alice Distributed_ |
-| T2       | report, spotter               | _Bob Systems_       |
-| T3       | track, trackMatch, trace      | _Charlie Rules_     |
-| T4       | test T1                       | _Charlie Rules_     |
-| T5       | test T2                       | _Alice Distributed_ |
-| T6       | test T3                       | _Bob Systems_       |
+| T1       | cam_join, cam_info, eye       | _Isabel Soares_     |
+| T2       | report, spotter               | _Henrique Dias_     |
+| T3       | track, trackMatch, trace      | _Rodrigo Sousa_     |
+| T4       | test T1                       | _Isabel Soares_     |
+| T5       | test T2                       | _Henrique Dias_     |
+| T6       | test T3                       | _Rodrigo Sousa_     |
 
 
 ## Getting Started
