@@ -19,7 +19,7 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;  
 
-    @GetMapping("/courses/{executionId}/tournaments")
+    @GetMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getOpenTournaments(Authentication authentication, @PathVariable int executionId) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
@@ -28,16 +28,14 @@ public class TournamentController {
     }
 
     @PostMapping("tournaments/{TournamentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public ResponseEntity addEnrolledStudentToTournament(Authentication authentication, @PathVariable int TournamentId) {
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public TournamentDto addEnrolledStudentToTournament(Authentication authentication, @PathVariable int TournamentId) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
 
-        tournamentService.addEnrolledStudentToTournament(studentId, TournamentId);
-
-        return ResponseEntity.ok().build();
+        return tournamentService.addEnrolledStudentToTournament(studentId, TournamentId);
     }
 
-    @PostMapping("/courses/{executionId}/tournaments")
+    @PostMapping("/executions/{executionId}/tournaments")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public TournamentDto createTournament(Authentication authentication, @PathVariable int executionId, @Valid @RequestBody TournamentDto tournament) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
