@@ -19,7 +19,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
     }
 
     @Override
-    public void camInfo(Silo.CamInfoRequest request,StreamObserver<Silo.CamInfoResponse> responseObserver){
+    public void camInfo(Silo.CamInfoRequest request, StreamObserver<Silo.CamInfoResponse> responseObserver){
 
         Silo.CamInfoResponse response = Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.getName())).build();
         
@@ -27,5 +27,35 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
 
 		responseObserver.onCompleted();
 
+    }
+
+    @Override
+    public void track(Silo.TrackRequest request, StreamObserver<Silo.TrackResponse> responseObserver) {
+
+        Silo.TrackResponse response = Silo.TrackResponse.newBuilder().setObservation(sauron.track(request.getType(), request.getIdentifier())).build();
+
+        responseObserver.onNext(response);
+
+		responseObserver.onCompleted();
+    }
+
+    @Override
+    public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
+
+        Silo.TrackMatchResponse response = Silo.TrackMatchResponse.newBuilder().setObservation(sauron.trackMatch(request.getType(), request.getPartIdentifier())).build();
+
+        responseObserver.onNext(response);
+
+		responseObserver.onCompleted();
+    }
+
+    @Override
+    public void trace(Silo.TraceRequest request, StreamObserver<Silo.TraceResponse> responseObserver) {
+
+        Silo.TraceResponse response = Silo.TraceResponse.newBuilder().addAllObservations(sauron.trace(request.getType(), request.getIdentifier())).build();
+
+        responseObserver.onNext(response);
+
+		responseObserver.onCompleted();
     }
 }

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.tecnico.sauron.silo.grpc.Silo.Coordinates;
+import pt.tecnico.sauron.silo.grpc.Silo.Identifier;
 import pt.tecnico.sauron.silo.grpc.Silo.Observation;
+import pt.tecnico.sauron.silo.grpc.Silo.ObservationObject;
 import pt.tecnico.sauron.silo.grpc.Silo.Camera;
 
 public class Sauron {
@@ -19,6 +21,18 @@ public class Sauron {
 
     public void addCamera(Camera camera){
 
+    }
+
+    public Observation track(ObservationObject type, Identifier identifier) {
+        return null;
+    }
+
+    public Observation trackMatch(ObservationObject type, String partIdentifier) {
+        return null;
+    }
+
+    public List<Observation> trace(ObservationObject type, Identifier identifier) {
+        return null;
     }
 
 }
