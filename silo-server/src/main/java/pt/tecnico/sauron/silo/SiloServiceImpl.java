@@ -8,7 +8,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
     private Sauron sauron = new Sauron();
 
     @Override
-    public void CamJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver){
+    public void camJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver){
 
         sauron.addCamera(request.getCamera());
         Silo.CamJoinResponse response = Silo.CamJoinResponse.newBuilder().build();
@@ -19,7 +19,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
     }
 
     @Override
-    public void CamInfo(Silo.CamInfoRequest request,StreamObserver<Silo.CamInfoResponse> responseObserver){
+    public void camInfo(Silo.CamInfoRequest request,StreamObserver<Silo.CamInfoResponse> responseObserver){
 
         Silo.CamInfoResponse response = Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.getName())).build();
         
