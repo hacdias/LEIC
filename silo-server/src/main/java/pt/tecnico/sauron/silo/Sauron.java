@@ -11,31 +11,30 @@ import pt.tecnico.sauron.silo.grpc.Silo.Camera;
 
 public class Sauron {
 
-    private List<Observation> observations = new ArrayList<Observation>();
-    private List<Camera> cameras = new ArrayList<Camera>();
-    
+    // private List<Observation> observations = new ArrayList<Observation>();
+    // private List<Camera> cameras = new ArrayList<Camera>();
+
     public void addCamera(Camera camera){
-        Boolean canAdd = true;
+        /* Boolean canAdd = true;
         for (Camera cam: cameras){
             if (cam.getName() == camera.getName()){
                 canAdd = false;
             }
-        } 
-
-        if (canAdd){
-            cameras.add(camera); 
         }
 
+        if (canAdd){
+            cameras.add(camera);
+        } */
     }
 
     public Coordinates getCamInfo(String name){
-        for (Camera cam: cameras){
+        /* for (Camera cam: cameras){
             if (cam.getName() == name){
                 return cam.getCoordinates();
             }
         }
 
-        return null;
+        return null; */
     }
 
     public Observation track(ObservationObject type, Identifier identifier) {

@@ -10,59 +10,59 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
     @Override
     public void camJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver){
 
-        sauron.addCamera(request.getCamera());
+        /* sauron.addCamera(request.getCamera());
         Silo.CamJoinResponse response = Silo.CamJoinResponse.newBuilder().build();
 
 		responseObserver.onNext(response);
 
-        responseObserver.onCompleted();
+        responseObserver.onCompleted(); */
     }
 
     @Override
     public void camInfo(Silo.CamInfoRequest request, StreamObserver<Silo.CamInfoResponse> responseObserver){
 
-        Silo.CamInfoResponse response = Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.getName())).build();
+        /* Silo.CamInfoResponse response = Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.getName())).build();
 
 		responseObserver.onNext(response);
 
-		responseObserver.onCompleted();
+		responseObserver.onCompleted(); */
 
     }
 
     @Override
     public void track(Silo.TrackRequest request, StreamObserver<Silo.TrackResponse> responseObserver) {
 
-        Silo.TrackResponse response = Silo.TrackResponse.newBuilder().setObservation(sauron.track(request.getType(), request.getIdentifier())).build();
+        /* Silo.TrackResponse response = Silo.TrackResponse.newBuilder().setObservation(sauron.track(request.getType(), request.getIdentifier())).build();
 
         responseObserver.onNext(response);
 
-		responseObserver.onCompleted();
+		responseObserver.onCompleted(); */
     }
 
     @Override
     public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
 
-        Silo.TrackMatchResponse response = Silo.TrackMatchResponse.newBuilder().setObservation(sauron.trackMatch(request.getType(), request.getPartIdentifier())).build();
+        /* Silo.TrackMatchResponse response = Silo.TrackMatchResponse.newBuilder().setObservation(sauron.trackMatch(request.getType(), request.getPartIdentifier())).build();
 
         responseObserver.onNext(response);
 
-		responseObserver.onCompleted();
+		responseObserver.onCompleted(); */
     }
 
     @Override
     public void trace(Silo.TraceRequest request, StreamObserver<Silo.TraceResponse> responseObserver) {
 
-        Silo.TraceResponse response = Silo.TraceResponse.newBuilder().addAllObservations(sauron.trace(request.getType(), request.getIdentifier())).build();
+        /* Silo.TraceResponse response = Silo.TraceResponse.newBuilder().addAllObservations(sauron.trace(request.getType(), request.getIdentifier())).build();
 
         responseObserver.onNext(response);
 
-		responseObserver.onCompleted();
+		responseObserver.onCompleted(); */
     }
 
     @Override
     public void report(Silo.ReportRequest request, StreamObserver<Silo.ReportResponse> responseObserver) {
 
-        sauron.report(request.getName(), request.getObservations(), request.getData());
+        // sauron.report(request.getName(), request.getObservations(), request.getData());
         // TODO: report nao retorna nada ?
 
     }
