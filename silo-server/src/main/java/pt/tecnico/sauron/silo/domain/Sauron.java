@@ -11,7 +11,19 @@ public class Sauron {
     private List<Observation> observations = new ArrayList<Observation>();
     private List<Camera> cameras = new ArrayList<Camera>();
 
-    public void addCamera (String name, Float latitude, Float longitude) {
+    public void ctrlPing() {
+        // TODO
+    }
+    
+    public void ctrlClear() {
+        // TODO
+    }
+
+    public void ctrlInit() {
+        // TODO
+    }
+
+    public void addCamera(String name, Float latitude, Float longitude) {
         try {
             getCamera(name);
         } catch (InvalidCameraException e) {
