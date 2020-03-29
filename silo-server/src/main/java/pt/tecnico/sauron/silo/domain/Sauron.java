@@ -17,12 +17,16 @@ public class Sauron {
     private List<Observation> observations = new ArrayList<Observation>();
     private List<Camera> cameras = new ArrayList<Camera>();
 
-    public void ctrlPing() {
-        // TODO
+    public PingInformation ctrlPing() {
+        PingInformation information = new PingInformation(cameras.size(), observations.size());
+        System.out.println("The system Silo was pinged!");
+
+        return information;
     }
 
     public void ctrlClear() {
-        // TODO
+        observations = new ArrayList<Observation>();
+        cameras = new ArrayList<Camera>();
     }
 
     public void ctrlInit() {

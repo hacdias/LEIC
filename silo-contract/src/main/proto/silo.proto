@@ -92,7 +92,34 @@ message TraceResponse {
     repeated Observation observations = 2;
 }
 
+message CtrlPingRequest {
+}
+
+message CtrlPingResponse {
+    ResponseStatus status = 1;
+    int32 cameras = 2;
+    int32 observations = 3;
+}
+
+message CtrlClearRequest {
+}
+
+message CtrlClearResponse {
+    ResponseStatus status = 1;
+}
+
+message CtrlInitRequest {
+    // TODO: How to give propper initizalization
+}
+
+message CtrlInitResponse {
+    ResponseStatus status = 1;
+}
+
 service Sauron {
+    rpc ctrlPing(CtrlPingRequest) returns (CtrlPingResponse);
+    rpc ctrlClear(CtrlClearRequest) returns (CtrlClearResponse);
+    rpc ctrlInit(CtrlInitRequest) returns (CtrlInitResponse);
     rpc camJoin(CamJoinRequest) returns (CamJoinResponse);
     rpc camInfo(CamInfoRequest) returns (CamInfoResponse);
     rpc report(ReportRequest) returns (ReportResponse);

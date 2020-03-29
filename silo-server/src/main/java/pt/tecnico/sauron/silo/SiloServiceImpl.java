@@ -4,6 +4,7 @@ import java.util.Map;
 import io.grpc.stub.StreamObserver;
 
 import pt.tecnico.sauron.silo.domain.ObservationType;
+import pt.tecnico.sauron.silo.domain.PingInformation;
 import pt.tecnico.sauron.silo.domain.Sauron;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
@@ -122,6 +123,42 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             builder.setStatus(Silo.ResponseStatus.INVALID_IDENTIFIER);
             // TODO: tell which of the identifiers is invalid!
         }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void ctrlPing(Silo.CtrlPingRequest request, StreamObserver<Silo.CtrlPingResponse> responseObserver) {
+        Silo.CtrlPingResponse.Builder builder = Silo.CtrlPingResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
+
+        PingInformation information = sauron.ctrlPing();
+        builder.setCameras(information.getCamerasNumber());
+        builder.setObservations(information.getObservationsNumber());
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void ctrlInit(Silo.CtrlInitRequest request, StreamObserver<Silo.CtrlInitResponse> responseObserver) {
+        Silo.CtrlInitResponse.Builder builder = Silo.CtrlInitResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
+
+        // TODO: Send Information
+        sauron.ctrlInit();
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void ctrlClear(Silo.CtrlClearRequest request, StreamObserver<Silo.CtrlClearResponse> responseObserver) {
+        Silo.CtrlClearResponse.Builder builder = Silo.CtrlClearResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
+
+        sauron.ctrlClear();
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
