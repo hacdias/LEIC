@@ -31,17 +31,17 @@ public class Sauron {
         throw new InvalidCameraException(name);
     }
 
-    /* public Observation track(ObservationObject type, Identifier identifier) {
+    public Observation track(ObservationType type, String identifier) {
         return null;
-    } */
+    }
 
-    /* public Observation trackMatch(ObservationObject type, String partIdentifier) {
+    public Observation trackMatch(ObservationType type, String pattern) {
         return null;
-    } */
+    }
 
-    /* public List<Observation> trace(ObservationObject type, Identifier identifier) {
+    public List<Observation> trace(ObservationType type, String identifier) {
         return null;
-    } */
+    }
 
     public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {
         Camera camera = getCamera(name);
