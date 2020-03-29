@@ -3,12 +3,6 @@ package pt.tecnico.sauron.silo;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.tecnico.sauron.silo.grpc.Silo.Coordinates;
-import pt.tecnico.sauron.silo.grpc.Silo.Identifier;
-import pt.tecnico.sauron.silo.grpc.Silo.Observation;
-import pt.tecnico.sauron.silo.grpc.Silo.ObservationObject;
-import pt.tecnico.sauron.silo.grpc.Silo.Camera;
-
 public class Sauron {
 
     // private List<Observation> observations = new ArrayList<Observation>();
@@ -53,7 +47,6 @@ public class Sauron {
         /* Recebe o nome da câmera, um conjunto de observações, e os dados correspondentes.
         O nome deve corresponder a uma câmera registada previamente.
         O servidor regista as observações com a sua data e hora, no momento da receção;
-        */
     } */
 
 }
