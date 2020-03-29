@@ -5,25 +5,27 @@ syntax = "proto3";
 package pt.tecnico.sauron.silo.grpc;
 import "google/protobuf/timestamp.proto";
 
-message Coordinates {
-    float latitude = 1;
-    float longitude = 2;
-}
-
-enum ObservationObject {
+enum ObservationType {
     PERSON = 0;
     CAR = 1;
 };
 
+enum ResponseStatus {
+    SUCCESS = 0;
+    DUPLICATE_CAMERA = 1;
+    INVALID_CAMERA = 2;
+    INVALID_IDENTIFIER = 3;
+}
+
 message Observation {
-    ObservationObject type = 1;
+    ObservationType type = 1;
     string identifier = 2;
     google.protobuf.Timestamp timestamp = 3;
 }
 
-message Identifier {
-    int64 personIdentifier = 1;
-    string carIdentifier = 2;
+message Coordinates {
+    float latitude = 1;
+    float longitude = 2;
 }
 
 message Camera {
@@ -34,47 +36,56 @@ message Camera {
 message CamJoinRequest {
     Camera camera = 1;
 }
-message CamJoinResponse { 
+
+message CamJoinResponse {
+    ResponseStatus status = 1;
 }
 
-message CamInfoRequest { 
+message CamInfoRequest {
     string name = 1;
 }
-message CamInfoResponse { 
+
+message CamInfoResponse {
     Coordinates coordinates = 1;
 }
 
-message ReportRequest { 
-    string name = 1;
+message ReportRequest {
+    string cameraName = 1;
     repeated Observation observations = 2;
-    repeated string data = 3;
 }
 
-message ReportResponse { 
+message ReportResponse {
+    ResponseStatus status = 1;
 }
 
-message TrackRequest { 
-    ObservationObject type = 1;
-    Identifier identifier = 2;
-}
-message TrackResponse { 
-    Observation observation = 1;
+message TrackRequest {
+    ObservationType type = 1;
+    string identifier = 2;
 }
 
-message TrackMatchRequest { 
-    ObservationObject type = 1;
-    string partIdentifier = 2;
-}
-message TrackMatchResponse { 
-    Observation observation = 1;
+message TrackResponse {
+    ResponseStatus status = 1;
+    Observation observation = 2;
 }
 
-message TraceRequest { 
-    ObservationObject type = 1;
-    Identifier identifier = 2;
+message TrackMatchRequest {
+    ObservationType type = 1;
+    string pattern = 2;
 }
-message TraceResponse { 
-    repeated Observation observations = 1;
+
+message TrackMatchResponse {
+    ResponseStatus status = 1;
+    Observation observation = 2;
+}
+
+message TraceRequest {
+    ObservationType type = 1;
+    string identifier = 2;
+}
+
+message TraceResponse {
+    ResponseStatus status = 1;
+    repeated Observation observations = 2;
 }
 
 service Sauron {

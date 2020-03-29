@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 
 public class Sauron {
@@ -14,7 +15,7 @@ public class Sauron {
     public void ctrlPing() {
         // TODO
     }
-    
+
     public void ctrlClear() {
         // TODO
     }
@@ -23,9 +24,10 @@ public class Sauron {
         // TODO
     }
 
-    public void addCamera(String name, Float latitude, Float longitude) {
+    public void addCamera(String name, Float latitude, Float longitude) throws DuplicateCameraException {
         try {
             getCamera(name);
+            throw new DuplicateCameraException(name);
         } catch (InvalidCameraException e) {
             Coordinates coordinates = new Coordinates(latitude, longitude);
             Camera camera = new Camera(name, coordinates);
