@@ -12,7 +12,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
 
         sauron.addCamera(request.getCamera());
         Silo.CamJoinResponse response = Silo.CamJoinResponse.newBuilder().build();
-        
+
 		responseObserver.onNext(response);
 
         responseObserver.onCompleted();
@@ -22,7 +22,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
     public void camInfo(Silo.CamInfoRequest request, StreamObserver<Silo.CamInfoResponse> responseObserver){
 
         Silo.CamInfoResponse response = Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.getName())).build();
-        
+
 		responseObserver.onNext(response);
 
 		responseObserver.onCompleted();
@@ -57,5 +57,13 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase{
         responseObserver.onNext(response);
 
 		responseObserver.onCompleted();
+    }
+
+    @Override
+    public void report(Silo.ReportRequest request, StreamObserver<Silo.ReportResponse> responseObserver) {
+
+        sauron.report(request.getName(), request.getObservations(), request.getData());
+        // TODO: report nao retorna nada ?
+
     }
 }

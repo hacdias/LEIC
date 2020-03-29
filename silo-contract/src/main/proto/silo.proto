@@ -48,8 +48,8 @@ message ReportRequest {
     string name = 1;
     repeated Observation observations = 2;
     repeated string data = 3;
-
 }
+
 message ReportResponse { 
 }
 

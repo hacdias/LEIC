@@ -3,7 +3,6 @@ package pt.tecnico.sauron.silo;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import pt.tecnico.sauron.silo.grpc.Silo.Coordinates;
 import pt.tecnico.sauron.silo.grpc.Silo.Identifier;
 import pt.tecnico.sauron.silo.grpc.Silo.Observation;
@@ -49,6 +48,13 @@ public class Sauron {
 
     public List<Observation> trace(ObservationObject type, Identifier identifier) {
         return null;
+    }
+
+    public void report(String name, List<Observation> observations, List<string> data) {
+        /* Recebe o nome da câmera, um conjunto de observações, e os dados correspondentes.
+        O nome deve corresponder a uma câmera registada previamente.
+        O servidor regista as observações com a sua data e hora, no momento da receção;
+        */
     }
 
 }
