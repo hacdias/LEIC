@@ -99,6 +99,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
         } catch (InvalidIdentifierException e) {
             builder.setStatus(Silo.ResponseStatus.INVALID_IDENTIFIER);
+            // TODO: tell which of the identifiers is invalid!
         }
 
         responseObserver.onNext(builder.build());
