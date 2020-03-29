@@ -10,6 +10,8 @@ import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
+import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
+import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
 
 public class Sauron {
     private List<Observation> observations = new ArrayList<Observation>();
@@ -25,9 +27,9 @@ public class Sauron {
 
     public void ctrlInit() {
         // TODO
-    }
+    } 
 
-    public void addCamera(String name, Float latitude, Float longitude) throws DuplicateCameraException {
+    public void addCamera(String name, Float latitude, Float longitude) throws DuplicateCameraException, InvalidCameraNameException, InvalidCameraCoordinatesException {
         try {
             getCamera(name);
             throw new DuplicateCameraException(name);

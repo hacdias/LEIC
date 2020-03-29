@@ -14,8 +14,10 @@ enum ResponseStatus {
     SUCCESS = 0;
     DUPLICATE_CAMERA = 1;
     INVALID_CAMERA = 2;
-    INVALID_IDENTIFIER = 3;
-    NO_OBSERVATION_FOUND = 4;
+    INVALID_CAMERA_NAME = 3;
+    INVALID_CAMERA_COORDINATES = 4;
+    INVALID_IDENTIFIER = 5;
+    NO_OBSERVATION_FOUND = 6;
 }
 
 message Observation {
@@ -48,6 +50,7 @@ message CamInfoRequest {
 
 message CamInfoResponse {
     Coordinates coordinates = 1;
+    ResponseStatus status = 2;
 }
 
 message ReportRequest {

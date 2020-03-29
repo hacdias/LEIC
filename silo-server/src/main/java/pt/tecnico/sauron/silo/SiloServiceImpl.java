@@ -6,6 +6,9 @@ import io.grpc.stub.StreamObserver;
 import pt.tecnico.sauron.silo.domain.ObservationType;
 import pt.tecnico.sauron.silo.domain.Sauron;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
+import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
+import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
+import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.grpc.*;
@@ -19,30 +22,38 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     @Override
     public void camJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver) {
+        Silo.CamJoinResponse.Builder builder = Silo.CamJoinResponse.newBuilder();
 
-        /*
-         * sauron.addCamera(request.getCamera()); Silo.CamJoinResponse response =
-         * Silo.CamJoinResponse.newBuilder().build();
-         *
-         * responseObserver.onNext(response);
-         *
-         * responseObserver.onCompleted();
-         */
+        try {
+            Silo.Camera cam = request.getCamera();
+            Silo.Coordinates coordinates = cam.getCoordinates();
+            sauron.addCamera(cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
+        } catch (InvalidCameraNameException e) {
+            builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA_NAME);
+        } catch (DuplicateCameraException e) {
+            builder.setStatus(Silo.ResponseStatus.DUPLICATE_CAMERA);
+        }catch (InvalidCameraCoordinatesException e) {
+            builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA_COORDINATES);
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+         
     }
 
     @Override
     public void camInfo(Silo.CamInfoRequest request, StreamObserver<Silo.CamInfoResponse> responseObserver) {
+        Silo.CamInfoResponse.Builder builder = Silo.CamInfoResponse.newBuilder();
 
-        /*
-         * Silo.CamInfoResponse response =
-         * Silo.CamInfoResponse.newBuilder().setCoordinates(sauron.getCamInfo(request.
-         * getName())).build();
-         *
-         * responseObserver.onNext(response);
-         *
-         * responseObserver.onCompleted();
-         */
+        try {
+            sauron.getCamera(request.getName());
+        } catch (InvalidCameraException e) {
+            builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
+        } 
 
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+         
     }
 
     @Override
