@@ -1,5 +1,6 @@
 package pt.tecnico.sauron.silo;
 
+import pt.tecnico.sauron.silo.domain.Sauron;
 import io.grpc.stub.StreamObserver;
 import pt.tecnico.sauron.silo.grpc.*;
 
