@@ -1,10 +1,13 @@
 package pt.tecnico.sauron.silo.domain;
 
+import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 
@@ -45,19 +48,48 @@ public class Sauron {
         throw new InvalidCameraException(name);
     }
 
-    public Observation track(ObservationType type, String identifier) {
-        // TODO
-        return null;
+    public Observation track(ObservationType type, String identifier) throws NoObservationException {
+        Observation lastObservation = observations.stream()
+            .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
+            .max(Comparator.comparing(Observation::getDatetime))
+            .orElse(null);
+
+        if (lastObservation == null)
+            throw new NoObservationException(identifier);
+        
+        return lastObservation;
     }
 
-    public Observation trackMatch(ObservationType type, String pattern) {
-        // TODO
-        return null;
+    public Observation trackMatch(ObservationType type, String pattern) throws NoObservationException {
+
+        String patternRegex = "^".concat(pattern).concat("$");
+        if (type == ObservationType.PERSON) {
+            patternRegex.replace("*", "\\d*");
+        } else if (type == ObservationType.CAR) {
+            patternRegex.replace("*", "\\w*");
+        }
+
+        Observation lastObservation = observations.stream()
+            .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(patternRegex))
+            .max(Comparator.comparing(Observation::getDatetime))
+            .orElse(null);
+
+        if (lastObservation == null)
+            throw new NoObservationException(pattern);
+        
+        return lastObservation;
     }
 
-    public List<Observation> trace(ObservationType type, String identifier) {
-        // TODO
-        return null;
+    public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
+        List<Observation> observationsMatch = observations.stream()
+            .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
+            .sorted(Comparator.comparing(Observation::getDatetime))
+            .collect(Collectors.toList());
+
+        if (observationsMatch.size() == 0)
+            throw new NoObservationException(identifier);
+        
+        return observationsMatch;
     }
 
     public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {

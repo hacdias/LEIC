@@ -15,6 +15,7 @@ enum ResponseStatus {
     DUPLICATE_CAMERA = 1;
     INVALID_CAMERA = 2;
     INVALID_IDENTIFIER = 3;
+    NO_OBSERVATION_FOUND = 4;
 }
 
 message Observation {

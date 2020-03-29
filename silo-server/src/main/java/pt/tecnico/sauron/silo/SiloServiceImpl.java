@@ -7,6 +7,7 @@ import pt.tecnico.sauron.silo.domain.ObservationType;
 import pt.tecnico.sauron.silo.domain.Sauron;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.grpc.*;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
@@ -46,44 +47,53 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     @Override
     public void track(Silo.TrackRequest request, StreamObserver<Silo.TrackResponse> responseObserver) {
+        Silo.TrackResponse.Builder builder = Silo.TrackResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
-        /*
-         * Silo.TrackResponse response =
-         * Silo.TrackResponse.newBuilder().setObservation(sauron.track(request.getType()
-         * , request.getIdentifier())).build();
-         *
-         * responseObserver.onNext(response);
-         *
-         * responseObserver.onCompleted();
-         */
+        try {
+            ObservationType type = typesConverter.get(request.getType());
+            sauron.track(type, request.getIdentifier());
+        } catch (NoObservationException e) {
+            builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
+            // TODO: tell which of the identifiers wasn't found!
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
+        Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
-        /*
-         * Silo.TrackMatchResponse response =
-         * Silo.TrackMatchResponse.newBuilder().setObservation(sauron.trackMatch(request
-         * .getType(), request.getPartIdentifier())).build();
-         *
-         * responseObserver.onNext(response);
-         *
-         * responseObserver.onCompleted();
-         */
+        try {
+            ObservationType type = typesConverter.get(request.getType());
+            sauron.trackMatch(type, request.getPattern());
+        } catch (NoObservationException e) {
+            builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
+            // TODO: tell which of the identifiers wasn't found!
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
     public void trace(Silo.TraceRequest request, StreamObserver<Silo.TraceResponse> responseObserver) {
+        Silo.TraceResponse.Builder builder = Silo.TraceResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
-        /*
-         * Silo.TraceResponse response =
-         * Silo.TraceResponse.newBuilder().addAllObservations(sauron.trace(request.
-         * getType(), request.getIdentifier())).build();
-         *
-         * responseObserver.onNext(response);
-         *
-         * responseObserver.onCompleted();
-         */
+        try {
+            ObservationType type = typesConverter.get(request.getType());
+            sauron.trace(type, request.getIdentifier());
+        } catch (NoObservationException e) {
+            builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
+            // TODO: tell which of the identifiers wasn't found!
+        }
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
