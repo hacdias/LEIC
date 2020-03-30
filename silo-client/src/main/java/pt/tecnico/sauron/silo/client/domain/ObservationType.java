@@ -3,12 +3,12 @@ package pt.tecnico.sauron.silo.client.domain;
 public enum ObservationType {
   PERSON {
     public String toString() {
-        return "person";
+      return "person";
     }
   },
   CAR {
     public String toString() {
-        return "car";
+      return "car";
     }
   }
 }
