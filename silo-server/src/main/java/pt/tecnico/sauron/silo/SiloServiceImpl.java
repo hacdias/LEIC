@@ -87,22 +87,25 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
   @Override
   public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
-    /* TODO: Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
+    Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
     try {
       ObservationType type = typesConverter.get(request.getType());
-      Observation observation = sauron.trackMatch(type, request.getPattern());
+      List<Observation> observations = sauron.trackMatch(type, request.getPattern());
 
-      Silo.ObservationInfo observationInfo = Converter.convertToMessage(observation);
-      builder.setObservation(observationInfo);
+      List<Silo.ObservationInfo> observationsInfo = observations.stream()
+        .map(element -> Converter.convertToMessage(element))
+        .collect(Collectors.toList());
+      
+      builder.addAllObservations(observationsInfo);
     } catch (NoObservationException e) {
       builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
       // TODO: tell which of the identifiers wasn't found!
     }
 
     responseObserver.onNext(builder.build());
-    responseObserver.onCompleted(); */
+    responseObserver.onCompleted();
   }
 
   @Override

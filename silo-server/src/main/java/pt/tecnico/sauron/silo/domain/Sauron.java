@@ -59,7 +59,7 @@ public class Sauron {
   public Observation track(ObservationType type, String identifier) throws NoObservationException {
     Observation lastObservation = observations.stream()
       .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
-      .max(Comparator.comparing(Observation::getDatetime))
+      .max(Comparator.comparing(Observation::getDatetime).reversed())
       .orElse(null);
 
     if (lastObservation == null) {
@@ -71,30 +71,32 @@ public class Sauron {
 
   public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
 
-    /* TODO String patternRegex = "^".concat(pattern).concat("$");
+    String patternRegex = "^".concat(pattern).concat("$");
     if (type == ObservationType.PERSON) {
       patternRegex.replace("*", "\\d*");
     } else if (type == ObservationType.CAR) {
       patternRegex.replace("*", "\\w*");
     }
 
-    Observation lastObservation = observations.stream()
-    .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(patternRegex))
-    .max(Comparator.comparing(Observation::getDatetime))
-    .orElse(null);
+    List<List<Observation>> matches = new ArrayList<List<Observation>>(observations.stream()
+      .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(patternRegex))
+      .collect(Collectors.groupingBy(element -> element.getIdentifier()))
+      .values());
 
-    if (lastObservation == null)
-    throw new NoObservationException(pattern);
+    List<Observation> firstMatches = matches.stream()
+      .map(element -> observations.stream()
+        .max(Comparator.comparing(Observation::getDatetime).reversed())
+        .orElse(null))
+      .filter(element -> element != null)
+      .collect(Collectors.toList());
 
-    return lastObservation; */
-
-    return new ArrayList<Observation>();
+    return firstMatches;
   }
 
   public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
     List<Observation> observationsMatch = observations.stream()
       .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
-      .sorted(Comparator.comparing(Observation::getDatetime))
+      .sorted(Comparator.comparing(Observation::getDatetime).reversed())
       .collect(Collectors.toList());
 
     if (observationsMatch.size() == 0) {
