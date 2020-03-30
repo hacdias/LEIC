@@ -17,15 +17,15 @@ public class Camera {
   }
 
   /**
-   * @return the name
-   */
+  * @return the name
+  */
   public String getName() {
     return name;
   }
 
   /**
-   * @return the coordinates
-   */
+  * @return the coordinates
+  */
   public Coordinates getCoordinates() {
     return coordinates;
   }

@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 public class EyeApp {
 
 	public static void main(String[] args) {
 		System.out.println(EyeApp.class.getSimpleName());
-		
+
 		// receive and print arguments
 
 		if (args.length != 6) {
@@ -44,8 +43,8 @@ public class EyeApp {
 			String firstWord = tokens.remove(0);
 			if (firstWord.equalsIgnoreCase("person")){
 				String identifierPerson = tokens.remove(0);
-			}	
-			
+			}
+
 			if (firstWord.equalsIgnoreCase("car")){
 				String identifierCar = tokens.remove(0);
 			}
@@ -55,7 +54,7 @@ public class EyeApp {
 				try{
 					java.util.concurrent.TimeUnit.MILLISECONDS.sleep(identifierZzz);
 				}catch( InterruptedException e ){
-					
+
 				}
 			}
 
@@ -66,5 +65,5 @@ public class EyeApp {
 		scanner.close();
 	}
 
-	
+
 }

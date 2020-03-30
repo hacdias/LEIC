@@ -24,7 +24,7 @@ public class Camera {
    */
   public String getName() {
     return name;
-  } 
+  }
 
   /**
    * @return the coordinates
