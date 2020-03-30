@@ -3,6 +3,7 @@ package pt.tecnico.sauron.silo.client.domain;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.Map;
 
 import com.google.protobuf.Timestamp;
@@ -69,4 +70,10 @@ public class Observation {
   public String toString() {
     return "Observation(" + type + "," +identifier + ")@" + datetime.toString() + " by " + camera.toString();
   }
+
+  public static class IdentifierComparator implements Comparator<Observation> { 
+    public int compare(Observation a, Observation b) { 
+      return a.getIdentifier().compareTo(b.getIdentifier());
+    } 
+  } 
 }
