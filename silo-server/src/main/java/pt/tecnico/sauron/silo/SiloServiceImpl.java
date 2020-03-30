@@ -87,7 +87,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     @Override
     public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
-        Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
+        /* TODO: Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
         builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
         try {
@@ -102,7 +102,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         }
 
         responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+        responseObserver.onCompleted(); */
     }
 
     @Override

@@ -31,14 +31,14 @@ public class Sauron {
 
     public void ctrlInit() {
         // TODO
-    } 
+    }
 
     public void addCamera(String name, Float latitude, Float longitude) throws DuplicateCameraException, InvalidCameraNameException, InvalidCameraCoordinatesException {
         try {
             Camera cam = getCamera(name);
             if (!(cam.getName() == name && cam.getCoordinates().getLatitude() == latitude && cam.getCoordinates().getLongitude() == longitude)){
                 throw new DuplicateCameraException(name);
-            }          
+            }
         } catch (InvalidCameraException e) {
             Coordinates coordinates = new Coordinates(latitude, longitude);
             Camera camera = new Camera(name, coordinates);
@@ -64,13 +64,13 @@ public class Sauron {
 
         if (lastObservation == null)
             throw new NoObservationException(identifier);
-        
+
         return lastObservation;
     }
 
-    public Observation trackMatch(ObservationType type, String pattern) throws NoObservationException {
+    public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
 
-        String patternRegex = "^".concat(pattern).concat("$");
+        /* TODO String patternRegex = "^".concat(pattern).concat("$");
         if (type == ObservationType.PERSON) {
             patternRegex.replace("*", "\\d*");
         } else if (type == ObservationType.CAR) {
@@ -84,8 +84,10 @@ public class Sauron {
 
         if (lastObservation == null)
             throw new NoObservationException(pattern);
-        
-        return lastObservation;
+
+        return lastObservation; */
+
+        return new ArrayList<Observation>();
     }
 
     public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
@@ -96,7 +98,7 @@ public class Sauron {
 
         if (observationsMatch.size() == 0)
             throw new NoObservationException(identifier);
-        
+
         return observationsMatch;
     }
 
