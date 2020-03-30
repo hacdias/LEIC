@@ -1,8 +1,12 @@
 package pt.tecnico.sauron.silo;
 
 import java.util.Map;
-import io.grpc.stub.StreamObserver;
+import java.util.stream.Collectors;
 
+import java.util.List;
+
+import io.grpc.stub.StreamObserver;
+import pt.tecnico.sauron.silo.domain.Observation;
 import pt.tecnico.sauron.silo.domain.ObservationType;
 import pt.tecnico.sauron.silo.domain.PingInformation;
 import pt.tecnico.sauron.silo.domain.Sauron;
@@ -13,6 +17,8 @@ import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.grpc.*;
+
+import pt.tecnico.sauron.silo.domain.Converter;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
     private Sauron sauron = new Sauron();
@@ -54,7 +60,6 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
-         
     }
 
     @Override
@@ -64,7 +69,10 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         try {
             ObservationType type = typesConverter.get(request.getType());
-            sauron.track(type, request.getIdentifier());
+            Observation observation = sauron.track(type, request.getIdentifier());
+
+            Silo.ObservationInfo observationInfo = Converter.convertToMessage(observation);
+            builder.setObservation(observationInfo);
         } catch (NoObservationException e) {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
             // TODO: tell which of the identifiers wasn't found!
@@ -81,7 +89,10 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         try {
             ObservationType type = typesConverter.get(request.getType());
-            sauron.trackMatch(type, request.getPattern());
+            Observation observation = sauron.trackMatch(type, request.getPattern());
+
+            Silo.ObservationInfo observationInfo = Converter.convertToMessage(observation);
+            builder.setObservation(observationInfo);
         } catch (NoObservationException e) {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
             // TODO: tell which of the identifiers wasn't found!
@@ -98,7 +109,14 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         try {
             ObservationType type = typesConverter.get(request.getType());
-            sauron.trace(type, request.getIdentifier());
+            List<Observation> observations = sauron.trace(type, request.getIdentifier());
+
+            List<Silo.ObservationInfo> observationInfos = observations.stream()
+                .map(element -> Converter.convertToMessage(element))
+                .collect(Collectors.toList());
+            
+            builder.addAllObservations(observationInfos);
+
         } catch (NoObservationException e) {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
             // TODO: tell which of the identifiers wasn't found!
@@ -134,8 +152,16 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
         PingInformation information = sauron.ctrlPing();
-        builder.setCameras(information.getCamerasNumber());
-        builder.setObservations(information.getObservationsNumber());
+
+        List<Silo.Camera> cameras = information.getCameras().stream()
+            .map(element -> Converter.convertToMessage(element))
+            .collect(Collectors.toList());
+        builder.addAllCameras(cameras);
+
+        List<Silo.ObservationInfo> observations = information.getObservations().stream()
+            .map(element -> Converter.convertToMessage(element))
+            .collect(Collectors.toList());
+        builder.addAllObservations(observations);
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();

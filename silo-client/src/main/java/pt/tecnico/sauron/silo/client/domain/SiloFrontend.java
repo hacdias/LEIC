@@ -1,5 +1,8 @@
 package pt.tecnico.sauron.silo.client.domain;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import pt.tecnico.sauron.silo.grpc.*;
@@ -28,12 +31,33 @@ public class SiloFrontend {
 
         String text;
         if (response.getStatus() == Silo.ResponseStatus.SUCCESS) {
-            Integer numberCameras = response.getCameras();
-            Integer numberObservations = response.getObservations();
+            List<Silo.Camera> cameras = response.getCamerasList();
+            List<Silo.ObservationInfo> observations = response.getObservationsList();
 
             text = "The server pinged back!\n";
-            text = text.concat("Number of Cameras: " +  numberCameras.toString() + "\n");
-            text = text.concat("Number of Observations: " + numberObservations.toString());
+            text = text.concat("Number of Cameras: " +  cameras.size() + "\n");
+            cameras.stream().map(element -> {
+                String subText;
+                subText = "Name: " + element.getName() + " : ";
+                subText = subText.concat("Latitude: " + element.getCoordinates().getLatitude() + " : ");
+                subText = subText.concat("Longitude: " + element.getCoordinates().getLatitude());
+                return subText;
+            }).collect(Collectors.joining("\n"));
+
+            text = text.concat("\nNumber of Observations: " + observations.size());
+            observations.stream().map(element -> {
+                String subText = "";
+                if (element.getObservation().getType() == Silo.ObservationType.CAR) subText = "car" + ",";
+                else if (element.getObservation().getType() == Silo.ObservationType.PERSON) subText = "person" + ",";
+                
+                subText = subText.concat(element.getObservation().getIdentifier() + ",");
+                subText = subText.concat(element.getObservation().getTimestamp().toString() + ",");
+                subText = subText.concat(element.getCamera().getName() + ",");
+                subText = subText.concat(element.getCamera().getCoordinates().getLatitude() + ",");
+                subText = subText.concat(String.valueOf(element.getCamera().getCoordinates().getLongitude()));
+                return subText;
+            }).collect(Collectors.joining("\n"));
+            
         } else {
             text = "There was a error with the command!";
         }

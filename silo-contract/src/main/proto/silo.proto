@@ -36,6 +36,11 @@ message Camera {
     Coordinates coordinates = 2;
 }
 
+message ObservationInfo {
+    Observation observation = 1;
+    Camera camera = 2;
+}
+
 message CamJoinRequest {
     Camera camera = 1;
 }
@@ -69,7 +74,7 @@ message TrackRequest {
 
 message TrackResponse {
     ResponseStatus status = 1;
-    Observation observation = 2;
+    ObservationInfo observation = 2;
 }
 
 message TrackMatchRequest {
@@ -79,7 +84,7 @@ message TrackMatchRequest {
 
 message TrackMatchResponse {
     ResponseStatus status = 1;
-    Observation observation = 2;
+    ObservationInfo observation = 2;
 }
 
 message TraceRequest {
@@ -89,7 +94,7 @@ message TraceRequest {
 
 message TraceResponse {
     ResponseStatus status = 1;
-    repeated Observation observations = 2;
+    repeated ObservationInfo observations = 2;
 }
 
 message CtrlPingRequest {
@@ -97,8 +102,8 @@ message CtrlPingRequest {
 
 message CtrlPingResponse {
     ResponseStatus status = 1;
-    int32 cameras = 2;
-    int32 observations = 3;
+    repeated Camera cameras = 2;
+    repeated ObservationInfo observations = 3;
 }
 
 message CtrlClearRequest {
@@ -109,7 +114,8 @@ message CtrlClearResponse {
 }
 
 message CtrlInitRequest {
-    // TODO: How to give propper initizalization
+    repeated Camera cameras = 1;
+    repeated ObservationInfo observations = 2;
 }
 
 message CtrlInitResponse {

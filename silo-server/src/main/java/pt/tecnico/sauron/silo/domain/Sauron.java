@@ -18,7 +18,7 @@ public class Sauron {
     private List<Camera> cameras = new ArrayList<Camera>();
 
     public PingInformation ctrlPing() {
-        PingInformation information = new PingInformation(cameras.size(), observations.size());
+        PingInformation information = new PingInformation(cameras, observations);
         System.out.println("The system Silo was pinged!");
 
         return information;
