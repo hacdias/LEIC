@@ -1,11 +1,13 @@
 package pt.tecnico.sauron.silo.client;
 
-import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
-
-import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+
+import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
+import pt.tecnico.sauron.silo.client.domain.Status;
+import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
 
 public class SiloClientApp {
 	public static void main(String[] args) {
@@ -24,21 +26,25 @@ public class SiloClientApp {
 			List<String> tokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 			String command = tokens.remove(0);
 
-			switch (command) {
-				case "help":
-					help(tokens);
-					break;
-				case "ping":
-					ping(frontend, tokens);
-					break;
-				case "init":
-					init(frontend, tokens);
-				case "clear":
-					clear(frontend, tokens);
-					break;
-				default:
-					System.out.printf("Invalid command: %s\n", input);
-					break;
+			try {
+				switch (command) {
+					case "help":
+						help(tokens);
+						break;
+					case "ping":
+						ping(frontend, tokens);
+						break;
+					case "init":
+						init(frontend, tokens);
+					case "clear":
+						clear(frontend, tokens);
+						break;
+					default:
+						System.out.printf("Invalid command: %s\n", input);
+						break;
+				}
+			} catch (SauronClientException e) {
+				System.out.println(e);
 			}
 
 			System.out.print("> ");
@@ -59,17 +65,16 @@ public class SiloClientApp {
 		System.out.println("\tclear - clear the server");
 	}
 
-	private static void ping(SiloFrontend frontend, List<String> tokens) {
-		String message = frontend.ping();
-		System.out.println(message);
+	private static void ping(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
+		Status status = frontend.ping();
+		System.out.println(status);
 	}
 
-	private static void init(SiloFrontend frontend, List<String> tokens) {
+	private static void init(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
 		frontend.init();
 	}
 
-	private static void clear(SiloFrontend frontend, List<String> tokens) {
+	private static void clear(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
 		frontend.clear();
 	}
-	
 }

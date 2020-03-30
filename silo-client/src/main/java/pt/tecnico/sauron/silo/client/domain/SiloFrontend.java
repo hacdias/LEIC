@@ -1,68 +1,77 @@
 package pt.tecnico.sauron.silo.client.domain;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.google.protobuf.Timestamp;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import pt.tecnico.sauron.silo.grpc.*;
-import pt.tecnico.sauron.silo.grpc.Silo.*;
+import pt.tecnico.sauron.silo.client.exceptions.DuplicateCameraException;
+import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraCoordinatesException;
+import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraException;
+import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
+import pt.tecnico.sauron.silo.client.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.client.exceptions.NoObservationFoundException;
+import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
+import pt.tecnico.sauron.silo.client.exceptions.UnknownException;
+import pt.tecnico.sauron.silo.grpc.SauronGrpc;
+import pt.tecnico.sauron.silo.grpc.Silo;
+import pt.tecnico.sauron.silo.grpc.Silo.CamInfoRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.CamInfoResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.CamJoinRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.CamJoinResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.CtrlClearRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.CtrlClearResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.CtrlPingRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.CtrlPingResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.ReportRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.ReportResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.TraceRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.TraceResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.TrackMatchRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.TrackMatchResponse;
+import pt.tecnico.sauron.silo.grpc.Silo.TrackRequest;
+import pt.tecnico.sauron.silo.grpc.Silo.TrackResponse;
 
 public class SiloFrontend {
-    private String serverAdress;
+    private String serverAddress;
     private Integer serverPort;
     ManagedChannel channel;
     SauronGrpc.SauronBlockingStub stub;
 
-    public SiloFrontend(String adress, Integer port) {
-        serverAdress = adress;
+    public SiloFrontend(String address, Integer port) {
+        serverAddress = address;
         serverPort = port;
-
-		String target = serverAdress + ":" + serverPort;
-		System.out.println("Target: " + target);
-
+		String target = serverAddress + ":" + serverPort;
 		channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
 		stub = SauronGrpc.newBlockingStub(channel);
     }
 
-    public String ping() {
+    private final Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
+        Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
+        Map.entry(ObservationType.CAR, Silo.ObservationType.CAR));
+
+    public Status ping() throws SauronClientException {
         CtrlPingRequest request = CtrlPingRequest.newBuilder().build();
         CtrlPingResponse response = stub.ctrlPing(request);
 
-        String text;
-        if (response.getStatus() == Silo.ResponseStatus.SUCCESS) {
-            List<Silo.Camera> cameras = response.getCamerasList();
-            List<Silo.ObservationInfo> observations = response.getObservationsList();
+        throwIfNotSuccess(response.getStatus());
 
-            text = "The server pinged back!\n";
-            text = text.concat("Number of Cameras: " +  cameras.size() + "\n");
-            cameras.stream().map(element -> {
-                String subText;
-                subText = "Name: " + element.getName() + " : ";
-                subText = subText.concat("Latitude: " + element.getCoordinates().getLatitude() + " : ");
-                subText = subText.concat("Longitude: " + element.getCoordinates().getLatitude());
-                return subText;
-            }).collect(Collectors.joining("\n"));
+        List<Camera> cameras = response.getCamerasList()
+            .stream()
+            .map(camera -> new Camera(camera))
+            .collect(Collectors.toList());
 
-            text = text.concat("\nNumber of Observations: " + observations.size());
-            observations.stream().map(element -> {
-                String subText = "";
-                if (element.getObservation().getType() == Silo.ObservationType.CAR) subText = "car" + ",";
-                else if (element.getObservation().getType() == Silo.ObservationType.PERSON) subText = "person" + ",";
-                
-                subText = subText.concat(element.getObservation().getIdentifier() + ",");
-                subText = subText.concat(element.getObservation().getTimestamp().toString() + ",");
-                subText = subText.concat(element.getCamera().getName() + ",");
-                subText = subText.concat(element.getCamera().getCoordinates().getLatitude() + ",");
-                subText = subText.concat(String.valueOf(element.getCamera().getCoordinates().getLongitude()));
-                return subText;
-            }).collect(Collectors.joining("\n"));
-            
-        } else {
-            text = "There was a error with the command!";
-        }
+        List<Observation> observations = response.getObservationsList()
+            .stream()
+            .map(observation -> new Observation(observation.getCamera(), observation.getObservation()))
+            .collect(Collectors.toList());
 
-        return text;
+        return new Status(cameras, observations);
     }
 
     public String init() {
@@ -70,26 +79,19 @@ public class SiloFrontend {
         return null;
     }
 
-    public String clear() {
+    public void clear() throws SauronClientException {
         CtrlClearRequest request = CtrlClearRequest.newBuilder().build();
         CtrlClearResponse response = stub.ctrlClear(request);
-
-        String text;
-        if (response.getStatus() == Silo.ResponseStatus.SUCCESS) {
-            text = "The server was cleared!\n";
-        } else {
-            text = "There was a error with the command!";
-        }
-
-        return text;
+        throwIfNotSuccess(response.getStatus());
     }
 
-    public CamJoinResponse camJoin(String name, Float latitude, Float longitude) {
-        Coordinates coordinates = Coordinates.newBuilder()
+    public void camJoin(String name, Float latitude, Float longitude) throws SauronClientException {
+        Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
             .setLatitude(latitude)
             .setLongitude(longitude)
             .build();
-        Camera camera = Camera.newBuilder()
+
+        Silo.Camera camera = Silo.Camera.newBuilder()
             .setName(name)
             .setCoordinates(coordinates)
             .build();
@@ -98,52 +100,107 @@ public class SiloFrontend {
             .setCamera(camera)
             .build();
 
-        return stub.camJoin(request);
+        CamJoinResponse response = stub.camJoin(request);
+        throwIfNotSuccess(response.getStatus());
     }
 
-    public CamInfoResponse camInfo(String name) {
+    public Coordinates camInfo(String name) throws SauronClientException {
         CamInfoRequest request = CamInfoRequest.newBuilder()
             .setName(name)
             .build();
 
-        return stub.camInfo(request);
+        CamInfoResponse response = stub.camInfo(request);
+        throwIfNotSuccess(response.getStatus());
+        return new Coordinates(response.getCoordinates());
     }
 
-    public ReportResponse report(String camName, List<Observation> observations) {
+    public void report(String camName, List<Observation> observations) throws SauronClientException {
+        List<Silo.Observation> siloObservations = observations
+            .stream()
+            .map(observation -> {
+                Instant instant = observation.getDatetime().atZone(ZoneId.systemDefault()).toInstant();
+
+                return Silo.Observation
+                    .newBuilder()
+                    .setIdentifier(observation.getIdentifier())
+                    .setType(typesConverter.get(observation.getType()))
+                    .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(instant.getEpochSecond())
+                        .setNanos(instant.getNano())
+                        .build()
+                    )
+                    .build();
+            })
+            .collect(Collectors.toList());
+
         ReportRequest request = ReportRequest.newBuilder()
             .setCameraName(camName)
-            .addAllObservations(observations)
+            .addAllObservations(siloObservations)
             .build();
 
-        return stub.report(request);
+        ReportResponse response = stub.report(request);
+        throwIfNotSuccess(response.getStatus());
     }
 
-    public TrackResponse track(ObservationType type, String identifier) {
+    public Observation track(ObservationType type, String identifier) throws SauronClientException {
         TrackRequest request = TrackRequest.newBuilder()
-            .setType(type)
+            .setType(typesConverter.get(type))
             .setIdentifier(identifier)
             .build();
-        
-        return stub.track(request);
+
+        TrackResponse response = stub.track(request);
+        throwIfNotSuccess(response.getStatus());
+        return new Observation(response.getObservation().getCamera(), response.getObservation().getObservation());
     }
 
-    public TrackMatchResponse trackMatch(ObservationType type, String pattern) {
+    public List<Observation> trackMatch(ObservationType type, String pattern) throws SauronClientException {
         TrackMatchRequest request = TrackMatchRequest.newBuilder()
-            .setType(type)
+            .setType(typesConverter.get(type))
             .setPattern(pattern)
             .build();
-        
-        return stub.trackMatch(request);
+
+        TrackMatchResponse response = stub.trackMatch(request);
+        throwIfNotSuccess(response.getStatus());
+
+        return response.getObservationsList()
+            .stream()
+            .map(info -> new Observation(info.getCamera(), info.getObservation()))
+            .collect(Collectors.toList());
     }
 
-    public TraceResponse trace(ObservationType type, String identifier) {
+    public List<Observation> trace(ObservationType type, String identifier) throws SauronClientException {
         TraceRequest request = TraceRequest.newBuilder()
-            .setType(type)
+            .setType(typesConverter.get(type))
             .setIdentifier(identifier)
             .build();
-        
-        return stub.trace(request);
+
+        TraceResponse response = stub.trace(request);
+        throwIfNotSuccess(response.getStatus());
+
+        return response.getObservationsList()
+            .stream()
+            .map(info -> new Observation(info.getCamera(), info.getObservation()))
+            .collect(Collectors.toList());
     }
 
-
+    private void throwIfNotSuccess(Silo.ResponseStatus status) throws SauronClientException {
+        switch (status) {
+            case SUCCESS:
+                return;
+            case DUPLICATE_CAMERA:
+                throw new DuplicateCameraException();
+            case INVALID_CAMERA:
+                throw new InvalidCameraException();
+            case INVALID_CAMERA_NAME:
+                throw new InvalidCameraNameException();
+            case INVALID_IDENTIFIER:
+                throw new InvalidIdentifierException();
+            case INVALID_CAMERA_COORDINATES:
+                throw new InvalidCameraCoordinatesException();
+            case NO_OBSERVATION_FOUND:
+                throw new NoObservationFoundException();
+            default:
+                throw new UnknownException();
+        }
+    }
 }
