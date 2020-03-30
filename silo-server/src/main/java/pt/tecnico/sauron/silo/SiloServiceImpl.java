@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.grpc.stub.StreamObserver;
 import pt.tecnico.sauron.silo.domain.Observation;
+import pt.tecnico.sauron.silo.domain.Camera;
 import pt.tecnico.sauron.silo.domain.ObservationType;
 import pt.tecnico.sauron.silo.domain.PingInformation;
 import pt.tecnico.sauron.silo.domain.Sauron;
@@ -30,6 +31,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
     @Override
     public void camJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver) {
         Silo.CamJoinResponse.Builder builder = Silo.CamJoinResponse.newBuilder();
+        builder.setStatus(Silo.ResponseStatus.SUCCESS);
 
         try {
             Silo.Camera cam = request.getCamera();
@@ -53,7 +55,8 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         Silo.CamInfoResponse.Builder builder = Silo.CamInfoResponse.newBuilder();
 
         try {
-            sauron.getCamera(request.getName());
+            Camera cam = sauron.getCamera(request.getName());
+            builder.setCoordinates(Converter.convertToMessage(cam.getCoordinates()));
         } catch (InvalidCameraException e) {
             builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
         } 
