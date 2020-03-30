@@ -83,4 +83,67 @@ public class SiloFrontend {
 
         return text;
     }
+
+    public CamJoinResponse camJoin(String name, Float latitude, Float longitude) {
+        Coordinates coordinates = Coordinates.newBuilder()
+            .setLatitude(latitude)
+            .setLongitude(longitude)
+            .build();
+        Camera camera = Camera.newBuilder()
+            .setName(name)
+            .setCoordinates(coordinates)
+            .build();
+
+        CamJoinRequest request = CamJoinRequest.newBuilder()
+            .setCamera(camera)
+            .build();
+
+        return stub.camJoin(request);
+    }
+
+    public CamInfoResponse camInfo(String name) {
+        CamInfoRequest request = CamInfoRequest.newBuilder()
+            .setName(name)
+            .build();
+
+        return stub.camInfo(request);
+    }
+
+    public ReportResponse report(String camName, List<Observation> observations) {
+        ReportRequest request = ReportRequest.newBuilder()
+            .setCameraName(camName)
+            .addAllObservations(observations)
+            .build();
+
+        return stub.report(request);
+    }
+
+    public TrackResponse track(ObservationType type, String identifier) {
+        TrackRequest request = TrackRequest.newBuilder()
+            .setType(type)
+            .setIdentifier(identifier)
+            .build();
+        
+        return stub.track(request);
+    }
+
+    public TrackMatchResponse trackMatch(ObservationType type, String pattern) {
+        TrackMatchRequest request = TrackMatchRequest.newBuilder()
+            .setType(type)
+            .setPattern(pattern)
+            .build();
+        
+        return stub.trackMatch(request);
+    }
+
+    public TraceResponse trace(ObservationType type, String identifier) {
+        TraceRequest request = TraceRequest.newBuilder()
+            .setType(type)
+            .setIdentifier(identifier)
+            .build();
+        
+        return stub.trace(request);
+    }
+
+
 }
