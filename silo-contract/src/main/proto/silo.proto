@@ -84,7 +84,7 @@ message TrackMatchRequest {
 
 message TrackMatchResponse {
     ResponseStatus status = 1;
-    ObservationInfo observation = 2;
+    repeated ObservationInfo observation = 2;
 }
 
 message TraceRequest {
