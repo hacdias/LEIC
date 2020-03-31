@@ -11,10 +11,10 @@ public class Camera {
     this.name = name;
     this.coordinates = coordinates;
 
-    if(!(name.matches("^(\\d|\\w){*}$")||name.length() > 3 || name.length()< 15)){
+    if(!(name.matches("^(\\d|\\w)*$") && name.length() >= 3 && name.length() <= 15)){
       throw new InvalidCameraNameException(name);
     }
-    if (!((coordinates.getLatitude() > -90 && coordinates.getLatitude() < 90) || ( coordinates.getLongitude() > -180 && coordinates.getLongitude() < 180))){
+    if (!((coordinates.getLatitude() >= -90 && coordinates.getLatitude() <= 90) && ( coordinates.getLongitude() >= -180 && coordinates.getLongitude() <= 180))){
       throw new InvalidCameraCoordinatesException(coordinates);
     }
   }
