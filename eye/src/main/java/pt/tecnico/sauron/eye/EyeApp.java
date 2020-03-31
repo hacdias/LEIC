@@ -58,7 +58,6 @@ public class EyeApp {
 		while (!input.equals("exit")) {
 			List <String> tokens = new ArrayList<String>(Arrays.asList(input.split(",")));
 			if (input.startsWith("#")){
-				System.out.print("> ");
 				input = scanner.nextLine();
 				continue;
 			}
@@ -69,7 +68,7 @@ public class EyeApp {
 				observations.add(createObservation(camera, firstWord, identifier));
 			}
 
-			if (input.isBlank()){
+			else if (input.isBlank()){
 				try {
 					api.report(camera.getName(), observations);
 				} catch (SauronClientException e) {
@@ -78,13 +77,17 @@ public class EyeApp {
 				observations.clear();
 			}
 
-			if (firstWord.equals("zzz")){
+			else if (firstWord.equals("zzz")){
 				Long identifierZzz = Long.parseLong(tokens.remove(0));
 				try{
 					java.util.concurrent.TimeUnit.MILLISECONDS.sleep(identifierZzz);
 				}catch( InterruptedException e ){
 
 				}
+			}
+
+			else {
+				System.out.println("Invalid input");
 			}
 			input = scanner.nextLine();
 		}
