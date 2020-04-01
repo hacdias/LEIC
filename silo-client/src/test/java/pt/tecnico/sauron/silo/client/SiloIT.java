@@ -169,7 +169,7 @@ public class SiloIT extends BaseIT {
 		Camera camera = new Camera(camName, coordinates);
 		api.camJoin(camName, latitude, longitude);
 
-		List<String> identifiers = List.of("AAZZAA", "112211", "11A211", "1ABBCC");
+		List<String> identifiers = List.of("AAZZAA", "112211", "11A211", "1ABBCC", "11aa11");
 
 		ObservationType type = ObservationType.CAR;
 		
