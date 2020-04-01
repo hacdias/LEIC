@@ -53,13 +53,19 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testCamJoinDuplicateCamera() throws SauronClientException {
+	public void testCamJoinDuplicateCameraByName() throws SauronClientException {
 		String name = "MyCamera";
+		api.camJoin(name, -30.12, 90.0);
+		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin(name, -35.0, -50.0));
+	}
+
+	@Test
+	public void testCamJoinDuplicateCameraByCoordinates() throws SauronClientException {
 		Double latitude = -30.95;
 		Double longitude = 50.94;
 
-		api.camJoin(name, latitude, longitude);
-		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin(name, latitude, longitude));
+		api.camJoin("MyCamera", latitude, longitude);
+		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin("AnotherCamera", latitude, longitude));
 	}
 
 	@Test
@@ -93,24 +99,24 @@ public class SiloIT extends BaseIT {
 	@Test
 	public void testReport() {
 		// TODO
-		assertEquals(true, true, "not implemented");
+		assertEquals(true, false, "not implemented");
 	}
 
 	@Test
 	public void testTrack() {
 		// TODO
-		assertEquals(true, true, "not implemented");
+		assertEquals(true, false, "not implemented");
 	}
 
 	@Test
 	public void testTrackMatch() {
 		// TODO
-		assertEquals(true, true, "not implemented");
+		assertEquals(true, false, "not implemented");
 	}
 
 	@Test
 	public void testTrace() {
 		// TODO
-		assertEquals(true, true, "not implemented");
+		assertEquals(true, false, "not implemented");
 	}
 }
