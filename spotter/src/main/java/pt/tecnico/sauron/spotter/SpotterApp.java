@@ -151,7 +151,8 @@ public class SpotterApp {
 		if (identifier.contains("*")) {
 			observations = api.trackMatch(type, identifier);
 		} else {
-			observations = List.of(api.track(type, identifier));
+			observations = new ArrayList<Observation>();
+			observations.add(api.track(type, identifier));
 		}
 
 		printFormatted(observations);
