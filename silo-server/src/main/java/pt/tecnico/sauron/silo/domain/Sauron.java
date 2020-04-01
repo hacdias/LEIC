@@ -28,7 +28,7 @@ public class Sauron {
   public void ctrlClear() {
     observations = new ArrayList<Observation>();
     cameras = new ArrayList<Camera>();
-    LOGGER.info("the system was cleared")
+    LOGGER.info("the system was cleared");
   }
 
   public void ctrlInit() {
