@@ -55,7 +55,7 @@ public class EyeApp {
 		Scanner scanner = new Scanner(System.in);
 		String input = scanner.nextLine();
 
-		while (!input.equals("exit")) {
+		while (input != null && !input.equals("exit")) {
 			List <String> tokens = new ArrayList<String>(Arrays.asList(input.split(",")));
 			if (input.startsWith("#")){
 				input = scanner.nextLine();
@@ -89,7 +89,10 @@ public class EyeApp {
 			else {
 				System.out.println("Invalid input");
 			}
-			input = scanner.nextLine();
+			
+			if (scanner.hasNextLine()){
+				input = scanner.nextLine();
+			} else { input = null; }
 		}
 
 		scanner.close();
