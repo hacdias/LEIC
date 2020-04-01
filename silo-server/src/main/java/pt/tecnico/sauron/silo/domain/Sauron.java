@@ -60,7 +60,7 @@ public class Sauron {
 
   public Observation track(ObservationType type, String identifier) throws NoObservationException {
     Observation lastObservation = observations.stream()
-      .filter(observation -> type == observation.getType() && identifier.equals(observation.getIdentifier()))
+      .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .max(Comparator.comparing(Observation::getDatetime).reversed())
       .orElse(null);
 
@@ -88,23 +88,27 @@ public class Sauron {
     String regex = buildRegex(type, pattern);
 
     List<List<Observation>> matches = new ArrayList<List<Observation>>(observations.stream()
-      .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(regex))
+      .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
       .collect(Collectors.groupingBy(element -> element.getIdentifier()))
       .values());
 
     List<Observation> firstMatches = matches.stream()
-      .map(element -> observations.stream()
+      .map(element -> element.stream()
         .max(Comparator.comparing(Observation::getDatetime).reversed())
         .orElse(null))
       .filter(element -> element != null)
       .collect(Collectors.toList());
+
+    if (firstMatches.size() == 0) {
+      throw new NoObservationException(pattern);
+    }
 
     return firstMatches;
   }
 
   public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
     List<Observation> observationsMatch = observations.stream()
-      .filter(observation -> type == observation.getType() && identifier.equals(observation.getIdentifier()))
+      .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .sorted(Comparator.comparing(Observation::getDatetime).reversed())
       .collect(Collectors.toList());
 
