@@ -38,10 +38,8 @@ public class Sauron {
   public void addCamera(String name, Double latitude, Double longitude)
       throws InvalidCameraNameException, InvalidCameraCoordinatesException, DuplicateCameraException {
     try {
-      Camera cam = getCamera(name);
-      if (!(cam.getName().equals(name) && cam.getCoordinates().getLatitude().equals(latitude) && cam.getCoordinates().getLongitude().equals(longitude))){
-        throw new DuplicateCameraException(name);
-      }
+      getCamera(name);
+      throw new DuplicateCameraException(name);
     } catch (InvalidCameraException e) {
       Coordinates coordinates = new Coordinates(latitude, longitude);
       Camera camera = new Camera(name, coordinates);
