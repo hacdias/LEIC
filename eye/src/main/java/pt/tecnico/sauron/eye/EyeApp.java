@@ -37,8 +37,8 @@ public class EyeApp {
 		final String host = args[0];
 		final Integer port = Integer.parseInt(args[1]);
 		final String cameraName = args[2];
-		final Float coordinatesLatitude = Float.parseFloat(args[3]);
-		final Float coordinatesLongitude = Float.parseFloat(args[4]);
+		final Double coordinatesLatitude = Double.parseDouble(args[3]);
+		final Double coordinatesLongitude = Double.parseDouble(args[4]);
 	
 		final SiloFrontend api = new SiloFrontend(host, port);
 		try {

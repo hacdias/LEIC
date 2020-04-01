@@ -1,10 +1,10 @@
 package pt.tecnico.sauron.silo.domain;
 
 public class Coordinates {
-  private Float latitude;
-  private Float longitude;
+  private Double latitude;
+  private Double longitude;
 
-  public Coordinates(Float latitude, Float longitude) {
+  public Coordinates(Double latitude, Double longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
   }
@@ -12,14 +12,14 @@ public class Coordinates {
   /**
    * @return the latitude
    */
-  public Float getLatitude() {
+  public Double getLatitude() {
     return latitude;
   }
 
   /**
    * @return the longitude
    */
-  public Float getLongitude() {
+  public Double getLongitude() {
     return longitude;
   }
 

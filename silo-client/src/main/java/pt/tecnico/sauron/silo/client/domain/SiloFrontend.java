@@ -86,7 +86,7 @@ public class SiloFrontend implements AutoCloseable {
     throwIfNotSuccess(response.getStatus());
   }
 
-  public void camJoin(String name, Float latitude, Float longitude) throws SauronClientException {
+  public void camJoin(String name, Double latitude, Double longitude) throws SauronClientException {
     Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
       .setLatitude(latitude)
       .setLongitude(longitude)
