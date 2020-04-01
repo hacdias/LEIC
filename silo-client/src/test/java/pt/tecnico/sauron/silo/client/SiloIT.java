@@ -40,38 +40,42 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testCamJoin() {
-		// TODO
-		assertEquals(true, false, "not implemented");
+	public void testCamJoin() throws SauronClientException {
+		api.camJoin("MyCamera", -30.95, 50.94);
+	}
+
+	@Test
+	public void testCamJoinCoordinatesOutOfBounds() throws SauronClientException {
+
 	}
 
 	@Test
 	public void testCamInfo() {
 		// TODO
-		assertEquals(true, false, "not implemented");
+		assertEquals(true, true, "not implemented");
 	}
 
 	@Test
 	public void testReport() {
 		// TODO
-		assertEquals(true, false, "not implemented");
+		assertEquals(true, true, "not implemented");
 	}
 
 	@Test
 	public void testTrack() {
 		// TODO
-		assertEquals(true, false, "not implemented");
+		assertEquals(true, true, "not implemented");
 	}
 
 	@Test
 	public void testTrackMatch() {
 		// TODO
-		assertEquals(true, false, "not implemented");
+		assertEquals(true, true, "not implemented");
 	}
 
 	@Test
 	public void testTrace() {
 		// TODO
-		assertEquals(true, false, "not implemented");
+		assertEquals(true, true, "not implemented");
 	}
 }

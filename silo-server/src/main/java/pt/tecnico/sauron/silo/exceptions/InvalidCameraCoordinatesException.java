@@ -1,23 +1,30 @@
 package pt.tecnico.sauron.silo.exceptions;
 
-import pt.tecnico.sauron.silo.domain.Coordinates;
-
 public class InvalidCameraCoordinatesException extends Exception {
   private static final long serialVersionUID = 1L;
-  Coordinates camCoordinates;
+  Double latitude;
+  Double longitude;
 
-  public InvalidCameraCoordinatesException(Coordinates coordinates) {
-    camCoordinates = coordinates;
+  public InvalidCameraCoordinatesException(Double latitude, Double longitude) {
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   public String toString(){
-    return ("InvalidCameraCoordinatesException Occurred: " + camCoordinates) ;
+    return ("InvalidCameraCoordinatesException Occurred: " + latitude + ", " + longitude) ;
   }
 
   /**
-   * @return the coordinates
+   * @return the latitude
    */
-  public Coordinates getCamCoordinates() {
-    return camCoordinates;
+  public Double getLatitude() {
+    return latitude;
+  }
+
+  /**
+   * @return the longitude
+   */
+  public Double getLongitude() {
+    return longitude;
   }
 }
