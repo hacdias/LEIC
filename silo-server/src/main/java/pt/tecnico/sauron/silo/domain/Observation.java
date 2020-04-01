@@ -1,6 +1,9 @@
 package pt.tecnico.sauron.silo.domain;
 
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 
 public class Observation {
@@ -15,9 +18,33 @@ public class Observation {
     this.datetime = datetime;
     this.camera = camera;
 
-    if ((type == ObservationType.CAR && !identifier.matches("^(\\d{2}|\\w{2}){3}$")) ||
+    if ((type == ObservationType.CAR && !this.checkCarIdentifier(identifier)) ||
       (type == ObservationType.PERSON && !identifier.matches("^\\d+$"))) {
       throw new InvalidIdentifierException(identifier);
+    }
+  }
+
+  private Boolean checkCarIdentifier(String identifier) {
+    Integer charGroups = new PatternMatcher("[A-Z]{2}").matches(identifier);
+    Integer intGroups = new PatternMatcher("[0-9]{2}").matches(identifier);
+
+    return charGroups >= 1 && intGroups >= 1 && intGroups + charGroups == 3;
+  }
+
+  private static class PatternMatcher {
+    Pattern pattern;
+
+    PatternMatcher(String regex) {
+      this.pattern = Pattern.compile(regex);
+    }
+
+    public Integer matches(String string) {
+      Matcher matcher = pattern.matcher(string);
+      Integer count = 0;
+      while (matcher.find()) {
+        count++;
+      }
+      return count;
     }
   }
 
