@@ -32,7 +32,7 @@ public class Sauron {
   }
 
   public void ctrlInit() {
-    // TODO
+    // EMPTY
   }
 
   public void addCamera(String name, Float latitude, Float longitude)

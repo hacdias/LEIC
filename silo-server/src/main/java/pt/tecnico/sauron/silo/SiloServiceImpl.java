@@ -97,7 +97,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
       List<Silo.ObservationInfo> observationsInfo = observations.stream()
         .map(element -> Converter.convertToMessage(element))
         .collect(Collectors.toList());
-      
+
       builder.addAllObservations(observationsInfo);
     } catch (NoObservationException e) {
       builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
@@ -125,7 +125,6 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     } catch (NoObservationException e) {
       builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
-      // TODO: tell which of the identifiers wasn't found!
     }
 
     responseObserver.onNext(builder.build());
@@ -145,7 +144,6 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
       builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
     } catch (InvalidIdentifierException e) {
       builder.setStatus(Silo.ResponseStatus.INVALID_IDENTIFIER);
-      // TODO: tell which of the identifiers is invalid!
     }
 
     responseObserver.onNext(builder.build());
@@ -175,11 +173,11 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
   @Override
   public void ctrlInit(Silo.CtrlInitRequest request, StreamObserver<Silo.CtrlInitResponse> responseObserver) {
-    Silo.CtrlInitResponse.Builder builder = Silo.CtrlInitResponse.newBuilder();
-    builder.setStatus(Silo.ResponseStatus.SUCCESS);
-
-    // TODO: Send Information
     sauron.ctrlInit();
+
+    Silo.CtrlInitResponse.Builder builder = Silo.CtrlInitResponse
+      .newBuilder()
+      .setStatus(Silo.ResponseStatus.SUCCESS);
 
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
@@ -187,10 +185,11 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
   @Override
   public void ctrlClear(Silo.CtrlClearRequest request, StreamObserver<Silo.CtrlClearResponse> responseObserver) {
-    Silo.CtrlClearResponse.Builder builder = Silo.CtrlClearResponse.newBuilder();
-    builder.setStatus(Silo.ResponseStatus.SUCCESS);
-
     sauron.ctrlClear();
+
+    Silo.CtrlClearResponse.Builder builder = Silo.CtrlClearResponse
+      .newBuilder()
+      .setStatus(Silo.ResponseStatus.SUCCESS);
 
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
