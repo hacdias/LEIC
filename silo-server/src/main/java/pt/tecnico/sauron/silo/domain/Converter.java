@@ -34,7 +34,7 @@ public class Converter {
 
   public static Silo.Camera convertToMessage(Camera camera) {
     return Silo.Camera.newBuilder()
-    .setName(camera.getName())
+      .setName(camera.getName())
       .setCoordinates(convertToMessage(camera.getCoordinates()))
       .build();
   }

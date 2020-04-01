@@ -1,17 +1,17 @@
 package pt.tecnico.sauron.silo.domain;
 
-import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
-import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
+import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
-import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
+import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 
 public class Sauron {
   private List<Observation> observations = new ArrayList<Observation>();
@@ -58,7 +58,7 @@ public class Sauron {
 
   public Observation track(ObservationType type, String identifier) throws NoObservationException {
     Observation lastObservation = observations.stream()
-      .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
+      .filter(observation -> type == observation.getType() && identifier.equals(observation.getIdentifier()))
       .max(Comparator.comparing(Observation::getDatetime).reversed())
       .orElse(null);
 
@@ -95,7 +95,7 @@ public class Sauron {
 
   public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
     List<Observation> observationsMatch = observations.stream()
-      .filter(observation -> type == observation.getType() && identifier == observation.getIdentifier())
+      .filter(observation -> type == observation.getType() && identifier.equals(observation.getIdentifier()))
       .sorted(Comparator.comparing(Observation::getDatetime).reversed())
       .collect(Collectors.toList());
 
