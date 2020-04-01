@@ -22,4 +22,9 @@ public class Coordinates {
   public Float getLongitude() {
     return longitude;
   }
+
+  @Override
+  public String toString() {
+    return "Coordinates(" + latitude + "," + longitude + ")";
+  }
 }

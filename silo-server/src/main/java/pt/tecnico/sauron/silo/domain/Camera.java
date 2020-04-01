@@ -32,4 +32,9 @@ public class Camera {
   public Coordinates getCoordinates() {
     return coordinates;
   }
+
+  @Override
+  public String toString() {
+    return "Camera(" + name + ")@" + coordinates.toString();
+  }
 }

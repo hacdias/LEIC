@@ -48,4 +48,9 @@ public class Observation {
   public Camera getCamera() {
     return camera;
   }
+
+  @Override
+  public String toString() {
+    return "Observation(" + type + "," +identifier + ")@" + datetime.toString() + " by " + camera.toString();
+  }
 }
