@@ -31,23 +31,6 @@ public class Observation {
     return charGroups >= 1 && intGroups >= 1 && intGroups + charGroups == 3;
   }
 
-  private static class PatternMatcher {
-    Pattern pattern;
-
-    PatternMatcher(String regex) {
-      this.pattern = Pattern.compile(regex);
-    }
-
-    public Integer matches(String string) {
-      Matcher matcher = pattern.matcher(string);
-      Integer count = 0;
-      while (matcher.find()) {
-        count++;
-      }
-      return count;
-    }
-  }
-
   /**
    * @return the type
    */
@@ -79,5 +62,22 @@ public class Observation {
   @Override
   public String toString() {
     return "Observation(" + type + "," +identifier + ")@" + datetime.toString() + " by " + camera.toString();
+  }
+
+  private static class PatternMatcher {
+    Pattern pattern;
+
+    PatternMatcher(String regex) {
+      this.pattern = Pattern.compile(regex);
+    }
+
+    public Integer matches(String string) {
+      Matcher matcher = pattern.matcher(string);
+      Integer count = 0;
+      while (matcher.find()) {
+        count++;
+      }
+      return count;
+    }
   }
 }
