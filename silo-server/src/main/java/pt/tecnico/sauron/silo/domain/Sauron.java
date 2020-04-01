@@ -43,7 +43,7 @@ public class Sauron {
       Coordinates coordinates = new Coordinates(latitude, longitude);
       Camera camera = new Camera(name, coordinates);
       cameras.add(camera);
-    } 
+    }
   }
 
   public Camera getCamera(String name) throws InvalidCameraException {
@@ -69,17 +69,24 @@ public class Sauron {
     return lastObservation;
   }
 
-  public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
-
+  private String buildRegex(ObservationType type, String pattern) {
     String patternRegex = "^".concat(pattern).concat("$");
-    if (type == ObservationType.PERSON) {
-      patternRegex.replace("*", "\\d*");
-    } else if (type == ObservationType.CAR) {
-      patternRegex.replace("*", "\\w*");
+
+    switch (type) {
+      case PERSON:
+        return patternRegex.replace("*", "\\d*");
+      case CAR:
+        return patternRegex.replace("*", "\\w*");
+      default:
+        return patternRegex;
     }
+  }
+
+  public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
+    String regex = buildRegex(type, pattern);
 
     List<List<Observation>> matches = new ArrayList<List<Observation>>(observations.stream()
-      .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(patternRegex))
+      .filter(observation -> type == observation.getType() && observation.getIdentifier().matches(regex))
       .collect(Collectors.groupingBy(element -> element.getIdentifier()))
       .values());
 
