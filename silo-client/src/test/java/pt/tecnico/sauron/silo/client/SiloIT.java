@@ -1,6 +1,7 @@
 package pt.tecnico.sauron.silo.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraCoordinatesExceptio
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidIdentifierException;
+import pt.tecnico.sauron.silo.client.exceptions.NoObservationFoundException;
 import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
 
 public class SiloIT extends BaseIT {
@@ -181,20 +183,212 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrack() {
-		// TODO
-		assertEquals(true, false, "not implemented");
+	public void testTrack() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson = new Observation(cam, type, identifier, datetime);
+
+		type = ObservationType.CAR;
+		identifier = "12ES23";
+		datetime = LocalDateTime.now();
+
+		Observation observationCar = new Observation(cam, type, identifier, datetime);
+		List<Observation> observations = new ArrayList<Observation>();
+
+		observations.add(observationPerson);
+		observations.add(observationCar);
+
+		api.report(name, observations);
+
+		Observation personObservation = api.track(ObservationType.PERSON, "1234");
+		Observation carObservation = api.track(ObservationType.CAR, "12ES23");
+
+		assertEquals(observationPerson.getIdentifier(), personObservation.getIdentifier());
+		assertEquals(observationPerson.getType(), personObservation.getType());
+
+		assertEquals(observationCar.getIdentifier(), carObservation.getIdentifier());
+		assertEquals(observationCar.getType(), carObservation.getType());
 	}
 
 	@Test
-	public void testTrackMatch() {
-		// TODO
-		assertEquals(true, false, "not implemented");
+	public void testTrackNoObservationFound() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson = new Observation(cam, type, identifier, datetime);
+
+		type = ObservationType.CAR;
+		identifier = "12ES23";
+		datetime = LocalDateTime.now();
+
+		Observation observationCar = new Observation(cam, type, identifier, datetime);
+		List<Observation> observations = new ArrayList<Observation>();
+
+		observations.add(observationPerson);
+		observations.add(observationCar);
+
+		api.report(name, observations);
+
+		Assertions.assertThrows(NoObservationFoundException.class, () -> api.track(ObservationType.PERSON, "141234567890"));
+		Assertions.assertThrows(NoObservationFoundException.class, () -> api.track(ObservationType.CAR, "10ES20"));
 	}
 
 	@Test
-	public void testTrace() {
-		// TODO
-		assertEquals(true, false, "not implemented");
+	public void testTrackMatch() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson = new Observation(cam, type, identifier, datetime);
+
+		type = ObservationType.CAR;
+		identifier = "12ES23";
+		datetime = LocalDateTime.now();
+
+		Observation observationCar = new Observation(cam, type, identifier, datetime);
+		List<Observation> observations = new ArrayList<Observation>();
+
+		observations.add(observationPerson);
+		observations.add(observationCar);
+
+		api.report(name, observations);
+
+		List<Observation> personObservations = api.trackMatch(ObservationType.PERSON, "1*3*");
+		List<Observation> carObservations = api.trackMatch(ObservationType.CAR, "12*23");
+
+		assertEquals(1, personObservations.size());
+		assertEquals(observationPerson.getIdentifier(), personObservations.get(0).getIdentifier());
+		assertEquals(observationPerson.getType(), personObservations.get(0).getType());
+
+		assertEquals(1, carObservations.size());
+		assertEquals(observationCar.getIdentifier(), carObservations.get(0).getIdentifier());
+		assertEquals(observationCar.getType(), carObservations.get(0).getType());
 	}
+
+	@Test
+	public void testTrackmatchNoObservationFound() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson = new Observation(cam, type, identifier, datetime);
+
+		type = ObservationType.CAR;
+		identifier = "12ES23";
+		datetime = LocalDateTime.now();
+
+		Observation observationCar = new Observation(cam, type, identifier, datetime);
+		List<Observation> observations = new ArrayList<Observation>();
+
+		observations.add(observationPerson);
+		observations.add(observationCar);
+
+		api.report(name, observations);
+		Assertions.assertThrows(NoObservationFoundException.class, () -> api.trackMatch(ObservationType.PERSON, "1*3"));
+		Assertions.assertThrows(NoObservationFoundException.class, () -> api.trackMatch(ObservationType.CAR, "2*2"));
+	}
+
+	@Test
+	public void testTrace() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson1 = new Observation(cam, type, identifier, datetime);
+		Observation observationPerson2 = new Observation(cam, type, identifier, datetime);
+
+		List<Observation> observations1 = new ArrayList<Observation>();
+
+		observations1.add(observationPerson1);
+		api.report(name, observations1);
+
+		List<Observation> observations2 = new ArrayList<Observation>();
+
+		observations2.add(observationPerson2);
+		api.report(name, observations2);
+
+		List<Observation> personObservations = api.trace(ObservationType.PERSON, "1234");
+	
+		assertEquals(2, personObservations.size());
+		assertEquals(observationPerson1.getIdentifier(), personObservations.get(1).getIdentifier());
+		assertEquals(observationPerson2.getIdentifier(), personObservations.get(0).getIdentifier());
+		assertEquals(observationPerson1.getType(), personObservations.get(1).getType());
+		assertEquals(observationPerson2.getType(), personObservations.get(0).getType());
+		assertTrue(personObservations.get(0).getDatetime().isAfter(personObservations.get(1).getDatetime()));
+		
+	}
+
+	@Test
+	public void testTraceNoObservationFound() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -35.45;
+		Double longitude = 66.16;
+
+		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Camera cam = new Camera(name, coordinates);
+		api.camJoin(name, latitude, longitude);
+
+		ObservationType type = ObservationType.PERSON;
+		String identifier = "1234";
+		LocalDateTime datetime = LocalDateTime.now();
+
+		Observation observationPerson1 = new Observation(cam, type, identifier, datetime);
+		Observation observationPerson2 = new Observation(cam, type, identifier, datetime);
+
+		List<Observation> observations1 = new ArrayList<Observation>();
+
+		observations1.add(observationPerson1);
+		api.report(name, observations1);
+
+		List<Observation> observations2 = new ArrayList<Observation>();
+
+		observations2.add(observationPerson2);
+		api.report(name, observations2);
+	
+		Assertions.assertThrows(NoObservationFoundException.class, () -> api.trace(ObservationType.PERSON, "1324"));
+	}
+
 }
