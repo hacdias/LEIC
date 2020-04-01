@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import pt.tecnico.sauron.silo.client.domain.Coordinates;
 import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
+import pt.tecnico.sauron.silo.client.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraCoordinatesException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
@@ -49,6 +50,16 @@ public class SiloIT extends BaseIT {
 	@Test
 	public void testCamJoinWrongName() {
 		Assertions.assertThrows(InvalidCameraNameException.class, () -> api.camJoin("An Invalid and Extra Long Name", 30.0, 90.0));
+	}
+
+	@Test
+	public void testCamJoinDuplicateCamera() throws SauronClientException {
+		String name = "MyCamera";
+		Double latitude = -30.95;
+		Double longitude = 50.94;
+
+		api.camJoin(name, latitude, longitude);
+		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin(name, latitude, longitude));
 	}
 
 	@Test
