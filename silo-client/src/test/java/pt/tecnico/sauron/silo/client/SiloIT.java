@@ -53,19 +53,10 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testCamJoinDuplicateCameraByName() throws SauronClientException {
+	public void testCamJoinDuplicateCamera() throws SauronClientException {
 		String name = "MyCamera";
 		api.camJoin(name, -30.12, 90.0);
 		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin(name, -35.0, -50.0));
-	}
-
-	@Test
-	public void testCamJoinDuplicateCameraByCoordinates() throws SauronClientException {
-		Double latitude = -30.95;
-		Double longitude = 50.94;
-
-		api.camJoin("MyCamera", latitude, longitude);
-		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin("AnotherCamera", latitude, longitude));
 	}
 
 	@Test
