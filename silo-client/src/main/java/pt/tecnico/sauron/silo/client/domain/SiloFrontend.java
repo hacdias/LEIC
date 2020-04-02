@@ -1,7 +1,7 @@
 package pt.tecnico.sauron.silo.client.domain;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -119,7 +119,7 @@ public class SiloFrontend implements AutoCloseable {
     List<Silo.Observation> siloObservations = observations
       .stream()
       .map(observation -> {
-        Instant instant = observation.getDatetime().atZone(ZoneId.systemDefault()).toInstant();
+        Instant instant = observation.getDatetime().atZone(ZoneOffset.UTC).toInstant();
 
         return Silo.Observation
           .newBuilder()

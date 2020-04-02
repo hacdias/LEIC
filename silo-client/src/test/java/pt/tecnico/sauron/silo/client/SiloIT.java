@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,13 @@ import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
 
 public class SiloIT extends BaseIT {
 	public static SiloFrontend api;
+	public static Integer rtt;
 
 	@BeforeAll
 	public static void oneTimeSetUp() {
 		String host = testProps.getProperty("server.host");
 		Integer port = Integer.parseInt(testProps.getProperty("server.port"));
+		rtt = Integer.parseInt(testProps.getProperty("server.rtt"));
 		api = new SiloFrontend(host, port);
 	}
 
@@ -215,9 +218,19 @@ public class SiloIT extends BaseIT {
 
 		assertEquals(observationPerson.getIdentifier(), personObservation.getIdentifier());
 		assertEquals(observationPerson.getType(), personObservation.getType());
+		assertTrue(personObservation.getDatetime().isAfter(observationPerson.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(personObservation.getDatetime().isBefore(observationPerson.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertEquals(name, personObservation.getCamera().getName());
+		assertEquals(latitude, personObservation.getCamera().getCoordinates().getLatitude());
+		assertEquals(longitude, personObservation.getCamera().getCoordinates().getLongitude());
 
 		assertEquals(observationCar.getIdentifier(), carObservation.getIdentifier());
 		assertEquals(observationCar.getType(), carObservation.getType());
+		assertTrue(carObservation.getDatetime().isAfter(observationCar.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(carObservation.getDatetime().isBefore(observationCar.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertEquals(name, carObservation.getCamera().getName());
+		assertEquals(latitude, carObservation.getCamera().getCoordinates().getLatitude());
+		assertEquals(longitude, carObservation.getCamera().getCoordinates().getLongitude());
 	}
 
 	@Test
@@ -286,10 +299,20 @@ public class SiloIT extends BaseIT {
 		assertEquals(1, personObservations.size());
 		assertEquals(observationPerson.getIdentifier(), personObservations.get(0).getIdentifier());
 		assertEquals(observationPerson.getType(), personObservations.get(0).getType());
+		assertTrue(personObservations.get(0).getDatetime().isAfter(observationPerson.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(personObservations.get(0).getDatetime().isBefore(observationPerson.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertEquals(name, personObservations.get(0).getCamera().getName());
+		assertEquals(latitude, personObservations.get(0).getCamera().getCoordinates().getLatitude());
+		assertEquals(longitude, personObservations.get(0).getCamera().getCoordinates().getLongitude());
 
 		assertEquals(1, carObservations.size());
 		assertEquals(observationCar.getIdentifier(), carObservations.get(0).getIdentifier());
 		assertEquals(observationCar.getType(), carObservations.get(0).getType());
+		assertTrue(carObservations.get(0).getDatetime().isAfter(observationCar.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(carObservations.get(0).getDatetime().isBefore(observationCar.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertEquals(name, carObservations.get(0).getCamera().getName());
+		assertEquals(latitude, carObservations.get(0).getCamera().getCoordinates().getLatitude());
+		assertEquals(longitude, carObservations.get(0).getCamera().getCoordinates().getLongitude());
 	}
 
 	@Test
@@ -358,7 +381,17 @@ public class SiloIT extends BaseIT {
 		assertEquals(observationPerson1.getType(), personObservations.get(1).getType());
 		assertEquals(observationPerson2.getType(), personObservations.get(0).getType());
 		assertTrue(personObservations.get(0).getDatetime().isAfter(personObservations.get(1).getDatetime()));
-		
+
+		assertTrue(personObservations.get(1).getDatetime().isAfter(observationPerson1.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(personObservations.get(0).getDatetime().isAfter(observationPerson2.getDatetime().minus(Duration.ofMillis(rtt))));
+		assertTrue(personObservations.get(1).getDatetime().isBefore(observationPerson1.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertTrue(personObservations.get(0).getDatetime().isBefore(observationPerson2.getDatetime().plus(Duration.ofMillis(rtt))));
+		assertEquals(name, personObservations.get(0).getCamera().getName());
+		assertEquals(name, personObservations.get(1).getCamera().getName());
+		assertEquals(latitude, personObservations.get(0).getCamera().getCoordinates().getLatitude());
+		assertEquals(latitude, personObservations.get(1).getCamera().getCoordinates().getLatitude());
+		assertEquals(longitude, personObservations.get(0).getCamera().getCoordinates().getLongitude());
+		assertEquals(longitude, personObservations.get(1).getCamera().getCoordinates().getLongitude());
 	}
 
 	@Test

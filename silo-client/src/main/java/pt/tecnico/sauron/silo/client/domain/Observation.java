@@ -2,7 +2,7 @@ package pt.tecnico.sauron.silo.client.domain;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class Observation {
     Timestamp ts = observation.getTimestamp();
     this.datetime = Instant
       .ofEpochSecond(ts.getSeconds() , ts.getNanos())
-      .atZone(ZoneId.systemDefault())
+      .atZone(ZoneOffset.UTC)
       .toLocalDateTime();
     this.camera = new Camera(camera);
   }
