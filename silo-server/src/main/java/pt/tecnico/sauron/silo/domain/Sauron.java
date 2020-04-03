@@ -61,7 +61,7 @@ public class Sauron {
   public Observation track(ObservationType type, String identifier) throws NoObservationException {
     Observation lastObservation = observations.stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
-      .max(Comparator.comparing(Observation::getDatetime).reversed())
+      .max(Comparator.comparing(Observation::getDatetime))
       .orElse(null);
 
     if (lastObservation == null) {
@@ -94,7 +94,7 @@ public class Sauron {
 
     List<Observation> firstMatches = matches.stream()
       .map(element -> element.stream()
-        .max(Comparator.comparing(Observation::getDatetime).reversed())
+        .max(Comparator.comparing(Observation::getDatetime))
         .orElse(null))
       .filter(element -> element != null)
       .collect(Collectors.toList());
