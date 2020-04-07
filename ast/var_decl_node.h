@@ -34,11 +34,11 @@ namespace og {
     }
 
   public:
-    inline bool is_public () {
+    inline bool is_public() {
       return _is_public;
     }
 
-    inline bool is_require () {
+    inline bool is_require() {
       return _is_require;
     }
 
