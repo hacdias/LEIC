@@ -296,12 +296,28 @@ void og::xml_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) 
 }
 
 void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
-  // TODO; this was from program
-  /*
-  openTag(node, lvl);
-  node->statements()->accept(this, lvl + 4);
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  os() << std::boolalpha;
+
+  os() << std::string(lvl, ' ') << "<" << node->label()
+    << " is_public='" << node->is_public()
+    << "' is_required='" << node->is_required()
+    << "' id='" << node->id()
+    << "' type='" << cdk::to_string(node->type())
+    << "'>" << std::endl;
+
+  openTag("args", lvl+2);
+  if (node->args() != nullptr) {
+    node->args()->accept(this, lvl + 4);
+  }
+  closeTag("args", lvl+2);
+
+  openTag("block", lvl+2);
+  node->block()->accept(this, lvl + 4);
+  closeTag("block", lvl+2);
+
   closeTag(node, lvl);
-  */
+  os() << std::noboolalpha;
 }
 
 //---------------------------------------------------------------------------
