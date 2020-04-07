@@ -323,7 +323,12 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
-  // TODO
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  openTag(node, lvl);
+  openTag("value", lvl + 2);
+  node->value()->accept(this, lvl + 4);
+  closeTag("value", lvl + 2);
+  closeTag(node, lvl);
 }
 
 void og::xml_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
