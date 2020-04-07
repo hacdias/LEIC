@@ -20,7 +20,7 @@ xml: build
 examples: build
 	$(MAKE) -C examples $(MAKEOPTS) all
 
-test: example
+test: examples
 
 clean:
 	$(MAKE) -C src $(MAKEOPTS) clean
