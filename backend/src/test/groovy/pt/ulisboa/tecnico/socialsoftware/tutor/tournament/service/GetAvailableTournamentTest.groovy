@@ -138,9 +138,8 @@ class GetAvailableTournamentTest extends Specification {
 
         then:
         tournaments.size() == 2
-        //tournaments.get(0).getTitle() == tournament.getTitle()
-        //tournaments.get(0).getStudent() == tournament.getStudent()
-
+        tournaments.get(0).getTitle() == tournament.getTitle()
+        tournaments.get(1).getTitle() == tournament2.getTitle()
     }
 
     def "get open tournament not created by student"() {
@@ -151,8 +150,7 @@ class GetAvailableTournamentTest extends Specification {
 
         then:
         tournaments.size() == 1
-        //tournaments.get(0).getTitle() == tournament.getTitle()
-        //tournaments.get(0).getStudent() == tournament.getStudent()
+        tournaments.get(0).getTitle() == tournament.getTitle()
     }
 
     def "get tournament not yet opened, but created by student"() {
@@ -163,8 +161,8 @@ class GetAvailableTournamentTest extends Specification {
 
         then:
         tournaments.size() == 2
-        //tournaments.get(0).getTitle() == tournament.getTitle()
-        //tournaments.get(0).getStudent() == tournament.getStudent()
+        tournaments.get(0).getTitle() == tournament.getTitle()
+        tournaments.get(1).getTitle() == tournament2.getTitle()
     }
 
     def "get tournament not yet opened and not created by student"() {
@@ -175,8 +173,7 @@ class GetAvailableTournamentTest extends Specification {
 
         then:
         tournaments.size() == 1
-        //tournaments.get(0).getTitle() == tournament.getTitle()
-        //tournaments.get(0).getStudent() == tournament.getStudent()
+        tournaments.get(0).getTitle() == tournament.getTitle()
     }
 
     @TestConfiguration

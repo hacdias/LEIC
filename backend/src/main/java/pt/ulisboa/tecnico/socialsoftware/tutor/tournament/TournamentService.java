@@ -121,15 +121,20 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void addEnrolledStudentToTournament(Integer studentId, Integer tournamentId) { 
+    public TournamentDto addEnrolledStudentToTournament(Integer studentId, Integer tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, tournamentId));
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
 
         if (student.getRole() != User.Role.STUDENT) {
             throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
         }
+        if (!student.getCourseExecutions().contains(tournament.getCourseExecution())) {
+            throw new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND);
+        }
         
         tournament.addEnrolledStudent(student);
+        return new TournamentDto(tournament);
+        
     }
 
     @Retryable(
