@@ -10,17 +10,17 @@ namespace og {
    * Class for describing tuple index nodes.
    */
   class tuple_index_node: public cdk::lvalue_node {
-    std::string _identifier;
-    cdk::integer_node* _index;
+    cdk::expression_node *_expression;
+    cdk::integer_node *_index;
 
   public:
-    inline tuple_index_node(int lineno, std::string *identifier, cdk::integer_node *index) :
-        cdk::lvalue_node(lineno), _identifier(*identifier), _index(index) {
+    inline tuple_index_node(int lineno, cdk::expression_node *expression, cdk::integer_node *index) :
+        cdk::lvalue_node(lineno), _expression(expression), _index(index) {
     }
 
   public:
-    inline std::string identifier() {
-      return _identifier;
+    inline cdk::expression_node *expression() {
+      return _expression;
     }
 
     inline cdk::integer_node *index() {
