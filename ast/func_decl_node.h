@@ -12,14 +12,14 @@ namespace og {
   class func_decl_node: public cdk::typed_node {
     bool _is_public;
     bool _is_required;
-    std::string _id;
+    std::string _identifier;
     cdk::sequence_node *_args;
 
   public:
     inline func_decl_node(int lineno, bool is_public, bool is_required,
-      cdk::basic_type *tp, std::string *id, cdk::sequence_node *args) :
+      cdk::basic_type *tp, std::string *identifier, cdk::sequence_node *args) :
         cdk::typed_node(lineno), _is_public(is_public), _is_required(is_required),
-        _id(*id), _args(args) {
+        _identifier(*identifier), _args(args) {
         type(std::shared_ptr<cdk::basic_type>(tp));
     }
   public:
@@ -31,8 +31,8 @@ namespace og {
       return _is_required;
     }
 
-    inline std::string id() {
-      return _id;
+    inline std::string identifier() {
+      return _identifier;
     }
 
     inline cdk::sequence_node *args() {

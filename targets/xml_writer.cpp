@@ -248,7 +248,7 @@ void og::xml_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
-  // TODO
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
 }
 
 //---------------------------------------------------------------------------
@@ -279,9 +279,9 @@ void og::xml_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) 
   os() << std::boolalpha;
 
   os() << std::string(lvl, ' ') << "<" << node->label()
-    << " is_public='" << node->is_public()s
+    << " is_public='" << node->is_public()
     << "' is_required='" << node->is_required()
-    << "' id='" << node->id()
+    << "' id='" << node->identifier()
     << "' type='" << cdk::to_string(node->type())
     << "'>" << std::endl;
 
@@ -302,7 +302,7 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
   os() << std::string(lvl, ' ') << "<" << node->label()
     << " is_public='" << node->is_public()
     << "' is_required='" << node->is_required()
-    << "' id='" << node->id()
+    << "' id='" << node->identifier()
     << "' type='" << cdk::to_string(node->type())
     << "'>" << std::endl;
 
