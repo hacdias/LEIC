@@ -48,6 +48,10 @@ void og::xml_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
   do_unary_operation(node, lvl);
 }
 
+void og::xml_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
+  do_unary_operation(node, lvl);
+}
+
 void og::xml_writer::do_not_node(cdk::not_node * const node, int lvl) {
   // EMPTY
 }
@@ -236,13 +240,6 @@ void og::xml_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
   openTag(node, lvl);
   closeTag(node, lvl);
-}
-
-//---------------------------------------------------------------------------
-
-void og::xml_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
-  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
-  do_unary_operation(node, lvl);
 }
 
 //---------------------------------------------------------------------------
