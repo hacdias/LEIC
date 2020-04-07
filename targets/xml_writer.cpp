@@ -241,7 +241,8 @@ void og::xml_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
-  // TODO
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  do_unary_operation(node, lvl);
 }
 
 //---------------------------------------------------------------------------
