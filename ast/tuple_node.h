@@ -10,38 +10,16 @@ namespace og {
    * Class representing a tuple (sequence of expressions).
    */
   class tuple_node: public cdk::expression_node {
-    std::vector<cdk::expression_node*> _nodes;
+    cdk::sequence_node *_nodes;
 
   public:
-    tuple_node(int lineno) :
-        cdk::expression_node(lineno) {
-    }
-
-    tuple_node(int lineno, cdk::expression_node *item, tuple_node *tuple = nullptr) :
-        cdk::expression_node(lineno) {
-      if (tuple != nullptr)
-        _nodes = tuple->nodes();
-      _nodes.push_back(item);
+    tuple_node(int lineno, cdk::sequence_node *nodes) :
+        cdk::expression_node(lineno), _nodes(nodes) {
     }
 
   public:
-    ~tuple_node() {
-      for (auto node : _nodes)
-        delete node;
-      _nodes.clear();
-    }
-
-  public:
-    cdk::expression_node *node(size_t i) {
-      return _nodes[i];
-    }
-
-    std::vector<cdk::expression_node*> &nodes() {
+    inline cdk::sequence_node *nodes() {
       return _nodes;
-    }
-
-    size_t size() {
-      return _nodes.size();
     }
 
     void accept(basic_ast_visitor *av, int level) {
