@@ -332,7 +332,15 @@ void og::xml_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
 }
 
 void og::xml_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
-  // TODO
+   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  openTag(node, lvl);
+  openTag("pointer", lvl + 2);
+  node->pointer()->accept(this, lvl + 4);
+  closeTag("pointer", lvl + 2);
+  openTag("index", lvl + 2);
+  node->index()->accept(this, lvl + 4);
+  closeTag("index", lvl + 2);
+  closeTag(node, lvl);
 }
 
 void og::xml_writer::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
