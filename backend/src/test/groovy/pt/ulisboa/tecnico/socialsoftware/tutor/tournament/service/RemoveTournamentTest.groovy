@@ -76,7 +76,6 @@ class RemoveTournamentTest extends Specification {
         topicRepository.save(topic)
 
         tournament = new Tournament()
-        tournament.setKey(1)
         tournament.setStudent(student)
         tournament.addEnrolledStudent(student)
         tournament.setCourseExecution(courseExecution)

@@ -7,14 +7,11 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "suggestion_review")
+@Table(name = "suggestion_reviews")
 public class SuggestionReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(unique=true, nullable = false)
-    private Integer key;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -34,12 +31,10 @@ public class SuggestionReview {
     private LocalDateTime creationDate;
 
     public SuggestionReview() {
-
     }
 
     public SuggestionReview(User teacher, Suggestion suggestion, SuggestionReviewDto suggestionReviewDto) {
         this.id = suggestionReviewDto.getId();
-        this.key = suggestionReviewDto.getKey();
         this.approved = suggestionReviewDto.getApproved();
         this.justification = suggestionReviewDto.getJustification();
         this.teacher = teacher;
@@ -51,10 +46,6 @@ public class SuggestionReview {
     }
 
     public void setId(Integer id) { this.id = id; }
-
-    public Integer getKey() { return key; }
-
-    public void setKey(Integer key) { this.key = key; }
 
     public Suggestion getSuggestion() {
         return suggestion;

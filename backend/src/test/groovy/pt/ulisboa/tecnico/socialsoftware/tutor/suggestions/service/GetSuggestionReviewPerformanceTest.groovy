@@ -13,14 +13,14 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionReviewService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionReviewDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class CreateSuggestionReviewTest extends Specification {
+class GetSuggestionReviewPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -96,50 +96,22 @@ class CreateSuggestionReviewTest extends Specification {
         suggestionRepository.save(suggestion)
     }
 
-    def "suggestion is approved with justification"() {
-        given: "a suggestion review Dto"
-        def suggestionReviewDto = new SuggestionReviewDto()
-        suggestionReviewDto.approved = true
-        suggestionReviewDto.justification = SUGGESTION_REVIEW_JUSTIFICATION
+    def "create 1 000 suggestion reviews and fetch them 10 000 times"() {
+        given: "1000 suggestion reviews"
+        1.upto(1000, {
+            def suggestionReviewDto = new SuggestionReviewDto()
+            suggestionReviewDto.approved = true
+            suggestionReviewDto.justification = SUGGESTION_REVIEW_JUSTIFICATION
+            suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
+        })
 
         when:
-        suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
+        1.upto(10000, {
+            suggestionReviewService.findSuggestionReviewsBySuggestion(suggestion.getId())
+        })
 
-        then: "the suggestion review is inside the repository, approved and with justification"
-
-        suggestionReviewRepository.count() == 1L
-        def result = suggestionReviewRepository.findAll().get(0)
-        result.getId() != null
-        result.getTeacher().getName() == TEACHER_NAME
-        result.getTeacher().getUsername() == TEACHER_USERNAME
-        result.getSuggestion().getQuestion().getTitle() == QUESTION_TITLE
-        result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
-        result.getSuggestion().getStudent().getName() == STUDENT_NAME
-        result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        result.getSuggestion().getApproved()
-        result.getApproved()
-        result.getJustification() == SUGGESTION_REVIEW_JUSTIFICATION
-    }
-
-    def "suggestion is rejected with no justification"() {
-        def suggestionReviewDto = new SuggestionReviewDto()
-        suggestionReviewDto.approved = false
-
-        when:
-        suggestionReviewService.createSuggestionReview(teacher.getId(), suggestion.getId(), suggestionReviewDto)
-
-        then: "the suggestion review is inside the repository, rejected and with no justification"
-        def result = suggestionReviewRepository.findAll().get(0)
-        result.getId() != null
-        result.getTeacher().getName() == TEACHER_NAME
-        result.getTeacher().getUsername() == TEACHER_USERNAME
-        result.getSuggestion().getQuestion().getTitle() == QUESTION_TITLE
-        result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
-        result.getSuggestion().getStudent().getName() == STUDENT_NAME
-        result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        !result.getSuggestion().getApproved()
-        !result.getApproved()
-        result.getJustification() == null
+        then:
+        true
     }
 
     @TestConfiguration

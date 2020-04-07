@@ -67,7 +67,7 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<SuggestionReview> suggestionReviews = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch= FetchType.LAZY)

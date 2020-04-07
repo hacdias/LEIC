@@ -19,19 +19,15 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 
 @Entity
 @Table(
-        name = "tournaments",
-        indexes = {@Index(name = "tournaments_indx_0", columnList = "key")
-        })
+        name = "tournaments"
+        )
 public class Tournament {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique=true, nullable = false)
-    private Integer key;
-
-    @ManyToOne(fetch = FetchType.LAZY) 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User student;
 
@@ -53,17 +49,16 @@ public class Tournament {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments",  fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)  
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "enrolledTournaments", fetch=FetchType.LAZY)
     public Set<User> enrolledStudents = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_execution_id")
-    private CourseExecution courseExecution;      
+    private CourseExecution courseExecution;   
     
     public Tournament() {}
 
     public Tournament(User student, TournamentDto tournamentDto) {
-        this.key = tournamentDto.getKey();
         this.creationDate = tournamentDto.getCreationDateDate();
 
         setNumberQuestions(tournamentDto.getNumberQuestions());
@@ -80,14 +75,6 @@ public class Tournament {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getKey() {
-        return key;
-    }
-
-    public void setKey(Integer key) {
-        this.key = key;
     }
 
     public User getStudent() {
@@ -179,14 +166,12 @@ public class Tournament {
     public String toString() {
         return "Tournament{" +
                 "id=" + id +
-                "key=" + key +
                 "student=" + student.getName() +
                 ", creationDate=" + creationDate +
                 ", availableDate=" + availableDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
                 ", numberQuestions='" + numberQuestions + '\'' +
-                ", topics='" + topics + '\'' +
                 '}';
     }
 
@@ -197,7 +182,7 @@ public class Tournament {
     }
 
     private void checkNumberQuestions(Integer numberQuestions) {
-        if (numberQuestions < 1) {
+        if (numberQuestions == null || numberQuestions < 1) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Number of questions");
         }
     }

@@ -22,7 +22,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentR
 
 
 @DataJpaTest
-public class StudentTournamentTest extends Specification {
+class StudentTournamentTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -60,7 +60,6 @@ public class StudentTournamentTest extends Specification {
         courseExecutionRepository.save(courseExecution)
 
         tournament = new Tournament()
-        tournament.setKey(1)
         tournament.setCourseExecution(courseExecution)
         courseExecution.addTournament(tournament)
 
