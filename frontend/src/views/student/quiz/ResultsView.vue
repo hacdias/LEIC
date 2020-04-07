@@ -47,22 +47,47 @@
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
     />
+    <div class="query-content">
+      <v-btn
+        color="primary"
+        dark
+        @click="
+          newQuery(statementManager.statementQuiz.questions[questionOrder])
+        "
+      >
+        I have a doubt about this question!
+      </v-btn>
+    </div>
+    <create-query-dialog
+      v-if="currentQuery"
+      v-model="createQueryDialog"
+      :query="currentQuery"
+      v-on:save-query="onSaveQuery"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import StatementManager from '@/models/statement/StatementManager';
 import ResultComponent from '@/views/student/quiz/ResultComponent.vue';
+import CreateQueryDialog from '@/views/student/query/CreateQueryDialog.vue';
+import Question from '@/models/management/Question';
+import Query from '@/models/management/Query';
+import { QuestionAnswer } from '../../../models/management/QuestionAnswer';
+import StatementQuestion from '../../../models/statement/StatementQuestion';
 
 @Component({
   components: {
-    'result-component': ResultComponent
+    'result-component': ResultComponent,
+    'create-query-dialog': CreateQueryDialog
   }
 })
 export default class ResultsView extends Vue {
   statementManager: StatementManager = StatementManager.getInstance;
   questionOrder: number = 0;
+  currentQuery: Query | null = null;
+  createQueryDialog: boolean = false;
 
   async created() {
     if (this.statementManager.isEmpty()) {
@@ -95,6 +120,24 @@ export default class ResultsView extends Vue {
   changeOrder(n: number): void {
     if (n >= 0 && n < +this.statementManager.statementQuiz!.questions.length) {
       this.questionOrder = n;
+    }
+  }
+
+  async newQuery(currentQuestion: StatementQuestion) {
+    await this.$store.dispatch('currentQuestion', currentQuestion);
+    this.currentQuery = new Query();
+    this.createQueryDialog = true;
+  }
+
+  async onSaveQuery(query: Query) {
+    this.createQueryDialog = false;
+    this.currentQuery = null;
+  }
+
+  @Watch('createQueryDialog')
+  closeError() {
+    if (!this.createQueryDialog) {
+      this.currentQuery = null;
     }
   }
 }

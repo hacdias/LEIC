@@ -3,12 +3,14 @@ import Vuex from 'vuex';
 import RemoteServices from '@/services/RemoteServices';
 import AuthDto from '@/models/user/AuthDto';
 import Course from '@/models/user/Course';
+import StatementQuestion from '@/models/statement/StatementQuestion';
 import User from '@/models/user/User';
 
 interface State {
   token: string;
   user: User | null;
   currentCourse: Course | null;
+  currentQuestion: StatementQuestion | null;
   error: boolean;
   errorMessage: string;
   loading: boolean;
@@ -18,6 +20,7 @@ const state: State = {
   token: '',
   user: null,
   currentCourse: null,
+  currentQuestion: null,
   error: false,
   errorMessage: '',
   loading: false
@@ -54,6 +57,9 @@ export default new Vuex.Store({
     },
     currentCourse(state, currentCourse: Course) {
       state.currentCourse = currentCourse;
+    },
+    currentQuestion(state, currentQuestion: StatementQuestion) {
+      state.currentQuestion = currentQuestion;
     }
   },
   actions: {
@@ -111,6 +117,12 @@ export default new Vuex.Store({
     },
     currentCourse({ commit }, currentCourse) {
       commit('currentCourse', currentCourse);
+    },
+    currentQuestion({ commit }, currentQuestion) {
+      commit('currentQuestion', currentQuestion);
+    },
+    currentQuestionAnswer({ commit }, currentQuestionAnswer) {
+      commit('currentQuestionAnswer', currentQuestionAnswer);
     }
   },
   getters: {
@@ -142,6 +154,9 @@ export default new Vuex.Store({
     },
     getCurrentCourse(state): Course | null {
       return state.currentCourse;
+    },
+    getCurrentQuestion(state): StatementQuestion | null {
+      return state.currentQuestion;
     },
     getError(state): boolean {
       return state.error;

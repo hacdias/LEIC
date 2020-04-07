@@ -9,18 +9,38 @@ import java.util.stream.Collectors;
 
 
 public class StatementQuestionDto implements Serializable {
+    private Integer id;
+    private Integer questionId;
     private String content;
     private List<StatementOptionDto> options;
     private ImageDto image;
     private Integer sequence;
 
     public StatementQuestionDto(QuestionAnswer questionAnswer) {
+        this.id = questionAnswer.getId();
+        this.questionId = questionAnswer.getQuizQuestion().getQuestion().getId();
         this.content = questionAnswer.getQuizQuestion().getQuestion().getContent();
         if (questionAnswer.getQuizQuestion().getQuestion().getImage() != null) {
             this.image = new ImageDto(questionAnswer.getQuizQuestion().getQuestion().getImage());
         }
         this.options = questionAnswer.getQuizQuestion().getQuestion().getOptions().stream().map(StatementOptionDto::new).collect(Collectors.toList());
         this.sequence = questionAnswer.getSequence();
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Integer questionId) {
+        this.questionId = questionId;
     }
 
     public String getContent() {

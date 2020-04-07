@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
+import Query from '@/models/management/Query';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
@@ -549,6 +550,20 @@ export default class RemoteServices {
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
       .delete('/admin/courses/executions/' + courseExecutionId)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createQuery(query: Query): Promise<Query> {
+    return httpClient
+      .post(
+        `/question/${Store.getters.getCurrentQuestion.questionId}/questionAnswer/${Store.getters.getCurrentQuestion.id}/queries`,
+        query
+      )
+      .then(response => {
+        return new Query(response.data);
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
