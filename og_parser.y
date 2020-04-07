@@ -139,8 +139,8 @@ bvars     : bvar ';'                                             { $$ = new cdk:
           ;
 
 block     : '{' '}'                                              { $$ = new og::block_node(LINE, nullptr, nullptr); }
-          | '{' bvars '}'                                        { $$ = new og::block_node(LINE, nullptr, $2); }
-          | '{' insts '}'                                        { $$ = new og::block_node(LINE, $2, nullptr); }
+          | '{' bvars '}'                                        { $$ = new og::block_node(LINE, $2, nullptr); }
+          | '{' insts '}'                                        { $$ = new og::block_node(LINE, nullptr, $2); }
           | '{' bvars insts '}'                                  { $$ = new og::block_node(LINE, $2, $3); }
           ;
 
