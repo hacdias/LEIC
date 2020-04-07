@@ -231,7 +231,29 @@ void og::xml_writer::do_continue_node(og::continue_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
-  // TODO
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  os() << std::boolalpha;
+
+  os() << std::string(lvl, ' ') << "<" << node->label()
+    << " is_public='" << node->is_public()
+    << "' is_require='" << node->is_require()
+    << "' type='" << cdk::to_string(node->type())
+    << "'>" << std::endl;
+
+  openTag("identifiers", lvl + 2);
+  for (std::string *s : node->identifiers()) {
+    os() << std::string(lvl + 4, ' ') << "<identifier>" << *s << "</identifier>" << std::endl;
+  }
+  closeTag("identifiers", lvl + 2);
+
+  openTag("expression", lvl + 2);
+  if (node->expression() != nullptr) {
+    node->expression()->accept(this, lvl + 4);
+  }
+  closeTag("expression", lvl+2);
+
+  closeTag(node, lvl);
+  os() << std::noboolalpha;
 }
 
 //---------------------------------------------------------------------------
