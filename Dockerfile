@@ -24,3 +24,4 @@ RUN wget $EXAMPLES_URL -O examples.zip && \
   rm examples.zip
 
 COPY Makefile /proj/Makefile
+COPY xmlall.sh /proj/xmlall.sh

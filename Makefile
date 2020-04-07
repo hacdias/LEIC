@@ -14,10 +14,13 @@ build:
 	$(MAKE) -C src $(MAKEOPTS) ast/all.h ast/visitor_decls.h # to work with multiple jobs
 	$(MAKE) -C src $(MAKEOPTS) all
 
+xml: build
+	./xmlall.sh
+
 examples: build
 	$(MAKE) -C examples $(MAKEOPTS) all
 
-test: examples
+test: example
 
 clean:
 	$(MAKE) -C src $(MAKEOPTS) clean
