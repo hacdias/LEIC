@@ -249,6 +249,9 @@ void og::xml_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) 
 
 void og::xml_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  openTag(node, lvl);
+  node->lvalue()->accept(this, lvl + 2);
+  closeTag(node, lvl);
 }
 
 //---------------------------------------------------------------------------
