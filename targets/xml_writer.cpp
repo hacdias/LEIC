@@ -254,7 +254,22 @@ void og::xml_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_block_node(og::block_node *const node, int lvl) {
-  // TODO
+  /* TODO: ASSERT_SAFE_EXPRESSIONS; */
+  openTag(node, lvl);
+
+  openTag("declarations", lvl + 2);
+  if (node->declarations() != nullptr) {
+    node->declarations()->accept(this, lvl + 4);
+  }
+  closeTag("declarations", lvl + 2);
+
+  openTag("instructions", lvl + 2);
+  if (node->instructions() != nullptr) {
+    node->instructions()->accept(this, lvl + 4);
+  }
+  closeTag("instructions", lvl + 2);
+
+  closeTag(node, lvl);
 }
 
 //---------------------------------------------------------------------------
