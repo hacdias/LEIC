@@ -172,20 +172,25 @@ void og::xml_writer::do_input_node(og::input_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_for_node(og::for_node *const node, int lvl) {
-  // TODO
   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
   openTag(node, lvl);
 
   openTag("init", lvl + 2);
-  node->init()->accept(this, lvl + 4);
+  if (node->init() != nullptr) {
+    node->init()->accept(this, lvl + 4);
+  }
   closeTag("init", lvl + 2);
 
   openTag("condition", lvl + 2);
-  node->condition()->accept(this, lvl + 4);
+  if (node->condition() != nullptr) {
+    node->condition()->accept(this, lvl + 4);
+  }
   closeTag("condition", lvl + 2);
 
   openTag("end", lvl + 2);
-  node->end()->accept(this, lvl + 4);
+  if (node->end() != nullptr) {
+    node->end()->accept(this, lvl + 4);
+  }
   closeTag("end", lvl + 2);
 
   openTag("block", lvl + 2);
