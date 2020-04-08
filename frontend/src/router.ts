@@ -20,6 +20,7 @@ import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 
 import SubmittedQueriesView from './views/student/query/SubmittedQueriesView.vue';
+import SubmittedQueriesInCourseView from './views/teacher/query/SubmittedQueriesInCourseView.vue';
 
 import AdminManagementView from './views/admin/AdminManagementView.vue';
 import NotFoundView from './views/NotFoundView.vue';
@@ -69,6 +70,15 @@ let router = new Router({
           component: QuestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Questions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'queries',
+          name: 'queries-management',
+          component: SubmittedQueriesInCourseView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Queries',
             requiredAuth: 'Teacher'
           }
         },
