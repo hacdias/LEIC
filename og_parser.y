@@ -227,7 +227,7 @@ exps      : expr                                                 { $$ = new cdk:
           | exps ',' expr                                        { $$ = new cdk::sequence_node(LINE, $3, $1); }
           ;
 
-tuple     : exps                                                 { $$ = new og::tuple_node(LINE, new cdk::sequence_node(LINE, $1)); }
+tuple     : exps                                                 { $$ = new og::tuple_node(LINE, $1); }
           ;
 
 lval      : tIDENTIFIER                                          { $$ = new cdk::variable_node(LINE, $1); }
