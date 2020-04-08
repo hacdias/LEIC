@@ -34,7 +34,7 @@ import Query from '@/models/management/Query';
 
 @Component
 export default class SubmittedQueriesView extends Vue {
-  queries: Query[] = [];
+  queries: Query[] = []; 
 
   async created() {
     await this.$store.dispatch('loading');
