@@ -153,9 +153,9 @@ void og::xml_writer::do_write_node(og::write_node * const node, int lvl) {
     << " has_newline='" << node->has_newline()
     << "'>" << std::endl;
 
-  openTag("argument", lvl+2);
-  node->argument()->accept(this, lvl + 2);
-  closeTag("argument", lvl+2);
+  openTag("argument", lvl + 2);
+  node->argument()->accept(this, lvl + 4);
+  closeTag("argument", lvl + 2);
 
   closeTag(node, lvl);
   os() << std::noboolalpha;
@@ -358,15 +358,15 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
     << "' type='" << cdk::to_string(node->type())
     << "'>" << std::endl;
 
-  openTag("args", lvl+2);
+  openTag("args", lvl + 2);
   if (node->args() != nullptr) {
     node->args()->accept(this, lvl + 4);
   }
-  closeTag("args", lvl+2);
+  closeTag("args", lvl + 2);
 
-  openTag("block", lvl+2);
+  openTag("block", lvl + 2);
   node->block()->accept(this, lvl + 4);
-  closeTag("block", lvl+2);
+  closeTag("block", lvl + 2);
 
   closeTag(node, lvl);
   os() << std::noboolalpha;
@@ -410,7 +410,7 @@ void og::xml_writer::do_tuple_index_node(og::tuple_index_node *const node, int l
 void og::xml_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
   os() << std::string(lvl, ' ') << "<" << node->label() << " id='" << node->identifier() << "'>" << std::endl;
-  openTag("expressions", lvl+2);
+  openTag("expressions", lvl + 2);
 
   if (node->expressions() != nullptr) {
     node->expressions()->accept(this, lvl + 4);
@@ -423,6 +423,6 @@ void og::xml_writer::do_func_call_node(og::func_call_node *const node, int lvl) 
 void og::xml_writer::do_tuple_node(og::tuple_node *const node, int lvl) {
   /* TODO: ASSERT_SAFE_EXPRESSIONS; */
   openTag(node, lvl);
-  node->nodes()->accept(this, lvl + 4);
+  node->nodes()->accept(this, lvl + 2);
   closeTag(node, lvl);
 }
