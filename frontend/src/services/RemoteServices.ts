@@ -569,6 +569,19 @@ export default class RemoteServices {
       });
   }
 
+  static getSubmittedQueries(): Promise<Query[]> {
+    return httpClient
+      .get('/user/queries')
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new Query(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async exportAll() {
     return httpClient
       .get('/admin/export', {

@@ -7,6 +7,22 @@
         <div class="col">Date Created</div>
         <div class="col last-col"></div>
       </li>
+      <li
+        class="list-row"
+        v-for="query in queries"
+        :key="query.id"
+        @click="solveQuiz(quiz)"
+      >
+        <div class="col">
+          {{ query.title }}
+        </div>
+        <div class="col">
+          {{ query.creationDate }}
+        </div>
+        <div class="col last-col">
+          <i class="fas fa-chevron-circle-right"></i>
+        </div>
+      </li>
     </ul>
   </div>
 </template>
@@ -14,12 +30,16 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
+import Query from '@/models/management/Query';
 
 @Component
 export default class SubmittedQueriesView extends Vue {
+  queries: Query[] = [];
+
   async created() {
     await this.$store.dispatch('loading');
     try {
+      this.queries = (await RemoteServices.getSubmittedQueries()).reverse();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
