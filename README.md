@@ -6,7 +6,10 @@ Usage:
 
 ```bash
 $ docker pull hacdias/co20:latest
-$ docker run -v /path/to/project/source:/proj/src -it hacdias/co20
+$ docker run \
+  -v /path/to/project/source:/proj/src \
+  -v /path/to/xml/output:/proj/xml \
+  -it hacdias/co20
 ```
 
 Inside you can:
@@ -18,4 +21,6 @@ $ make
 $ make clean
 # Run the tests
 $ make test
+# Make XML from source files
+$ make xml
 ```

@@ -18,6 +18,7 @@ RUN zypper in -y -t pattern devel_basis
 
 WORKDIR /proj
 VOLUME /proj/src
+VOLUME /proj/xml
 
 RUN wget $EXAMPLES_URL -O examples.zip && \
   unzip examples.zip && \
