@@ -1,29 +1,6 @@
 <template>
   <div class="container">
-    <h2>Submitted Queries In Course</h2>
-    <ul>
-      <li class="list-header">
-        <div class="col">Title</div>
-        <div class="col">Date Created</div>
-        <div class="col last-col"></div>
-      </li>
-      <li
-        class="list-row"
-        v-for="query in queries"
-        :key="query.id"
-        @click="seeQuery(query)"
-      >
-        <div class="col">
-          {{ query.title }}
-        </div>
-        <div class="col">
-          {{ query.creationDate }}
-        </div>
-        <div class="col last-col">
-          <i class="fas fa-chevron-circle-right"></i>
-        </div>
-      </li>
-    </ul>
+    <h2>Query History</h2>
   </div>
 </template>
 
@@ -33,24 +10,18 @@ import RemoteServices from '@/services/RemoteServices';
 import Query from '@/models/management/Query';
 
 @Component
-export default class SubmittedQueriesView extends Vue {
-  queries: Query[] = [];
+export default class QueryView extends Vue {
+  query: Query[] = [];
 
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.queries = (
-        await RemoteServices.getSubmittedQueriesInCourse()
-      ).reverse();
+      this.query = this.$store.getters.getCurrentQuery;
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
-  }
-
-  async seeQuery(query: Query) {
-    this.$store.dispatch('currentQuery', query);
-    await this.$router.push({ name: 'see-query' });
+    console.log(this.query);
   }
 }
 </script>

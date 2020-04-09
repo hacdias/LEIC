@@ -42,7 +42,7 @@ public class QueryController {
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<QueryDto> getQueriesInTeachersCourse(Principal principal) {
         User teacher = (User) ((Authentication) principal).getPrincipal();
-        return this.queryService.getQueriesByStudent(teacher.getId());
+        return this.queryService.getQueriesInTeachersCourse(teacher.getId());
     }
 
     @PostMapping("/question/{questionId}/questionAnswer/{questionAnswerId}/queries")

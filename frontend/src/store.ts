@@ -5,12 +5,14 @@ import AuthDto from '@/models/user/AuthDto';
 import Course from '@/models/user/Course';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import User from '@/models/user/User';
+import Query from './models/management/Query';
 
 interface State {
   token: string;
   user: User | null;
   currentCourse: Course | null;
   currentQuestion: StatementQuestion | null;
+  currentQuery: Query | null;
   error: boolean;
   errorMessage: string;
   loading: boolean;
@@ -21,6 +23,7 @@ const state: State = {
   user: null,
   currentCourse: null,
   currentQuestion: null,
+  currentQuery: null,
   error: false,
   errorMessage: '',
   loading: false
@@ -60,6 +63,9 @@ export default new Vuex.Store({
     },
     currentQuestion(state, currentQuestion: StatementQuestion) {
       state.currentQuestion = currentQuestion;
+    },
+    currentQuery(state, currentQuery: Query) {
+      state.currentQuery = currentQuery;
     }
   },
   actions: {
@@ -121,8 +127,8 @@ export default new Vuex.Store({
     currentQuestion({ commit }, currentQuestion) {
       commit('currentQuestion', currentQuestion);
     },
-    currentQuestionAnswer({ commit }, currentQuestionAnswer) {
-      commit('currentQuestionAnswer', currentQuestionAnswer);
+    currentQuery({ commit }, currentQuery) {
+      commit('currentQuery', currentQuery);
     }
   },
   getters: {
@@ -157,6 +163,9 @@ export default new Vuex.Store({
     },
     getCurrentQuestion(state): StatementQuestion | null {
       return state.currentQuestion;
+    },
+    getCurrentQuery(state): Query | null {
+      return state.currentQuery;
     },
     getError(state): boolean {
       return state.error;
