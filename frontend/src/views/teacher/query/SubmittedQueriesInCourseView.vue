@@ -50,7 +50,7 @@ export default class SubmittedQueriesView extends Vue {
 
   async seeQuery(query: Query) {
     this.$store.dispatch('currentQuery', query);
-    await this.$router.push({ name: 'see-query' });
+    await this.$router.push({ name: 'see-query-management' });
   }
 }
 </script>

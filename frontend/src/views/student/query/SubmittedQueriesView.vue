@@ -11,7 +11,7 @@
         class="list-row"
         v-for="query in queries"
         :key="query.id"
-        @click="solveQuiz(quiz)"
+        @click="seeQuery(query)"
       >
         <div class="col">
           {{ query.title }}
@@ -44,6 +44,11 @@ export default class SubmittedQueriesView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async seeQuery(query: Query) {
+    this.$store.dispatch('currentQuery', query);
+    await this.$router.push({ name: 'see-query-student' });
   }
 }
 </script>
