@@ -66,7 +66,12 @@
         <v-btn color="blue darken-1" @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" data-cy="saveSuggestionButton" @click="saveSuggestion">Save</v-btn>
+        <v-btn
+          color="blue darken-1"
+          data-cy="saveSuggestionButton"
+          @click="saveSuggestion"
+          >Save</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

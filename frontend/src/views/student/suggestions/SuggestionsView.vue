@@ -20,7 +20,11 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newSuggestion" data-cy="createSuggestionButton"
+          <v-btn
+            color="primary"
+            dark
+            @click="newSuggestion"
+            data-cy="createSuggestionButton"
             >New Suggestion</v-btn
           >
         </v-card-title>
