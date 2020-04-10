@@ -607,12 +607,17 @@ export default class RemoteServices {
   }
 
   static deleteSuggestion(suggestionId: number) {
-    return httpClient.delete(`/suggestions/${suggestionId}`).catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+    return httpClient
+      .delete(`/suggestions/${suggestionId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 
-  static uploadSuggestionImage(file: File, suggestionId: number): Promise<string> {
+  static uploadSuggestionImage(
+    file: File,
+    suggestionId: number
+  ): Promise<string> {
     let formData = new FormData();
     formData.append('file', file);
     return httpClient

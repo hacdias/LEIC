@@ -147,7 +147,12 @@
           </v-list>
         </v-menu>
 
-        <v-btn to="/student/suggestions" v-if="isStudent && currentCourse" text dark>
+        <v-btn
+          to="/student/suggestions"
+          v-if="isStudent && currentCourse"
+          text
+          dark
+        >
           Suggestions
           <v-icon>fas fa-lightbulb</v-icon>
         </v-btn>
