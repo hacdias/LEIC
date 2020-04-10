@@ -570,7 +570,7 @@ export default class RemoteServices {
 
   static async getStudentSuggestions(): Promise<Suggestion[]> {
     return httpClient
-      .get(`/suggestions`)
+      .get('/suggestions')
       .then(response => {
         return response.data.map((suggestion: any) => {
           return new Suggestion(suggestion);
