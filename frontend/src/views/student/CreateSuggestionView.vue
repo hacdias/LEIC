@@ -1,13 +1,7 @@
 <template>
   <div class="container">
-    <h2>Submitted Suggestions</h2>
-    <ul>
-      <li class="list-header">
-        <div class="col">Title</div>
-        <div class="col">Date Created</div>
-        <div class="col last-col"></div>
-      </li>
-    </ul>
+    <h2>Create Suggestion</h2>
+  
   </div>
 </template>
 
@@ -15,7 +9,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 @Component
-export default class SuggestionsView extends Vue {
+export default class CreateSuggestionView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
