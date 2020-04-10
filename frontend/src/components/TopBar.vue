@@ -147,6 +147,25 @@
           </v-list>
         </v-menu>
 
+        <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" text dark>
+              Suggestions
+              <v-icon>fas fa-lightbulb</v-icon>
+            </v-btn>
+          </template>
+          <v-list dense>
+            <v-list-item to="/student/suggestions">
+              <v-list-item-action>
+                <v-icon>fas fa-feather</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>My Suggestions</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
