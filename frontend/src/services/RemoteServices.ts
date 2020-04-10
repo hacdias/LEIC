@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
+import Suggestion from '@/models/management/Suggestion';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
@@ -549,6 +550,85 @@ export default class RemoteServices {
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
       .delete('/admin/courses/executions/' + courseExecutionId)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getCourseSuggestions(): Promise<Suggestion[]> {
+    return httpClient
+      .get(`/courses/${Store.getters.getCurrentCourse.courseId}/suggestions`)
+      .then(response => {
+        return response.data.map((Suggestion: any) => {
+          return new Suggestion(Suggestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getStudentSuggestions(): Promise<Suggestion[]> {
+    return httpClient
+      .get('/suggestions')
+      .then(response => {
+        return response.data.map((suggestion: any) => {
+          return new Suggestion(suggestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createSuggestion(suggestion: Suggestion): Promise<Suggestion> {
+    return httpClient
+      .post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/suggestions/`,
+        suggestion
+      )
+      .then(response => {
+        return new Suggestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static updateSuggestion(suggestion: Suggestion): Promise<Suggestion> {
+    return httpClient
+      .put(`/suggestions/${suggestion.id}`, suggestion)
+      .then(response => {
+        return new Suggestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static deleteSuggestion(suggestionId: number) {
+    return httpClient
+      .delete(`/suggestions/${suggestionId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static uploadSuggestionImage(
+    file: File,
+    suggestionId: number
+  ): Promise<string> {
+    let formData = new FormData();
+    formData.append('file', file);
+    return httpClient
+      .put(`/suggestions/${suggestionId}/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(response => {
+        return response.data as string;
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

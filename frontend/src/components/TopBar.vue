@@ -147,6 +147,17 @@
           </v-list>
         </v-menu>
 
+        <v-btn
+          to="/student/suggestions"
+          v-if="isStudent && currentCourse"
+          text
+          dark
+          data-cy="suggestionsButton"
+        >
+          Suggestions
+          <v-icon>fas fa-lightbulb</v-icon>
+        </v-btn>
+
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
@@ -311,6 +322,13 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/suggestions">
+            <v-list-item-action>
+              <v-icon>lightbulb</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Suggestions</v-list-item-content>
           </v-list-item>
         </v-list-group>
 
