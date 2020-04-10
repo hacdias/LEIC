@@ -20,7 +20,7 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newSuggestion"
+          <v-btn color="primary" dark @click="newSuggestion" data-cy="createSuggestionButton"
             >New Suggestion</v-btn
           >
         </v-card-title>
@@ -83,6 +83,7 @@
               v-on="on"
               @click="deleteSuggestion(item)"
               color="red"
+              data-cy="deleteSuggestionButton"
               >delete</v-icon
             >
           </template>

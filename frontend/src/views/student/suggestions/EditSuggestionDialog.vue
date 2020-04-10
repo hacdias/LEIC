@@ -24,6 +24,7 @@
               <v-text-field
                 v-model="editSuggestion.question.title"
                 label="Title"
+                data-cy="Title"
               />
             </v-flex>
             <v-flex xs24 sm12 md12>
@@ -32,6 +33,7 @@
                 rows="10"
                 v-model="editSuggestion.question.content"
                 label="Content"
+                data-cy="Content"
               ></v-textarea>
             </v-flex>
             <v-flex
@@ -45,12 +47,14 @@
                 v-model="editSuggestion.question.options[index - 1].correct"
                 class="ma-4"
                 label="Correct"
+                :data-cy="`OptionCorrect[${index - 1}]`"
               />
               <v-textarea
                 outline
                 rows="10"
                 v-model="editSuggestion.question.options[index - 1].content"
                 label="Content"
+                :data-cy="`OptionContent[${index - 1}]`"
               ></v-textarea>
             </v-flex>
           </v-layout>
@@ -62,7 +66,7 @@
         <v-btn color="blue darken-1" @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" @click="saveSuggestion">Save</v-btn>
+        <v-btn color="blue darken-1" data-cy="saveSuggestionButton" @click="saveSuggestion">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

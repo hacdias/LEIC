@@ -152,6 +152,7 @@
           v-if="isStudent && currentCourse"
           text
           dark
+          data-cy="suggestionsButton"
         >
           Suggestions
           <v-icon>fas fa-lightbulb</v-icon>
