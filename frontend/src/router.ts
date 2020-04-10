@@ -18,8 +18,7 @@ import QuizView from './views/student/quiz/QuizView.vue';
 import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
-import SuggestionsView from './views/student/SuggestionsView.vue';
-import CreateSuggestionView from './views/student/CreateSuggestionView.vue';
+import SuggestionsView from './views/student/suggestions/SuggestionsView.vue';
 
 import AdminManagementView from './views/admin/AdminManagementView.vue';
 import NotFoundView from './views/NotFoundView.vue';
@@ -193,15 +192,6 @@ let router = new Router({
           component: SuggestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Suggestions',
-            requiredAuth: 'Student'
-          }
-        },
-        {
-          path: 'create-suggestion',
-          name: 'create-suggestion',
-          component: CreateSuggestionView,
-          meta: {
-            title: process.env.VUE_APP_NAME + ' - Create Suggestion',
             requiredAuth: 'Student'
           }
         }
