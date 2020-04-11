@@ -16,19 +16,8 @@ void og::type_checker::do_sequence_node(cdk::sequence_node *const node, int lvl)
 void og::type_checker::do_nil_node(cdk::nil_node *const node, int lvl) {
   // EMPTY
 }
+
 void og::type_checker::do_data_node(cdk::data_node *const node, int lvl) {
-  // EMPTY
-}
-void og::type_checker::do_double_node(cdk::double_node *const node, int lvl) {
-  // EMPTY
-}
-void og::type_checker::do_not_node(cdk::not_node *const node, int lvl) {
-  // EMPTY
-}
-void og::type_checker::do_and_node(cdk::and_node *const node, int lvl) {
-  // EMPTY
-}
-void og::type_checker::do_or_node(cdk::or_node *const node, int lvl) {
   // EMPTY
 }
 
@@ -44,6 +33,10 @@ void og::type_checker::do_string_node(cdk::string_node *const node, int lvl) {
   node->type(cdk::make_primitive_type(4, cdk::TYPE_STRING));
 }
 
+void og::type_checker::do_double_node(cdk::double_node *const node, int lvl) {
+  // EMPTY
+}
+
 //---------------------------------------------------------------------------
 
 void og::type_checker::processUnaryExpression(cdk::unary_operation_node *const node, int lvl) {
@@ -55,7 +48,16 @@ void og::type_checker::processUnaryExpression(cdk::unary_operation_node *const n
 }
 
 void og::type_checker::do_neg_node(cdk::neg_node *const node, int lvl) {
+  // TODO: int, double
   processUnaryExpression(node, lvl);
+}
+
+void og::type_checker::do_id_node(og::id_node *const node, int lvl) {
+  // TODO: int, double
+}
+
+void og::type_checker::do_not_node(cdk::not_node *const node, int lvl) {
+  // TODO: int
 }
 
 //---------------------------------------------------------------------------
@@ -73,37 +75,66 @@ void og::type_checker::processBinaryExpression(cdk::binary_operation_node *const
 }
 
 void og::type_checker::do_add_node(cdk::add_node *const node, int lvl) {
+  // TODO: int, real, pointer
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_sub_node(cdk::sub_node *const node, int lvl) {
+  // TODO: int, real, pointer
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_mul_node(cdk::mul_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_div_node(cdk::div_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_mod_node(cdk::mod_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_lt_node(cdk::lt_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_le_node(cdk::le_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_ge_node(cdk::ge_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_gt_node(cdk::gt_node *const node, int lvl) {
+  // TODO: int, real
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_ne_node(cdk::ne_node *const node, int lvl) {
+  // TODO: int, real, pointer
   processBinaryExpression(node, lvl);
 }
+
 void og::type_checker::do_eq_node(cdk::eq_node *const node, int lvl) {
+  // TODO: int, real, pointer
   processBinaryExpression(node, lvl);
+}
+
+void og::type_checker::do_and_node(cdk::and_node *const node, int lvl) {
+  // TODO: int
+}
+
+void og::type_checker::do_or_node(cdk::or_node *const node, int lvl) {
+  // TODO: int
 }
 
 //---------------------------------------------------------------------------
@@ -193,12 +224,6 @@ void og::type_checker::do_if_else_node(og::if_else_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
-  // TODO
-}
-
-//---------------------------------------------------------------------------
-
-void og::type_checker::do_id_node(og::id_node *const node, int lvl) {
   // TODO
 }
 
