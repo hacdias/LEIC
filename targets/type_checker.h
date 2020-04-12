@@ -24,8 +24,8 @@ namespace og {
     }
 
   protected:
-    void processUnaryExpression(cdk::unary_operation_node *const node, int lvl);
-    void processBinaryExpression(cdk::binary_operation_node *const node, int lvl);
+    void processUnaryExpression(cdk::unary_operation_node *const node, int lvl, bool acceptInt, bool acceptDouble);
+    void processBinaryExpression(cdk::binary_operation_node *const node, int lvl, bool acceptInt, bool acceptDouble, bool acceptPointer);
     template<typename T>
     void process_literal(cdk::literal_node<T> *const node, int lvl) {
     }
