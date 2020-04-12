@@ -65,26 +65,35 @@
 <X_STRING>\\"t"               *yylval.s += "\t";
 <X_STRING>\\\0                yy_push_state(X_ENDSTRING);
 <X_STRING>.|\n                *yylval.s += yytext;
-<X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::string(1, strtol(yytext, nullptr, 16));
+<X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::string(1, std::stoi(yytext, nullptr, 16));
 <X_ENDSTRING>\"               yy_pop_state(); yy_pop_state(); return tSTRING;
 <X_ENDSTRING>\\\"             ;
 <X_ENDSTRING>.                ;
 
 [0-9]+                        {
-  yylval.i = strtol(yytext, nullptr, 10);
-  if (errno == ERANGE) yyerror("Integer overflow");
+  try {
+    yylval.i = std::stoi(yytext, nullptr, 10);
+  } catch (std::out_of_range& e) {
+    yyerror("Integer overflow");
+  }
   return tINT;
 }
 
-0x[0-9A-Fa-f]+                {
-  yylval.i = strtol(yytext, nullptr, 16);
-  if (errno == ERANGE) yyerror("Integer overflow");
+0x[0-9A-Fa-f]+                 {
+  try {
+    yylval.i = std::stoi(yytext, nullptr, 16);
+  } catch (std::out_of_range& e) {
+    yyerror("Integer overflow");
+  }
   return tINT;
 }
 
 ((([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+))([eE][0-9]*)*)|([0-9]+[eE][0-9]+) {
-  yylval.r = strtod(yytext, nullptr);
-  if (errno == ERANGE) yyerror("Real overflow");
+  try {
+    yylval.r = std::stod(yytext, nullptr);
+  } catch (std::out_of_range& e) {
+    yyerror("Real overflow");
+  }
   return tREAL;
 }
 
