@@ -21,7 +21,6 @@
   cdk::lvalue_node            *lvalue;
   cdk::basic_type             *type;        /* a type */
   og::block_node              *block;       /* a block */
-  og::tuple_node              *tuple;       /* a tuple */
 };
 
 %token <i> tINT
@@ -53,8 +52,7 @@
 %type <strings> ids
 %type <node> inst program var icond iiter func proc inst decl param bvar fvar
 %type <sequence> exps decls insts args params bvars fvars_aux fvars
-%type <tuple> tuple
-%type <expression> expr
+%type <expression> expr tuple
 %type <lvalue> lval
 %type <type> type
 %type <block> block
