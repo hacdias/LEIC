@@ -184,10 +184,10 @@ iiter     : tFOR exps    ';' exps  ';' exps  tDO inst            { $$ = new og::
           | tFOR         ';' exps  ';'       tDO inst            { $$ = new og::for_node(LINE, nullptr, $3, nullptr, $6); }
           | tFOR         ';'       ';' exps  tDO inst            { $$ = new og::for_node(LINE, nullptr, nullptr, $4, $6); }
           | tFOR         ';'       ';'       tDO inst            { $$ = new og::for_node(LINE, nullptr, nullptr, nullptr, $5); }
-          | tFOR fnvars   ';' exps  ';' exps  tDO inst           { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
-          | tFOR fnvars   ';' exps  ';'       tDO inst           { $$ = new og::for_node(LINE, $2, $4, nullptr, $7); }
-          | tFOR fnvars   ';'       ';' exps  tDO inst           { $$ = new og::for_node(LINE, $2, nullptr, $5, $7); }
-          | tFOR fnvars   ';'       ';'       tDO inst           { $$ = new og::for_node(LINE, $2, nullptr, nullptr, $6); }
+          | tFOR fnvars  ';' exps  ';' exps  tDO inst            { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
+          | tFOR fnvars  ';' exps  ';'       tDO inst            { $$ = new og::for_node(LINE, $2, $4, nullptr, $7); }
+          | tFOR fnvars  ';'       ';' exps  tDO inst            { $$ = new og::for_node(LINE, $2, nullptr, $5, $7); }
+          | tFOR fnvars  ';'       ';'       tDO inst            { $$ = new og::for_node(LINE, $2, nullptr, nullptr, $6); }
           ;
 
 expr      : tINT                                                 { $$ = new cdk::integer_node(LINE, $1); }
