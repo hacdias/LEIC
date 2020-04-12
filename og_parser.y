@@ -168,8 +168,8 @@ fnvar     : type tIDENTIFIER                                     { $$ = new og::
           | type tIDENTIFIER '=' expr                            { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
           ;
 
-fnvars_aux: fnvar                                                 { $$ = new cdk::sequence_node(LINE, $1); }
-          | fnvars_aux ',' fnvar                                  { $$ = new cdk::sequence_node(LINE, $3, $1); }
+fnvars_aux: fnvar                                                { $$ = new cdk::sequence_node(LINE, $1); }
+          | fnvars_aux ',' fnvar                                 { $$ = new cdk::sequence_node(LINE, $3, $1); }
           ;
 
 fnvars    : tTPAUTO ids '=' tuple                                { $$ = new cdk::sequence_node(LINE, new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4)); }
