@@ -90,7 +90,7 @@
 
 [-()[\]<>=+*/%;{}.,@?]        return *yytext;
 
-[ \n\r\t]+                      ; /* ignore whitespace */
+[ \n\r\t]+                    ; /* ignore whitespace */
 
 .                             yyerror("Unknown character");
 
