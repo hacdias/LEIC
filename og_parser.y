@@ -50,8 +50,8 @@
 
 %type <s> string
 %type <strings> ids
-%type <node> inst program var icond iiter func proc inst decl param bvar fvar
-%type <sequence> exps decls insts args params bvars fvars_aux fvars
+%type <node> inst program var icond iiter func proc inst decl param bvar fnvar
+%type <sequence> exps decls insts args params bvars fnvars_aux fnvars
 %type <expression> expr tuple
 %type <lvalue> lval
 %type <type> type
@@ -164,16 +164,16 @@ icond     : expr tTHEN inst %prec tIFX                           { $$ = new og::
           | expr tTHEN inst tELIF icond                          { $$ = new og::if_else_node(LINE, $1, $3, $5); }
           ;
 
-fvar      : type tIDENTIFIER                                     { $$ = new og::var_decl_node(LINE, false, false, $1, $2, nullptr); }
+fnvar     : type tIDENTIFIER                                     { $$ = new og::var_decl_node(LINE, false, false, $1, $2, nullptr); }
           | type tIDENTIFIER '=' expr                            { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
           ;
 
-fvars_aux : fvar                                                 { $$ = new cdk::sequence_node(LINE, $1); }
-          | fvars_aux ',' fvar                                   { $$ = new cdk::sequence_node(LINE, $3, $1); }
+fnvars_aux: fnvar                                                 { $$ = new cdk::sequence_node(LINE, $1); }
+          | fnvars_aux ',' fnvar                                  { $$ = new cdk::sequence_node(LINE, $3, $1); }
           ;
 
-fvars     : tTPAUTO ids '=' tuple                                { $$ = new cdk::sequence_node(LINE, new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4)); }
-          | fvars_aux                                            { $$ = $1; }
+fnvars    : tTPAUTO ids '=' tuple                                { $$ = new cdk::sequence_node(LINE, new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4)); }
+          | fnvars_aux                                           { $$ = $1; }
           ;
 
 iiter     : tFOR exps    ';' exps  ';' exps  tDO inst            { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
@@ -184,10 +184,10 @@ iiter     : tFOR exps    ';' exps  ';' exps  tDO inst            { $$ = new og::
           | tFOR         ';' exps  ';'       tDO inst            { $$ = new og::for_node(LINE, nullptr, $3, nullptr, $6); }
           | tFOR         ';'       ';' exps  tDO inst            { $$ = new og::for_node(LINE, nullptr, nullptr, $4, $6); }
           | tFOR         ';'       ';'       tDO inst            { $$ = new og::for_node(LINE, nullptr, nullptr, nullptr, $5); }
-          | tFOR fvars   ';' exps  ';' exps  tDO inst            { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
-          | tFOR fvars   ';' exps  ';'       tDO inst            { $$ = new og::for_node(LINE, $2, $4, nullptr, $7); }
-          | tFOR fvars   ';'       ';' exps  tDO inst            { $$ = new og::for_node(LINE, $2, nullptr, $5, $7); }
-          | tFOR fvars   ';'       ';'       tDO inst            { $$ = new og::for_node(LINE, $2, nullptr, nullptr, $6); }
+          | tFOR fnvars   ';' exps  ';' exps  tDO inst           { $$ = new og::for_node(LINE, $2, $4, $6, $8); }
+          | tFOR fnvars   ';' exps  ';'       tDO inst           { $$ = new og::for_node(LINE, $2, $4, nullptr, $7); }
+          | tFOR fnvars   ';'       ';' exps  tDO inst           { $$ = new og::for_node(LINE, $2, nullptr, $5, $7); }
+          | tFOR fnvars   ';'       ';'       tDO inst           { $$ = new og::for_node(LINE, $2, nullptr, nullptr, $6); }
           ;
 
 expr      : tINT                                                 { $$ = new cdk::integer_node(LINE, $1); }
