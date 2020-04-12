@@ -65,7 +65,7 @@
 <X_STRING>\\"t"               *yylval.s += "\t";
 <X_STRING>\\\0                yy_push_state(X_ENDSTRING);
 <X_STRING>.|\n                *yylval.s += yytext;
-<X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::string(1, std::stoi(yytext, nullptr, 16));
+<X_STRING>\\[0-9a-fA-F]{1,2}  *yylval.s += std::stoi(yytext + 1, nullptr, 16);
 <X_ENDSTRING>\"               yy_pop_state(); yy_pop_state(); return tSTRING;
 <X_ENDSTRING>\\\"             ;
 <X_ENDSTRING>.                ;
