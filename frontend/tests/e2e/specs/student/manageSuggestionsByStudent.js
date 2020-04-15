@@ -1,12 +1,12 @@
 describe('Suggestions walkthrough', () => {
   beforeEach(() => {
-    cy.demoStudentLogin()
-    cy.navigateSuggestions()
-  })
+    cy.demoStudentLogin();
+    cy.navigateSuggestions();
+  });
 
   afterEach(() => {
-    cy.contains('Logout').click()
-  })
+    cy.contains('Logout').click();
+  });
 
   it('login creates and deletes a suggestion', () => {
     cy.createSuggestion('Test-Question', 'Test Question Content', [
@@ -26,9 +26,8 @@ describe('Suggestions walkthrough', () => {
         correct: false,
         content: 'Option 4'
       }
-    ])
+    ]);
 
-    cy.deleteSuggestion('Test-Question')
-  })
-
+    cy.deleteSuggestion('Test-Question');
+  });
 });
