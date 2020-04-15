@@ -5,24 +5,11 @@
       <li class="list-header">
         <div class="col">Title</div>
         <div class="col">Date Created</div>
+        <div class="col">Number of Answers</div>
         <div class="col last-col"></div>
       </li>
-      <li
-        class="list-row"
-        v-for="query in queries"
-        :key="query.id"
-        @click="seeQuery(query)"
-      >
-        <div class="col">
-          {{ query.title }}
-        </div>
-        <div class="col">
-          {{ query.creationDate }}
-        </div>
-        <div class="col last-col">
-          <i class="fas fa-chevron-circle-right"></i>
-        </div>
-      </li>
+      <show-query-list :queries="queries"
+       @see-query="seeQuery"/>
     </ul>
   </div>
 </template>
@@ -31,8 +18,13 @@
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Query from '@/models/management/Query';
+import ShowQueryList from '@/components/ShowQueryList.vue';
 
-@Component
+@Component({
+  components: {
+    'show-query-list': ShowQueryList
+  }
+})
 export default class SubmittedQueriesView extends Vue {
   queries: Query[] = [];
 
@@ -46,8 +38,7 @@ export default class SubmittedQueriesView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async seeQuery(query: Query) {
-    this.$store.dispatch('currentQuery', query);
+  async seeQuery() {
     await this.$router.push({ name: 'see-query-student' });
   }
 }

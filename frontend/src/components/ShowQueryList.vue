@@ -23,16 +23,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 import Query from '@/models/management/Query';
+import { RawLocation } from 'vue-router';
 
 @Component
 export default class ShowQueryList extends Vue {
   @Prop({ type: Array, required: true }) readonly queries!: Query[];
 
-  async seeQuery(query: Query) {
+  @Emit('see-query')
+  seeQuery(query: Query) {
     this.$store.dispatch('currentQuery', query);
-    await this.$router.push({ name: 'see-query-management' });
+    return 1;
   }
 }
 </script>

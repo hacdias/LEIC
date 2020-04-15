@@ -8,9 +8,11 @@
         <div class="col">Number of Answers</div>
         <div class="col last-col"></div>
       </li>
-      <show-query-list :queries="queriesUnanswered(queries)" />
+      <show-query-list :queries="queriesUnanswered(queries)"
+        @see-query="seeQuery"/>
       <br />
-      <show-query-list :queries="queriesAnswered(queries)" />
+      <show-query-list :queries="queriesAnswered(queries)"
+        @see-query="seeQuery"/>
     </ul>
   </div>
 </template>
@@ -47,6 +49,10 @@ export default class SubmittedQueriesView extends Vue {
 
   queriesAnswered(queries: Query[]) {
     return this.queries.filter(query => query.numberAnswers != 0);
+  }
+
+  async seeQuery() {
+    await this.$router.push({ name: 'see-query-management' });
   }
 }
 </script>
