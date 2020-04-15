@@ -5,24 +5,12 @@
       <li class="list-header">
         <div class="col">Title</div>
         <div class="col">Date Created</div>
+        <div class="col">Number of Answers</div>
         <div class="col last-col"></div>
       </li>
-      <li
-        class="list-row"
-        v-for="query in queries"
-        :key="query.id"
-        @click="seeQuery(query)"
-      >
-        <div class="col">
-          {{ query.title }}
-        </div>
-        <div class="col">
-          {{ query.creationDate }}
-        </div>
-        <div class="col last-col">
-          <i class="fas fa-chevron-circle-right"></i>
-        </div>
-      </li>
+      <show-query-list :queries="queriesUnanswered(queries)" />
+      <br />
+      <show-query-list :queries="queriesAnswered(queries)" />
     </ul>
   </div>
 </template>
@@ -31,8 +19,13 @@
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Query from '@/models/management/Query';
+import ShowQueryList from '@/components/ShowQueryList.vue';
 
-@Component
+@Component({
+  components: {
+    'show-query-list': ShowQueryList
+  }
+})
 export default class SubmittedQueriesView extends Vue {
   queries: Query[] = [];
 
@@ -48,9 +41,12 @@ export default class SubmittedQueriesView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async seeQuery(query: Query) {
-    this.$store.dispatch('currentQuery', query);
-    await this.$router.push({ name: 'see-query-management' });
+  queriesUnanswered(queries: Query[]) {
+    return this.queries.filter(query => query.numberAnswers == 0);
+  }
+
+  queriesAnswered(queries: Query[]) {
+    return this.queries.filter(query => query.numberAnswers != 0);
   }
 }
 </script>
@@ -91,18 +87,6 @@ export default class SubmittedQueriesView extends Vue {
       text-transform: uppercase;
       letter-spacing: 0.03em;
       text-align: center;
-    }
-
-    .col {
-      flex-basis: 25% !important;
-      margin: auto; /* Important */
-      text-align: center;
-    }
-
-    .list-row {
-      background-color: #ffffff;
-      box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.1);
-      display: flex;
     }
   }
 }

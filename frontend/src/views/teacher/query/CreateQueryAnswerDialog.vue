@@ -9,20 +9,17 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          New Query
+          New Query Answer
         </span>
       </v-card-title>
-      <v-card-text class="text-left" v-if="createQuery">
+      <v-card-text class="text-left" v-if="createQueryAnswer">
         <v-container grid-list-md fluid>
           <v-layout column wrap>
-            <v-flex xs24 sm12 md8>
-              <v-text-field v-model="createQuery.title" label="Title" />
-            </v-flex>
             <v-flex xs24 sm12 md12>
               <v-textarea
                 outline
                 rows="10"
-                v-model="createQuery.content"
+                v-model="createQueryAnswer.content"
                 label="Content"
               ></v-textarea>
             </v-flex>
@@ -35,7 +32,7 @@
         <v-btn color="blue darken-1" @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" @click="saveQuery">Save</v-btn>
+        <v-btn color="blue darken-1" @click="saveQueryAnswer">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -43,32 +40,32 @@
 
 <script lang="ts">
 import { Component, Model, Prop, Vue } from 'vue-property-decorator';
-import Query from '@/models/management/Query';
+import QueryAnswer from '@/models/management/QueryAnswer';
 import RemoteServices from '@/services/RemoteServices';
 
 @Component
-export default class CreateQueryDialog extends Vue {
+export default class createQueryAnswerDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
-  @Prop({ type: Query, required: true }) readonly query!: Query;
-  createQuery!: Query;
+  @Prop({ type: QueryAnswer, required: true })
+  readonly queryAnswer!: QueryAnswer;
+  createQueryAnswer!: QueryAnswer;
 
   created() {
-    this.createQuery = new Query(this.query);
+    this.createQueryAnswer = new QueryAnswer(this.queryAnswer);
   }
 
-  async saveQuery() {
-    if (
-      this.createQuery &&
-      (!this.createQuery.title || !this.createQuery.content)
-    ) {
-      await this.$store.dispatch('error', 'Query must have title and content');
+  async saveQueryAnswer() {
+    if (this.createQueryAnswer && !this.createQueryAnswer.content) {
+      await this.$store.dispatch('error', 'Answer Query must have content');
       return;
     }
 
-    if (this.createQuery) {
+    if (this.createQueryAnswer) {
       try {
-        const result = await RemoteServices.createQuery(this.createQuery);
-        this.$emit('save-query', result);
+        const result = await RemoteServices.createQueryAnswer(
+          this.createQueryAnswer
+        );
+        this.$emit('save-query-answer', result);
       } catch (error) {
         await this.$store.dispatch('error', error);
       }

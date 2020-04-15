@@ -11,6 +11,9 @@ public class QueryDto implements Serializable {
     private String title;
     private String content;
     private String creationDate = null;
+    private Integer numberAnswers;
+    private Integer questionId;
+    private String byName;
 
     public QueryDto() {
     }
@@ -19,6 +22,9 @@ public class QueryDto implements Serializable {
         this.id = query.getId();
         this.title = query.getTitle();
         this.content = query.getContent();
+        this.numberAnswers = query.getAnswers().size();
+        this.questionId = query.getQuestion().getId();
+        this.byName = query.getStudent().getName();
 
         if (query.getCreationDate() != null)
             this.creationDate = query.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -39,6 +45,16 @@ public class QueryDto implements Serializable {
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
+
+    public Integer getNumberAnswers() { return numberAnswers; }
+
+    public Integer getQuestionId() { return questionId; }
+
+    public void setQuestionId(Integer questionId) { this.questionId = questionId; }
+
+    public String getbyName() { return this.byName; }
+
+    public void setbyName(String byName) { this.byName = byName; }
 
     @Override
     public String toString() {

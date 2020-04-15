@@ -1,26 +1,74 @@
 <template>
   <div class="container">
     <h2>Query History</h2>
+    <question-of-query-component :question="question" />
+    <br />
+    <query-component :query="query" />
+    <br />
+    <show-query-answer-list :answers="answers" />
+    <div class="query-content">
+      <v-btn color="primary" dark @click="newQueryAnswer()">
+        Answer
+      </v-btn>
+    </div>
+    <create-answer-query-dialog
+      v-if="currentQueryAnswer"
+      v-model="createQueryAnswerDialog"
+      :queryAnswer="currentQueryAnswer"
+      v-on:save-query-answer="onSaveQueryAnswer"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
+import Question from '@/models/management/Question';
 import Query from '@/models/management/Query';
+import QueryAnswer from '@/models/management/QueryAnswer';
+import CreateQueryAnswerDialog from '@/views/teacher/query/CreateQueryAnswerDialog.vue';
+import QuestionOfQueryComponent from '@/components/QuestionOfQueryComponent.vue';
+import ShowQueryAnswerList from '@/components/ShowQueryAnswerList.vue';
+import QueryComponent from '../../../components/QueryComponent.vue';
 
-@Component
+@Component({
+  components: {
+    'question-of-query-component': QuestionOfQueryComponent,
+    'query-component': QueryComponent,
+    'show-query-answer-list': ShowQueryAnswerList,
+    'create-answer-query-dialog': CreateQueryAnswerDialog
+  }
+})
 export default class QueryView extends Vue {
-  query: Query[] = [];
+  createQueryAnswerDialog: boolean = false;
+
+  question: Question | null = null;
+  query: Query | null = this.$store.getters.getCurrentQuery;
+  answers: QueryAnswer[] = [];
+  currentQueryAnswer: QueryAnswer | null = null;
 
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.query = this.$store.getters.getCurrentQuery;
+      this.answers = await RemoteServices.getAnswersToQuery();
+      if (this.query != null && this.query.questionId != null)
+        this.question = await RemoteServices.getQuestion(this.query.questionId);
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async newQueryAnswer() {
+    this.currentQueryAnswer = new QueryAnswer();
+    this.createQueryAnswerDialog = true;
+  }
+
+  async onSaveQueryAnswer(queryAnswer: QueryAnswer) {
+    this.answers = this.answers.filter(a => a.id !== queryAnswer.id);
+    this.answers.push(queryAnswer);
+    this.createQueryAnswerDialog = false;
+    this.currentQueryAnswer = null;
   }
 }
 </script>
@@ -45,35 +93,6 @@ export default class QueryView extends Vue {
   ul {
     overflow: hidden;
     padding: 0 5px;
-
-    li {
-      border-radius: 3px;
-      padding: 15px 10px;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .list-header {
-      background-color: #1976d2;
-      color: white;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      text-align: center;
-    }
-
-    .col {
-      flex-basis: 25% !important;
-      margin: auto; /* Important */
-      text-align: center;
-    }
-
-    .list-row {
-      background-color: #ffffff;
-      box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.1);
-      display: flex;
-    }
   }
 }
 </style>

@@ -2,6 +2,7 @@ import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
 import Query from '@/models/management/Query';
+import QueryAnswer from '@/models/management/QueryAnswer';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
@@ -15,6 +16,7 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswer } from '@/models/management/QuizAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
+import { QuestionAnswer } from '@/models/management/QuestionAnswer';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -133,6 +135,17 @@ export default class RemoteServices {
         return response.data.map((question: any) => {
           return new Question(question);
         });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getQuestion(questionId: number): Promise<Question> {
+    return httpClient
+      .get(`/questions/${questionId}`)
+      .then(response => {
+        return new Question(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -589,6 +602,30 @@ export default class RemoteServices {
         return response.data.map((query: any) => {
           return new Query(query);
         });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getAnswersToQuery(): Promise<QueryAnswer[]> {
+    return httpClient
+      .get(`/query/${Store.getters.getCurrentQuery.id}/answers`)
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new QueryAnswer(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createQueryAnswer(queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+    return httpClient
+      .post(`/query/${Store.getters.getCurrentQuery.id}/answers`, queryAnswer)
+      .then(response => {
+        return new QueryAnswer(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));

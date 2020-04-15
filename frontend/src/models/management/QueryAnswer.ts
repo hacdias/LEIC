@@ -1,13 +1,15 @@
 export default class QueryAnswer {
-    id: number | null = null;
-    content: string = '';
-    creationDate!: string | null;
-  
-    constructor(jsonObj?: QueryAnswer) {
-      if (jsonObj) {
-        this.id = jsonObj.id;
-        this.content = jsonObj.content;
-        this.creationDate = jsonObj.creationDate;
-      } 
+  id: number | null = null;
+  content: string = '';
+  creationDate!: string | null;
+  byName: string = '';
+
+  constructor(jsonObj?: QueryAnswer) {
+    if (jsonObj) {
+      this.id = jsonObj.id;
+      this.content = jsonObj.content;
+      this.creationDate = jsonObj.creationDate;
+      this.byName = jsonObj.byName;
     }
   }
+}
