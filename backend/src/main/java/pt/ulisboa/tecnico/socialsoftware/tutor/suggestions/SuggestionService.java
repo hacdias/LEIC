@@ -12,6 +12,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
@@ -35,6 +38,9 @@ public class SuggestionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     @Retryable(
             value = { SQLException.class },
@@ -68,6 +74,7 @@ public class SuggestionService {
                 .findById(suggestionId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
 
+        suggestion.getQuestion().update(suggestionDto.getQuestion());
         suggestion.update(suggestionDto);
         return new SuggestionDto(suggestion);
     }
@@ -82,6 +89,27 @@ public class SuggestionService {
                 .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
 
         return new SuggestionDto(suggestion);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void uploadImage(Integer suggestionId, String type) {
+        Suggestion suggestion = suggestionRepository.findById(suggestionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.SUGGESTION_NOT_FOUND, suggestionId));
+
+        Question question = suggestion.getQuestion();
+
+        Image image = question.getImage();
+
+        if (image == null) {
+            image = new Image();
+            question.setImage(image);
+            imageRepository.save(image);
+        }
+
+        question.getImage().setUrl(question.getKey() + "." + type);
     }
 
     @Retryable(
