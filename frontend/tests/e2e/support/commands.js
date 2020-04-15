@@ -21,5 +21,93 @@
 // Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
 //
 //
-// -- This is will overwrite an existing command --
+// -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+/// <reference types="Cypress" />
+Cypress.Commands.add('demoAdminLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="adminButton"]').click();
+  cy.contains('Administration').click();
+  cy.contains('Manage Courses').click();
+});
+
+Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
+  cy.get('[data-cy="createButton"]').click();
+  cy.get('[data-cy="Name"]').type(name);
+  cy.get('[data-cy="Acronym"]').type(acronym);
+  cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+  cy.get('[data-cy="saveButton"]').click();
+});
+
+Cypress.Commands.add('closeErrorMessage', (name, acronym, academicTerm) => {
+  cy.contains('Error')
+    .parent()
+    .find('button')
+    .click();
+});
+
+Cypress.Commands.add('deleteCourseExecution', acronym => {
+  cy.contains(acronym)
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 7)
+    .find('[data-cy="deleteCourse"]')
+    .click();
+});
+
+Cypress.Commands.add(
+  'createFromCourseExecution',
+  (name, acronym, academicTerm) => {
+    cy.contains(name)
+      .parent()
+      .should('have.length', 1)
+      .children()
+      .should('have.length', 7)
+      .find('[data-cy="createFromCourse"]')
+      .click();
+    cy.get('[data-cy="Acronym"]').type(acronym);
+    cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+    cy.get('[data-cy="saveButton"]').click();
+  }
+);
+
+Cypress.Commands.add('demoStudentLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="studentButton"]').click();
+});
+
+Cypress.Commands.add('navigateSuggestions', () => {
+  cy.get('[data-cy="suggestionsButton"]').click();
+});
+
+Cypress.Commands.add('createSuggestion', (name, content, options) => {
+  cy.get('[data-cy="createSuggestionButton"]').click();
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').type(name);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').type(content);
+
+  for (let i = 0; i < options.length; i++) {
+    cy.get(`[data-cy="OptionCorrect[${i}]"]`).focus();
+    if (options[i].correct) {
+      // Checkbox is hidden so we need to force.
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).check({ force: true });
+    }
+    cy.get(`[data-cy="OptionContent[${i}]"]`).focus();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).type(options[i].content);
+  }
+
+  cy.get('[data-cy="saveSuggestionButton"]').click();
+});
+
+Cypress.Commands.add('deleteSuggestion', title => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 6)
+    .find('[data-cy="deleteSuggestionButton"]')
+    .click();
+});
