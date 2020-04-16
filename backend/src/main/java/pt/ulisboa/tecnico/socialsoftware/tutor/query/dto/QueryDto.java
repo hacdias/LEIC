@@ -13,6 +13,7 @@ public class QueryDto implements Serializable {
     private String creationDate = null;
     private Integer numberAnswers;
     private Integer questionId;
+    private String byUsername;
     private String byName;
 
     public QueryDto() {
@@ -24,6 +25,7 @@ public class QueryDto implements Serializable {
         this.content = query.getContent();
         this.numberAnswers = query.getAnswers().size();
         this.questionId = query.getQuestion().getId();
+        this.byUsername = query.getStudent().getUsername();
         this.byName = query.getStudent().getName();
 
         if (query.getCreationDate() != null)
@@ -53,6 +55,10 @@ public class QueryDto implements Serializable {
     public void setQuestionId(Integer questionId) { this.questionId = questionId; }
 
     public String getbyName() { return this.byName; }
+
+    public void setbyUsername(String byUsername) { this.byUsername = byUsername; }
+
+    public String getbyUsername() { return this.byUsername; }
 
     public void setbyName(String byName) { this.byName = byName; }
 

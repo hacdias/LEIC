@@ -582,6 +582,23 @@ export default class RemoteServices {
       });
   }
 
+  static async updateQuery(query: Query): Promise<Query> {
+    return httpClient
+      .put(`/queries/${query.id}`, query)
+      .then(response => {
+        return new Query(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async deleteQuery(queryId: number) {
+    return httpClient.delete(`/queries/${queryId}`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
+  }
+
   static getSubmittedQueries(): Promise<Query[]> {
     return httpClient
       .get('/user/queries')

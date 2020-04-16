@@ -5,6 +5,7 @@ export default class Query {
   creationDate!: string | null;
   numberAnswers: number | null = null;
   questionId: number | null = null;
+  byUsername: string = '';
   byName: string = '';
 
   constructor(jsonObj?: Query) {
@@ -15,6 +16,7 @@ export default class Query {
       this.creationDate = jsonObj.creationDate;
       this.numberAnswers = jsonObj.numberAnswers;
       this.questionId = jsonObj.questionId;
+      this.byUsername = jsonObj.byUsername;
       this.byName = jsonObj.byName;
     }
   }

@@ -357,6 +357,14 @@
             </v-list-item-action>
             <v-list-item-content>Suggestions</v-list-item-content>
           </v-list-item>
+
+          <v-list-item to="/student/queries">
+            <v-list-item-action>
+              <v-icon>fas fa-question-circle</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Queries Submitted
+            </v-list-item-content>
+          </v-list-item>
         </v-list-group>
 
         <v-list-item to="/courses" v-if="isLoggedIn && moreThanOneCourse">
