@@ -25,12 +25,12 @@ public class SpotterApp {
 			System.exit(1);
 		}
 
-		final String host = args[0];
-		final int port = Integer.parseInt(args[1]);
-		final SiloFrontend api = new SiloFrontend(host, port);
+		final String zooHost = args[0];
+		final int zooPort = Integer.parseInt(args[1]);
+		final SiloFrontend api = new SiloFrontend(zooHost, zooPort);
 
-		System.out.printf("Server address: %s\n", host);
-		System.out.printf("Server port: %s\n", port);
+		System.out.printf("Server address: %s\n", zooHost);
+		System.out.printf("Server port: %s\n", zooPort);
 
 		Scanner scanner = new Scanner(System.in);
 		System.out.printf("> ");

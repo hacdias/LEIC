@@ -37,6 +37,10 @@ import pt.tecnico.sauron.silo.grpc.Silo.TrackMatchResponse;
 import pt.tecnico.sauron.silo.grpc.Silo.TrackRequest;
 import pt.tecnico.sauron.silo.grpc.Silo.TrackResponse;
 
+import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
+import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
+import pt.ulisboa.tecnico.sdis.zk.ZKRecord;
+
 public class SiloFrontend implements AutoCloseable {
   private String serverAddress;
   private Integer serverPort;
@@ -46,9 +50,19 @@ public class SiloFrontend implements AutoCloseable {
   public SiloFrontend(String address, Integer port) {
     serverAddress = address;
     serverPort = port;
-    String target = serverAddress + ":" + serverPort;
-    channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
-    stub = SauronGrpc.newBlockingStub(channel);
+    String path = address + ":" + port;
+
+    ZKNaming zkNaming = new ZKNaming(address, Integer.toString(port));
+
+    try {
+      ZKRecord record = zkNaming.lookup(path);
+      String target = record.getURI();
+
+      channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
+      stub = SauronGrpc.newBlockingStub(channel);
+    } catch (ZKNamingException e) {
+      System.err.println("There was an error with ZKNamingException: " + e);
+    }
   }
 
   private final Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(

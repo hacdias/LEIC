@@ -34,13 +34,14 @@ public class EyeApp {
 			System.exit(1);
 		}
 
-		final String host = args[0];
-		final Integer port = Integer.parseInt(args[1]);
+		final String zooHost = args[0];
+		final Integer zooPort = Integer.parseInt(args[1]);
+
 		final String cameraName = args[2];
 		final Double coordinatesLatitude = Double.parseDouble(args[3]);
 		final Double coordinatesLongitude = Double.parseDouble(args[4]);
 	
-		final SiloFrontend api = new SiloFrontend(host, port);
+		final SiloFrontend api = new SiloFrontend(zooHost, zooPort);
 		try {
 			api.camJoin(cameraName, coordinatesLatitude, coordinatesLongitude);
 		} catch(SauronClientException e){
