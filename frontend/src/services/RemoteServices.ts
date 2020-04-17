@@ -567,6 +567,19 @@ export default class RemoteServices {
       });
   }
 
+  static async getTeacherSuggestions(): Promise<Suggestion[]> {
+    return httpClient
+      .get('/teacher/suggestions')
+      .then(response => {
+        return response.data.map((suggestion: any) => {
+          return new Suggestion(suggestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async getStudentSuggestions(): Promise<Suggestion[]> {
     return httpClient
       .get('/suggestions')

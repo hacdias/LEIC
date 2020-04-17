@@ -51,7 +51,7 @@ public class SuggestionController {
         return suggestionService.findSuggestionById(suggestionId);
     }
 
-    @GetMapping("/courses/suggestions")
+    @GetMapping("/teacher/suggestions")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<SuggestionDto> getSuggestionsInTeachersCourse(Authentication authentication) {
         Integer teacherId = ((User) authentication.getPrincipal()).getId();
