@@ -74,7 +74,7 @@ let router = new Router({
         },
         {
           path: 'suggestions',
-          name: 'suggestions',
+          name: 'suggestions-management',
           component: TeacherSuggestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Suggestions',
