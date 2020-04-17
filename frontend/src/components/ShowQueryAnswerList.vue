@@ -17,7 +17,7 @@
         :key="answer.id"
       >
         <v-layout column wrap>
-           <v-container class="query-answer-header" grid-list-md fluid>
+          <v-container class="query-answer-header" grid-list-md fluid>
             <div class="float-right" v-if="isAuthor(answer)">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -43,7 +43,11 @@
                 <span>Delete Query Answer</span>
               </v-tooltip>
             </div>
-            <p>{{ answer.creationDate }} <b>by</b> {{ answer.byName }} ({{ answer.byUsername }})</p>
+            <p>
+              {{ answer.creationDate }} <b>by</b> {{ answer.byName }} ({{
+                answer.byUsername
+              }})
+            </p>
           </v-container>
           <div class="text--primary pre-formatted">
             {{ answer.content }}
@@ -66,7 +70,7 @@ export default class ShowQueryAnswerList extends Vue {
     return this.answers.length == 0;
   }
 
-  isAuthor(answer : QueryAnswer) {
+  isAuthor(answer: QueryAnswer) {
     let activeUser = this.$store.getters.getUser;
     return activeUser && activeUser.username == answer.byUsername;
   }

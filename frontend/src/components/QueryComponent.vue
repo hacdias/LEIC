@@ -7,10 +7,7 @@
             <div class="float-right" v-if="isAuthor">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon
-                    class="mr-2"
-                    v-on="on"
-                    @click="$emit('edit-query')"
+                  <v-icon class="mr-2" v-on="on" @click="$emit('edit-query')"
                     >edit</v-icon
                   >
                 </template>
@@ -33,7 +30,11 @@
               {{ query.title }}
             </p>
           </v-container>
-          <p>{{ query.creationDate }} <b>by</b> {{ query.byName }} ({{ query.byUsername }})</p>
+          <p>
+            {{ query.creationDate }} <b>by</b> {{ query.byName }} ({{
+              query.byUsername
+            }})
+          </p>
           <div class="text--primary pre-formatted">
             {{ query.content }}
           </div>

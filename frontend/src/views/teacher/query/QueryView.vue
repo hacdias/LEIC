@@ -5,9 +5,11 @@
     <br />
     <query-component :query="query" />
     <br />
-    <show-query-answer-list :answers="answers" 
+    <show-query-answer-list
+      :answers="answers"
       @edit-query-answer="editQueryAnswer"
-      @delete-query-answer="deleteQueryAnswer"/>
+      @delete-query-answer="deleteQueryAnswer"
+    />
     <div class="query-content">
       <v-btn color="primary" dark @click="newQueryAnswer()">
         Answer
@@ -83,14 +85,15 @@ export default class QueryView extends Vue {
     this.currentQueryAnswer = null;
   }
 
-  editQueryAnswer(answer :QueryAnswer) {
+  editQueryAnswer(answer: QueryAnswer) {
     this.currentQueryAnswer = answer;
     this.editQueryAnswerDialog = true;
   }
 
-  async deleteQueryAnswer(answer : QueryAnswer) {
+  async deleteQueryAnswer(answer: QueryAnswer) {
     if (
-      answer && answer.id &&
+      answer &&
+      answer.id &&
       confirm('Are you sure you want to delete this answer?')
     ) {
       try {

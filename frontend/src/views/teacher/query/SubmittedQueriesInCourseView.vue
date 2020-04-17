@@ -8,11 +8,15 @@
         <div class="col">Number of Answers</div>
         <div class="col last-col"></div>
       </li>
-      <show-query-list :queries="queriesUnanswered(queries)"
-        @see-query="seeQuery"/>
+      <show-query-list
+        :queries="queriesUnanswered(queries)"
+        @see-query="seeQuery"
+      />
       <br />
-      <show-query-list :queries="queriesAnswered(queries)"
-        @see-query="seeQuery"/>
+      <show-query-list
+        :queries="queriesAnswered(queries)"
+        @see-query="seeQuery"
+      />
     </ul>
   </div>
 </template>

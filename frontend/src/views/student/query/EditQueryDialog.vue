@@ -57,10 +57,7 @@ export default class EditQueryDialog extends Vue {
   }
 
   async saveQuery() {
-    if (
-      this.editQuery &&
-      (!this.editQuery.title || !this.editQuery.content)
-    ) {
+    if (this.editQuery && (!this.editQuery.title || !this.editQuery.content)) {
       await this.$store.dispatch('error', 'Query must have title and content');
       return;
     }

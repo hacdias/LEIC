@@ -649,7 +649,9 @@ export default class RemoteServices {
       });
   }
 
-  static async updateQueryAnswer(queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+  static async updateQueryAnswer(
+    queryAnswer: QueryAnswer
+  ): Promise<QueryAnswer> {
     return httpClient
       .put(`/answerQueries/${queryAnswer.id}`, queryAnswer)
       .then(response => {
@@ -661,9 +663,11 @@ export default class RemoteServices {
   }
 
   static async deleteQueryAnswer(queryAnswerId: number) {
-    return httpClient.delete(`/answerQueries/${queryAnswerId}`).catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+    return httpClient
+      .delete(`/answerQueries/${queryAnswerId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 
   static async getCourseSuggestions(): Promise<Suggestion[]> {

@@ -8,8 +8,7 @@
         <div class="col">Number of Answers</div>
         <div class="col last-col"></div>
       </li>
-      <show-query-list :queries="queries"
-       @see-query="seeQuery"/>
+      <show-query-list :queries="queries" @see-query="seeQuery" />
     </ul>
   </div>
 </template>

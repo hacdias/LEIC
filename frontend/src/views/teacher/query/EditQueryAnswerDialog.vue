@@ -46,7 +46,8 @@ import RemoteServices from '@/services/RemoteServices';
 @Component
 export default class EditQueryAnswerDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
-  @Prop({ type: QueryAnswer, required: true }) readonly queryAnswer!: QueryAnswer;
+  @Prop({ type: QueryAnswer, required: true })
+  readonly queryAnswer!: QueryAnswer;
   editQueryAnswer!: QueryAnswer;
 
   created() {
@@ -54,16 +55,16 @@ export default class EditQueryAnswerDialog extends Vue {
   }
 
   async saveQueryAnswer() {
-    if (
-      this.editQueryAnswer && !this.editQueryAnswer.content
-    ) {
+    if (this.editQueryAnswer && !this.editQueryAnswer.content) {
       await this.$store.dispatch('error', 'Query Answer must have content');
       return;
     }
 
     if (this.editQueryAnswer) {
       try {
-        const result = await RemoteServices.updateQueryAnswer(this.editQueryAnswer);
+        const result = await RemoteServices.updateQueryAnswer(
+          this.editQueryAnswer
+        );
         this.$emit('save-query-answer', result);
       } catch (error) {
         await this.$store.dispatch('error', error);
