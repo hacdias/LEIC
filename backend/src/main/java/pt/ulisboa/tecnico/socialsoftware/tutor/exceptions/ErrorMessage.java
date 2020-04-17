@@ -57,7 +57,7 @@ public enum ErrorMessage {
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
-    QUERY_IS_ANSWERED("Query already has at least an answer"),
+    QUERY_IS_ANSWERED("Query has been answered"),
     QUERY_MISSING_DATA("Missing information for query"),
     ANSWER_QUERY_MISSING_DATA("Missing information to answer query"),
     QUESTION_NOT_ANSWERED("Question wasn't answered"),

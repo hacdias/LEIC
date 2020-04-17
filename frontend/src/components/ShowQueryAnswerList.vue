@@ -17,8 +17,35 @@
         :key="answer.id"
       >
         <v-layout column wrap>
-          <p>{{ answer.creationDate }} <b>by</b> {{ answer.byName }}</p>
-          <div class="text--primary">
+           <v-container class="query-answer-header" grid-list-md fluid>
+            <div class="float-right" v-if="isAuthor(answer)">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    class="mr-2"
+                    v-on="on"
+                    @click="$emit('edit-query-answer', answer)"
+                    >edit</v-icon
+                  >
+                </template>
+                <span>Edit Query Answer</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    class="mr-2"
+                    v-on="on"
+                    @click="$emit('delete-query-answer', answer)"
+                    color="red"
+                    >delete</v-icon
+                  >
+                </template>
+                <span>Delete Query Answer</span>
+              </v-tooltip>
+            </div>
+            <p>{{ answer.creationDate }} <b>by</b> {{ answer.byName }} ({{ answer.byUsername }})</p>
+          </v-container>
+          <div class="text--primary pre-formatted">
             {{ answer.content }}
           </div>
         </v-layout>
@@ -38,5 +65,23 @@ export default class ShowQueryAnswerList extends Vue {
   get noAnswers() {
     return this.answers.length == 0;
   }
+
+  isAuthor(answer : QueryAnswer) {
+    let activeUser = this.$store.getters.getUser;
+    return activeUser && activeUser.username == answer.byUsername;
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+.query-answer-header {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.pre-formatted {
+  white-space: pre-wrap;
+}
+</style>

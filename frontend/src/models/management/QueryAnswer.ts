@@ -3,6 +3,7 @@ export default class QueryAnswer {
   content: string = '';
   creationDate!: string | null;
   byName: string = '';
+  byUsername: string = '';
 
   constructor(jsonObj?: QueryAnswer) {
     if (jsonObj) {
@@ -10,6 +11,7 @@ export default class QueryAnswer {
       this.content = jsonObj.content;
       this.creationDate = jsonObj.creationDate;
       this.byName = jsonObj.byName;
+      this.byUsername = jsonObj.byUsername;
     }
   }
 }

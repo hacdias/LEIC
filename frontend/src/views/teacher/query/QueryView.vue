@@ -5,15 +5,23 @@
     <br />
     <query-component :query="query" />
     <br />
-    <show-query-answer-list :answers="answers" />
+    <show-query-answer-list :answers="answers" 
+      @edit-query-answer="editQueryAnswer"
+      @delete-query-answer="deleteQueryAnswer"/>
     <div class="query-content">
       <v-btn color="primary" dark @click="newQueryAnswer()">
         Answer
       </v-btn>
     </div>
-    <create-answer-query-dialog
+    <create-query-answer-dialog
       v-if="currentQueryAnswer"
       v-model="createQueryAnswerDialog"
+      :queryAnswer="currentQueryAnswer"
+      v-on:save-query-answer="onSaveQueryAnswer"
+    />
+    <edit-query-answer-dialog
+      v-if="currentQueryAnswer"
+      v-model="editQueryAnswerDialog"
       :queryAnswer="currentQueryAnswer"
       v-on:save-query-answer="onSaveQueryAnswer"
     />
@@ -27,6 +35,7 @@ import Question from '@/models/management/Question';
 import Query from '@/models/management/Query';
 import QueryAnswer from '@/models/management/QueryAnswer';
 import CreateQueryAnswerDialog from '@/views/teacher/query/CreateQueryAnswerDialog.vue';
+import EditQueryAnswerDialog from '@/views/teacher/query/EditQueryAnswerDialog.vue';
 import QuestionOfQueryComponent from '@/components/QuestionOfQueryComponent.vue';
 import ShowQueryAnswerList from '@/components/ShowQueryAnswerList.vue';
 import QueryComponent from '../../../components/QueryComponent.vue';
@@ -36,11 +45,13 @@ import QueryComponent from '../../../components/QueryComponent.vue';
     'question-of-query-component': QuestionOfQueryComponent,
     'query-component': QueryComponent,
     'show-query-answer-list': ShowQueryAnswerList,
-    'create-answer-query-dialog': CreateQueryAnswerDialog
+    'create-query-answer-dialog': CreateQueryAnswerDialog,
+    'edit-query-answer-dialog': EditQueryAnswerDialog
   }
 })
 export default class QueryView extends Vue {
   createQueryAnswerDialog: boolean = false;
+  editQueryAnswerDialog: boolean = false;
 
   question: Question | null = null;
   query: Query | null = this.$store.getters.getCurrentQuery;
@@ -68,7 +79,27 @@ export default class QueryView extends Vue {
     this.answers = this.answers.filter(a => a.id !== queryAnswer.id);
     this.answers.push(queryAnswer);
     this.createQueryAnswerDialog = false;
+    this.editQueryAnswerDialog = false;
     this.currentQueryAnswer = null;
+  }
+
+  editQueryAnswer(answer :QueryAnswer) {
+    this.currentQueryAnswer = answer;
+    this.editQueryAnswerDialog = true;
+  }
+
+  async deleteQueryAnswer(answer : QueryAnswer) {
+    if (
+      answer && answer.id &&
+      confirm('Are you sure you want to delete this answer?')
+    ) {
+      try {
+        await RemoteServices.deleteQueryAnswer(answer.id);
+        this.answers = this.answers.filter(a => a.id !== answer.id);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 }
 </script>
