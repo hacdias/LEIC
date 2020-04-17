@@ -49,6 +49,7 @@
     />
     <div class="query-content">
       <v-btn
+        data-cy="createQueryButton"
         color="primary"
         dark
         @click="

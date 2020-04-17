@@ -61,7 +61,10 @@
                 <v-list-item-title>Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/management/queries">
+            <v-list-item
+              to="/management/queries"
+              data-cy="queriesSubmittedButton"
+            >
               <v-list-item-action>
                 <v-icon>fas fa-question-circle</v-icon>
               </v-list-item-action>
@@ -114,13 +117,13 @@
 
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="queriesButton">
               Queries
               <v-icon>fas fa-question-circle</v-icon>
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/queries">
+            <v-list-item to="/student/queries" data-cy="queriesSubmittedButton">
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
@@ -133,13 +136,16 @@
 
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="quizzesButton">
               Quizzes
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/available">
+            <v-list-item
+              to="/student/available"
+              data-cy="quizzesAvailableButton"
+            >
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
@@ -261,7 +267,10 @@
               <v-list-item-title>Questions</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item to="/management/queries">
+          <v-list-item
+            to="/management/queries"
+            data-cy="queriesSubmittedButton"
+          >
             <v-list-item-action>
               <v-icon>fas fa-question-circle</v-icon>
             </v-list-item-action>
@@ -366,7 +375,7 @@
             <v-list-item-content>Suggestions</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="/student/queries">
+          <v-list-item to="/student/queries" data-cy="queriesSubmittedButton">
             <v-list-item-action>
               <v-icon>fas fa-question-circle</v-icon>
             </v-list-item-action>

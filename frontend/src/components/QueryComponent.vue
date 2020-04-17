@@ -7,15 +7,20 @@
             <div class="float-right" v-if="isAuthor">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                  <v-icon class="mr-2" v-on="on" @click="$emit('edit-query')"
-                    >edit</v-icon
-                  >
+                  <v-icon
+                    data-cy="editQueryButton"
+                    class="mr-2"
+                    v-on="on"
+                    @click="$emit('edit-query')"
+                    >edit
+                  </v-icon>
                 </template>
                 <span>Edit Query</span>
               </v-tooltip>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-icon
+                    data-cy="deleteQueryButton"
                     class="mr-2"
                     v-on="on"
                     @click="$emit('delete-query')"
@@ -26,7 +31,7 @@
                 <span>Delete Query</span>
               </v-tooltip>
             </div>
-            <p class="display-1 text--primary">
+            <p class="display-1 text--primary" data-cy="queryTitle">
               {{ query.title }}
             </p>
           </v-container>
@@ -35,7 +40,7 @@
               query.byUsername
             }})
           </p>
-          <div class="text--primary pre-formatted">
+          <div class="text--primary pre-formatted" data-cy="queryContent">
             {{ query.content }}
           </div>
         </v-layout>

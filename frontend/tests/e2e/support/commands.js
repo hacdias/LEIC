@@ -101,6 +101,14 @@ Cypress.Commands.add('createSuggestion', (name, content, options) => {
   cy.get('[data-cy="saveSuggestionButton"]').click();
 });
 
+Cypress.Commands.add('answerQuiz', quizNumber => {
+  cy.get('.list-header > :nth-child(1)').click(); //Avoiding problems with topbar
+  cy.get(`ul > :nth-child(${quizNumber + 2})`).click();
+  
+  cy.get('.end-quiz').click();
+  cy.get('.primary--text > .v-btn__content').click();
+});
+
 Cypress.Commands.add('deleteSuggestion', title => {
   cy.contains(title)
     .parent()
@@ -109,5 +117,75 @@ Cypress.Commands.add('deleteSuggestion', title => {
     .children()
     .should('have.length', 6)
     .find('[data-cy="deleteSuggestionButton"]')
+    .click();
+});
+
+Cypress.Commands.add('navigateAvailableQuizzes', () => {
+  cy.get('[data-cy="quizzesButton"]').click();
+  cy.get('[data-cy="quizzesAvailableButton"]').click();
+});
+
+Cypress.Commands.add('navigateQueries', () => {
+  cy.get('[data-cy="queriesButton"]').click();
+  cy.get('[data-cy="queriesSubmittedButton"]').click();
+});
+
+Cypress.Commands.add('navigateQuery', title => {
+  cy.get('.list-header > :nth-child(1)').click(); //Avoiding problems with topbar
+  cy.contains(title)
+    .parent()
+    .click();
+});
+
+Cypress.Commands.add('verifyQuery', (title, content) => {
+  cy.get('[data-cy=queryComponent]')
+    .find('[data-cy="queryTitle"]')
+    .should('have.text', ' ' + title + ' ');
+  cy.get('[data-cy=queryComponent]')
+    .find('[data-cy="queryContent"]')
+    .should('have.text', ' ' + content + ' ');
+});
+
+Cypress.Commands.add('createQuery', (name, content) => {
+  cy.get('[data-cy="createQueryButton"]').click();
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').type(name);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryButton"]').click();
+});
+
+Cypress.Commands.add('editQuery', (name, content) => {
+  cy.get('[data-cy=queryComponent]')
+    .find('[data-cy="editQueryButton"]')
+    .click();
+
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').clear();
+  cy.get('[data-cy="Title"]').type(name);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').clear();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryButton"]').click();
+});
+
+Cypress.Commands.add('appendQuery', (name, content) => {
+  cy.get('[data-cy=queryComponent]')
+    .find('[data-cy="editQueryButton"]')
+    .click();
+
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').type(name);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryButton"]').click();
+});
+
+Cypress.Commands.add('deleteQuery', () => {
+  cy.get('[data-cy=queryComponent]')
+    .find('[data-cy="deleteQueryButton"]')
     .click();
 });

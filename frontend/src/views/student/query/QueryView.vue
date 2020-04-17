@@ -2,6 +2,7 @@
   <div class="container">
     <h2>Query History</h2>
     <query-component
+      data-cy="queryComponent"
       :query="query"
       @edit-query="editQuery"
       @delete-query="deleteQuery"
