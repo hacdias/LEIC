@@ -77,6 +77,11 @@ Cypress.Commands.add('demoStudentLogin', () => {
   cy.get('[data-cy="studentButton"]').click();
 });
 
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
 Cypress.Commands.add('navigateSuggestions', () => {
   cy.get('[data-cy="suggestionsButton"]').click();
 });
@@ -125,8 +130,13 @@ Cypress.Commands.add('navigateAvailableQuizzes', () => {
   cy.get('[data-cy="quizzesAvailableButton"]').click();
 });
 
-Cypress.Commands.add('navigateQueries', () => {
+Cypress.Commands.add('navigateQueriesStudents', () => {
   cy.get('[data-cy="queriesButton"]').click();
+  cy.get('[data-cy="queriesSubmittedButton"]').click();
+});
+
+Cypress.Commands.add('navigateQueriesTeachers', () => {
+  cy.get('[data-cy="managementButton"]').click();
   cy.get('[data-cy="queriesSubmittedButton"]').click();
 });
 
@@ -187,5 +197,52 @@ Cypress.Commands.add('appendQuery', (name, content) => {
 Cypress.Commands.add('deleteQuery', () => {
   cy.get('[data-cy=queryComponent]')
     .find('[data-cy="deleteQueryButton"]')
+    .click();
+});
+
+Cypress.Commands.add('verifyQueryAnswer', (content) => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="queryAnswerContent"]')
+    .should('have.text', ' ' + content + ' ');
+});
+
+Cypress.Commands.add('createQueryAnswer', (content) => {
+  cy.get('[data-cy="createQueryAnswerButton"]').click();
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryAnswerButton"]').click();
+});
+
+Cypress.Commands.add('editQueryAnswer', (content) => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="editQueryAnswerButton"]')
+    .click();
+
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').clear();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryAnswerButton"]').click();
+});
+
+Cypress.Commands.add('appendQueryAnswer', (content) => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="editQueryAnswerButton"]')
+    .click();
+
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveQueryAnswerButton"]').click();
+});
+
+Cypress.Commands.add('deleteQueryAnswer', () => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="deleteQueryAnswerButton"]')
     .click();
 });

@@ -12,7 +12,7 @@ describe('Queries walkthrough', () => {
     it('login creates, updates and deletes a query', () => {
       cy.createQuery('Test Query', 'Test Query Content');
   
-      cy.navigateQueries();
+      cy.navigateQueriesStudents();
       cy.navigateQuery('Test Query');
       cy.verifyQuery('Test Query', 'Test Query Content');
       

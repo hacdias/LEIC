@@ -16,13 +16,14 @@
         v-for="answer in answers"
         :key="answer.id"
       >
-        <v-layout column wrap>
+        <v-layout data-cy="queryAnswerComponent" column wrap>
           <v-container class="query-answer-header" grid-list-md fluid>
             <div class="float-right" v-if="isAuthor(answer)">
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-icon
                     class="mr-2"
+                    data-cy="editQueryAnswerButton"
                     v-on="on"
                     @click="$emit('edit-query-answer', answer)"
                     >edit</v-icon
@@ -34,6 +35,7 @@
                 <template v-slot:activator="{ on }">
                   <v-icon
                     class="mr-2"
+                    data-cy="deleteQueryAnswerButton"
                     v-on="on"
                     @click="$emit('delete-query-answer', answer)"
                     color="red"
@@ -49,7 +51,7 @@
               }})
             </p>
           </v-container>
-          <div class="text--primary pre-formatted">
+          <div data-cy="queryAnswerContent" class="text--primary pre-formatted">
             {{ answer.content }}
           </div>
         </v-layout>

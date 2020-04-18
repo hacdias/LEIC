@@ -17,6 +17,7 @@
           <v-layout column wrap>
             <v-flex xs24 sm12 md12>
               <v-textarea
+                data-cy="Content"
                 outline
                 rows="10"
                 v-model="createQueryAnswer.content"
@@ -32,7 +33,12 @@
         <v-btn color="blue darken-1" @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" @click="saveQueryAnswer">Save</v-btn>
+        <v-btn
+          color="blue darken-1"
+          @click="saveQueryAnswer"
+          data-cy="saveQueryAnswerButton"
+          >Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

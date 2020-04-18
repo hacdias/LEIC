@@ -11,7 +11,12 @@
       @delete-query-answer="deleteQueryAnswer"
     />
     <div class="query-content">
-      <v-btn color="primary" dark @click="newQueryAnswer()">
+      <v-btn
+        data-cy="createQueryAnswerButton"
+        color="primary"
+        dark
+        @click="newQueryAnswer()"
+      >
         Answer
       </v-btn>
     </div>
