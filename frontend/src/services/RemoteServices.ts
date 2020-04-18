@@ -2,6 +2,7 @@ import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
 import Suggestion from '@/models/management/Suggestion';
+import SuggestionReview from '@/models/management/SuggestionReview';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
@@ -640,6 +641,22 @@ export default class RemoteServices {
       })
       .then(response => {
         return response.data as string;
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createSuggestionReview(
+    suggestionReview: SuggestionReview
+  ): Promise<SuggestionReview> {
+    return httpClient
+      .post(
+        `/suggestions/${Store.getters.getCurrentSuggestion.suggestionId}/suggestionReviews/`,
+        suggestionReview
+      )
+      .then(response => {
+        return new SuggestionReview(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));

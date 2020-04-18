@@ -38,7 +38,35 @@
           <span>{{ item.approved ? 'Yes' : 'No' }}</span>
         </v-chip>
       </template>
+
+      <template v-slot:item.action="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="showSuggestionDialog(item)"
+              >visibility</v-icon
+            >
+          </template>
+          <span>Show Suggestion</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on" @click="addSuggestionReview"
+              >add</v-icon
+            >
+          </template>
+          <span>Add Suggestion Review</span>
+        </v-tooltip>
+      </template>
     </v-data-table>
+    <add-suggestion-review-dialog
+      v-if="currentSuggestionReview"
+      v-model="addSuggestionReviewDialog"
+      :suggestionReview="currentSuggestionReview"
+    />
     <show-suggestion-dialog
       v-if="currentSuggestion"
       :dialog="suggestionDialog"
@@ -54,17 +82,22 @@ import RemoteServices from '@/services/RemoteServices';
 import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
 import Image from '@/models/management/Image';
 import Suggestion from '@/models/management/Suggestion';
+import SuggestionReview from '@/models/management/SuggestionReview';
 import ShowSuggestionDialog from '@/views/student/suggestions/ShowSuggestionDialog.vue';
+import AddSuggestionReviewDialog from '@/views/teacher/suggestions/AddSuggestionReviewDialog.vue';
 
 @Component({
   components: {
-    'show-suggestion-dialog': ShowSuggestionDialog
+    'show-suggestion-dialog': ShowSuggestionDialog,
+    'add-suggestion-review-dialog': AddSuggestionReviewDialog
   }
 })
 export default class TeacherSuggestionsView extends Vue {
   suggestions: Suggestion[] = [];
   currentSuggestion: Suggestion | null = null;
+  currentSuggestionReview: SuggestionReview | null = null;
   suggestionDialog: boolean = false;
+  addSuggestionReviewDialog: boolean = false;
   search: string = '';
 
   headers: object = [
@@ -121,6 +154,11 @@ export default class TeacherSuggestionsView extends Vue {
 
   onCloseShowSuggestionDialog() {
     this.suggestionDialog = false;
+  }
+
+  addSuggestionReview() {
+    this.currentSuggestionReview = new SuggestionReview();
+    this.addSuggestionReviewDialog = true;
   }
 }
 </script>
