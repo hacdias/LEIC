@@ -647,6 +647,19 @@ export default class RemoteServices {
       });
   }
 
+  static async getTeacherSuggestionReviews(): Promise<SuggestionReview[]> {
+    return httpClient
+      .get('/suggestionReviews')
+      .then(response => {
+        return response.data.map((suggestionReview: any) => {
+          return new SuggestionReview(suggestionReview);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static createSuggestionReview(
     suggestionReview: SuggestionReview
   ): Promise<SuggestionReview> {
