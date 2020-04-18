@@ -54,7 +54,11 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="addSuggestionReview"
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="addSuggestionReview(item)"
               >add</v-icon
             >
           </template>
@@ -65,7 +69,9 @@
     <add-suggestion-review-dialog
       v-if="currentSuggestionReview"
       v-model="addSuggestionReviewDialog"
+      :suggestion="currentSuggestion"
       :suggestionReview="currentSuggestionReview"
+      v-on:save-suggestion-review="onSaveSuggestionReview"
     />
     <show-suggestion-dialog
       v-if="currentSuggestion"
@@ -156,9 +162,17 @@ export default class TeacherSuggestionsView extends Vue {
     this.suggestionDialog = false;
   }
 
-  addSuggestionReview() {
+  addSuggestionReview(suggestion: Suggestion) {
+    this.currentSuggestion = suggestion;
+    this.$store.dispatch('currentSuggestion', this.currentSuggestion);
     this.currentSuggestionReview = new SuggestionReview();
     this.addSuggestionReviewDialog = true;
+  }
+
+  async onSaveSuggestionReview() {
+    this.addSuggestionReviewDialog = false;
+    this.currentSuggestion = null;
+    this.currentSuggestionReview = null;
   }
 }
 </script>

@@ -652,7 +652,7 @@ export default class RemoteServices {
   ): Promise<SuggestionReview> {
     return httpClient
       .post(
-        `/suggestions/${Store.getters.getCurrentSuggestion.suggestionId}/suggestionReviews/`,
+        `/suggestions/${Store.getters.getCurrentSuggestion.id}/suggestionReviews/`,
         suggestionReview
       )
       .then(response => {
