@@ -69,6 +69,14 @@
                 <v-list-item-title>Suggestions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/management/suggestionReviews">
+              <v-list-item-action>
+                <v-icon>check</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Suggestion Reviews</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item to="/management/topics">
               <v-list-item-action>
                 <v-icon>category</v-icon>
@@ -248,6 +256,14 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Suggestions</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/management/suggestionReviews">
+            <v-list-item-action>
+              <v-icon>lightbulb</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Suggestion Reviews</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/management/topics">
