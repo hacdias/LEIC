@@ -30,9 +30,12 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
-          >Cancel</v-btn
-        >
+        <v-btn
+          data-cy="cancelButton"
+          color="blue darken-1"
+          @click="$emit('dialog', false)"
+          >Cancel
+        </v-btn>
         <v-btn
           color="blue darken-1"
           @click="saveQueryAnswer"
@@ -62,7 +65,10 @@ export default class EditQueryAnswerDialog extends Vue {
 
   async saveQueryAnswer() {
     if (this.editQueryAnswer && !this.editQueryAnswer.content) {
-      await this.$store.dispatch('error', 'Query Answer must have content');
+      await this.$store.dispatch(
+        'error',
+        'Error: Query Answer must have content'
+      );
       return;
     }
 

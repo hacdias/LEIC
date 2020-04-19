@@ -39,7 +39,7 @@ Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="saveButton"]').click();
 });
 
-Cypress.Commands.add('closeErrorMessage', (name, acronym, academicTerm) => {
+Cypress.Commands.add('closeErrorMessage', () => {
   cy.contains('Error')
     .parent()
     .find('button')
@@ -173,10 +173,13 @@ Cypress.Commands.add('editQuery', (name, content) => {
 
   cy.get('[data-cy="Title"]').focus();
   cy.get('[data-cy="Title"]').clear();
-  cy.get('[data-cy="Title"]').type(name);
+  if (name != '') 
+    cy.get('[data-cy="Title"]').type(name);
+    
   cy.get('[data-cy="Content"]').focus();
   cy.get('[data-cy="Content"]').clear();
-  cy.get('[data-cy="Content"]').type(content);
+  if (content != '')
+    cy.get('[data-cy="Content"]').type(content);
 
   cy.get('[data-cy="saveQueryButton"]').click();
 });
@@ -223,7 +226,8 @@ Cypress.Commands.add('editQueryAnswer', (content) => {
 
   cy.get('[data-cy="Content"]').focus();
   cy.get('[data-cy="Content"]').clear();
-  cy.get('[data-cy="Content"]').type(content);
+  if (content != '')
+    cy.get('[data-cy="Content"]').type(content);
 
   cy.get('[data-cy="saveQueryAnswerButton"]').click();
 });

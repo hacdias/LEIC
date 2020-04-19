@@ -37,9 +37,12 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
-          >Cancel</v-btn
-        >
+        <v-btn
+          data-cy="cancelButton"
+          color="blue darken-1"
+          @click="$emit('dialog', false)"
+          >Cancel
+        </v-btn>
         <v-btn
           data-cy="saveQueryButton"
           color="blue darken-1"
@@ -68,7 +71,10 @@ export default class EditQueryDialog extends Vue {
 
   async saveQuery() {
     if (this.editQuery && (!this.editQuery.title || !this.editQuery.content)) {
-      await this.$store.dispatch('error', 'Query must have title and content');
+      await this.$store.dispatch(
+        'error',
+        'Error: Query must have title and content'
+      );
       return;
     }
 
