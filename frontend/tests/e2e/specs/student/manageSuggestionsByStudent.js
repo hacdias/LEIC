@@ -72,5 +72,5 @@ describe('Suggestions walkthrough', () => {
 
     cy.deleteSuggestion('Test-Question1');
     cy.deleteSuggestion('Test-Question2');
-  })
+  });
 });

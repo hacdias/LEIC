@@ -664,9 +664,9 @@ export default class RemoteServices {
     suggestion: Suggestion
   ): Promise<SuggestionReview[]> {
     return httpClient
-      .get( `/suggestions/${suggestion.id}/suggestionReviews/`)
+      .get(`/suggestions/${suggestion.id}/suggestionReviews/`)
       .then(responses => {
-        return responses.data.map((res: any) => new SuggestionReview(res))
+        return responses.data.map((res: any) => new SuggestionReview(res));
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
