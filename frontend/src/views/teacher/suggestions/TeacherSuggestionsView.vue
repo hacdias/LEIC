@@ -59,6 +59,7 @@
               class="mr-2"
               v-on="on"
               @click="addSuggestionReview(item)"
+              data-cy="createSuggestionReviewButton"
               >add</v-icon
             >
           </template>

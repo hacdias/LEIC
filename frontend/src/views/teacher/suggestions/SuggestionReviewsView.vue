@@ -49,6 +49,20 @@
           </template>
           <span>Show Suggestion</span>
         </v-tooltip>
+        <v-tooltip bottom v-if="!item.approved">
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="deleteSuggestionReview(item)"
+              color="red"
+              data-cy="deleteSuggestionReviewButton"
+              >delete</v-icon
+            >
+          </template>
+          <span>Delete Suggestion Review</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <show-suggestion-dialog
@@ -124,6 +138,23 @@ export default class SuggestionReviewsView extends Vue {
 
   onCloseShowSuggestionDialog() {
     this.suggestionDialog = false;
+  }
+
+  async deleteSuggestionReview(toDelete: SuggestionReview) {
+    if (
+      toDelete.id &&
+      !toDelete.approved &&
+      confirm('Are you sure you want to delete this suggestion review?')
+    ) {
+      try {
+        await RemoteServices.deleteSuggestionReview(toDelete.id);
+        this.suggestionReviews = this.suggestionReviews.filter(
+          suggestionReview => suggestionReview.id != toDelete.id
+        );
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 }
 </script>
