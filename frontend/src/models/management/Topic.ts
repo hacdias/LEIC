@@ -10,4 +10,8 @@ export default class Topic {
       this.numberOfQuestions = jsonObj.numberOfQuestions;
     }
   }
+  
+  public toString = () : string => {
+    return `${this.name}`;
+  }
 }
