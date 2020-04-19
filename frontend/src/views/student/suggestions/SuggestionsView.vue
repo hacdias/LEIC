@@ -44,6 +44,7 @@
 
       <template v-slot:item.image="{ item }">
         <v-file-input
+          v-if="!item.approved"
           show-size
           dense
           small-chips
@@ -71,7 +72,7 @@
           </template>
           <span>Show Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!item.approved">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="editSuggestion(item)"
               >edit</v-icon
@@ -79,7 +80,7 @@
           </template>
           <span>Edit Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!item.approved">
           <template v-slot:activator="{ on }">
             <v-icon
               small
@@ -92,6 +93,20 @@
             >
           </template>
           <span>Delete Suggestion</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="viewSuggestionReviews(item)"
+              color="orange"
+              data-cy="viewSuggestionReviews"
+              >assignment</v-icon
+            >
+          </template>
+          <span>View Reviews</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -107,6 +122,13 @@
       :suggestion="currentSuggestion"
       v-on:close-show-suggestion-dialog="onCloseShowSuggestionDialog"
     />
+    <show-reviews-dialog
+      v-if="reviewsDialog"
+      :dialog="reviewsDialog"
+      :reviews="reviews"
+      :suggestion="currentSuggestion"
+      v-on:close-show-reviews-dialog="onCloseShowReviewsDialog"
+    />
   </v-card>
 </template>
 
@@ -115,21 +137,26 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
 import Suggestion from '@/models/management/Suggestion';
+import SuggestionReview from '@/models/management/SuggestionReview';
 import Image from '@/models/management/Image';
 import ShowSuggestionDialog from '@/views/student/suggestions/ShowSuggestionDialog.vue';
 import EditSuggestionDialog from '@/views/student/suggestions/EditSuggestionDialog.vue';
+import ShowReviewsDialog from '@/views/student/suggestions/ShowReviewsDialog.vue';
 
 @Component({
   components: {
     'show-suggestion-dialog': ShowSuggestionDialog,
-    'edit-suggestion-dialog': EditSuggestionDialog
+    'edit-suggestion-dialog': EditSuggestionDialog,
+    'show-reviews-dialog': ShowReviewsDialog
   }
 })
 export default class SuggestionsView extends Vue {
   suggestions: Suggestion[] = [];
+  reviews: SuggestionReview[] = [];
   currentSuggestion: Suggestion | null = null;
   editSuggestionDialog: boolean = false;
   suggestionDialog: boolean = false;
+  reviewsDialog: boolean = false;
   search: string = '';
 
   headers: object = [
@@ -211,6 +238,10 @@ export default class SuggestionsView extends Vue {
     this.suggestionDialog = false;
   }
 
+  onCloseShowReviewsDialog() {
+    this.reviewsDialog = false;
+  }
+
   newSuggestion() {
     this.currentSuggestion = new Suggestion();
     this.editSuggestionDialog = true;
@@ -219,6 +250,16 @@ export default class SuggestionsView extends Vue {
   editSuggestion(suggestion: Suggestion) {
     this.currentSuggestion = suggestion;
     this.editSuggestionDialog = true;
+  }
+
+  async viewSuggestionReviews(suggestion: Suggestion) {
+    try {
+      this.reviews = await RemoteServices.getSuggestionReviews(suggestion);
+      this.reviewsDialog = true;
+      this.currentSuggestion = suggestion;
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   async onSaveSuggestion(suggestion: Suggestion) {

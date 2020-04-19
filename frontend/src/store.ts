@@ -4,11 +4,13 @@ import RemoteServices from '@/services/RemoteServices';
 import AuthDto from '@/models/user/AuthDto';
 import Course from '@/models/user/Course';
 import User from '@/models/user/User';
+import Suggestion from '@/models/management/Suggestion';
 
 interface State {
   token: string;
   user: User | null;
   currentCourse: Course | null;
+  currentSuggestion: Suggestion | null;
   error: boolean;
   errorMessage: string;
   loading: boolean;
@@ -18,6 +20,7 @@ const state: State = {
   token: '',
   user: null,
   currentCourse: null,
+  currentSuggestion: null,
   error: false,
   errorMessage: '',
   loading: false
@@ -54,6 +57,9 @@ export default new Vuex.Store({
     },
     currentCourse(state, currentCourse: Course) {
       state.currentCourse = currentCourse;
+    },
+    currentSuggestion(state, currentSuggestion: Suggestion) {
+      state.currentSuggestion = currentSuggestion;
     }
   },
   actions: {
@@ -111,6 +117,9 @@ export default new Vuex.Store({
     },
     currentCourse({ commit }, currentCourse) {
       commit('currentCourse', currentCourse);
+    },
+    currentSuggestion({ commit }, currentSuggestion) {
+      commit('currentSuggestion', currentSuggestion);
     }
   },
   getters: {
@@ -142,6 +151,9 @@ export default new Vuex.Store({
     },
     getCurrentCourse(state): Course | null {
       return state.currentCourse;
+    },
+    getCurrentSuggestion(state): Suggestion | null {
+      return state.currentSuggestion;
     },
     getError(state): boolean {
       return state.error;

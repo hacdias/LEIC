@@ -145,3 +145,49 @@ Cypress.Commands.add('enrollTournament', (name) => {
     cy.get('tbody').find('.v-icon').first().click({force:true})
     cy.get('tbody').children().first().find('.v-chip__content').children().should('have.text', 'Yes')
 })
+
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
+Cypress.Commands.add('navigateSuggestionsTeacher', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestions').click();
+});
+
+Cypress.Commands.add('navigateSuggestionReviews', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestion Reviews').click();
+});
+
+Cypress.Commands.add('createSuggestionReview', (title, approved, justification) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 6)
+    .find('[data-cy="createSuggestionReviewButton"]')
+    .click();
+  
+  cy.get('[data-cy="Approved"]').focus();
+  if (approved) {
+    cy.get('[data-cy="Approved"]').check();
+  }
+  cy.get('[data-cy="Justification"]').focus();
+  cy.get('[data-cy="Justification"]').type(justification);
+
+  cy.get('[data-cy="saveSuggestionReviewButton"]').click();
+});
+
+Cypress.Commands.add('deleteSuggestionReview', title => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 4)
+    .find('[data-cy="deleteSuggestionReviewButton"]')
+    .click({ force: true });
+});

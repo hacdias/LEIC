@@ -20,7 +20,8 @@ import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import SuggestionsView from './views/student/suggestions/SuggestionsView.vue';
 import TournamentsView from './views/student/tournaments/TournamentsView.vue';
-
+import TeacherSuggestionsView from './views/teacher/suggestions/TeacherSuggestionsView.vue';
+import SuggestionReviewsView from './views/teacher/suggestions/SuggestionReviewsView.vue';
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
@@ -69,6 +70,24 @@ let router = new Router({
           component: QuestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Questions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'suggestions',
+          name: 'suggestions-management',
+          component: TeacherSuggestionsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Suggestions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'suggestionReviews',
+          name: 'suggestionReviews-management',
+          component: SuggestionReviewsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Suggestion Reviews',
             requiredAuth: 'Teacher'
           }
         },
