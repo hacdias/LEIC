@@ -44,6 +44,7 @@
 
       <template v-slot:item.image="{ item }">
         <v-file-input
+          v-if="!item.approved"
           show-size
           dense
           small-chips
@@ -71,7 +72,7 @@
           </template>
           <span>Show Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!item.approved">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="editSuggestion(item)"
               >edit</v-icon
@@ -79,7 +80,7 @@
           </template>
           <span>Edit Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!item.approved">
           <template v-slot:activator="{ on }">
             <v-icon
               small
