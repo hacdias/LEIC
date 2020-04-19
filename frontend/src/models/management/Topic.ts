@@ -12,6 +12,6 @@ export default class Topic {
   }
   
   public toString = () : string => {
-    return `${this.name}`;
+    return this.name;
   }
 }
