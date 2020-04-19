@@ -27,6 +27,16 @@
           <span>{{ item.enrolled ? 'Yes' : 'No' }}</span>
         </v-chip>
       </template>
+	  <template v-slot:item.action="{ item }">
+        <v-tooltip bottom v-if="!item.enrolled">
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on" @click="enroll(item, item.id)">
+              add</v-icon
+            >
+          </template>
+          <span>Enroll</span>
+        </v-tooltip>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -83,6 +93,17 @@ export default class TournamentList extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+  
+  async enroll(tournament: Tournament, tournamentId: number) {
+    if (confirm('Are you sure you want to enroll this tournament?')) {
+      try {
+        await RemoteServices.enroll(tournamentId);
+        tournament.enrolled = true;
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 }
 </script>
