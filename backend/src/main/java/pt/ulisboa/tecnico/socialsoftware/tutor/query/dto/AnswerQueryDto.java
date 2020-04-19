@@ -9,6 +9,8 @@ public class AnswerQueryDto implements Serializable {
     private Integer id;
     private String content;
     private String creationDate = null;
+    private String byName;
+    private String byUsername;
 
     public AnswerQueryDto() {
     }
@@ -16,6 +18,8 @@ public class AnswerQueryDto implements Serializable {
     public AnswerQueryDto(AnswerQuery answerQuery) {
         this.id = answerQuery.getId();
         this.content = answerQuery.getContent();
+        this.byName = answerQuery.getTeacher().getName();
+        this.byUsername = answerQuery.getTeacher().getUsername();
 
         if (answerQuery.getCreationDate() != null)
             this.creationDate = answerQuery.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -32,6 +36,14 @@ public class AnswerQueryDto implements Serializable {
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
+
+    public String getbyName() { return this.byName; }
+
+    public void setbyName(String byName) { this.byName = byName; }
+
+    public String getbyUsername() { return this.byUsername; }
+
+    public void setbyUsername(String byUsername) { this.byUsername = byUsername; }
 
     @Override
     public String toString() {

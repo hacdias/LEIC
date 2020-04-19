@@ -19,11 +19,18 @@ import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import SuggestionsView from './views/student/suggestions/SuggestionsView.vue';
+
+import SubmittedQueriesView from './views/student/query/SubmittedQueriesView.vue';
+import QueryStudentView from './views/student/query/QueryView.vue';
+
+import SubmittedQueriesInCourseView from './views/teacher/query/SubmittedQueriesInCourseView.vue';
+import QueryTeacherView from './views/teacher/query/QueryView.vue';
+
+import AdminManagementView from './views/admin/AdminManagementView.vue';
+import NotFoundView from './views/NotFoundView.vue';
 import TournamentsView from './views/student/tournaments/TournamentsView.vue';
 import TeacherSuggestionsView from './views/teacher/suggestions/TeacherSuggestionsView.vue';
 import SuggestionReviewsView from './views/teacher/suggestions/SuggestionReviewsView.vue';
-import AdminManagementView from '@/views/admin/AdminManagementView.vue';
-import NotFoundView from '@/views/NotFoundView.vue';
 import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
 import AssessmentsView from '@/views/teacher/assessments/AssessmentsView.vue';
 import CreateQuizzesView from '@/views/student/CreateQuizzesView.vue';
@@ -74,11 +81,29 @@ let router = new Router({
           }
         },
         {
+          path: 'queries',
+          name: 'queries-management',
+          component: SubmittedQueriesInCourseView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Queries',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
           path: 'suggestions',
           name: 'suggestions-management',
           component: TeacherSuggestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Suggestions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'see-query',
+          name: 'see-query-management',
+          component: QueryTeacherView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - See Query',
             requiredAuth: 'Teacher'
           }
         },
@@ -143,6 +168,24 @@ let router = new Router({
       name: 'student',
       component: StudentView,
       children: [
+        {
+          path: 'queries',
+          name: 'submitted-queries',
+          component: SubmittedQueriesView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Submitted Queries',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'see-query',
+          name: 'see-query-student',
+          component: QueryStudentView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - See Query',
+            requiredAuth: 'Student'
+          }
+        },
         {
           path: 'available',
           name: 'available-quizzes',

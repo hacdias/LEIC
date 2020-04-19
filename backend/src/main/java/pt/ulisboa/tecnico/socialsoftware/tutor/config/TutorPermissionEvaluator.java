@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import pt.ulisboa.tecnico.socialsoftware.tutor.administration.AdministrationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.AnswerQueryService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.AnswerQueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
@@ -44,6 +46,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     @Autowired
     private QueryService queryService;
 
+    @Autowired
+    private AnswerQueryService answerQueryService;
+    
     @Autowired
     private SuggestionService suggestionService;
 
@@ -91,6 +96,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(username, quizService.findQuizCourseExecution(id).getCourseExecutionId());
                 case "QUERY.ALTER":
                     return userCanAlterQuery(username, id);
+                case "ANSWER.QUERY.ALTER":
+                    return userCanAlterAnswerQuery(username, id);
                 case "QUERY.ACCESS":
                     return userCanAddAnswerQuery(username, id);
                 case "SUGGESTION.AUTHOR":
@@ -132,6 +139,12 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
         Integer studentId = userService.findByUsername(username).getId();
         List<QueryDto> queries = queryService.getQueriesByStudent(studentId);
         return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
+    }
+
+    private boolean userCanAlterAnswerQuery(String username, int answerQueryId) {
+        Integer userNameId = userService.findByUsername(username).getId();
+        List<AnswerQueryDto> answers = answerQueryService.getAnswersByTeacher(userNameId);
+        return answers.stream().anyMatch(answerQueryDto -> answerQueryDto.getId() == answerQueryId);
     }
 
     private boolean userCanAddAnswerQuery(String username, int queryId) {

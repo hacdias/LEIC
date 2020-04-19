@@ -44,13 +44,13 @@ public class AnswerQueryController {
     }
 
     @PutMapping("/answerQueries/{answerQueryId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#answerQueryId, 'ANSWER_QUERY.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#answerQueryId, 'ANSWER.QUERY.ALTER')")
     public AnswerQueryDto updateAnswerQuery(@PathVariable Integer answerQueryId, @Valid @RequestBody AnswerQueryDto answerQueryDto) {
         return this.answerQueryService.updateAnswerQuery(answerQueryId, answerQueryDto);
     }
 
     @DeleteMapping("/answerQueries/{answerQueryId}")
-    @PreAuthorize("hasPermission(#answerQueryId, 'QUERY.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#answerQueryId, 'ANSWER.QUERY.ALTER')")
     public ResponseEntity removeAnswerQuery(@PathVariable Integer answerQueryId) throws IOException {
         logger.debug("removeAnswerQuery answerQueryId: {}: ", answerQueryId);
         AnswerQueryDto answerQueryDto = answerQueryService.findAnswerQueryById(answerQueryId);

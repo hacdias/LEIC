@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
+import Query from '@/models/management/Query';
+import QueryAnswer from '@/models/management/QueryAnswer';
 import Suggestion from '@/models/management/Suggestion';
 import Tournament from '@/models/management/Tournament';
 import SuggestionReview from '@/models/management/SuggestionReview';
@@ -16,6 +18,7 @@ import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
+import { QuestionAnswer } from '@/models/management/QuestionAnswer';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -134,6 +137,17 @@ export default class RemoteServices {
         return response.data.map((question: any) => {
           return new Question(question);
         });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getQuestion(questionId: number): Promise<Question> {
+    return httpClient
+      .get(`/questions/${questionId}`)
+      .then(response => {
+        return new Question(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -551,6 +565,108 @@ export default class RemoteServices {
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
       .delete('/admin/courses/executions/' + courseExecutionId)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createQuery(query: Query): Promise<Query> {
+    return httpClient
+      .post(
+        `/question/${Store.getters.getCurrentQuestion.questionId}/questionAnswer/${Store.getters.getCurrentQuestion.id}/queries`,
+        query
+      )
+      .then(response => {
+        return new Query(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async updateQuery(query: Query): Promise<Query> {
+    return httpClient
+      .put(`/queries/${query.id}`, query)
+      .then(response => {
+        return new Query(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async deleteQuery(queryId: number) {
+    return httpClient.delete(`/queries/${queryId}`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
+  }
+
+  static getSubmittedQueries(): Promise<Query[]> {
+    return httpClient
+      .get('/user/queries')
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new Query(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getSubmittedQueriesInCourse(): Promise<Query[]> {
+    return httpClient
+      .get('/teacher/queriesInCourses')
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new Query(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getAnswersToQuery(): Promise<QueryAnswer[]> {
+    return httpClient
+      .get(`/query/${Store.getters.getCurrentQuery.id}/answers`)
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new QueryAnswer(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createQueryAnswer(queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+    return httpClient
+      .post(`/query/${Store.getters.getCurrentQuery.id}/answers`, queryAnswer)
+      .then(response => {
+        return new QueryAnswer(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async updateQueryAnswer(
+    queryAnswer: QueryAnswer
+  ): Promise<QueryAnswer> {
+    return httpClient
+      .put(`/answerQueries/${queryAnswer.id}`, queryAnswer)
+      .then(response => {
+        return new Query(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async deleteQueryAnswer(queryAnswerId: number) {
+    return httpClient
+      .delete(`/answerQueries/${queryAnswerId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

@@ -3,13 +3,17 @@ import Vuex from 'vuex';
 import RemoteServices from '@/services/RemoteServices';
 import AuthDto from '@/models/user/AuthDto';
 import Course from '@/models/user/Course';
+import StatementQuestion from '@/models/statement/StatementQuestion';
 import User from '@/models/user/User';
+import Query from './models/management/Query';
 import Suggestion from '@/models/management/Suggestion';
 
 interface State {
   token: string;
   user: User | null;
   currentCourse: Course | null;
+  currentQuestion: StatementQuestion | null;
+  currentQuery: Query | null;
   currentSuggestion: Suggestion | null;
   error: boolean;
   errorMessage: string;
@@ -20,6 +24,8 @@ const state: State = {
   token: '',
   user: null,
   currentCourse: null,
+  currentQuestion: null,
+  currentQuery: null,
   currentSuggestion: null,
   error: false,
   errorMessage: '',
@@ -57,6 +63,12 @@ export default new Vuex.Store({
     },
     currentCourse(state, currentCourse: Course) {
       state.currentCourse = currentCourse;
+    },
+    currentQuestion(state, currentQuestion: StatementQuestion) {
+      state.currentQuestion = currentQuestion;
+    },
+    currentQuery(state, currentQuery: Query) {
+      state.currentQuery = currentQuery;
     },
     currentSuggestion(state, currentSuggestion: Suggestion) {
       state.currentSuggestion = currentSuggestion;
@@ -118,6 +130,12 @@ export default new Vuex.Store({
     currentCourse({ commit }, currentCourse) {
       commit('currentCourse', currentCourse);
     },
+    currentQuestion({ commit }, currentQuestion) {
+      commit('currentQuestion', currentQuestion);
+    },
+    currentQuery({ commit }, currentQuery) {
+      commit('currentQuery', currentQuery);
+    },
     currentSuggestion({ commit }, currentSuggestion) {
       commit('currentSuggestion', currentSuggestion);
     }
@@ -151,6 +169,12 @@ export default new Vuex.Store({
     },
     getCurrentCourse(state): Course | null {
       return state.currentCourse;
+    },
+    getCurrentQuestion(state): StatementQuestion | null {
+      return state.currentQuestion;
+    },
+    getCurrentQuery(state): Query | null {
+      return state.currentQuery;
     },
     getCurrentSuggestion(state): Suggestion | null {
       return state.currentSuggestion;
