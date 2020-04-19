@@ -63,7 +63,6 @@ public class Tournament {
 
         setNumberQuestions(tournamentDto.getNumberQuestions());
         setStudent(student);
-        addEnrolledStudent(student);
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
