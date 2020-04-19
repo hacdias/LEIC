@@ -19,7 +19,7 @@ import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import SuggestionsView from './views/student/suggestions/SuggestionsView.vue';
-import TournamentView from './views/student/tournaments/TournamentsView.vue';
+import TournamentsView from './views/student/tournaments/TournamentsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
