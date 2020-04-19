@@ -22,7 +22,7 @@ public class SuggestionReview {
     private Suggestion suggestion;
 
     @Column(name = "justification", columnDefinition = "TEXT")
-    private String justification;
+    private String justification = "";
 
     @Column(name = "approved")
     private Boolean approved;
@@ -36,7 +36,11 @@ public class SuggestionReview {
     public SuggestionReview(User teacher, Suggestion suggestion, SuggestionReviewDto suggestionReviewDto) {
         this.id = suggestionReviewDto.getId();
         this.approved = suggestionReviewDto.getApproved();
-        this.justification = suggestionReviewDto.getJustification();
+
+        if (suggestionReviewDto.getJustification() != null) {
+            this.justification = suggestionReviewDto.getJustification();
+        }
+
         this.teacher = teacher;
         this.suggestion = suggestion;
     }
