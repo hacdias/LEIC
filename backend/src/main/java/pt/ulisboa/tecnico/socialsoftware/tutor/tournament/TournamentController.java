@@ -27,6 +27,14 @@ public class TournamentController {
         return tournamentService.getOpenTournaments(studentId, executionId);
     }
 
+    @GetMapping("/executions/{executionId}/EnrolledTournaments")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<TournamentDto> getEnrolledTournaments(Authentication authentication, @PathVariable int executionId) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+
+        return tournamentService.getEnrolledTournaments(studentId, executionId);
+    }
+
     @PostMapping("tournaments/{TournamentId}")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public TournamentDto addEnrolledStudentToTournament(Authentication authentication, @PathVariable int TournamentId) {
@@ -40,6 +48,7 @@ public class TournamentController {
     public TournamentDto createTournament(Authentication authentication, @PathVariable int executionId, @Valid @RequestBody TournamentDto tournament) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
 
+        formatDates(tournament);
         return tournamentService.createTournament(executionId, studentId, tournament);
     }
 
@@ -51,5 +60,15 @@ public class TournamentController {
         tournamentService.removeTournament(studentId, tournamentId);
 
         return ResponseEntity.ok().build();
+    }
+
+    private void formatDates(TournamentDto tournament) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        if (tournament.getAvailableDate() != null && !tournament.getAvailableDate().matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2})")){
+            tournament.setAvailableDate(LocalDateTime.parse(tournament.getAvailableDate().replaceAll(".$", ""), DateTimeFormatter.ISO_DATE_TIME).format(formatter));
+        }
+        if (tournament.getConclusionDate() !=null && !tournament.getConclusionDate().matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2})"))
+            tournament.setConclusionDate(LocalDateTime.parse(tournament.getConclusionDate().replaceAll(".$", ""), DateTimeFormatter.ISO_DATE_TIME).format(formatter));
     }
 }

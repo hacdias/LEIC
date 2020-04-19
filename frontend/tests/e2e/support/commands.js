@@ -250,3 +250,89 @@ Cypress.Commands.add('deleteQueryAnswer', () => {
     .find('[data-cy="deleteQueryAnswerButton"]')
     .click();
 });
+
+Cypress.Commands.add('navigateTournaments', () => {
+    cy.get('[data-cy="tournamentsButton"]').click()
+})
+
+Cypress.Commands.add('createTournament', (name, numberQuestions) => {
+  cy.get('[data-cy="newTournamentButton"]').click()
+
+  cy.get('[data-cy="Title"]').focus()
+  cy.get('[data-cy="Title"]').type(name)
+
+  cy.get('[data-cy="numberQuestions"]').focus()
+  cy.get('[data-cy="numberQuestions"]').type(numberQuestions)
+
+  cy.get('[data-cy="availableDate"]').click()
+  cy.get('.v-date-picker-header')
+    .children('.v-btn')
+    .first().click({force:true})
+  cy.get('tbody')
+    .find('.v-btn')
+    .last().click({force:true})
+  cy.get('.v-card__actions')
+    .children('.v-btn')
+    .last().click({force:true})
+
+  cy.contains('*Conclusion Date')
+    .parent()
+    .children('input').click()
+  cy.get('.v-date-picker-header')
+    .children('.v-btn')
+    .last().click({force:true})
+  cy.get('tbody')
+    .find('.v-btn')
+    .last().click({force:true})
+  cy.get('.v-card__actions').children('.v-btn').last().click({force:true})
+
+  cy.contains('add').click()
+
+  cy.get('[data-cy="saveTournamentButton"]').click()
+})
+
+Cypress.Commands.add('enrollTournament', (name) => {
+  cy.contains('enroll').click()
+  cy.contains('Yes').parent().should('have.text', 'Yes')
+})
+
+Cypress.Commands.add('navigateSuggestionsTeacher', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestions').click();
+});
+
+Cypress.Commands.add('navigateSuggestionReviews', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestion Reviews').click();
+});
+
+Cypress.Commands.add('createSuggestionReview', (title, approved, justification) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 6)
+    .find('[data-cy="createSuggestionReviewButton"]')
+    .click();
+  
+  cy.get('[data-cy="Approved"]').focus();
+  if (approved) {
+    cy.get('[data-cy="Approved"]').check();
+  }
+  cy.get('[data-cy="Justification"]').focus();
+  cy.get('[data-cy="Justification"]').type(justification);
+
+  cy.get('[data-cy="saveSuggestionReviewButton"]').click();
+});
+
+Cypress.Commands.add('deleteSuggestionReview', title => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 4)
+    .find('[data-cy="deleteSuggestionReviewButton"]')
+    .click({ force: true });
+});

@@ -46,7 +46,7 @@ public class TournamentDto implements Serializable {
                 TopicDto topicDto = new TopicDto(topic);
                 addTopic(topicDto);
             }
-        } 
+        }
     }
 
     public Integer getId() {

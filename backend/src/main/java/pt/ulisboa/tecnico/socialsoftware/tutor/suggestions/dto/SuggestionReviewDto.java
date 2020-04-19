@@ -1,7 +1,8 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,7 @@ public class SuggestionReviewDto implements Serializable {
     private Boolean approved;
     private String justification;
     private String creationDate;
+    private SuggestionDto suggestion;
 
     public SuggestionReviewDto () {
     }
@@ -18,7 +20,12 @@ public class SuggestionReviewDto implements Serializable {
     public SuggestionReviewDto (SuggestionReview suggestionReview) {
         this.id = suggestionReview.getId();
         this.approved = suggestionReview.getApproved();
-        this.justification = suggestionReview.getJustification();
+        this.justification = "";
+        this.suggestion = new SuggestionDto(suggestionReview.getSuggestion());
+
+        if (suggestionReview.getJustification() != null) {
+            this.justification = suggestionReview.getJustification();
+        }
 
         if (suggestionReview.getCreationDate() != null) {
             this.creationDate = suggestionReview.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -53,13 +60,22 @@ public class SuggestionReviewDto implements Serializable {
         this.creationDate = creationDate;
     }
 
+    public SuggestionDto getSuggestion() {
+        return suggestion;
+    }
+
+    public void setSuggestion(SuggestionDto suggestion) {
+        this.suggestion = suggestion;
+    }
+
     @Override
     public String toString() {
-        return "SuggestionDto{" +
+        return "SuggestionReviewDto{" +
                 "id=" + id +
                 ", approved=" + approved +
                 ", justification=" + justification +
                 ", creationDate='" + creationDate + '\'' +
+                ", suggestion=" + suggestion +
                 '}';
     }
 }

@@ -6,11 +6,18 @@
   >
     <v-card>
       <v-card-title>
-        <span class="headline">{{ suggestion.question.title }}</span>
+        <span class="headline">"{{ suggestion.question.title }}" Reviews</span>
       </v-card-title>
 
       <v-card-text class="text-left">
-        <show-suggestion :suggestion="suggestion" />
+        <ul>
+          <li v-for="review in reviews" :key="review.id">
+            <span v-if="review.approved">✅</span>
+            <span v-else>❌</span>
+            {{ review.creationDate }}
+            <p>{{ review.justification }}</p>
+          </li>
+        </ul>
       </v-card-text>
 
       <v-card-actions>
@@ -26,19 +33,16 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Suggestion from '@/models/management/Suggestion';
-import ShowSuggestion from '@/views/student/suggestions/ShowSuggestion.vue';
+import SuggestionReview from '@/models/management/SuggestionReview';
 
-@Component({
-  components: {
-    'show-suggestion': ShowSuggestion
-  }
-})
-export default class ShowSuggestionDialog extends Vue {
+@Component({})
+export default class ShowReviewsDialog extends Vue {
   @Prop({ type: Suggestion, required: true }) readonly suggestion!: Suggestion;
+  @Prop({ type: Array, required: true }) readonly reviews!: SuggestionReview[];
   @Prop({ type: Boolean, required: true }) readonly dialog!: boolean;
 
   closeSuggestionDialog() {
-    this.$emit('close-show-suggestion-dialog');
+    this.$emit('close-show-reviews-dialog');
   }
 }
 </script>

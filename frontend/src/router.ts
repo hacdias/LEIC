@@ -28,6 +28,9 @@ import QueryTeacherView from './views/teacher/query/QueryView.vue';
 
 import AdminManagementView from './views/admin/AdminManagementView.vue';
 import NotFoundView from './views/NotFoundView.vue';
+import TournamentsView from './views/student/tournaments/TournamentsView.vue';
+import TeacherSuggestionsView from './views/teacher/suggestions/TeacherSuggestionsView.vue';
+import SuggestionReviewsView from './views/teacher/suggestions/SuggestionReviewsView.vue';
 import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
 import AssessmentsView from '@/views/teacher/assessments/AssessmentsView.vue';
 import CreateQuizzesView from '@/views/student/CreateQuizzesView.vue';
@@ -87,11 +90,29 @@ let router = new Router({
           }
         },
         {
+          path: 'suggestions',
+          name: 'suggestions-management',
+          component: TeacherSuggestionsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Suggestions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
           path: 'see-query',
           name: 'see-query-management',
           component: QueryTeacherView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - See Query',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'suggestionReviews',
+          name: 'suggestionReviews-management',
+          component: SuggestionReviewsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Suggestion Reviews',
             requiredAuth: 'Teacher'
           }
         },
@@ -225,6 +246,15 @@ let router = new Router({
           component: ScanView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Scan',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments',
+          name: 'tournaments',
+          component: TournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Tournaments',
             requiredAuth: 'Student'
           }
         },

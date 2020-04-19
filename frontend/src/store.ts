@@ -6,6 +6,7 @@ import Course from '@/models/user/Course';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import User from '@/models/user/User';
 import Query from './models/management/Query';
+import Suggestion from '@/models/management/Suggestion';
 
 interface State {
   token: string;
@@ -13,6 +14,7 @@ interface State {
   currentCourse: Course | null;
   currentQuestion: StatementQuestion | null;
   currentQuery: Query | null;
+  currentSuggestion: Suggestion | null;
   error: boolean;
   errorMessage: string;
   loading: boolean;
@@ -24,6 +26,7 @@ const state: State = {
   currentCourse: null,
   currentQuestion: null,
   currentQuery: null,
+  currentSuggestion: null,
   error: false,
   errorMessage: '',
   loading: false
@@ -66,6 +69,9 @@ export default new Vuex.Store({
     },
     currentQuery(state, currentQuery: Query) {
       state.currentQuery = currentQuery;
+    },
+    currentSuggestion(state, currentSuggestion: Suggestion) {
+      state.currentSuggestion = currentSuggestion;
     }
   },
   actions: {
@@ -129,6 +135,9 @@ export default new Vuex.Store({
     },
     currentQuery({ commit }, currentQuery) {
       commit('currentQuery', currentQuery);
+    },
+    currentSuggestion({ commit }, currentSuggestion) {
+      commit('currentSuggestion', currentSuggestion);
     }
   },
   getters: {
@@ -166,6 +175,9 @@ export default new Vuex.Store({
     },
     getCurrentQuery(state): Query | null {
       return state.currentQuery;
+    },
+    getCurrentSuggestion(state): Suggestion | null {
+      return state.currentSuggestion;
     },
     getError(state): boolean {
       return state.error;

@@ -72,6 +72,22 @@
                 <v-list-item-title>Queries Submitted</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/management/suggestions">
+              <v-list-item-action>
+                <v-icon>lightbulb</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Suggestions</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/management/suggestionReviews">
+              <v-list-item-action>
+                <v-icon>check</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Suggestion Reviews</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item to="/management/topics">
               <v-list-item-action>
                 <v-icon>category</v-icon>
@@ -180,6 +196,11 @@
           </v-list>
         </v-menu>
 
+        <v-btn to="/student/tournaments" v-if="isStudent && currentCourse" text dark data-cy="tournamentsButton" >
+          Tournaments
+          <v-icon>fas fa-trophy</v-icon>
+        </v-btn>
+
         <v-btn
           to="/student/suggestions"
           v-if="isStudent && currentCourse"
@@ -276,6 +297,22 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Queries Submitted</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/management/suggestions">
+            <v-list-item-action>
+              <v-icon>lightbulb</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Suggestions</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/management/suggestionReviews">
+            <v-list-item-action>
+              <v-icon>lightbulb</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Suggestion Reviews</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/management/topics">
