@@ -20,8 +20,12 @@ public class SuggestionReviewDto implements Serializable {
     public SuggestionReviewDto (SuggestionReview suggestionReview) {
         this.id = suggestionReview.getId();
         this.approved = suggestionReview.getApproved();
-        this.justification = suggestionReview.getJustification();
+        this.justification = "";
         this.suggestion = new SuggestionDto(suggestionReview.getSuggestion());
+
+        if (suggestionReview.getJustification() != null) {
+            this.justification = suggestionReview.getJustification();
+        }
 
         if (suggestionReview.getCreationDate() != null) {
             this.creationDate = suggestionReview.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
