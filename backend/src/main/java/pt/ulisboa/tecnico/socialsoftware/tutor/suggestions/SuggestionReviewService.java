@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
@@ -53,7 +54,8 @@ public class SuggestionReviewService {
         suggestionReview.setCreationDate(LocalDateTime.now());
 
         if (!suggestionReview.getSuggestion().getApproved() && suggestionReview.getApproved()) {
-            suggestionReview.getSuggestion().setApproved(suggestionReviewDto.getApproved());
+            suggestion.setApproved(true);
+            suggestion.getQuestion().setStatus(Question.Status.DISABLED);
         }
 
         suggestionReviewRepository.save(suggestionReview);
