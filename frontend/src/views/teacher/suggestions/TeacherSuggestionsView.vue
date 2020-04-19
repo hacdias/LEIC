@@ -52,7 +52,7 @@
           </template>
           <span>Show Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!item.approved">
           <template v-slot:activator="{ on }">
             <v-icon
               small
