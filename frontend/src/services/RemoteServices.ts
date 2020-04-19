@@ -2,6 +2,7 @@ import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
 import Suggestion from '@/models/management/Suggestion';
+import SuggestionReview from '@/models/management/SuggestionReview';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
@@ -567,6 +568,19 @@ export default class RemoteServices {
       });
   }
 
+  static async getTeacherSuggestions(): Promise<Suggestion[]> {
+    return httpClient
+      .get('/teacher/suggestions')
+      .then(response => {
+        return response.data.map((suggestion: any) => {
+          return new Suggestion(suggestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async getStudentSuggestions(): Promise<Suggestion[]> {
     return httpClient
       .get('/suggestions')
@@ -628,6 +642,56 @@ export default class RemoteServices {
       .then(response => {
         return response.data as string;
       })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getTeacherSuggestionReviews(): Promise<SuggestionReview[]> {
+    return httpClient
+      .get('/suggestionReviews')
+      .then(response => {
+        return response.data.map((suggestionReview: any) => {
+          return new SuggestionReview(suggestionReview);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getSuggestionReviews(
+    suggestion: Suggestion
+  ): Promise<SuggestionReview[]> {
+    return httpClient
+      .get(`/suggestions/${suggestion.id}/suggestionReviews/`)
+      .then(responses => {
+        return responses.data.map((res: any) => new SuggestionReview(res));
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createSuggestionReview(
+    suggestionReview: SuggestionReview
+  ): Promise<SuggestionReview> {
+    return httpClient
+      .post(
+        `/suggestions/${Store.getters.getCurrentSuggestion.id}/suggestionReviews/`,
+        suggestionReview
+      )
+      .then(response => {
+        return new SuggestionReview(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static deleteSuggestionReview(suggestionReviewId: number) {
+    return httpClient
+      .delete(`/suggestionReviews/${suggestionReviewId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

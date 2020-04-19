@@ -24,6 +24,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -143,6 +144,26 @@ public class SuggestionService {
                 .stream()
                 .filter(suggestion -> suggestion.getStudent().getId() == studentId)
                 .map(SuggestionDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<SuggestionDto> findSuggestionsInTeachersCourse(Integer teacherId) {
+        User teacher = userRepository.findById(teacherId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND,teacherId));
+
+        List<Integer> teacherCourses = teacher.getCourseExecutions().stream()
+                .map(courseExecution -> courseExecution.getCourse().getId())
+                .collect(Collectors.toList());
+
+        return suggestionRepository.findAll()
+                .stream()
+                .filter(suggestion ->  teacherCourses.contains(suggestion.getQuestion().getCourse().getId()))
+                .map(SuggestionDto::new)
+                .sorted(Comparator.comparing(SuggestionDto::getCreationDate))
                 .collect(Collectors.toList());
     }
 

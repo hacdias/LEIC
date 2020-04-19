@@ -51,6 +51,13 @@ public class SuggestionController {
         return suggestionService.findSuggestionById(suggestionId);
     }
 
+    @GetMapping("/teacher/suggestions")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public List<SuggestionDto> getSuggestionsInTeachersCourse(Authentication authentication) {
+        Integer teacherId = ((User) authentication.getPrincipal()).getId();
+        return this.suggestionService.findSuggestionsInTeachersCourse(teacherId);
+    }
+
     @PostMapping("/courses/{courseId}/suggestions")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public SuggestionDto createSuggestion(Authentication authentication, @PathVariable int courseId, @Valid @RequestBody SuggestionDto suggestion) {

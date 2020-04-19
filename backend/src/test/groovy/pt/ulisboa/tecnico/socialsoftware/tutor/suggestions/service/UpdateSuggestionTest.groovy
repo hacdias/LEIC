@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
@@ -52,6 +53,7 @@ class UpdateSuggestionTest extends Specification {
     def courseExecution
     def student
     def suggestion
+    def question
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -65,7 +67,7 @@ class UpdateSuggestionTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
-        def question = new Question()
+        question = new Question()
         question.setKey(1)
         question.setContent(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
@@ -87,6 +89,7 @@ class UpdateSuggestionTest extends Specification {
         given: "an updated suggestion"
         def suggestionDto = new SuggestionDto(suggestion)
         suggestionDto.setApproved(true)
+        suggestionDto.setQuestion(new QuestionDto(question))
 
         when:
         suggestionService.updateSuggestion(suggestion.getId(), suggestionDto)
