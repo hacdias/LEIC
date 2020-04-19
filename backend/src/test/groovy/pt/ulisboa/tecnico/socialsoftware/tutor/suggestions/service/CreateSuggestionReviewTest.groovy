@@ -139,7 +139,7 @@ class CreateSuggestionReviewTest extends Specification {
         result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
         !result.getSuggestion().getApproved()
         !result.getApproved()
-        result.getJustification() == null
+        result.getJustification() == ""
     }
 
     @TestConfiguration
