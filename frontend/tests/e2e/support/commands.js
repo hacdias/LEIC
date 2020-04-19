@@ -117,33 +117,44 @@ Cypress.Commands.add('navigateTournaments', () => {
 })
 
 Cypress.Commands.add('createTournament', (name, numberQuestions) => {
-    cy.get('[data-cy="newTournamentButton"]').click()
+  cy.get('[data-cy="newTournamentButton"]').click()
 
-    cy.get('[data-cy="availableDate"]').click()
-    cy.get('div').children('.v-date-picker-header').children('.v-btn').first().click({force:true})
-    cy.get('tbody').find('.v-btn').last().click({force:true})
-    cy.get('div').children('.v-card__actions').children('.v-btn').last().focus().click({force:true})
+  cy.get('[data-cy="Title"]').focus()
+  cy.get('[data-cy="Title"]').type(name)
 
-    cy.get('[data-cy="Title"]').focus()
-    cy.get('[data-cy="Title"]').type(name)
+  cy.get('[data-cy="numberQuestions"]').focus()
+  cy.get('[data-cy="numberQuestions"]').type(numberQuestions)
 
-    cy.get('#input-143').type('2020-04-14 00:00', {force: true})
-    cy.get('div').children('.v-date-picker-header').children('.v-btn').first().click({force:true})
-    cy.get('tbody').find('.v-btn').last().click({force:true})
-    cy.get('div').children('.v-card__actions').children('.v-btn').last().click({force:true})
+  cy.get('[data-cy="availableDate"]').click()
+  cy.get('.v-date-picker-header')
+    .children('.v-btn')
+    .first().click({force:true})
+  cy.get('tbody')
+    .find('.v-btn')
+    .last().click({force:true})
+  cy.get('.v-card__actions')
+    .children('.v-btn')
+    .last().click({force:true})
 
-    cy.get('[data-cy="numberQuestions"]').focus()
-    cy.get('[data-cy="numberQuestions"]').type(numberQuestions)
+  cy.contains('*Conclusion Date')
+    .parent()
+    .children('input').click()
+  cy.get('.v-date-picker-header')
+    .children('.v-btn')
+    .last().click({force:true})
+  cy.get('tbody')
+    .find('.v-btn')
+    .last().click({force:true})
+  cy.get('.v-card__actions').children('.v-btn').last().click({force:true})
 
-    cy.get('div').children('.v-data-table__wrapper').find('.v-icon').first().click({force:true})
+  cy.contains('add').click()
 
-    cy.get('[data-cy="saveTournamentButton"]').click()
+  cy.get('[data-cy="saveTournamentButton"]').click()
 })
 
 Cypress.Commands.add('enrollTournament', (name) => {
-
-    cy.get('tbody').find('.v-icon').first().click({force:true})
-    cy.get('tbody').children().first().find('.v-chip__content').children().should('have.text', 'Yes')
+  cy.contains('enroll').click()
+  cy.contains('Yes').parent().should('have.text', 'Yes')
 })
 
 Cypress.Commands.add('demoTeacherLogin', () => {

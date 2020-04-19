@@ -31,7 +31,7 @@
         <v-tooltip bottom v-if="!item.enrolled">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="enroll(item, item.id)">
-              add</v-icon
+              enroll</v-icon
             >
           </template>
           <span>Enroll</span>
