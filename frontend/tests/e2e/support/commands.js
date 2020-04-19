@@ -292,7 +292,7 @@ Cypress.Commands.add('createTournament', (name, numberQuestions) => {
 })
 
 Cypress.Commands.add('enrollTournament', (name) => {
-  cy.contains('enroll').click()
+  cy.contains('add').click()
   cy.contains('Yes').parent().should('have.text', 'Yes')
 })
 
