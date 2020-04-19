@@ -57,7 +57,7 @@ describe('Queries and Answers walkthrough', () => {
       cy.contains('Logout').click();
     });
 
-    it('login teacher invalid update a query', () => {
+    it('login teacher invalid update a query answer', () => {
       cy.demoTeacherLogin();
       cy.navigateQueriesTeachers();
       cy.navigateQuery('Test Query Updated Again');
