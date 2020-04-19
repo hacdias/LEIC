@@ -166,4 +166,21 @@ public class TournamentService {
                 .collect(Collectors.toList());
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @org.springframework.transaction.annotation.Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getEnrolledTournaments(Integer studentId, Integer executionId) {
+        courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND, executionId));
+        User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        Comparator<Tournament> comparator = Comparator.comparing(Tournament::getAvailableDate, Comparator.nullsFirst(Comparator.reverseOrder()));
+
+        return tournamentRepository.findTournaments(executionId).stream()
+                .filter(tournament -> (tournament.getEnrolledStudents().contains(student) ))
+                .filter(tournament -> tournament.getCourseExecution().getId() == executionId)
+                .sorted(comparator)
+                .map(tournament -> new TournamentDto(tournament))
+                .collect(Collectors.toList());
+    }
 }

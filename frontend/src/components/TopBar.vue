@@ -163,6 +163,11 @@
           </v-list>
         </v-menu>
 
+        <v-btn to="/student/tournaments" v-if="isStudent && currentCourse" text dark data-cy="tournamentsButton" >
+          Tournaments
+          <v-icon>fas fa-trophy</v-icon>
+        </v-btn>
+
         <v-btn
           to="/student/suggestions"
           v-if="isStudent && currentCourse"

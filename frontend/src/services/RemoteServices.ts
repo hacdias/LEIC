@@ -2,6 +2,7 @@ import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
 import Suggestion from '@/models/management/Suggestion';
+import Tournament from '@/models/management/Tournament';
 import SuggestionReview from '@/models/management/SuggestionReview';
 import { Quiz } from '@/models/management/Quiz';
 import Course from '@/models/user/Course';
@@ -647,6 +648,22 @@ export default class RemoteServices {
       });
   }
 
+  static createSuggestionReview(
+    suggestionReview: SuggestionReview
+  ): Promise<SuggestionReview> {
+    return httpClient
+      .post(
+        `/suggestions/${Store.getters.getCurrentSuggestion.id}/suggestionReviews/`,
+        suggestionReview
+      )
+      .then(response => {
+        return new SuggestionReview(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async getTeacherSuggestionReviews(): Promise<SuggestionReview[]> {
     return httpClient
       .get('/suggestionReviews')
@@ -655,6 +672,14 @@ export default class RemoteServices {
           return new SuggestionReview(suggestionReview);
         });
       })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static deleteSuggestionReview(suggestionReviewId: number) {
+    return httpClient
+      .delete(`/suggestionReviews/${suggestionReviewId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
@@ -672,26 +697,57 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
-
-  static createSuggestionReview(
-    suggestionReview: SuggestionReview
-  ): Promise<SuggestionReview> {
+  
+  static async saveTournament(tournament: Tournament): Promise<Tournament> {
     return httpClient
       .post(
-        `/suggestions/${Store.getters.getCurrentSuggestion.id}/suggestionReviews/`,
-        suggestionReview
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
+        tournament
       )
       .then(response => {
-        return new SuggestionReview(response.data);
+        return new Tournament(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
   }
 
-  static deleteSuggestionReview(suggestionReviewId: number) {
+  static async enroll(tournamentId: number): Promise<Tournament> {
     return httpClient
-      .delete(`/suggestionReviews/${suggestionReviewId}`)
+      .post(`tournaments/${tournamentId}`)
+      .then(response => {
+        return new Tournament(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getOpenTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+          `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getEnrolledTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+          `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/EnrolledTournaments`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
