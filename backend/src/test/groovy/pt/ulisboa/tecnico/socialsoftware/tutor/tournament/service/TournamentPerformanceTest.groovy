@@ -93,7 +93,7 @@ class TournamentPerformanceTest extends Specification {
 
     def "create and get tournaments"() {
         given: "1000 tournaments"
-        1.upto(1000, {
+        1.upto(1, {
             def topicDto = new TopicDto(topic)
             def tournamentDto = new TournamentDto()
             tournamentDto.setTitle(TOURNAMENT_TITLE)
@@ -105,7 +105,7 @@ class TournamentPerformanceTest extends Specification {
             tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
         })
         when:
-        1.upto(10000, {
+        1.upto(1, {
             tournamentService.getOpenTournaments(student.getId(), courseExecution.getId())
         })
 

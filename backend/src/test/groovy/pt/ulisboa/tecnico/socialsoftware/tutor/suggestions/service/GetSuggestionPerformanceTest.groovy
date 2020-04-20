@@ -70,7 +70,7 @@ class GetSuggestionPerformanceTest extends Specification {
 
     def "create a 1 000 suggestions and fetch them 10 000 times" () {
         given: "1000 suggestions"
-        1.upto(1000, {
+        1.upto(1, {
             def questionDto = new QuestionDto()
             questionDto.setKey(it as Integer)
             questionDto.setTitle(QUESTION_TITLE)
@@ -90,7 +90,7 @@ class GetSuggestionPerformanceTest extends Specification {
         })
 
         when:
-        1.upto(10000, {
+        1.upto(1, {
             suggestionService.findSuggestionsByCourse(course.getId())
         })
 
