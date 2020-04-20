@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
@@ -67,14 +68,22 @@ class UpdateSuggestionTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
+
         question = new Question()
         question.setKey(1)
-        question.setContent(QUESTION_TITLE)
+        question.setTitle(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
         question.setNumberOfAnswers(2)
         question.setNumberOfCorrect(1)
+
+        def option = new Option()
+        option.setContent(OPTION_CONTENT)
+        option.setCorrect(true)
+        option.setQuestion(question)
+
         question.setCourse(course)
+        question.addOption(option)
         course.addQuestion(question)
         questionRepository.save(question)
 
@@ -83,6 +92,8 @@ class UpdateSuggestionTest extends Specification {
         suggestion.setApproved(false)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
+
+        question.setSuggestion(suggestion)
     }
 
     def "update suggestion to approved"() {
