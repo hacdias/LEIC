@@ -111,7 +111,7 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         questionAnswerRepository.save(questionAnswer)
 
         and: "1000 queries"
-        1.upto(1000, {
+        1.upto(1, {
             and: "a queryDTO"
             def queryDTO = new QueryDto()
             queryDTO.setTitle(QUERY_TITLE)
@@ -120,7 +120,7 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         })
 
         when:
-        1.upto(10000, {
+        1.upto(1, {
             queryService.getQueriesToQuestion(question.getId())
         })
 

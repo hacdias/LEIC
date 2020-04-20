@@ -98,7 +98,7 @@ class GetSuggestionReviewPerformanceTest extends Specification {
 
     def "create 1 000 suggestion reviews and fetch them 10 000 times"() {
         given: "1000 suggestion reviews"
-        1.upto(1000, {
+        1.upto(1, {
             def suggestionReviewDto = new SuggestionReviewDto()
             suggestionReviewDto.approved = true
             suggestionReviewDto.justification = SUGGESTION_REVIEW_JUSTIFICATION
@@ -106,7 +106,7 @@ class GetSuggestionReviewPerformanceTest extends Specification {
         })
 
         when:
-        1.upto(10000, {
+        1.upto(1, {
             suggestionReviewService.findSuggestionReviewsBySuggestion(suggestion.getId())
         })
 
