@@ -50,7 +50,7 @@ public class SiloFrontend implements AutoCloseable {
   public SiloFrontend(String address, Integer port) {
     serverAddress = address;
     serverPort = port;
-    String path = address + ":" + port;
+    String path = "/grpc/sauron/silo/1";
 
     ZKNaming zkNaming = new ZKNaming(address, Integer.toString(port));
 
