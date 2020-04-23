@@ -37,7 +37,7 @@ public class SiloIT extends BaseIT {
 		String host = testProps.getProperty("server.host");
 		Integer port = Integer.parseInt(testProps.getProperty("server.port"));
 		rtt = Integer.parseInt(testProps.getProperty("server.rtt"));
-		api = new SiloFrontend(host, port);
+		api = new SiloFrontend(host, port, 1);
 	}
 
 	@AfterAll

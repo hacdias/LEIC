@@ -14,8 +14,13 @@ public class SiloClientApp {
 		System.out.println(SiloClientApp.class.getSimpleName());
 
 		final String host = args[0];
-		final int port = Integer.parseInt(args[1]);
-		final SiloFrontend frontend = new SiloFrontend(host, port);
+		final Integer port = Integer.parseInt(args[1]);
+		Integer instance = -1;
+
+		if (args.length == 3)
+			instance = Integer.parseInt(args[2]);
+		
+		final SiloFrontend frontend = new SiloFrontend(host, port, instance);
 
 		Scanner scanner = new Scanner(System.in);
 		System.out.printf("> ");

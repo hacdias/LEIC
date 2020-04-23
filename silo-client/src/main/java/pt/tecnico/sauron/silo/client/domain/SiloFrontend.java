@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.google.protobuf.Timestamp;
@@ -47,21 +49,35 @@ public class SiloFrontend implements AutoCloseable {
   ManagedChannel channel;
   SauronGrpc.SauronBlockingStub stub;
 
-  public SiloFrontend(String address, Integer port) {
+  public SiloFrontend(String address, Integer port, Integer instance) {
     serverAddress = address;
     serverPort = port;
-    String path = "/grpc/sauron/silo/1";
+    String path = "/grpc/sauron/silo";
+    ZKRecord record = null;
 
     ZKNaming zkNaming = new ZKNaming(address, Integer.toString(port));
 
     try {
-      ZKRecord record = zkNaming.lookup(path);
+      if (instance != -1) {
+        path += "/" + Integer.toString(instance);
+        record = zkNaming.lookup(path);
+      } else {
+        Collection<ZKRecord> available = zkNaming.listRecords(path);
+        Random rand = new Random();
+        Integer num = rand.nextInt(available.size());
+        for(ZKRecord r: available) if (--num < 0) record = r;
+        if (record == null) {
+          throw new ZKNamingException("No record available");
+        }
+      }
+      
+      System.out.println("Connected to: " + record);
       String target = record.getURI();
 
       channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
       stub = SauronGrpc.newBlockingStub(channel);
     } catch (ZKNamingException e) {
-      System.err.println("There was an error with ZKNamingException: " + e);
+      System.err.println(e);
     }
   }
 

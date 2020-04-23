@@ -26,8 +26,13 @@ public class SpotterApp {
 		}
 
 		final String zooHost = args[0];
-		final int zooPort = Integer.parseInt(args[1]);
-		final SiloFrontend api = new SiloFrontend(zooHost, zooPort);
+		final Integer zooPort = Integer.parseInt(args[1]);
+		Integer instance = -1;
+
+		if (args.length == 3)
+			instance = Integer.parseInt(args[2]);
+
+		final SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance);
 
 		System.out.printf("Server address: %s\n", zooHost);
 		System.out.printf("Server port: %s\n", zooPort);

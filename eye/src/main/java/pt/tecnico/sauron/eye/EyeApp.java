@@ -40,8 +40,12 @@ public class EyeApp {
 		final String cameraName = args[2];
 		final Double coordinatesLatitude = Double.parseDouble(args[3]);
 		final Double coordinatesLongitude = Double.parseDouble(args[4]);
+
+		Integer instance = -1;
+		if (args.length == 6)
+			instance = Integer.parseInt(args[5]);
 	
-		final SiloFrontend api = new SiloFrontend(zooHost, zooPort);
+		final SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance);
 		try {
 			api.camJoin(cameraName, coordinatesLatitude, coordinatesLongitude);
 		} catch(SauronClientException e){
