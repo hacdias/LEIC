@@ -61,8 +61,13 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testCamJoinWrongName() {
+	public void testCamJoinInvalidNameTooLong() {
 		Assertions.assertThrows(InvalidCameraNameException.class, () -> api.camJoin("An Invalid and Extra Long Name", 30.0, 90.0));
+	}
+
+	@Test
+	public void testCamJoinInvalidNameCharacters() {
+		Assertions.assertThrows(InvalidCameraNameException.class, () -> api.camJoin("Not@Name", 30.0, 90.0));
 	}
 
 	@Test
@@ -154,7 +159,7 @@ public class SiloIT extends BaseIT {
 		List<String> identifiers = List.of("AAAA", "1A1");
 
 		ObservationType type = ObservationType.PERSON;
-		
+
 		for (String identifier : identifiers) {
 			List<Observation> observations = new ArrayList<Observation>();
 			Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
@@ -175,7 +180,7 @@ public class SiloIT extends BaseIT {
 		List<String> identifiers = List.of("AAZZAA", "112211", "11A211", "1ABBCC", "11aa11");
 
 		ObservationType type = ObservationType.CAR;
-		
+
 		for (String identifier : identifiers) {
 			List<Observation> observations = new ArrayList<Observation>();
 			Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
@@ -191,7 +196,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -239,7 +244,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -271,7 +276,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -321,7 +326,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -352,7 +357,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -374,7 +379,7 @@ public class SiloIT extends BaseIT {
 		api.report(name, observations2);
 
 		List<Observation> personObservations = api.trace(ObservationType.PERSON, "1234");
-	
+
 		assertEquals(2, personObservations.size());
 		assertEquals(observationPerson1.getIdentifier(), personObservations.get(1).getIdentifier());
 		assertEquals(observationPerson2.getIdentifier(), personObservations.get(0).getIdentifier());
@@ -400,7 +405,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude); 
+		Coordinates coordinates = new Coordinates(latitude, longitude);
 		Camera cam = new Camera(name, coordinates);
 		api.camJoin(name, latitude, longitude);
 
@@ -420,7 +425,7 @@ public class SiloIT extends BaseIT {
 
 		observations2.add(observationPerson2);
 		api.report(name, observations2);
-	
+
 		Assertions.assertThrows(NoObservationFoundException.class, () -> api.trace(ObservationType.PERSON, "1324"));
 	}
 
