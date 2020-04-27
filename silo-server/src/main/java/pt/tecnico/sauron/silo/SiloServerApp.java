@@ -10,7 +10,7 @@ import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
 import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 
 public class SiloServerApp {
-	
+
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// receive and print arguments
 		System.out.printf("Received %d arguments%n", args.length);
@@ -26,30 +26,25 @@ public class SiloServerApp {
 		final String path = args[4];
 
 		try {
+			System.out.print("Connecting to zookeeper...");
 			zkNaming = new ZKNaming(zooHost, zooPort);
-			// publish
 			zkNaming.rebind(path, host, port);
-			
-			System.out.println(SiloServerApp.class.getSimpleName());		
-			
+			System.out.println(" connected.");
+
 			// check arguments
 			if (args.length < 1) {
 				System.err.println("Argument(s) missing!");
 				System.err.printf("Usage: java %s port%n", SiloServerApp.class.getName());
 				return;
 			}
-			
+
 			final BindableService impl = new SiloServiceImpl();
-			
-			// Create a new server to listen on port
+
+			System.out.print("Server starting...");
 			Server server = ServerBuilder.forPort(Integer.parseInt(port)).addService(impl).build();
-			
-			// Start the server
 			server.start();
-			
-			// Server threads are running in the background.
-			System.out.println("Server started");
-			
+			System.out.println(" started.");
+
 			// Do not exit the main thread. Wait until server is terminated.
 			server.awaitTermination();
 
@@ -66,5 +61,5 @@ public class SiloServerApp {
 			}
 		}
 	}
-		
+
 }
