@@ -47,13 +47,11 @@ public class SiloServerApp {
 
 			// Do not exit the main thread. Wait until server is terminated.
 			server.awaitTermination();
-
 		} catch (ZKNamingException e) {
 			System.err.println("There was an error with ZKNamingException: " + e);
-		} finally  {
+		} finally {
 			if (zkNaming != null) {
 				try {
-					// remove
 					zkNaming.unbind(path,host,port);
 				} catch (ZKNamingException e) {
 					System.err.println("There was an error with ZKNamingException: " + e);
