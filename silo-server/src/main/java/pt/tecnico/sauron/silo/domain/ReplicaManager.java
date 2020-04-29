@@ -3,59 +3,121 @@ package pt.tecnico.sauron.silo.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import pt.tecnico.sauron.silo.grpc.Silo;
+// TODO:
+//  every 30 seconds (default, can be customized), send our information to other replicas
+//  For this, I think we might even use Silo-Frontend to keep connections to all other replicas.
+//  - Check book on how to estimate which changes the other replicas DON'T have.
+//  - Changes must be sent in order.
 
 public class ReplicaManager {
-  private Integer instance;
-  private List<Integer> replicaTimestamp = Collections.synchronizedList(new ArrayList<Integer>());
-  private List<Integer> valueTimestamp = Collections.synchronizedList(new ArrayList<Integer>());
-  private List<LogElement> log = Collections.synchronizedList(new ArrayList<LogElement>());
-  private List<List<Integer>> operationTable = Collections.synchronizedList(new ArrayList<List<Integer>>());
+  private final Integer instance;
+
+  // By using a static object as a lock, we can safely use this as a synchronized
+  // lock between multiple threads instead of locking on each object.
+  private static final Object lock = new Object();
+
+  // This is the data we want to keep in sync with other replicas.
+  private final List<Integer> valueTimestamp = Collections.synchronizedList(new ArrayList<>());
+  private final List<Observation> observations = Collections.synchronizedList(new ArrayList<>());
+  private final List<Camera> cameras = Collections.synchronizedList(new ArrayList<>());
+
+  // The update information!
+  private final List<Integer> replicaTimestamp = Collections.synchronizedList(new ArrayList<>());
+  private final List<ReplicaLog> log = Collections.synchronizedList(new ArrayList<>());
+  private final List<List<Integer>> operationsTable = Collections.synchronizedList(new ArrayList<>());
 
   public ReplicaManager(Integer instance, Integer numberServers) {
     this.instance = instance;
 
-    for (Integer i = 0; i < numberServers; i++) {
+    for (int i = 0; i < numberServers; i++) {
       this.replicaTimestamp.add(0);
       this.valueTimestamp.add(0);
     }
   }
 
-  private Boolean timestampGreaterOrEquals(List<Integer> prev) {
-    for (Integer i = 0; i < prev.size(); i++) {
+  public ReplicaResponse addObservation (List<Integer> prev, Observation observation) {
+    return add(prev, observation);
+  }
+
+  public ReplicaResponse addCamera (List<Integer> prev, Camera camera) {
+    return add(prev, camera);
+  }
+
+  public ReplicaResponse getObservations(List<Integer> prev) {
+    return get(prev, false);
+  }
+
+  public ReplicaResponse getCameras (List<Integer> prev) {
+    return get(prev, true);
+  }
+
+  private void incrementReplicaTimestamp () {
+    this.replicaTimestamp.set(this.instance -1, this.replicaTimestamp.get(this.instance -1) + 1);
+  }
+
+  private void updatePrevTimestamp (List<Integer> prev) {
+    prev.set(this.instance - 1, this.replicaTimestamp.get(this.instance - 1));
+  }
+
+  private ReplicaResponse add (List<Integer> prev, Object o) {
+    synchronized (lock) {
+      // Discard if already done...
+      if (this.operationsTable.contains(prev)) {
+        return new ReplicaResponse(prev);
+      }
+
+      incrementReplicaTimestamp();
+      updatePrevTimestamp(prev);
+
+      if (o instanceof Camera) {
+        log.add(new ReplicaLog(prev, (Camera)o));
+      } else if (o instanceof Observation) {
+        log.add(new ReplicaLog(prev, (Observation)o));
+      }
+
+      new Thread(() -> {
+        while (true) {
+          synchronized (lock) {
+            if (validTimestamp(prev)) {
+              // TODO: execute operation and update valueTimestamp:
+              //  - For each entry i, update valueTimestamp[i] if replicaTimestamp[i] > valueTimestamp[i]
+              return;
+            }
+          }
+        }
+      }).start();
+
+      return new ReplicaResponse(prev);
+    }
+  }
+
+  private ReplicaResponse get (List<Integer> prev, boolean isCameras) {
+    while (true) {
+      synchronized (lock) {
+        if (validTimestamp(prev)) {
+          if (isCameras) {
+            return new ReplicaResponse(this.valueTimestamp, cameras);
+          } else {
+            return new ReplicaResponse(this.valueTimestamp, observations);
+          }
+        }
+      }
+
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException ignored) {}
+    }
+  }
+
+  // NOTE: this function must only be called in synchronized blocks!
+  private boolean validTimestamp (List<Integer> prev) {
+    for (int i = 0; i < prev.size(); i++) {
       if (prev.get(i) > this.valueTimestamp.get(i)) {
         return false;
       }
     }
 
     return true;
-  }
-
-  public List<Integer> read(List<Integer> prev) {
-    while (!this.timestampGreaterOrEquals(prev)) {
-      try {
-        TimeUnit.MILLISECONDS.sleep(100);
-      } catch (InterruptedException e) {}
-    }
-    return new ArrayList<Integer>(this.valueTimestamp);
-  }
-
-  public List<Integer> modify(List<Integer> prev, Object request) {
-    if (!this.operationTable.contains(prev)) {
-      this.replicaTimestamp.set(this.instance - 1, this.replicaTimestamp.get(this.instance - 1) + 1);
-
-      prev.set(this.instance - 1, this.replicaTimestamp.get(this.instance - 1));
-
-      if (request instanceof Silo.CamJoinRequest) {
-        log.add(new LogElement(prev, (Silo.CamJoinRequest)request));
-      } else if (request instanceof Silo.ReportRequest) {
-        log.add(new LogElement(prev, (Silo.ReportRequest)request));
-      }
-      return prev;
-    }
-
-    return prev;
   }
 }
