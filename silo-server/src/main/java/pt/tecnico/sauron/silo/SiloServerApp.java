@@ -21,9 +21,11 @@ public class SiloServerApp {
 		ZKNaming zkNaming = null;
 		final String zooHost = args[0];
 		final String zooPort = args[1];
-		final String host = args[2];
-		final String port = args[3];
-		final String path = args[4];
+		final Integer instance = Integer.parseInt(args[2]);
+		final String host = args[3];
+		final String port = Integer.toString(Integer.parseInt(args[4]) + instance);
+		final String path = args[5];
+		final Integer numberServers = Integer.parseInt(args[6]);
 
 		try {
 			System.out.print("Connecting to zookeeper...");
@@ -38,7 +40,7 @@ public class SiloServerApp {
 				return;
 			}
 
-			final BindableService impl = new SiloServiceImpl();
+			final BindableService impl = new SiloServiceImpl(instance, numberServers);
 
 			System.out.print("Server starting...");
 			Server server = ServerBuilder.forPort(Integer.parseInt(port)).addService(impl).build();

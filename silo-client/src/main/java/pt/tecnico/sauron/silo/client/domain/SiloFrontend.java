@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ public class SiloFrontend implements AutoCloseable {
   private String serverAddress;
   private Integer serverPort;
   ManagedChannel channel;
+  List<Integer> timestamp = new ArrayList<Integer>();
   SauronGrpc.SauronBlockingStub stub;
 
   public SiloFrontend(String address, Integer port, Integer instance) {
@@ -55,14 +57,17 @@ public class SiloFrontend implements AutoCloseable {
     String path = "/grpc/sauron/silo";
     ZKRecord record = null;
 
-    ZKNaming zkNaming = new ZKNaming(address, Integer.toString(port));
+    ZKNaming zkNaming = new ZKNaming(serverAddress, Integer.toString(serverPort));
 
     try {
       if (instance != -1) {
+        System.out.println("Connecting to instance " + instance + " of server");
         path += "/" + Integer.toString(instance);
         record = zkNaming.lookup(path);
       } else {
+        System.out.println("Connecting to a random instance of server");
         Collection<ZKRecord> available = zkNaming.listRecords(path);
+        // FIXME
         Random rand = new Random();
         Integer num = rand.nextInt(available.size());
         for(ZKRecord r: available) if (--num < 0) record = r;
@@ -130,7 +135,7 @@ public class SiloFrontend implements AutoCloseable {
     CamJoinRequest request = CamJoinRequest.newBuilder()
       .setCamera(camera)
       .build();
-
+    
     CamJoinResponse response = stub.camJoin(request);
     throwIfNotSuccess(response.getStatus());
   }

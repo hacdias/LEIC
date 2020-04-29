@@ -29,7 +29,7 @@ public class EyeApp {
 
 		// receive and print arguments
 
-		if (args.length != 5) {
+		if (args.length < 5 || args.length > 6) {
 			System.out.printf("Invalid arguments count: %d", args.length);
 			System.exit(1);
 		}

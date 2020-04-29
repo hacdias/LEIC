@@ -20,7 +20,7 @@ public class SpotterApp {
 	public static void main(String[] args) {
 		System.out.println(SpotterApp.class.getSimpleName());
 
-		if (args.length != 2) {
+		if (args.length < 2 || args.length > 3) {
 			System.out.printf("Invalid arguments count: %d", args.length);
 			System.exit(1);
 		}

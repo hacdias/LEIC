@@ -20,6 +20,10 @@ enum ResponseStatus {
     NO_OBSERVATION_FOUND = 6;
 }
 
+message Timestamp {
+    repeated int32 value = 1;
+}
+
 message Observation {
     ObservationType type = 1;
     string identifier = 2;
@@ -43,83 +47,101 @@ message ObservationInfo {
 
 message CamJoinRequest {
     Camera camera = 1;
+    Timestamp timestamp = 2;
 }
 
 message CamJoinResponse {
     ResponseStatus status = 1;
+    Timestamp timestamp = 2;
 }
 
 message CamInfoRequest {
     string name = 1;
+    Timestamp timestamp = 2;
 }
 
 message CamInfoResponse {
     Coordinates coordinates = 1;
     ResponseStatus status = 2;
+    Timestamp timestamp = 3;
 }
 
 message ReportRequest {
     string cameraName = 1;
     repeated Observation observations = 2;
+    Timestamp timestamp = 3;
 }
 
 message ReportResponse {
     ResponseStatus status = 1;
+    Timestamp timestamp = 2;
 }
 
 message TrackRequest {
     ObservationType type = 1;
     string identifier = 2;
+    Timestamp timestamp = 3;
 }
 
 message TrackResponse {
     ResponseStatus status = 1;
     ObservationInfo observation = 2;
+    Timestamp timestamp = 3;
 }
 
 message TrackMatchRequest {
     ObservationType type = 1;
     string pattern = 2;
+    Timestamp timestamp = 3;
 }
 
 message TrackMatchResponse {
     ResponseStatus status = 1;
     repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
 }
 
 message TraceRequest {
     ObservationType type = 1;
     string identifier = 2;
+    Timestamp timestamp = 3;
 }
 
 message TraceResponse {
     ResponseStatus status = 1;
     repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
 }
 
 message CtrlPingRequest {
+    Timestamp timestamp = 1;
 }
 
 message CtrlPingResponse {
     ResponseStatus status = 1;
     repeated Camera cameras = 2;
     repeated ObservationInfo observations = 3;
+    Timestamp timestamp = 4;
 }
 
 message CtrlClearRequest {
+    Timestamp timestamp = 1;
 }
 
 message CtrlClearResponse {
     ResponseStatus status = 1;
+    Timestamp timestamp = 2;
 }
 
 message CtrlInitRequest {
     repeated Camera cameras = 1;
     repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
 }
 
 message CtrlInitResponse {
     ResponseStatus status = 1;
+    Timestamp timestamp = 2;
 }
 
 service Sauron {

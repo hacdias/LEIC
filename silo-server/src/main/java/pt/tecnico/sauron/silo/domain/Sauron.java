@@ -39,7 +39,7 @@ public class Sauron {
     // EMPTY
   }
 
-  public void addCamera(String name, Double latitude, Double longitude)
+  synchronized public void addCamera(String name, Double latitude, Double longitude)
       throws InvalidCameraNameException, InvalidCameraCoordinatesException, DuplicateCameraException {
     try {
       Camera camera = getCamera(name);
@@ -55,7 +55,7 @@ public class Sauron {
     }
   }
 
-  public Camera getCamera(String name) throws InvalidCameraException {
+  synchronized public Camera getCamera(String name) throws InvalidCameraException {
     for (Camera cam : synCameras) {
       if (cam.getName().equals(name)) {
         return cam;
@@ -65,7 +65,7 @@ public class Sauron {
     throw new InvalidCameraException(name);
   }
 
-  public Observation track(ObservationType type, String identifier) throws NoObservationException {
+  synchronized public Observation track(ObservationType type, String identifier) throws NoObservationException {
     Observation lastObservation = synObservations.stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .max(Comparator.comparing(Observation::getDatetime))
@@ -91,7 +91,7 @@ public class Sauron {
     }
   }
 
-  public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
+  synchronized public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
     String regex = buildRegex(type, pattern);
 
     List<List<Observation>> matches = new ArrayList<List<Observation>>(synObservations.stream()
@@ -113,7 +113,7 @@ public class Sauron {
     return firstMatches;
   }
 
-  public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
+  synchronized public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
     List<Observation> observationsMatch = synObservations.stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .sorted(Comparator.comparing(Observation::getDatetime).reversed())
@@ -126,7 +126,7 @@ public class Sauron {
     return observationsMatch;
   }
 
-  public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {
+  synchronized public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {
     Camera camera = getCamera(name);
     Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
     synObservations.add(observation);

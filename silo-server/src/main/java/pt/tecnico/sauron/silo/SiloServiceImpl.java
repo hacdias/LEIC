@@ -1,5 +1,7 @@
 package pt.tecnico.sauron.silo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,6 +12,7 @@ import pt.tecnico.sauron.silo.domain.Converter;
 import pt.tecnico.sauron.silo.domain.Observation;
 import pt.tecnico.sauron.silo.domain.ObservationType;
 import pt.tecnico.sauron.silo.domain.PingInformation;
+import pt.tecnico.sauron.silo.domain.ReplicaManager;
 import pt.tecnico.sauron.silo.domain.Sauron;
 import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
@@ -21,7 +24,13 @@ import pt.tecnico.sauron.silo.grpc.SauronGrpc;
 import pt.tecnico.sauron.silo.grpc.Silo;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
+  private ReplicaManager replicaManager;
   private Sauron sauron = new Sauron();
+
+  public SiloServiceImpl(Integer instance, Integer numberServers) {
+    super();
+    this.replicaManager = new ReplicaManager(instance, numberServers);
+  }
 
   private final Map<Silo.ObservationType, ObservationType> typesConverter = Map.ofEntries(
     Map.entry(Silo.ObservationType.PERSON, ObservationType.PERSON),
