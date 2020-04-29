@@ -2,6 +2,7 @@ package pt.tecnico.sauron.silo.domain;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -19,15 +20,18 @@ public class Sauron {
   private List<Observation> observations = new ArrayList<Observation>();
   private List<Camera> cameras = new ArrayList<Camera>();
 
-  public PingInformation ctrlPing() {
-    PingInformation information = new PingInformation(cameras, observations);
+  List<Observation> synObservations = Collections.synchronizedList(observations); 
+  List<Camera> synCameras = Collections.synchronizedList(cameras);
+
+  public PingInformation ctrlPing() {  
+    PingInformation information = new PingInformation(synCameras, synObservations);
     LOGGER.info("the system was pinged");
     return information;
   }
 
   public void ctrlClear() {
-    observations = new ArrayList<Observation>();
-    cameras = new ArrayList<Camera>();
+    synObservations.clear();
+    synCameras.clear();
     LOGGER.info("the system was cleared");
   }
 
@@ -43,13 +47,13 @@ public class Sauron {
     } catch (InvalidCameraException e) {
       Coordinates coordinates = new Coordinates(latitude, longitude);
       Camera camera = new Camera(name, coordinates);
-      cameras.add(camera);
+      synCameras.add(camera);
       LOGGER.info("a new camera was added: " + camera.toString());
     }
   }
 
   public Camera getCamera(String name) throws InvalidCameraException {
-    for (Camera cam : cameras) {
+    for (Camera cam : synCameras) {
       if (cam.getName().equals(name)) {
         return cam;
       }
@@ -59,7 +63,7 @@ public class Sauron {
   }
 
   public Observation track(ObservationType type, String identifier) throws NoObservationException {
-    Observation lastObservation = observations.stream()
+    Observation lastObservation = synObservations.stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .max(Comparator.comparing(Observation::getDatetime))
       .orElse(null);
@@ -87,7 +91,7 @@ public class Sauron {
   public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
     String regex = buildRegex(type, pattern);
 
-    List<List<Observation>> matches = new ArrayList<List<Observation>>(observations.stream()
+    List<List<Observation>> matches = new ArrayList<List<Observation>>(synObservations.stream()
       .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
       .collect(Collectors.groupingBy(element -> element.getIdentifier()))
       .values());
@@ -107,7 +111,7 @@ public class Sauron {
   }
 
   public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
-    List<Observation> observationsMatch = observations.stream()
+    List<Observation> observationsMatch = synObservations.stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
       .sorted(Comparator.comparing(Observation::getDatetime).reversed())
       .collect(Collectors.toList());
@@ -122,7 +126,7 @@ public class Sauron {
   public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {
     Camera camera = getCamera(name);
     Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
-    observations.add(observation);
+    synObservations.add(observation);
     LOGGER.info("a new observation was added: " + observation.toString());
   }
 }
