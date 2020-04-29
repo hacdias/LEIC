@@ -16,10 +16,9 @@ Sistemas Distribuídos 2019-2020, segundo semestre
 
 ## Melhorias da primeira parte
 
-_(que correções ou melhorias foram feitas ao código da primeira parte -- incluir link para commits no GitHub onde a alteração foi feita)_
-
-- [descrição da alteração](https://github.com/tecnico-distsys/CXX-Sauron/commit/156e1ac25798e2360b362b3a8fc474f7cfe64d01)
-- [Sincronização correta de variáveis partilhadas]
+- [Correção de testes em falta](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
+- [Sincronização correta de variáveis partilhadas](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)
+- [Aceitação do registo de câmara com as mesmas coordenadas]()
 
 
 ## Modelo de faltas

@@ -78,6 +78,12 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
+	public void testCamJoinTwice() throws SauronClientException {
+		api.camJoin("MyCamera", -23.13 , 99.0);
+		api.camJoin("MyCamera", -23.13 , 99.0);
+	} 
+
+	@Test
 	public void testCamJoinWrongLatitude() {
 		Assertions.assertThrows(InvalidCameraCoordinatesException.class, () -> api.camJoin("MyCamera", -95.0, 90.0));
 	}
