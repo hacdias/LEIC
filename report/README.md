@@ -18,7 +18,7 @@ Sistemas Distribuídos 2019-2020, segundo semestre
 
 - [Correção de testes em falta](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
 - [Sincronização correta de variáveis partilhadas](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)
-- [Aceitação do registo de câmara com as mesmas coordenadas]()
+- [Aceitação do registo de câmara com as mesmas coordenadas](https://github.com/tecnico-distsys/A46-Sauron/commit/02b35fdd471efb15a3194e2333990e55f34a845f)
 
 
 ## Modelo de faltas
