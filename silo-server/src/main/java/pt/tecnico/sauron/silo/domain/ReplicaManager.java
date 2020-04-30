@@ -25,32 +25,48 @@ public class ReplicaManager {
     private final List<ReplicaLog> log = Collections.synchronizedList(new ArrayList<>());
     private final List<String> operationsTable = Collections.synchronizedList(new ArrayList<>());
 
+    private final List<List<Integer>> tableTimestamps;
+
     List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
 
-    public ReplicaManager(Integer instance, Integer numberServers) {
+    public ReplicaManager(Integer instance, Integer numberServers, String host, Integer basePort) {
         LOGGER.info(String.format("Replica manager created: instance %d; numberServers: %d", instance, numberServers));
 
-        this.instance = instance;
+        this.instance = instance - 1;
         this.numberServers = numberServers;
+        this.tableTimestamps = new ArrayList<>();
 
         for (int i = 0; i < numberServers; i++) {
             this.replicaTimestamp.add(0);
             this.valueTimestamp.add(0);
         }
 
-        threads.add(update(1000 * 30));
-        threads.get(0).start();
+        for (int i = 0; i < numberServers; i++) {
+            this.tableTimestamps.add(new ArrayList<>(this.replicaTimestamp));
+        }
+
+        this.tableTimestamps.set(this.instance, this.replicaTimestamp);
+        this.threads.add(update(1000 * 10, numberServers, host, basePort + 1));
+        this.threads.get(0).start();
     }
 
-    private Thread update (Integer milliseconds) {
+    private Thread update (Integer milliseconds, Integer numberServers, String host, Integer basePort) {
         return new Thread(() -> {
+            List<Replica> replicas = new ArrayList<>();
+
+            for (int i = 0; i < numberServers; i++) {
+                if (i == this.instance) {
+                    continue;
+                }
+                replicas.add(new Replica(i, host + ":" + Integer.toString(basePort + i)));
+            }
+
             while (true)  {
                 LOGGER.info("UPDATE THREAD");
-                // TODO:
-                //  send our information to other replicas, for this, I think we might even use Silo-Frontend to keep
-                //  connections to all other replicas.
-                //  - Check book on how to estimate which changes the other replicas DON'T have.
-                //  - Changes must be sent in order.
+
+                for (Replica replica : replicas) {
+                    replica.gossip(this.log, this.replicaTimestamp);
+                }
 
                 try {
                     Thread.sleep(milliseconds);
@@ -63,50 +79,13 @@ public class ReplicaManager {
     }
 
     public ReplicaResponse addObservations (List<Integer> prev, String uuid, List<Observation> observations) {
-        ReplicaResponse res = add(prev, uuid, (List<Integer> timestamp) -> {
-            LOGGER.info(String.format("Adding observations to log: %h", observations));
-            log.add(new ReplicaLog(timestamp, uuid, observations));
-        }, () -> {
-            if (observations.isEmpty()) {
-                LOGGER.info("Observations list is empty, skipping.");
-                return;
-            }
-
-            String cameraName = observations.get(0).getCameraName();
-            Camera camera = null;
-
-            for (Camera cam : cameras) {
-                if (cam.getName().equals(cameraName)) {
-                    camera = cam;
-                    break;
-                }
-            }
-
-            if (camera == null) {
-                LOGGER.info("Camera " + cameraName + "does not exist. THIS SHOULD NOT HAPPEN");
-                return;
-            }
-
-            for (Observation observation : observations) {
-                observation.setCamera(camera);
-                this.observations.add(observation);
-                LOGGER.info("Observation added to the stable value: " + observation.toString());
-            }
-        });
-
+        ReplicaResponse res = add(prev, uuid, null, observations);
         res.setObservations(observations);
         return res;
     }
 
     public ReplicaResponse addCamera (List<Integer> prev, String uuid, Camera camera) {
-        ReplicaResponse res = add(prev, uuid, (List<Integer> timestamp) -> {
-            LOGGER.info("Adding camera to log: " + camera.toString());
-            log.add(new ReplicaLog(timestamp, uuid, camera));
-        }, () -> {
-            this.cameras.add(camera);
-            LOGGER.info("Camera added to the stable value: " + camera.toString());
-        });
-
+        ReplicaResponse res = add(prev, uuid, camera, null);
         res.setCamera(camera);
         return res;
     }
@@ -123,12 +102,81 @@ public class ReplicaManager {
         return get(prev, true, true);
     }
 
-    private void incrementReplicaTimestamp () {
-        this.replicaTimestamp.set(this.instance -1, this.replicaTimestamp.get(this.instance -1) + 1);
+    public void receiveGossip (List<Integer> receivedTimestamp, List<ReplicaLog> receivedLog) {
+        synchronized (lock) {
+            LOGGER.info("Processing gossips... ");
+
+            if (receivedLog.isEmpty()) {
+                LOGGER.info("Gossip was empty... how dare you?");
+                return;
+            }
+
+            tableTimestamps.set(receivedLog.get(0).getInstance(), receivedTimestamp);
+
+            for (ReplicaLog r : receivedLog) {
+                if (this.operationsTable.contains(r.getUuid())) {
+                    LOGGER.info("Operation already processed (UUID on operations table): " + r.getUuid());
+                    continue;
+                }
+
+                boolean add = false;
+                for (int i = 0; i < numberServers; i++) {
+                    if (r.getTimestamp().get(i) > this.replicaTimestamp.get(i)) {
+                        add = true;
+                        break;
+                    }
+                }
+
+                if (add) {
+                    this.log.add(r);
+                    LOGGER.info("Operation added to log: " + r.getUuid());
+                } else {
+                    LOGGER.info("Operation already processed (r.ts < replicaTS): " + r.getUuid());
+                }
+            }
+
+            for (int i = 0; i < numberServers; i++) {
+                if (receivedTimestamp.get(i) > replicaTimestamp.get(i)) {
+                    replicaTimestamp.set(i, receivedTimestamp.get(i));
+                }
+            }
+
+            goThroughLog();
+            cleanupLog();
+            LOGGER.info("Gossip processed.");
+        }
     }
 
-    private void updatePrevTimestamp (List<Integer> prev) {
-        prev.set(this.instance - 1, this.replicaTimestamp.get(this.instance - 1));
+    private void cleanupLog () {
+        LOGGER.info("Cleaning up logs...");
+        List<ReplicaLog> toRemove = new ArrayList<>();
+
+        for (int i = 0; i < numberServers; i++) {
+            System.out.println(tableTimestamps.get(i).toString());
+        }
+
+        System.out.println("LOGS;::::::");
+
+        for (ReplicaLog r : this.log) {
+            int c = r.getInstance();
+
+            boolean canRemove = true;
+
+            System.out.println(r.getTimestamp().toString());
+
+            for (int i = 0; i < numberServers; i++) {
+                if (tableTimestamps.get(i).get(c) < r.getTimestamp().get(c)) {
+                    canRemove = false;
+                }
+            }
+
+            if (canRemove) toRemove.add(r);
+        }
+
+        for (ReplicaLog r : toRemove) {
+            LOGGER.info("Removed log: " + r.getUuid());
+            this.log.remove(r);
+        }
     }
 
     private List<Integer> parsePrev (List<Integer> prev) {
@@ -139,7 +187,68 @@ public class ReplicaManager {
         return new ArrayList<>(prev);
     }
 
-    private ReplicaResponse add (List<Integer> prev, String uuid, AppendFunction append, ExecuteFunction execute) {
+    private void goThroughLog () {
+        sortLog();
+
+        for (ReplicaLog r : this.log) {
+            execute(r);
+        }
+    }
+
+    private void execute(ReplicaLog r) {
+        if (r == null) {
+            return;
+        }
+
+        if (validTimestamp(r.getPrev()) && !this.operationsTable.contains(r.getUuid())) {
+            LOGGER.info("Will execute (add) " + r.getUuid());
+            executeAux(r);
+            operationsTable.add(r.getUuid());
+
+            for (int i = 0; i < numberServers; i++) {
+                if (r.getTimestamp().get(i) > valueTimestamp.get(i)) {
+                    valueTimestamp.set(i, r.getTimestamp().get(i));
+                }
+            }
+
+            LOGGER.info("Executed (add) " + r.getUuid());
+        }
+    }
+
+    private void executeAux (ReplicaLog r) {
+        if (r.getCamera() != null) {
+            this.cameras.add(r.getCamera());
+            LOGGER.info("Camera added to the stable value: " + r.getCamera().toString());
+        } else if (r.getObservations() != null) {
+            if (r.getObservations().isEmpty()) {
+                LOGGER.info("Observations list is empty, skipping.");
+                return;
+            }
+
+            String cameraName = r.getObservations().get(0).getCameraName();
+            Camera camera = null;
+
+            for (Camera cam : cameras) {
+                if (cam.getName().equals(cameraName)) {
+                    camera = cam;
+                    break;
+                }
+            }
+
+            if (camera == null) {
+                LOGGER.severe("Camera " + cameraName + "does not exist. THIS SHOULD NOT HAPPEN");
+                return;
+            }
+
+            for (Observation observation : r.getObservations()) {
+                observation.setCamera(camera);
+                this.observations.add(observation);
+                LOGGER.info("Observation added to the stable value: " + observation.toString());
+            }
+        }
+    }
+
+    private ReplicaResponse add (List<Integer> prev, String uuid, Camera camera, List<Observation> observations) {
         List<Integer> newTimestamp = parsePrev(prev);
 
         synchronized (lock) {
@@ -149,34 +258,29 @@ public class ReplicaManager {
                 return new ReplicaResponse(prev);
             }
 
-            incrementReplicaTimestamp();
-            updatePrevTimestamp(newTimestamp);
-            LOGGER.info("Timestamp " + prev.toString() + " updated to " + newTimestamp.toString());
-            append.run(newTimestamp);
-
-            Thread thread = new Thread(() -> {
-                while (true) {
-                    synchronized (lock) {
-                        if (validTimestamp(prev)) {
-                            LOGGER.info("Will execute (add) " + newTimestamp.toString());
-                            execute.run();
-                            operationsTable.add(uuid);
-
-                            for (int i = 0; i < newTimestamp.size(); i++) {
-                                if (replicaTimestamp.get(i) > valueTimestamp.get(i)) {
-                                    valueTimestamp.set(i, replicaTimestamp.get(i));
-                                }
-                            }
-
-                            LOGGER.info("New value timestamp is: " + valueTimestamp.toString());
-                            return;
-                        }
-                    }
+            for (ReplicaLog r : this.log) {
+                if (r.getUuid().equals(uuid)) {
+                    LOGGER.info("Operation already in log: " + uuid);
+                    return new ReplicaResponse(prev);
                 }
-            });
+            }
 
-            threads.add(thread);
-            thread.start();
+            this.replicaTimestamp.set(this.instance, this.replicaTimestamp.get(this.instance) + 1);
+            newTimestamp.set(this.instance, this.replicaTimestamp.get(this.instance));
+
+            ReplicaLog r = null;
+
+            if (camera != null) {
+                LOGGER.info("Adding camera to log: " + uuid);
+                r = new ReplicaLog(this.instance, prev, newTimestamp, uuid, camera);
+                log.add(r);
+            } else if (observations != null) {
+                LOGGER.info("Adding observations to log" + uuid);
+                r = new ReplicaLog(this.instance, prev, newTimestamp, uuid, observations);
+                log.add(r);
+            }
+
+            execute(r);
         }
 
         return new ReplicaResponse(newTimestamp);
@@ -190,7 +294,7 @@ public class ReplicaManager {
             synchronized (lock) {
                 if (validTimestamp(prev)) {
                     LOGGER.info("Will execute (get) " + prev.toString());
-                    ReplicaResponse res = new ReplicaResponse(prev);
+                    ReplicaResponse res = new ReplicaResponse(valueTimestamp);
                     if (isCameras) {
                         res.setCameras(cameras);
                     }
@@ -210,6 +314,18 @@ public class ReplicaManager {
                 return null;
             }
         }
+    }
+
+    private void sortLog () {
+        log.sort((r1, r2) -> {
+            for (int i = 0; i < this.numberServers; i++) {
+                if (r1.getPrev().get(i) < r2.getPrev().get(i)) {
+                    return -1;
+                }
+            }
+
+            return 1;
+        });
     }
 
     // NOTE: this function must only be called in synchronized blocks!

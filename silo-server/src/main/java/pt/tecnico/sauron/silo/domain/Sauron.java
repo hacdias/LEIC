@@ -13,15 +13,19 @@ import java.util.stream.Collectors;
 public class Sauron {
     private final Integer instance;
     private final Integer totalInstances;
+    private final String host;
+    private final Integer basePort;
     private ReplicaManager replicaManager;
 
     // TODO(add to report): control operations are not distributed since
     //  they're only used for testing purposes https://piazza.com/class/k6cbgwcjrk11og?cid=194
 
-    public Sauron (Integer instance, Integer totalInstances) {
+    public Sauron (Integer instance, Integer totalInstances, String host, Integer basePort) {
         this.instance = instance;
         this.totalInstances = totalInstances;
-        replicaManager = new ReplicaManager(instance, totalInstances);
+        this.host = host;
+        this.basePort = basePort;
+        replicaManager = new ReplicaManager(instance, totalInstances, host, basePort);
     }
 
     public ReplicaResponse ctrlPing(List<Integer> prev) {
@@ -30,7 +34,7 @@ public class Sauron {
 
     public void ctrlClear() {
         replicaManager.close();
-        replicaManager = new ReplicaManager(instance, totalInstances);
+        replicaManager = new ReplicaManager(instance, totalInstances, host, basePort);
         Logger.getGlobal().info("SERVER RESET");
     }
 
@@ -126,6 +130,10 @@ public class Sauron {
     //  replica is updated in the moment we make the request. https://piazza.com/class/k6cbgwcjrk11og?cid=181
     public ReplicaResponse report (List<Integer> prev, String uuid, List<Observation> observations) {
         return replicaManager.addObservations(prev, uuid, observations);
+    }
+
+    public void receiveGossip (List<Integer> replicaTimestamp, List<ReplicaLog> log) {
+        replicaManager.receiveGossip(replicaTimestamp, log);
     }
 
     private String buildRegex(ObservationType type, String pattern) {

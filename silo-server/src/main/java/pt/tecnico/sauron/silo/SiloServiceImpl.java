@@ -21,9 +21,9 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
     );
     private Sauron sauron;
 
-    public SiloServiceImpl(Integer instance, Integer numberServers) {
+    public SiloServiceImpl(Integer instance, Integer numberServers, String host, Integer basePort) {
         super();
-        this.sauron = new Sauron(instance, numberServers);
+        this.sauron = new Sauron(instance, numberServers, host, basePort);
     }
 
     private Silo.Timestamp convertTimestamp (List<Integer> timestamp) {
@@ -213,6 +213,39 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             .setTimestamp(convertTimestamp(new ArrayList<>()));
 
         responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void gossip(Silo.GossipRequest request, StreamObserver<Silo.GossipResponse> responseObserver) {
+        List<Integer> timestamp = request.getTimestamp().getValueList();
+        List<ReplicaLog> log = new ArrayList<>();
+
+        try {
+            for (Silo.Log l : request.getLogList()) {
+                List<Integer> prev = l.getPrev().getValueList();
+                List<Integer> lts = l.getTimestamp().getValueList();
+
+                if (l.hasCamera()) {
+                    Coordinates coordinates = new Coordinates(l.getCamera().getCoordinates().getLatitude(), l.getCamera().getCoordinates().getLongitude());
+                    Camera camera = new Camera(l.getCamera().getName(), coordinates);
+                    log.add(new ReplicaLog(l.getInstance(), prev, lts, l.getUuid(), camera));
+                } else if (!l.getObservationsList().isEmpty()) {
+                    List<Observation> observations = new ArrayList<>();
+                    for (Silo.Observation observation : l.getObservationsList()) {
+                        ObservationType type = typesConverter.get(observation.getType());
+                        Observation obs = new Observation(observation.getCameraName(), type, observation.getIdentifier(), LocalDateTime.now());
+                        observations.add(obs);
+                    }
+                    log.add(new ReplicaLog(l.getInstance(), prev, lts, l.getUuid(), observations));
+                }
+            }
+        } catch (InvalidCameraNameException|InvalidCameraCoordinatesException|InvalidIdentifierException ignored) {
+            // Do nothing...
+        }
+
+        sauron.receiveGossip(timestamp, log);
+        responseObserver.onNext(Silo.GossipResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
 }

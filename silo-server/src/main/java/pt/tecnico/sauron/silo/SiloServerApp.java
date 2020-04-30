@@ -21,7 +21,8 @@ public class SiloServerApp {
         final String zooPort = args[1];
         final int instance = Integer.parseInt(args[2]);
         final String host = args[3];
-        final String port = Integer.toString(Integer.parseInt(args[4]) + instance);
+        final int basePort = Integer.parseInt(args[4]);
+        final String port = Integer.toString(basePort + instance);
         final String path = args[5];
         final Integer numberServers = Integer.parseInt(args[6]);
 
@@ -40,7 +41,7 @@ public class SiloServerApp {
                 }
             }));
 
-            final BindableService impl = new SiloServiceImpl(instance, numberServers);
+            final BindableService impl = new SiloServiceImpl(instance, numberServers, host, basePort);
 
             System.out.print("Server starting...");
             Server server = ServerBuilder.forPort(Integer.parseInt(port)).addService(impl).build();

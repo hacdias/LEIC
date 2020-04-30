@@ -4,25 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReplicaLog {
-    private List<Integer> timestamp;
-    private String uuid;
-    private Camera camera = null;
-    private List<Observation> observations = null;
+    private final Integer instance;
+    private final List<Integer> prev;
+    private final List<Integer> timestamp;
+    private final String uuid;
+    private final Camera camera;
+    private final List<Observation> observations;
 
-    public ReplicaLog(List<Integer> timestamp, String uuid, Camera camera) {
+    public ReplicaLog(Integer instance, List<Integer> prev, List<Integer> timestamp, String uuid, Camera camera) {
+        this.instance = instance;
         this.timestamp = new ArrayList<>(timestamp);
-        this.camera = camera;
         this.uuid = uuid;
+        this.prev = new ArrayList<>(prev);
+
+        this.camera = camera;
+        this.observations = null;
     }
 
-    public ReplicaLog(List<Integer> timestamp, String uuid, List<Observation> observations) {
+    public ReplicaLog(Integer instance, List<Integer> prev, List<Integer> timestamp, String uuid, List<Observation> observations) {
+        this.instance = instance;
         this.timestamp = new ArrayList<>(timestamp);
-        this.observations = new ArrayList<>(observations);
         this.uuid = uuid;
+        this.prev = new ArrayList<>(prev);
+
+        this.camera = null;
+        this.observations = new ArrayList<>(observations);
+    }
+
+    public Integer getInstance() {
+        return instance;
     }
 
     public List<Integer> getTimestamp() {
         return timestamp;
+    }
+
+    public List<Integer> getPrev() {
+        return prev;
     }
 
     public Camera getCamera() {

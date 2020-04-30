@@ -24,11 +24,6 @@ public class Observation {
         }
     }
 
-    public Observation(Camera camera, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
-        this(type, identifier, datetime);
-        this.camera = camera;
-    }
-
     public Observation(String cameraName, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
         this(type, identifier, datetime);
         this.cameraName = cameraName;

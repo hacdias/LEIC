@@ -28,6 +28,7 @@ message Observation {
     ObservationType type = 1;
     string identifier = 2;
     google.protobuf.Timestamp timestamp = 3;
+    string cameraName = 4;
 }
 
 message Coordinates {
@@ -146,6 +147,24 @@ message CtrlInitResponse {
     Timestamp timestamp = 2;
 }
 
+message Log {
+    int32 instance = 1;
+    Timestamp prev = 2;
+    Timestamp timestamp = 3;
+    string uuid = 4;
+    Camera camera = 5;
+    repeated Observation observations = 6;
+}
+
+message GossipRequest {
+    Timestamp timestamp = 1;
+    repeated Log log = 2;
+}
+
+message GossipResponse {
+
+}
+
 service Sauron {
     rpc ctrlPing(CtrlPingRequest) returns (CtrlPingResponse);
     rpc ctrlClear(CtrlClearRequest) returns (CtrlClearResponse);
@@ -156,4 +175,5 @@ service Sauron {
     rpc track(TrackRequest) returns (TrackResponse);
     rpc trackMatch(TrackMatchRequest) returns (TrackMatchResponse);
     rpc trace(TraceRequest) returns (TraceResponse);
+    rpc gossip(GossipRequest) returns (GossipResponse);
 }
