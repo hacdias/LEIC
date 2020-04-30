@@ -2,34 +2,29 @@ package pt.tecnico.sauron.silo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.grpc.stub.StreamObserver;
 import pt.tecnico.sauron.silo.domain.*;
-import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
-import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
-import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 import pt.tecnico.sauron.silo.grpc.SauronGrpc;
 import pt.tecnico.sauron.silo.grpc.Silo;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
+  private final Map<Silo.ObservationType, ObservationType> typesConverter = Map.ofEntries(
+    Map.entry(Silo.ObservationType.PERSON, ObservationType.PERSON),
+    Map.entry(Silo.ObservationType.CAR, ObservationType.CAR)
+  );
   private Sauron sauron;
 
   public SiloServiceImpl(Integer instance, Integer numberServers) {
     super();
     this.sauron = new Sauron(instance, numberServers);
   }
-
-  private final Map<Silo.ObservationType, ObservationType> typesConverter = Map.ofEntries(
-    Map.entry(Silo.ObservationType.PERSON, ObservationType.PERSON),
-    Map.entry(Silo.ObservationType.CAR, ObservationType.CAR)
-  );
 
   private Silo.Timestamp convertTimestamp (List<Integer> timestamp) {
     return Silo.Timestamp.newBuilder().addAllValue(timestamp).build();
@@ -201,7 +196,8 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     Silo.CtrlInitResponse.Builder builder = Silo.CtrlInitResponse
       .newBuilder()
-      .setStatus(Silo.ResponseStatus.SUCCESS);
+      .setStatus(Silo.ResponseStatus.SUCCESS)
+      .setTimestamp(convertTimestamp(new ArrayList<>()));
 
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
@@ -213,7 +209,8 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
     Silo.CtrlClearResponse.Builder builder = Silo.CtrlClearResponse
       .newBuilder()
-      .setStatus(Silo.ResponseStatus.SUCCESS);
+      .setStatus(Silo.ResponseStatus.SUCCESS)
+      .setTimestamp(convertTimestamp(new ArrayList<>()));
 
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();

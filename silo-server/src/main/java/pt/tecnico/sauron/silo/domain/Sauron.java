@@ -1,16 +1,11 @@
 package pt.tecnico.sauron.silo.domain;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
-import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
-import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
-import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 
 public class Sauron {
   private final Integer instance;
