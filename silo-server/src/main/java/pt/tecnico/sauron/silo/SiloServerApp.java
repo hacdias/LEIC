@@ -17,10 +17,9 @@ public class SiloServerApp {
             System.out.printf("arg[%d] = %s%n", i, args[i]);
         }
 
-        ZKNaming zkNaming = null;
         final String zooHost = args[0];
         final String zooPort = args[1];
-        final Integer instance = Integer.parseInt(args[2]);
+        final int instance = Integer.parseInt(args[2]);
         final String host = args[3];
         final String port = Integer.toString(Integer.parseInt(args[4]) + instance);
         final String path = args[5];
@@ -28,16 +27,18 @@ public class SiloServerApp {
 
         try {
             System.out.print("Connecting to zookeeper...");
-            zkNaming = new ZKNaming(zooHost, zooPort);
+            final ZKNaming zkNaming = new ZKNaming(zooHost, zooPort);
             zkNaming.rebind(path, host, port);
             System.out.println(" connected.");
 
-            // check arguments
-            if (args.length < 1) {
-                System.err.println("Argument(s) missing!");
-                System.err.printf("Usage: java %s port%n", SiloServerApp.class.getName());
-                return;
-            }
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    zkNaming.unbind(path,host,port);
+                    System.out.println("Port unbound.");
+                } catch (ZKNamingException e) {
+                    System.err.println("There was an error with ZKNamingException: " + e);
+                }
+            }));
 
             final BindableService impl = new SiloServiceImpl(instance, numberServers);
 
@@ -50,14 +51,6 @@ public class SiloServerApp {
             server.awaitTermination();
         } catch (ZKNamingException e) {
             System.err.println("There was an error with ZKNamingException: " + e);
-        } finally {
-            if (zkNaming != null) {
-                try {
-                    zkNaming.unbind(path,host,port);
-                } catch (ZKNamingException e) {
-                    System.err.println("There was an error with ZKNamingException: " + e);
-                }
-            }
         }
     }
 
