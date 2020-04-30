@@ -1,16 +1,9 @@
 package pt.tecnico.sauron.silo.domain;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
-
-// TODO:
-//  every 30 seconds (default, can be customized), send our information to other replicas
-//  For this, I think we might even use Silo-Frontend to keep connections to all other replicas.
-//  - Check book on how to estimate which changes the other replicas DON'T have.
-//  - Changes must be sent in order.
 
 public class ReplicaManager {
   private final Integer instance;
@@ -54,6 +47,10 @@ public class ReplicaManager {
       while (true)  {
         LOGGER.info("UPDATE THREAD");
         // TODO:
+        //  send our information to other replicas, for this, I think we might even use Silo-Frontend to keep
+        //  connections to all other replicas.
+        //  - Check book on how to estimate which changes the other replicas DON'T have.
+        //  - Changes must be sent in order.
 
         try {
           Thread.sleep(milliseconds);
