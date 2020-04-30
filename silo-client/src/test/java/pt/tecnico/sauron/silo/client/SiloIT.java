@@ -60,7 +60,7 @@ public class SiloIT extends BaseIT {
 		api.camJoin("MyCamera", -30.95, 50.94);
 	}
 
-	@Test
+ 	@Test
 	public void testCamJoinInvalidNameTooLong() {
 		Assertions.assertThrows(InvalidCameraNameException.class, () -> api.camJoin("An Invalid and Extra Long Name", 30.0, 90.0));
 	}
@@ -70,14 +70,7 @@ public class SiloIT extends BaseIT {
 		Assertions.assertThrows(InvalidCameraNameException.class, () -> api.camJoin("Not@Name", 30.0, 90.0));
 	}
 
-	@Test
-	public void testCamJoinDuplicateCamera() throws SauronClientException {
-		String name = "MyCamera";
-		api.camJoin(name, -30.12, 90.0);
-		Assertions.assertThrows(DuplicateCameraException.class, () -> api.camJoin(name, -35.0, -50.0));
-	}
-
-	@Test
+ 	@Test
 	public void testCamJoinTwice() throws SauronClientException {
 		api.camJoin("MyCamera", -23.13 , 99.0);
 		api.camJoin("MyCamera", -23.13 , 99.0);
@@ -434,5 +427,4 @@ public class SiloIT extends BaseIT {
 
 		Assertions.assertThrows(NoObservationFoundException.class, () -> api.trace(ObservationType.PERSON, "1324"));
 	}
-
 }

@@ -14,45 +14,20 @@ public class ReplicaResponse {
         this.timestamp = new ArrayList<>(timestamp);
     }
 
-    public ReplicaResponse(List<Integer> timestamp, Observation observation) {
-        this(timestamp);
-        this.observation = observation;
-    }
-
-    public ReplicaResponse(List<Integer> timestamp, Camera camera) {
-        this(timestamp);
+    public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
-    public ReplicaResponse(List<Integer> timestamp, List<Camera> cameras, List<Observation> observations) {
-        this.timestamp = timestamp;
-        this.cameras = new ArrayList<>(cameras);
-        this.observations = new ArrayList<>(observations);
+    public void setObservation(Observation observation) {
+        this.observation = observation;
     }
 
-    @SuppressWarnings("unchecked")
-    public ReplicaResponse(List<Integer> timestamp, List<?> objects) {
-        this.timestamp = timestamp;
+    public void setCameras(List<Camera> cameras) {
+        this.cameras = new ArrayList<>(cameras);
+    }
 
-        if (objects.isEmpty()) {
-            return;
-        }
-
-        // We make a copy of the list to assure it is not modified, i.e.,
-        // no new elements are added and it represents the actual state when
-        // this was created.
-
-        if (objects.get(0) instanceof Camera) {
-            this.cameras = new ArrayList<>((List<Camera>)objects);
-            return;
-        }
-
-        if (objects.get(0) instanceof Observation) {
-            this.observations = new ArrayList<>((List<Observation>)objects);
-            return;
-        }
-
-        throw new IllegalArgumentException();
+    public void setObservations(List<Observation> observations) {
+        this.observations = new ArrayList<>(observations);
     }
 
     public List<Integer> getTimestamp() {

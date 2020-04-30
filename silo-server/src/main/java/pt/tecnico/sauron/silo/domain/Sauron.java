@@ -1,10 +1,7 @@
 package pt.tecnico.sauron.silo.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -16,66 +13,121 @@ import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 import pt.tecnico.sauron.silo.exceptions.NoObservationException;
 
 public class Sauron {
-  private static final Logger LOGGER = Logger.getLogger(Sauron.class.getName());
-  private List<Observation> observations = new ArrayList<Observation>();
-  private List<Camera> cameras = new ArrayList<Camera>();
+  private final Integer instance;
+  private final Integer totalInstances;
+  private ReplicaManager replicaManager;
 
-  List<Observation> synObservations = Collections.synchronizedList(observations);
-  List<Camera> synCameras = Collections.synchronizedList(cameras);
+  // TODO(add to report): control operations are not distributed since
+  //  they're only used for testing purposes https://piazza.com/class/k6cbgwcjrk11og?cid=194
 
-  public PingInformation ctrlPing() {
-    PingInformation information = new PingInformation(synCameras, synObservations);
-    LOGGER.info("the system was pinged");
-    return information;
+  public Sauron (Integer instance, Integer totalInstances) {
+    this.instance = instance;
+    this.totalInstances = totalInstances;
+    replicaManager = new ReplicaManager(instance, totalInstances);
+  }
+
+  public ReplicaResponse ctrlPing(List<Integer> prev) {
+    return replicaManager.getAll(prev);
   }
 
   public void ctrlClear() {
-    synObservations.clear();
-    synCameras.clear();
-    LOGGER.info("the system was cleared");
+    replicaManager.close();
+    replicaManager = new ReplicaManager(instance, totalInstances);
+    Logger.getGlobal().info("SERVER RESET");
   }
 
   public void ctrlInit() {
     // EMPTY
   }
 
-  synchronized public void addCamera(String name, Double latitude, Double longitude)
-      throws InvalidCameraNameException, InvalidCameraCoordinatesException, DuplicateCameraException {
-    try {
-      Camera camera = getCamera(name);
-      if (camera.getCoordinates().getLatitude().equals(latitude) && camera.getCoordinates().getLongitude().equals(longitude)){
-        return ;
-      }
-      throw new DuplicateCameraException(name);
-    } catch (InvalidCameraException e) {
-      Coordinates coordinates = new Coordinates(latitude, longitude);
-      Camera camera = new Camera(name, coordinates);
-      synCameras.add(camera);
-      LOGGER.info("a new camera was added: " + camera.toString());
-    }
+  public ReplicaResponse addCamera(List<Integer> prev, String name, Double latitude, Double longitude)
+      throws InvalidCameraNameException, InvalidCameraCoordinatesException {
+
+     Camera camera = getCamera(prev, name).getCamera();
+     if (camera != null && (!camera.getCoordinates().getLatitude().equals(latitude) || !camera.getCoordinates().getLongitude().equals(longitude))) {
+       // In this case, we have a duplicate camera, i.e., a camera with the same name and different coordinates.
+       // In the worst case scenario, we add a duplicate camera to the replica, but we can check that on the
+       // ReplicaManager.
+       return null;
+     }
+
+     if (camera != null) {
+       // The camera already exists, but is not duplicated.
+       return new ReplicaResponse(prev);
+     }
+
+    Coordinates coordinates = new Coordinates(latitude, longitude);
+    camera = new Camera(name, coordinates);
+    return replicaManager.addCamera(prev, camera);
   }
 
-  synchronized public Camera getCamera(String name) throws InvalidCameraException {
-    for (Camera cam : synCameras) {
+  public ReplicaResponse getCamera(List<Integer> prev, String name) {
+    ReplicaResponse req = replicaManager.getCameras(prev);
+    ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
+
+    for (Camera cam : req.getCameras()) {
       if (cam.getName().equals(name)) {
-        return cam;
+        res.setCamera(cam);
+        break;
       }
     }
 
-    throw new InvalidCameraException(name);
+    return res;
   }
 
-  synchronized public Observation track(ObservationType type, String identifier) throws NoObservationException {
-    Observation lastObservation = synObservations.stream()
+  public ReplicaResponse track(List<Integer> prev, ObservationType type, String identifier) {
+    ReplicaResponse req = replicaManager.getObservations(prev);
+    ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
+
+    Observation lastObservation = req.getObservations().stream()
+            .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
+            .max(Comparator.comparing(Observation::getDatetime))
+            .orElse(null);
+
+    res.setObservation(lastObservation);
+    return res;
+  }
+
+  public ReplicaResponse trackMatch(List<Integer> prev, ObservationType type, String pattern) {
+    ReplicaResponse req = replicaManager.getObservations(prev);
+    ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
+
+    String regex = buildRegex(type, pattern);
+
+    Collection<List<Observation>> matches = req.getObservations().stream()
+      .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
+      .collect(Collectors.groupingBy(Observation::getIdentifier))
+      .values();
+
+    List<Observation> firstMatches = matches.stream()
+      .map(element -> element.stream()
+        .max(Comparator.comparing(Observation::getDatetime))
+        .orElse(null))
+      .filter(Objects::nonNull)
+      .collect(Collectors.toList());
+
+    res.setObservations(firstMatches);
+    return res;
+  }
+
+  public ReplicaResponse trace(List<Integer> prev, ObservationType type, String identifier) {
+    ReplicaResponse req = replicaManager.getObservations(prev);
+    ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
+
+    List<Observation> observationsMatch = req.getObservations().stream()
       .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
-      .max(Comparator.comparing(Observation::getDatetime))
-      .orElse(null);
+      .sorted(Comparator.comparing(Observation::getDatetime).reversed())
+      .collect(Collectors.toList());
 
-    if (lastObservation == null) {
-      throw new NoObservationException(identifier);
-    }
+    res.setObservations(observationsMatch);
+    return res;
+  }
 
-    return lastObservation;
+
+  // TODO(add to report): we removed the InvalidCameraException because we can't guarantee this
+  //  replica is updated in the moment we make the request. https://piazza.com/class/k6cbgwcjrk11og?cid=181
+  public ReplicaResponse report (List<Integer> prev, List<Observation> observations) {
+    return replicaManager.addObservations(prev, observations);
   }
 
   private String buildRegex(ObservationType type, String pattern) {
@@ -89,47 +141,5 @@ public class Sauron {
       default:
         return patternRegex;
     }
-  }
-
-  synchronized public List<Observation> trackMatch(ObservationType type, String pattern) throws NoObservationException {
-    String regex = buildRegex(type, pattern);
-
-    List<List<Observation>> matches = new ArrayList<List<Observation>>(synObservations.stream()
-      .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
-      .collect(Collectors.groupingBy(element -> element.getIdentifier()))
-      .values());
-
-    List<Observation> firstMatches = matches.stream()
-      .map(element -> element.stream()
-        .max(Comparator.comparing(Observation::getDatetime))
-        .orElse(null))
-      .filter(element -> element != null)
-      .collect(Collectors.toList());
-
-    if (firstMatches.size() == 0) {
-      throw new NoObservationException(pattern);
-    }
-
-    return firstMatches;
-  }
-
-  synchronized public List<Observation> trace(ObservationType type, String identifier) throws NoObservationException {
-    List<Observation> observationsMatch = synObservations.stream()
-      .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
-      .sorted(Comparator.comparing(Observation::getDatetime).reversed())
-      .collect(Collectors.toList());
-
-    if (observationsMatch.size() == 0) {
-      throw new NoObservationException(identifier);
-    }
-
-    return observationsMatch;
-  }
-
-  synchronized public void report (String name, ObservationType type, String identifier) throws InvalidCameraException, InvalidIdentifierException {
-    Camera camera = getCamera(name);
-    Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
-    synObservations.add(observation);
-    LOGGER.info("a new observation was added: " + observation.toString());
   }
 }

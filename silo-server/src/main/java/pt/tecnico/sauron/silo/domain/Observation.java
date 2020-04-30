@@ -9,19 +9,29 @@ import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 public class Observation {
   private ObservationType type;
   private String identifier;
+  private String cameraName;
   private LocalDateTime datetime;
   private Camera camera;
 
-  public Observation(Camera camera, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
+  private Observation (ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
     this.type = type;
     this.identifier = identifier;
     this.datetime = datetime;
-    this.camera = camera;
 
     if ((type == ObservationType.CAR && !this.checkCarIdentifier(identifier)) ||
-      (type == ObservationType.PERSON && !identifier.matches("^\\d+$"))) {
+            (type == ObservationType.PERSON && !identifier.matches("^\\d+$"))) {
       throw new InvalidIdentifierException(identifier);
     }
+  }
+
+  public Observation(Camera camera, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
+    this(type, identifier, datetime);
+    this.camera = camera;
+  }
+
+  public Observation(String cameraName, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
+    this(type, identifier, datetime);
+    this.cameraName = cameraName;
   }
 
   private Boolean checkCarIdentifier(String identifier) {
@@ -31,32 +41,40 @@ public class Observation {
     return charGroups >= 1 && intGroups >= 1 && intGroups + charGroups == 3;
   }
 
-  /**
-   * @return the type
-   */
   public ObservationType getType() {
     return type;
   }
 
-  /**
-   * @return the datetime
-   */
   public LocalDateTime getDatetime() {
     return datetime;
   }
 
-  /**
-   * @return the identifier
-   */
   public String getIdentifier() {
     return identifier;
   }
 
-  /**
-   * @return the camera
-   */
   public Camera getCamera() {
     return camera;
+  }
+
+  public String getCameraName() {
+    return cameraName;
+  }
+
+  public void setType(ObservationType type) {
+    this.type = type;
+  }
+
+  public void setDatetime(LocalDateTime datetime) {
+    this.datetime = datetime;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
+
+  public void setCamera(Camera camera) {
+    this.camera = camera;
   }
 
   @Override

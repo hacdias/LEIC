@@ -1,5 +1,6 @@
 package pt.tecnico.sauron.silo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,13 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.grpc.stub.StreamObserver;
-import pt.tecnico.sauron.silo.domain.Camera;
-import pt.tecnico.sauron.silo.domain.Converter;
-import pt.tecnico.sauron.silo.domain.Observation;
-import pt.tecnico.sauron.silo.domain.ObservationType;
-import pt.tecnico.sauron.silo.domain.PingInformation;
-import pt.tecnico.sauron.silo.domain.ReplicaManager;
-import pt.tecnico.sauron.silo.domain.Sauron;
+import pt.tecnico.sauron.silo.domain.*;
 import pt.tecnico.sauron.silo.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraException;
@@ -24,12 +19,11 @@ import pt.tecnico.sauron.silo.grpc.SauronGrpc;
 import pt.tecnico.sauron.silo.grpc.Silo;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
-  private ReplicaManager replicaManager;
-  private Sauron sauron = new Sauron();
+  private Sauron sauron;
 
   public SiloServiceImpl(Integer instance, Integer numberServers) {
     super();
-    this.replicaManager = new ReplicaManager(instance, numberServers);
+    this.sauron = new Sauron(instance, numberServers);
   }
 
   private final Map<Silo.ObservationType, ObservationType> typesConverter = Map.ofEntries(
@@ -37,39 +31,52 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
     Map.entry(Silo.ObservationType.CAR, ObservationType.CAR)
   );
 
+  private Silo.Timestamp convertTimestamp (List<Integer> timestamp) {
+    return Silo.Timestamp.newBuilder().addAllValue(timestamp).build();
+  }
+
   @Override
   public void camJoin(Silo.CamJoinRequest request, StreamObserver<Silo.CamJoinResponse> responseObserver) {
     Silo.CamJoinResponse.Builder builder = Silo.CamJoinResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
+    List<Integer> prev = request.getTimestamp().getValueList();
 
     try {
       Silo.Camera cam = request.getCamera();
       Silo.Coordinates coordinates = cam.getCoordinates();
-      sauron.addCamera(cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
+      ReplicaResponse res = sauron.addCamera(prev, cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
+
+      if (res == null) {
+        builder.setTimestamp(convertTimestamp(prev));
+        builder.setStatus(Silo.ResponseStatus.DUPLICATE_CAMERA);
+      } else {
+        builder.setTimestamp(convertTimestamp(res.getTimestamp()));
+      }
     } catch (InvalidCameraNameException e) {
       builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA_NAME);
-    } catch (DuplicateCameraException e) {
-      builder.setStatus(Silo.ResponseStatus.DUPLICATE_CAMERA);
-    }catch (InvalidCameraCoordinatesException e) {
+      builder.setTimestamp(convertTimestamp(prev));
+    } catch (InvalidCameraCoordinatesException e) {
       builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA_COORDINATES);
+      builder.setTimestamp(convertTimestamp(prev));
     }
 
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
-
   }
 
   @Override
   public void camInfo(Silo.CamInfoRequest request, StreamObserver<Silo.CamInfoResponse> responseObserver) {
     Silo.CamInfoResponse.Builder builder = Silo.CamInfoResponse.newBuilder();
+    List<Integer> prev = request.getTimestamp().getValueList();
+    ReplicaResponse res = sauron.getCamera(prev, request.getName());
 
-    try {
-      Camera cam = sauron.getCamera(request.getName());
-      builder.setCoordinates(Converter.convertToMessage(cam.getCoordinates()));
-    } catch (InvalidCameraException e) {
+    if (res.getCamera() == null) {
       builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
+    } else {
+      builder.setCoordinates(Converter.convertToMessage(res.getCamera().getCoordinates()));
     }
 
+    builder.setTimestamp(convertTimestamp(res.getTimestamp()));
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
   }
@@ -78,18 +85,19 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
   public void track(Silo.TrackRequest request, StreamObserver<Silo.TrackResponse> responseObserver) {
     Silo.TrackResponse.Builder builder = Silo.TrackResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
+    List<Integer> prev = request.getTimestamp().getValueList();
 
-    try {
-      ObservationType type = typesConverter.get(request.getType());
-      Observation observation = sauron.track(type, request.getIdentifier());
+    ObservationType type = typesConverter.get(request.getType());
+    ReplicaResponse res = sauron.track(prev, type, request.getIdentifier());
 
-      Silo.ObservationInfo observationInfo = Converter.convertToMessage(observation);
-      builder.setObservation(observationInfo);
-    } catch (NoObservationException e) {
+    if (res.getObservation() == null) {
       builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
-      // TODO: tell which of the identifiers wasn't found!
+    } else {
+      Silo.ObservationInfo observationInfo = Converter.convertToMessage(res.getObservation());
+      builder.setObservation(observationInfo);
     }
 
+    builder.setTimestamp(convertTimestamp(res.getTimestamp()));
     responseObserver.onNext(builder.build());
     responseObserver.onCompleted();
   }
@@ -98,19 +106,19 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
   public void trackMatch(Silo.TrackMatchRequest request, StreamObserver<Silo.TrackMatchResponse> responseObserver) {
     Silo.TrackMatchResponse.Builder builder = Silo.TrackMatchResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
+    List<Integer> prev = request.getTimestamp().getValueList();
 
-    try {
-      ObservationType type = typesConverter.get(request.getType());
-      List<Observation> observations = sauron.trackMatch(type, request.getPattern());
+    ObservationType type = typesConverter.get(request.getType());
+    ReplicaResponse res = sauron.trackMatch(prev, type, request.getPattern());
 
-      List<Silo.ObservationInfo> observationsInfo = observations.stream()
-        .map(element -> Converter.convertToMessage(element))
-        .collect(Collectors.toList());
+    if (res.getObservations().isEmpty()) {
+      builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
+    } else {
+      List<Silo.ObservationInfo> observationsInfo = res.getObservations().stream()
+              .map(Converter::convertToMessage)
+              .collect(Collectors.toList());
 
       builder.addAllObservations(observationsInfo);
-    } catch (NoObservationException e) {
-      builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
-      // TODO: tell which of the identifiers wasn't found!
     }
 
     responseObserver.onNext(builder.build());
@@ -121,19 +129,19 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
   public void trace(Silo.TraceRequest request, StreamObserver<Silo.TraceResponse> responseObserver) {
     Silo.TraceResponse.Builder builder = Silo.TraceResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
+    List<Integer> prev = request.getTimestamp().getValueList();
 
-    try {
-      ObservationType type = typesConverter.get(request.getType());
-      List<Observation> observations = sauron.trace(type, request.getIdentifier());
+    ObservationType type = typesConverter.get(request.getType());
+    ReplicaResponse res = sauron.trace(prev, type, request.getIdentifier());
 
-      List<Silo.ObservationInfo> observationInfos = observations.stream()
-        .map(element -> Converter.convertToMessage(element))
-        .collect(Collectors.toList());
+    if (res.getObservations().isEmpty()) {
+      builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
+    } else {
+      List<Silo.ObservationInfo> observationInfos = res.getObservations().stream()
+              .map(Converter::convertToMessage)
+              .collect(Collectors.toList());
 
       builder.addAllObservations(observationInfos);
-
-    } catch (NoObservationException e) {
-      builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
     }
 
     responseObserver.onNext(builder.build());
@@ -143,16 +151,21 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
   @Override
   public void report(Silo.ReportRequest request, StreamObserver<Silo.ReportResponse> responseObserver) {
     Silo.ReportResponse.Builder builder = Silo.ReportResponse.newBuilder();
+    List<Integer> prev = request.getTimestamp().getValueList();
+    List<Observation> observations = new ArrayList<>();
 
     try {
       for (Silo.Observation observation : request.getObservationsList()) {
         ObservationType type = typesConverter.get(observation.getType());
-        sauron.report(request.getCameraName(), type, observation.getIdentifier());
+        observations.add(new Observation(request.getCameraName(), type, observation.getIdentifier(), LocalDateTime.now()));
       }
-    } catch (InvalidCameraException e) {
-      builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
+
+      ReplicaResponse res = sauron.report(prev, observations);
+      builder.setTimestamp(convertTimestamp(res.getTimestamp()));
+      builder.setStatus(Silo.ResponseStatus.SUCCESS);
     } catch (InvalidIdentifierException e) {
       builder.setStatus(Silo.ResponseStatus.INVALID_IDENTIFIER);
+      builder.setTimestamp(convertTimestamp(prev));
     }
 
     responseObserver.onNext(builder.build());
@@ -163,16 +176,18 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
   public void ctrlPing(Silo.CtrlPingRequest request, StreamObserver<Silo.CtrlPingResponse> responseObserver) {
     Silo.CtrlPingResponse.Builder builder = Silo.CtrlPingResponse.newBuilder();
     builder.setStatus(Silo.ResponseStatus.SUCCESS);
+    List<Integer> prev = request.getTimestamp().getValueList();
 
-    PingInformation information = sauron.ctrlPing();
+    ReplicaResponse res = sauron.ctrlPing(prev);
+    builder.setTimestamp(convertTimestamp(res.getTimestamp()));
 
-    List<Silo.Camera> cameras = information.getCameras().stream()
-      .map(element -> Converter.convertToMessage(element))
+    List<Silo.Camera> cameras = res.getCameras().stream()
+      .map(Converter::convertToMessage)
       .collect(Collectors.toList());
     builder.addAllCameras(cameras);
 
-    List<Silo.ObservationInfo> observations = information.getObservations().stream()
-      .map(element -> Converter.convertToMessage(element))
+    List<Silo.ObservationInfo> observations = res.getObservations().stream()
+      .map(Converter::convertToMessage)
       .collect(Collectors.toList());
     builder.addAllObservations(observations);
 

@@ -3,6 +3,7 @@ package pt.tecnico.sauron.silo.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 // TODO:
 //  every 30 seconds (default, can be customized), send our information to other replicas
@@ -12,6 +13,9 @@ import java.util.List;
 
 public class ReplicaManager {
   private final Integer instance;
+  private final Integer numberServers;
+
+  private static final Logger LOGGER = Logger.getLogger(ReplicaManager.class.getName());
 
   // By using a static object as a lock, we can safely use this as a synchronized
   // lock between multiple threads instead of locking on each object.
@@ -28,7 +32,10 @@ public class ReplicaManager {
   private final List<List<Integer>> operationsTable = Collections.synchronizedList(new ArrayList<>());
 
   public ReplicaManager(Integer instance, Integer numberServers) {
+    LOGGER.info(String.format("Replica manager created: instance %d; numberServers: %d", instance, numberServers));
+
     this.instance = instance;
+    this.numberServers = numberServers;
 
     for (int i = 0; i < numberServers; i++) {
       this.replicaTimestamp.add(0);
@@ -36,12 +43,53 @@ public class ReplicaManager {
     }
   }
 
-  public ReplicaResponse addObservation (List<Integer> prev, Observation observation) {
-    return add(prev, observation);
+  public ReplicaResponse addObservations (List<Integer> prev, List<Observation> observations) {
+    ReplicaResponse res = add(prev, (List<Integer> timestamp) -> {
+      LOGGER.info(String.format("Adding observations to log: %h", observations));
+      log.add(new ReplicaLog(timestamp, observations));
+    }, () -> {
+      if (observations.isEmpty()) {
+        LOGGER.info("Observations list is empty, skipping.");
+        return;
+      }
+
+      String cameraName = observations.get(0).getCameraName();
+      Camera camera = null;
+
+      for (Camera cam : cameras) {
+        if (cam.getName().equals(cameraName)) {
+          camera = cam;
+          break;
+        }
+      }
+
+      if (camera == null) {
+        LOGGER.info("Camera " + cameraName + "does not exist. THIS SHOULD NOT HAPPEN");
+        return;
+      }
+
+      for (Observation observation : observations) {
+        observation.setCamera(camera);
+        this.observations.add(observation);
+        LOGGER.info("Observation added to the stable value: " + observation.toString());
+      }
+    });
+
+    res.setObservations(observations);
+    return res;
   }
 
   public ReplicaResponse addCamera (List<Integer> prev, Camera camera) {
-    return add(prev, camera);
+    ReplicaResponse res = add(prev, (List<Integer> timestamp) -> {
+      LOGGER.info("Adding camera to log: " + camera.toString());
+      log.add(new ReplicaLog(timestamp, camera));
+    }, () -> {
+      this.cameras.add(camera);
+      LOGGER.info("Camera added to the stable value: " + camera.toString());
+    });
+
+    res.setCamera(camera);
+    return res;
   }
 
   public ReplicaResponse getObservations(List<Integer> prev) {
@@ -64,29 +112,45 @@ public class ReplicaManager {
     prev.set(this.instance - 1, this.replicaTimestamp.get(this.instance - 1));
   }
 
-  private ReplicaResponse add (List<Integer> prev, Object o) {
+  private List<Integer> parsePrev (List<Integer> prev) {
+    if (prev == null || prev.size() != numberServers) {
+      return new ArrayList<>(valueTimestamp);
+    }
+
+    return new ArrayList<>(prev);
+  }
+
+  private ReplicaResponse add (List<Integer> prev, AppendFunction append, ExecuteFunction execute) {
+    List<Integer> newTimestamp = parsePrev(prev);
+
     synchronized (lock) {
       // Discard if already done...
       if (this.operationsTable.contains(prev)) {
+        LOGGER.info("Operation already done: " + prev.toString());
         return new ReplicaResponse(prev);
       }
 
       incrementReplicaTimestamp();
-      updatePrevTimestamp(prev);
-
-      if (o instanceof Camera) {
-        log.add(new ReplicaLog(prev, (Camera)o));
-      } else if (o instanceof Observation) {
-        log.add(new ReplicaLog(prev, (Observation)o));
-      }
+      updatePrevTimestamp(newTimestamp);
+      LOGGER.info("Timestamp " + prev.toString() + " updated to " + newTimestamp.toString());
+      append.run(prev);
     }
 
     new Thread(() -> {
       while (true) {
         synchronized (lock) {
           if (validTimestamp(prev)) {
-            // TODO: execute operation and update valueTimestamp:
-            //  - For each entry i, update valueTimestamp[i] if replicaTimestamp[i] > valueTimestamp[i]
+            LOGGER.info("Will execute (add) " + newTimestamp.toString());
+            execute.run();
+            operationsTable.add(newTimestamp);
+
+            for (int i = 0; i < newTimestamp.size(); i++) {
+              if (replicaTimestamp.get(i) > valueTimestamp.get(i)) {
+                valueTimestamp.set(i, replicaTimestamp.get(i));
+              }
+            }
+
+            LOGGER.info("New value timestamp is: " + valueTimestamp.toString());
             return;
           }
         }
@@ -96,17 +160,24 @@ public class ReplicaManager {
     return new ReplicaResponse(prev);
   }
 
-  private ReplicaResponse get (List<Integer> prev, boolean isCameras, boolean isObservations) {
+  private ReplicaResponse get (List<Integer> rawPrev, boolean isCameras, boolean isObservations) {
+    List<Integer> prev = parsePrev(rawPrev);
+    LOGGER.info("Pending execute (get) " + prev.toString());
+
     while (true) {
       synchronized (lock) {
         if (validTimestamp(prev)) {
-          if (isCameras && !isObservations) {
-            return new ReplicaResponse(this.valueTimestamp, cameras);
-          } else if (isObservations && !isCameras) {
-            return new ReplicaResponse(this.valueTimestamp, observations);
-          } else {
-            return new ReplicaResponse(this.valueTimestamp, cameras, observations);
+          LOGGER.info("Will execute (get) " + prev.toString());
+          ReplicaResponse res = new ReplicaResponse(prev);
+          if (isCameras) {
+            res.setCameras(cameras);
           }
+
+          if (isObservations) {
+            res.setObservations(observations);
+          }
+
+          return res;
         }
       }
 
@@ -125,5 +196,17 @@ public class ReplicaManager {
     }
 
     return true;
+  }
+
+  private interface AppendFunction {
+    void run(List<Integer> timestamp);
+  }
+
+  private interface ExecuteFunction {
+    void run();
+  }
+
+  public void close () {
+    // TODO: stop threads.
   }
 }

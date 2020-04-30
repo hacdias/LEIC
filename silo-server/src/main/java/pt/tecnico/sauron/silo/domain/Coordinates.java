@@ -2,6 +2,8 @@ package pt.tecnico.sauron.silo.domain;
 
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
 
+import java.util.Objects;
+
 public class Coordinates {
   private Double latitude;
   private Double longitude;
@@ -32,5 +34,10 @@ public class Coordinates {
   @Override
   public String toString() {
     return "Coordinates(" + latitude + "," + longitude + ")";
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(latitude, longitude);
   }
 }

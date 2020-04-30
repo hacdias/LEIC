@@ -1,23 +1,21 @@
 package pt.tecnico.sauron.silo.domain;
 
-import pt.tecnico.sauron.silo.grpc.Silo;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReplicaLog {
     private List<Integer> timestamp;
     private Camera camera = null;
-    private Observation observation = null;
+    private List<Observation> observations = null;
 
     public ReplicaLog(List<Integer> timestamp, Camera camera) {
-        this.timestamp = new ArrayList<Integer>(timestamp);
+        this.timestamp = new ArrayList<>(timestamp);
         this.camera = camera;
     }
 
-    public ReplicaLog(List<Integer> timestamp, Observation observation) {
-        this.timestamp = new ArrayList<Integer>(timestamp);
-        this.observation = observation;
+    public ReplicaLog(List<Integer> timestamp, List<Observation> observations) {
+        this.timestamp = new ArrayList<>(timestamp);
+        this.observations = new ArrayList<>(observations);
     }
 
     public List<Integer> getTimestamp() {
@@ -28,7 +26,7 @@ public class ReplicaLog {
         return camera;
     }
 
-    public Observation getObservation() {
-        return observation;
+    public List<Observation> getObservations() {
+        return observations;
     }
 }
