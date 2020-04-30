@@ -1,12 +1,12 @@
-# Relatório do projeto Sauron
+# Sauron Project Report
 
-Sistemas Distribuídos 2019-2020, segundo semestre
+Distributed Systems 2019/2020, Second Semester
 
-## Autores
+## Authors
 
-**Grupo A46**
+**Group A46**
 
-| Número | Nome              | Utilizador                       | Correio eletrónico                         |
+| Number | Name              | User                             | Email                                      |
 | -------|-------------------|----------------------------------| ------------------------------------------ |
 | 89455  | Henrique Dias     | <https://github.com/hacdias>     | <mailto:henrique.dias@tecnico.ulisboa.pt>  |
 | 89466  | Isabel Soares     | <https://github.com/isabelSoares>| <mailto:isabel.r.soares@tecnico.ulisboa.pt>|
@@ -14,37 +14,32 @@ Sistemas Distribuídos 2019-2020, segundo semestre
 
 ![Henrique Dias](henrique.png) ![Isabel Soares](isabel.png) ![Rodrigo Sousa](rodrigo.png)
 
-## Melhorias da primeira parte
+## First Part Improvements
 
-- [Correção de testes em falta](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
-- [Sincronização correta de variáveis partilhadas](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)
-- [Aceitação do registo de câmara com as mesmas coordenadas](https://github.com/tecnico-distsys/A46-Sauron/commit/02b35fdd471efb15a3194e2333990e55f34a845f)
+- [Add tests for invalid camera names](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
+- [Synchronize shared variables](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)
+- [Accept camera with same specifications](https://github.com/tecnico-distsys/A46-Sauron/commit/02b35fdd471efb15a3194e2333990e55f34a845f)
 
-
-## Modelo de faltas
+## Fault Model
 
 _(que faltas são toleradas, que faltas não são toleradas)_
 
-
-## Solução
+## Solution
 
 _(Figura da solução de tolerância a faltas)_
 
 _(Breve explicação da solução, suportada pela figura anterior)_
 
 
-## Protocolo de replicação
+## Replication Protocol
 
 _(Explicação do protocolo)_
 
 _(descrição das trocas de mensagens)_
 
-
-## Opções de implementação
+## Implementation Specifics
 
 _(Descrição de opções de implementação, incluindo otimizações e melhorias introduzidas)_
-
-
 
 ## Notas finais
 
