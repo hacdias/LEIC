@@ -78,15 +78,15 @@ The gossip operations are required to ensure all replicas end up receiving all t
 - The instance number _i_;
 - The `sourceTimestamp`, which is the replica timestamp of replica _i_;
 - The logs records we estimate the replica _j_ does not have:
-  - TODO: explain
+    - TODO: explain
   
 When the replica _j_ receives the gossip message from the replica _i_, it then proceeds as follows:
 
 1. Updates the entry _i_ in the timestamp table with the `replicaTimestamp`;
 2. For each log record `r`:
-  - Checks if `r.id` is on the executed operations list. If so, discards.
-  - Checks if `r.timestamp` > `replicaTimestamp`. If not, discards.
-  - Adds the record to its own record log.
+    - Checks if `r.id` is on the executed operations list. If so, discards.
+    - Checks if `r.timestamp` > `replicaTimestamp`. If not, discards.
+    - Adds the record to its own record log.
 3. Updates `replicaTimestamp`, by executing `merge(sourceTimestamp, replicaTimestamp)`.
 4. Goes through the log and executes all stable operations.
 5. Finally, cleans up the log, freeing some space, by comparing every timestamp on the table of timestamps with each record's timestamp. Being `c` the number of the instance where the record was initially created, if the every timestamp's _c_ entry >= record's timestamp _c_ entry, then it means the record can be safely removed from the log since all replicas already received that information.
