@@ -41,7 +41,7 @@ For our replication protocol between replicas, we decided to use a modified [_go
 - _Executed Operations_: a list with the unique IDs of the executed operations on the current replica.
 - _Timestamp Table_: a list with the the known replica timestamps from other replicas.
 
-Let's define some operations `a priori`:
+Let's define some operations _a priori_:
 
 ```
 merge(tsA, tsB):
