@@ -63,8 +63,8 @@ When a client wants to add a new Camera or Observation, it generates a [UUID](ht
 
 If the request is accepted, then we follow the algorithm:
 
-1. Update the replica timestamp by incrementing the _i_\th entry, where `i` is the current instance number starting on 0.
-2. Create a unique `timestamp` to represent the operation from now on. This timestamp is created by duplicating `previous` and replacing the _i_\th entry with the previously calculated value.
+1. Update the replica timestamp by incrementing the ith entry, where `i` is the current instance number starting on 0.
+2. Create a unique `timestamp` to represent the operation from now on. This timestamp is created by duplicating `previous` and replacing the ith entry with the previously calculated value.
 3. Creates a new log record with the new `timestamp`, the current instance number, the `id` and the data to add.
 4. Returns the new timestamp to the client.
 5. Checks if the operation can be executed immediately by checking if `previous` <= `valueTimestamp`. If possible, execute `merge(timestamp, valueTimestamp)`.
