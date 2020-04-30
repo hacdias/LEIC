@@ -1,6 +1,7 @@
 package pt.tecnico.sauron.silo.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,6 +32,8 @@ public class ReplicaManager {
   private final List<ReplicaLog> log = Collections.synchronizedList(new ArrayList<>());
   private final List<List<Integer>> operationsTable = Collections.synchronizedList(new ArrayList<>());
 
+  List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
+
   public ReplicaManager(Integer instance, Integer numberServers) {
     LOGGER.info(String.format("Replica manager created: instance %d; numberServers: %d", instance, numberServers));
 
@@ -41,6 +44,25 @@ public class ReplicaManager {
       this.replicaTimestamp.add(0);
       this.valueTimestamp.add(0);
     }
+
+    threads.add(update(1000 * 30));
+    threads.get(0).start();
+  }
+
+  private Thread update (Integer milliseconds) {
+    return new Thread(() -> {
+      while (true)  {
+        LOGGER.info("UPDATE THREAD");
+        // TODO:
+
+        try {
+          Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+          LOGGER.info("Thread interrupted.");
+          return;
+        }
+      }
+    });
   }
 
   public ReplicaResponse addObservations (List<Integer> prev, List<Observation> observations) {
@@ -134,28 +156,31 @@ public class ReplicaManager {
       updatePrevTimestamp(newTimestamp);
       LOGGER.info("Timestamp " + prev.toString() + " updated to " + newTimestamp.toString());
       append.run(prev);
-    }
 
-    new Thread(() -> {
-      while (true) {
-        synchronized (lock) {
-          if (validTimestamp(prev)) {
-            LOGGER.info("Will execute (add) " + newTimestamp.toString());
-            execute.run();
-            operationsTable.add(newTimestamp);
+      Thread thread = new Thread(() -> {
+        while (true) {
+          synchronized (lock) {
+            if (validTimestamp(prev)) {
+              LOGGER.info("Will execute (add) " + newTimestamp.toString());
+              execute.run();
+              operationsTable.add(newTimestamp);
 
-            for (int i = 0; i < newTimestamp.size(); i++) {
-              if (replicaTimestamp.get(i) > valueTimestamp.get(i)) {
-                valueTimestamp.set(i, replicaTimestamp.get(i));
+              for (int i = 0; i < newTimestamp.size(); i++) {
+                if (replicaTimestamp.get(i) > valueTimestamp.get(i)) {
+                  valueTimestamp.set(i, replicaTimestamp.get(i));
+                }
               }
-            }
 
-            LOGGER.info("New value timestamp is: " + valueTimestamp.toString());
-            return;
+              LOGGER.info("New value timestamp is: " + valueTimestamp.toString());
+              return;
+            }
           }
         }
-      }
-    }).start();
+      });
+
+      threads.add(thread);
+      thread.start();
+    }
 
     return new ReplicaResponse(prev);
   }
@@ -183,7 +208,10 @@ public class ReplicaManager {
 
       try {
         Thread.sleep(100);
-      } catch (InterruptedException ignored) {}
+      } catch (InterruptedException ignored) {
+        LOGGER.info("Thread interrupted.");
+        return null;
+      }
     }
   }
 
@@ -207,6 +235,13 @@ public class ReplicaManager {
   }
 
   public void close () {
-    // TODO: stop threads.
+    synchronized (lock) {
+      for (Thread thread : threads) {
+        thread.interrupt();
+        try {
+          thread.join();
+        } catch (InterruptedException ignored) {}
+      }
+    }
   }
 }
