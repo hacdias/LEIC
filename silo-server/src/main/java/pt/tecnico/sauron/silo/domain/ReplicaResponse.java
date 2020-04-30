@@ -24,6 +24,12 @@ public class ReplicaResponse {
         this.camera = camera;
     }
 
+    public ReplicaResponse(List<Integer> timestamp, List<Camera> cameras, List<Observation> observations) {
+        this.timestamp = timestamp;
+        this.cameras = new ArrayList<>(cameras);
+        this.observations = new ArrayList<>(observations);
+    }
+
     @SuppressWarnings("unchecked")
     public ReplicaResponse(List<Integer> timestamp, List<?> objects) {
         this.timestamp = timestamp;
@@ -37,12 +43,12 @@ public class ReplicaResponse {
         // this was created.
 
         if (objects.get(0) instanceof Camera) {
-            this.cameras = new ArrayList<Camera>((List<Camera>)objects);
+            this.cameras = new ArrayList<>((List<Camera>)objects);
             return;
         }
 
         if (objects.get(0) instanceof Observation) {
-            this.observations = new ArrayList<Observation>((List<Observation>)objects);
+            this.observations = new ArrayList<>((List<Observation>)objects);
             return;
         }
 

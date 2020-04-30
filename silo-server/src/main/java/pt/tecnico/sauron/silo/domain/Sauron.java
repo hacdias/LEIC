@@ -20,10 +20,10 @@ public class Sauron {
   private List<Observation> observations = new ArrayList<Observation>();
   private List<Camera> cameras = new ArrayList<Camera>();
 
-  List<Observation> synObservations = Collections.synchronizedList(observations); 
+  List<Observation> synObservations = Collections.synchronizedList(observations);
   List<Camera> synCameras = Collections.synchronizedList(cameras);
 
-  public PingInformation ctrlPing() {  
+  public PingInformation ctrlPing() {
     PingInformation information = new PingInformation(synCameras, synObservations);
     LOGGER.info("the system was pinged");
     return information;

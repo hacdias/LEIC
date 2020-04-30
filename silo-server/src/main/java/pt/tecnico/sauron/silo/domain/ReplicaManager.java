@@ -45,11 +45,15 @@ public class ReplicaManager {
   }
 
   public ReplicaResponse getObservations(List<Integer> prev) {
-    return get(prev, false);
+    return get(prev, false, true);
   }
 
   public ReplicaResponse getCameras (List<Integer> prev) {
-    return get(prev, true);
+    return get(prev, true, false);
+  }
+
+  public ReplicaResponse getAll (List<Integer> prev) {
+    return get(prev, true, true);
   }
 
   private void incrementReplicaTimestamp () {
@@ -92,14 +96,16 @@ public class ReplicaManager {
     return new ReplicaResponse(prev);
   }
 
-  private ReplicaResponse get (List<Integer> prev, boolean isCameras) {
+  private ReplicaResponse get (List<Integer> prev, boolean isCameras, boolean isObservations) {
     while (true) {
       synchronized (lock) {
         if (validTimestamp(prev)) {
-          if (isCameras) {
+          if (isCameras && !isObservations) {
             return new ReplicaResponse(this.valueTimestamp, cameras);
-          } else {
+          } else if (isObservations && !isCameras) {
             return new ReplicaResponse(this.valueTimestamp, observations);
+          } else {
+            return new ReplicaResponse(this.valueTimestamp, cameras, observations);
           }
         }
       }
