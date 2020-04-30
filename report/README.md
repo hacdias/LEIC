@@ -41,6 +41,6 @@ _(descrição das trocas de mensagens)_
 
 _(Descrição de opções de implementação, incluindo otimizações e melhorias introduzidas)_
 
-## Notas finais
+## Final Remarks
 
 _(Algo mais a dizer?)_
