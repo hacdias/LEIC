@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public class Replica implements Closeable {
     private final Integer instance;
+    private final Integer currentInstance;
 
     private final SauronGrpc.SauronBlockingStub stub;
     private final ManagedChannel channel;
@@ -30,8 +31,8 @@ public class Replica implements Closeable {
         Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
     );
 
-
-    public Replica (Integer instance, String target) {
+    public Replica (Integer currentInstance, Integer instance, String target) {
+        this.currentInstance = currentInstance;
         this.instance = instance;
         this.target = target;
 
@@ -40,10 +41,6 @@ public class Replica implements Closeable {
     }
 
     public void gossip (List<ReplicaLog> log, List<Integer> replicaTimestamp) {
-        if (log.isEmpty()) {
-            return;
-        }
-
         LOGGER.info("Gossipping to " + instance.toString());
 
         // TODO: filter
@@ -61,6 +58,7 @@ public class Replica implements Closeable {
         Silo.GossipRequest gossip = Silo.GossipRequest.newBuilder()
             .setTimestamp(Silo.Timestamp.newBuilder().addAllValue(replicaTimestamp))
             .addAllLog(siloLogs)
+            .setInstance(this.currentInstance)
             .build();
 
         try {

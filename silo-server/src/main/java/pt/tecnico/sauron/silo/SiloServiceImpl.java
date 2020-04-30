@@ -244,7 +244,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             // Do nothing...
         }
 
-        sauron.receiveGossip(timestamp, log);
+        sauron.receiveGossip(timestamp, request.getInstance(), log);
         responseObserver.onNext(Silo.GossipResponse.newBuilder().build());
         responseObserver.onCompleted();
     }

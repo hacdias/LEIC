@@ -159,6 +159,7 @@ message Log {
 message GossipRequest {
     Timestamp timestamp = 1;
     repeated Log log = 2;
+    int32 instance = 3;
 }
 
 message GossipResponse {

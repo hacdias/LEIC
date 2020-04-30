@@ -132,8 +132,8 @@ public class Sauron {
         return replicaManager.addObservations(prev, uuid, observations);
     }
 
-    public void receiveGossip (List<Integer> replicaTimestamp, List<ReplicaLog> log) {
-        replicaManager.receiveGossip(replicaTimestamp, log);
+    public void receiveGossip (List<Integer> sourceTimestamp, Integer sourceInstance, List<ReplicaLog> log) {
+        replicaManager.receiveGossip(sourceTimestamp, sourceInstance, log);
     }
 
     private String buildRegex(ObservationType type, String pattern) {

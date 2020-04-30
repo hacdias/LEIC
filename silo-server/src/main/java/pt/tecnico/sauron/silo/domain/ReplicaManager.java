@@ -46,7 +46,7 @@ public class ReplicaManager {
         }
 
         this.tableTimestamps.set(this.instance, this.replicaTimestamp);
-        this.threads.add(update(1000 * 10, numberServers, host, basePort + 1));
+        this.threads.add(update(1000 * 30, numberServers, host, basePort + 1));
         this.threads.get(0).start();
     }
 
@@ -58,7 +58,7 @@ public class ReplicaManager {
                 if (i == this.instance) {
                     continue;
                 }
-                replicas.add(new Replica(i, host + ":" + Integer.toString(basePort + i)));
+                replicas.add(new Replica(this.instance, i, host + ":" + Integer.toString(basePort + i)));
             }
 
             while (true)  {
@@ -102,16 +102,15 @@ public class ReplicaManager {
         return get(prev, true, true);
     }
 
-    public void receiveGossip (List<Integer> receivedTimestamp, List<ReplicaLog> receivedLog) {
+    public void receiveGossip (List<Integer> sourceTimestamp, Integer sourceInstance, List<ReplicaLog> receivedLog) {
         synchronized (lock) {
             LOGGER.info("Processing gossips... ");
 
+            tableTimestamps.set(sourceInstance, sourceTimestamp);
+
             if (receivedLog.isEmpty()) {
                 LOGGER.info("Gossip was empty... how dare you?");
-                return;
             }
-
-            tableTimestamps.set(receivedLog.get(0).getInstance(), receivedTimestamp);
 
             for (ReplicaLog r : receivedLog) {
                 if (this.operationsTable.contains(r.getUuid())) {
@@ -136,8 +135,8 @@ public class ReplicaManager {
             }
 
             for (int i = 0; i < numberServers; i++) {
-                if (receivedTimestamp.get(i) > replicaTimestamp.get(i)) {
-                    replicaTimestamp.set(i, receivedTimestamp.get(i));
+                if (sourceTimestamp.get(i) > this.replicaTimestamp.get(i)) {
+                    this.replicaTimestamp.set(i, sourceTimestamp.get(i));
                 }
             }
 
