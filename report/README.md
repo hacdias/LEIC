@@ -56,7 +56,7 @@ merge(tsA, tsB):
 
 ### Add Operations
 
-When a client wants to add a new Camera or Observation, it generates a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) _id_ to uniquely identify the request. Then, it sends the `id`, the `data` (Camera or Observations) and the `previous` timestamp that was stored in the client. When the request `req` arrives in the server, the replica checks decides whether of not to discard the request. A request is discared if:
+When a client wants to add a new Camera or Observation, it generates a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) _id_ to uniquely identify the request. Then, it sends the `id`, the `data` (Camera or Observations) and the `previous` timestamp that was stored in the client. When the request `req` arrives in the server, the replica checks decides whether of not to discard the request. A request is discarded if:
 
 - The `id` is present on the executed operations list; or
 - The `id` is present on any log record.
@@ -80,7 +80,7 @@ The gossip operations are required to ensure all replicas end up receiving all t
 - The logs records we estimate the replica _j_ does not have:
   - TODO: explain
   
-When the replica _j_ receives the gossip message from the replica _i_, it then procceeds as follows:
+When the replica _j_ receives the gossip message from the replica _i_, it then proceeds as follows:
 
 1. Updates the entry _i_ in the timestamp table with the `replicaTimestamp`;
 2. For each log record `r`:
