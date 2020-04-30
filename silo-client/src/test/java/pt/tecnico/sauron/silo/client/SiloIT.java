@@ -27,13 +27,14 @@ import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidIdentifierException;
 import pt.tecnico.sauron.silo.client.exceptions.NoObservationFoundException;
 import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
+import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 
 public class SiloIT extends BaseIT {
 	public static SiloFrontend api;
 	public static Integer rtt;
 
 	@BeforeAll
-	public static void oneTimeSetUp() {
+	public static void oneTimeSetUp() throws ZKNamingException {
 		String host = testProps.getProperty("server.host");
 		Integer port = Integer.parseInt(testProps.getProperty("server.port"));
 		rtt = Integer.parseInt(testProps.getProperty("server.rtt"));
@@ -51,12 +52,12 @@ public class SiloIT extends BaseIT {
 	}
 
 	@AfterEach
-	public void tearDown() throws SauronClientException {
+	public void tearDown() throws SauronClientException, ZKNamingException {
 		api.clear();
 	}
 
 	@Test
-	public void testCamJoin() throws SauronClientException {
+	public void testCamJoin() throws SauronClientException, ZKNamingException {
 		api.camJoin("MyCamera", -30.95, 50.94);
 	}
 
@@ -71,7 +72,7 @@ public class SiloIT extends BaseIT {
 	}
 
  	@Test
-	public void testCamJoinTwice() throws SauronClientException {
+	public void testCamJoinTwice() throws SauronClientException, ZKNamingException {
 		api.camJoin("MyCamera", -23.13 , 99.0);
 		api.camJoin("MyCamera", -23.13 , 99.0);
 	} 
@@ -87,7 +88,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testCamInfo() throws SauronClientException {
+	public void testCamInfo() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -30.95;
 		Double longitude = 50.94;
@@ -105,7 +106,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testReport() throws SauronClientException {
+	public void testReport() throws SauronClientException, ZKNamingException {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
@@ -113,7 +114,7 @@ public class SiloIT extends BaseIT {
 		Camera camera = new Camera(camName, coordinates);
 		api.camJoin(camName, latitude, longitude);
 
-		List<Observation> observations = new ArrayList<Observation>();
+		List<Observation> observations = new ArrayList<>();
 		ObservationType type1 = ObservationType.PERSON;
 		String identifier1 = "12345";
 		Observation observation1 = new Observation(camera, type1, identifier1, LocalDateTime.now());
@@ -126,28 +127,8 @@ public class SiloIT extends BaseIT {
 		api.report(camName, observations);
 	}
 
-	public void testReportNoRegisteredCamera() throws SauronClientException {
-		String camName = "Camera1";
-		Double latitude = 45.0;
-		Double longitude = 45.0;
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera camera = new Camera(camName, coordinates);;
-
-		List<Observation> observations = new ArrayList<Observation>();
-		ObservationType type1 = ObservationType.PERSON;
-		String identifier1 = "12345";
-		Observation observation1 = new Observation(camera, type1, identifier1, LocalDateTime.now());
-		observations.add(observation1);
-		ObservationType type2 = ObservationType.CAR;
-		String identifier2 = "AA22AA";
-		Observation observation2 = new Observation(camera, type2, identifier2, LocalDateTime.now());
-		observations.add(observation2);
-
-		Assertions.assertThrows(InvalidCameraException.class, () -> api.report(camName, observations));
-	}
-
 	@Test
-	public void testReportInvalidPersonIdentifier() throws SauronClientException {
+	public void testReportInvalidPersonIdentifier() throws SauronClientException, ZKNamingException {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
@@ -160,7 +141,7 @@ public class SiloIT extends BaseIT {
 		ObservationType type = ObservationType.PERSON;
 
 		for (String identifier : identifiers) {
-			List<Observation> observations = new ArrayList<Observation>();
+			List<Observation> observations = new ArrayList<>();
 			Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
 			observations.add(observation);
 			Assertions.assertThrows(InvalidIdentifierException.class, () -> api.report(camName, observations), "Failed on: " + identifier);
@@ -168,7 +149,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testReportInvalidCarIdentifier() throws SauronClientException {
+	public void testReportInvalidCarIdentifier() throws SauronClientException, ZKNamingException {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
@@ -181,7 +162,7 @@ public class SiloIT extends BaseIT {
 		ObservationType type = ObservationType.CAR;
 
 		for (String identifier : identifiers) {
-			List<Observation> observations = new ArrayList<Observation>();
+			List<Observation> observations = new ArrayList<>();
 			Observation observation = new Observation(camera, type, identifier, LocalDateTime.now());
 			observations.add(observation);
 			Assertions.assertThrows(InvalidIdentifierException.class, () -> api.report(camName, observations), "Failed on: " + identifier);
@@ -190,7 +171,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrack() throws SauronClientException {
+	public void testTrack() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -210,7 +191,7 @@ public class SiloIT extends BaseIT {
 		datetime = LocalDateTime.now();
 
 		Observation observationCar = new Observation(cam, type, identifier, datetime);
-		List<Observation> observations = new ArrayList<Observation>();
+		List<Observation> observations = new ArrayList<>();
 
 		observations.add(observationPerson);
 		observations.add(observationCar);
@@ -238,7 +219,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrackNoObservationFound() throws SauronClientException {
+	public void testTrackNoObservationFound() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -258,7 +239,7 @@ public class SiloIT extends BaseIT {
 		datetime = LocalDateTime.now();
 
 		Observation observationCar = new Observation(cam, type, identifier, datetime);
-		List<Observation> observations = new ArrayList<Observation>();
+		List<Observation> observations = new ArrayList<>();
 
 		observations.add(observationPerson);
 		observations.add(observationCar);
@@ -270,7 +251,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrackMatch() throws SauronClientException {
+	public void testTrackMatch() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -320,7 +301,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrackmatchNoObservationFound() throws SauronClientException {
+	public void testTrackmatchNoObservationFound() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -351,7 +332,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTrace() throws SauronClientException {
+	public void testTrace() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -399,7 +380,7 @@ public class SiloIT extends BaseIT {
 	}
 
 	@Test
-	public void testTraceNoObservationFound() throws SauronClientException {
+	public void testTraceNoObservationFound() throws SauronClientException, ZKNamingException {
 		String name = "MyCamera";
 		Double latitude = -35.45;
 		Double longitude = 66.16;
@@ -415,12 +396,12 @@ public class SiloIT extends BaseIT {
 		Observation observationPerson1 = new Observation(cam, type, identifier, datetime);
 		Observation observationPerson2 = new Observation(cam, type, identifier, datetime);
 
-		List<Observation> observations1 = new ArrayList<Observation>();
+		List<Observation> observations1 = new ArrayList<>();
 
 		observations1.add(observationPerson1);
 		api.report(name, observations1);
 
-		List<Observation> observations2 = new ArrayList<Observation>();
+		List<Observation> observations2 = new ArrayList<>();
 
 		observations2.add(observationPerson2);
 		api.report(name, observations2);

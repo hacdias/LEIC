@@ -29,45 +29,35 @@ public class SiloFrontend implements AutoCloseable {
     private ManagedChannel channel;
     private SauronGrpc.SauronBlockingStub stub;
 
-    public SiloFrontend(String address, Integer port, Integer instance) {
+    public SiloFrontend(String address, Integer port, Integer instance) throws ZKNamingException {
         this.zkNaming = new ZKNaming(address, Integer.toString(port));
         connectToReplica(instance);
     }
 
-    private void connectToReplica(Integer instance) {
+    private void connectToReplica(Integer instance) throws ZKNamingException {
         String path = basePath;
         ZKRecord record = null;
 
-        try {
-            if (instance != -1) {
-                LOGGER.info("Connecting to instance " + instance + " of server ");
-                path += "/" + Integer.toString(instance);
-                record = zkNaming.lookup(path);
-            } else {
-                LOGGER.info("Connecting to a random instance.");
-                Collection<ZKRecord> available = zkNaming.listRecords(path);
-                // FIXME
-                int num = new Random().nextInt(available.size());
-                for (ZKRecord r : available) {
-                    if (--num < 0) {
-                        record = r;
-                    }
-                }
-
-                if (record == null) {
-                    throw new ZKNamingException("No record available");
+        if (instance != -1) {
+            path += "/" + Integer.toString(instance);
+            record = zkNaming.lookup(path);
+        } else {
+            Collection<ZKRecord> available = zkNaming.listRecords(path);
+            int num = new Random().nextInt(available.size());
+            for (ZKRecord r : available) {
+                if (--num < 0) {
+                    record = r;
                 }
             }
 
-            LOGGER.info("Connected to: " + record);
-            String target = record.getURI();
-
-            channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
-            stub = SauronGrpc.newBlockingStub(channel);
-        } catch (ZKNamingException e) {
-            // TODO
-            LOGGER.severe(e.toString());
+            if (record == null) {
+                throw new ZKNamingException("No record available");
+            }
         }
+
+        String target = record.getURI();
+        channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
+        stub = SauronGrpc.newBlockingStub(channel);
     }
 
     private Silo.Timestamp buildTimestamp() {
@@ -92,9 +82,16 @@ public class SiloFrontend implements AutoCloseable {
         }
     }
 
-    public Status ping() throws SauronClientException {
+    public Status ping() throws SauronClientException, ZKNamingException {
         CtrlPingRequest request = CtrlPingRequest.newBuilder().setTimestamp(buildTimestamp()).build();
-        CtrlPingResponse response = stub.ctrlPing(request);
+        CtrlPingResponse response;
+
+        try {
+            response = stub.ctrlPing(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            return ping();
+        }
 
         updateTimestamp(response.getTimestamp().getValueList());
 
@@ -114,18 +111,27 @@ public class SiloFrontend implements AutoCloseable {
     }
 
     public String init() {
-        // TODO
+        // EMPTY
         return null;
     }
 
-    public void clear() throws SauronClientException {
+    public void clear() throws SauronClientException, ZKNamingException {
         CtrlClearRequest request = CtrlClearRequest.newBuilder().setTimestamp(buildTimestamp()).build();
-        CtrlClearResponse response = stub.ctrlClear(request);
+        CtrlClearResponse response;
+
+        try {
+            response = stub.ctrlClear(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            clear();
+            return;
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
     }
 
-    public void camJoin(String name, Double latitude, Double longitude) throws SauronClientException {
+    public void camJoin(String name, Double latitude, Double longitude) throws SauronClientException, ZKNamingException {
         Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
             .setLatitude(latitude)
             .setLongitude(longitude)
@@ -141,24 +147,41 @@ public class SiloFrontend implements AutoCloseable {
             .setCamera(camera)
             .build();
 
-        CamJoinResponse response = stub.camJoin(request);
+        CamJoinResponse response;
+
+        try {
+            response = stub.camJoin(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            camJoin(name, latitude, longitude);
+            return;
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
     }
 
-    public Coordinates camInfo(String name) throws SauronClientException {
+    public Coordinates camInfo(String name) throws SauronClientException, ZKNamingException {
         CamInfoRequest request = CamInfoRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setName(name)
             .build();
 
-        CamInfoResponse response = stub.camInfo(request);
+        CamInfoResponse response;
+
+        try {
+            response = stub.camInfo(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            return camInfo(name);
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
         return new Coordinates(response.getCoordinates());
     }
 
-    public void report(String camName, List<Observation> observations) throws SauronClientException {
+    public void report(String camName, List<Observation> observations) throws SauronClientException, ZKNamingException {
         List<Silo.Observation> siloObservations = observations
             .stream()
             .map(observation -> {
@@ -183,32 +206,56 @@ public class SiloFrontend implements AutoCloseable {
             .addAllObservations(siloObservations)
             .build();
 
-        ReportResponse response = stub.report(request);
+        ReportResponse response;
+
+        try {
+            response = stub.report(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            report(camName, observations);
+            return;
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
     }
 
-    public Observation track(ObservationType type, String identifier) throws SauronClientException {
+    public Observation track(ObservationType type, String identifier) throws SauronClientException, ZKNamingException {
         TrackRequest request = TrackRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setType(typesConverter.get(type))
             .setIdentifier(identifier)
             .build();
 
-        TrackResponse response = stub.track(request);
+        TrackResponse response;
+        try {
+            response = stub.track(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            return track(type, identifier);
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
         return new Observation(response.getObservation().getCamera(), response.getObservation().getObservation());
     }
 
-    public List<Observation> trackMatch(ObservationType type, String pattern) throws SauronClientException {
+    public List<Observation> trackMatch(ObservationType type, String pattern) throws SauronClientException, ZKNamingException {
         TrackMatchRequest request = TrackMatchRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setType(typesConverter.get(type))
             .setPattern(pattern)
             .build();
 
-        TrackMatchResponse response = stub.trackMatch(request);
+        TrackMatchResponse response;
+
+        try {
+            response = stub.trackMatch(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            return trackMatch(type, pattern);
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
 
@@ -218,14 +265,22 @@ public class SiloFrontend implements AutoCloseable {
             .collect(Collectors.toList());
     }
 
-    public List<Observation> trace(ObservationType type, String identifier) throws SauronClientException {
+    public List<Observation> trace(ObservationType type, String identifier) throws SauronClientException, ZKNamingException {
         TraceRequest request = TraceRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setType(typesConverter.get(type))
             .setIdentifier(identifier)
             .build();
 
-        TraceResponse response = stub.trace(request);
+        TraceResponse response;
+
+        try {
+            response = stub.trace(request);
+        } catch (io.grpc.StatusRuntimeException e) {
+            connectToReplica(-1);
+            return trace(type, identifier);
+        }
+
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
 

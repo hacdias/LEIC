@@ -3,6 +3,7 @@ package pt.tecnico.sauron.silo.client;
 import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
 import pt.tecnico.sauron.silo.client.domain.Status;
 import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
+import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class SiloClientApp {
         if (args.length == 3)
             instance = Integer.parseInt(args[2]);
 
-        Scanner scanner;
+        Scanner scanner = null;
         try (SiloFrontend frontend = new SiloFrontend(host, port, instance)) {
 
             scanner = new Scanner(System.in);
@@ -58,9 +59,15 @@ public class SiloClientApp {
                 System.out.flush();
                 input = scanner.nextLine();
             }
+        } catch (ZKNamingException e) {
+            System.err.println("Could not connect to ZooKeeper");
+            System.err.print(e.toString());
+            System.exit(1);
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
         }
-
-        scanner.close();
     }
 
     private static void help() {
@@ -73,7 +80,7 @@ public class SiloClientApp {
         System.out.println("\tclear - clear the server");
     }
 
-    private static void ping(SiloFrontend frontend) throws SauronClientException {
+    private static void ping(SiloFrontend frontend) throws SauronClientException, ZKNamingException {
         Status status = frontend.ping();
         System.out.println(status);
     }
@@ -82,7 +89,7 @@ public class SiloClientApp {
         frontend.init();
     }
 
-    private static void clear(SiloFrontend frontend) throws SauronClientException {
+    private static void clear(SiloFrontend frontend) throws SauronClientException, ZKNamingException {
         frontend.clear();
     }
 }

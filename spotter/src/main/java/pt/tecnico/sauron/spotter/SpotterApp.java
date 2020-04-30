@@ -4,6 +4,7 @@ import pt.tecnico.sauron.silo.client.domain.Observation;
 import pt.tecnico.sauron.silo.client.domain.ObservationType;
 import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
 import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
+import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -28,7 +29,7 @@ public class SpotterApp {
         if (args.length == 3)
             instance = Integer.parseInt(args[2]);
 
-        Scanner scanner;
+        Scanner scanner = null;
         try (SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance)) {
             System.out.printf("Server address: %s%n", zooHost);
             System.out.printf("Server port: %s%n", zooPort);
@@ -74,9 +75,15 @@ public class SpotterApp {
                 System.out.print("> ");
                 input = scanner.nextLine();
             }
+        } catch (ZKNamingException e) {
+            System.err.println("Could not connect to ZooKeeper");
+            System.err.print(e.toString());
+            System.exit(1);
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
         }
-
-        scanner.close();
     }
 
     private static void help(SiloFrontend api) {
@@ -90,7 +97,7 @@ public class SpotterApp {
         System.out.println("\tclear - clear the server");
     }
 
-    private static void ping(List<String> tokens, SiloFrontend api) throws SauronClientException {
+    private static void ping(List<String> tokens, SiloFrontend api) throws SauronClientException, ZKNamingException {
         if (!tokens.isEmpty()) {
             System.out.printf("Invalid arguments: %s. Run 'help' for more information.%n", String.join(" ", tokens));
             return;
@@ -99,7 +106,7 @@ public class SpotterApp {
         System.out.println(api.ping());
     }
 
-    private static void clear(List<String> tokens, SiloFrontend api) throws SauronClientException {
+    private static void clear(List<String> tokens, SiloFrontend api) throws SauronClientException, ZKNamingException {
         if (!tokens.isEmpty()) {
             System.out.printf("Invalid arguments: %s. Run 'help' for more information.%n", String.join(" ", tokens));
             return;
@@ -123,7 +130,7 @@ public class SpotterApp {
         return true;
     }
 
-    private static void trail(List<String> tokens, SiloFrontend api) throws SauronClientException {
+    private static void trail(List<String> tokens, SiloFrontend api) throws SauronClientException, ZKNamingException {
         if (!validateTrailSpot(tokens)) {
             return;
         }
@@ -141,7 +148,7 @@ public class SpotterApp {
         printFormatted(observations);
     }
 
-    private static void spot(List<String> tokens, SiloFrontend api) throws SauronClientException {
+    private static void spot(List<String> tokens, SiloFrontend api) throws SauronClientException, ZKNamingException {
         if (!validateTrailSpot(tokens)) {
             return;
         }

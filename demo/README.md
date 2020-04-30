@@ -22,3 +22,11 @@ And now you can see the tests running!
 
 For more information about how each application works (eye, spotter),
 please take a look at their READMEs!
+
+
+---
+
+
+```
+mvn compile exec:java -Dinstance=1 -DnumberServers=1
+```
