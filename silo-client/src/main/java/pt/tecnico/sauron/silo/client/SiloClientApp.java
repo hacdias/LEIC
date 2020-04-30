@@ -1,85 +1,88 @@
 package pt.tecnico.sauron.silo.client;
 
+import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
+import pt.tecnico.sauron.silo.client.domain.Status;
+import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
-import pt.tecnico.sauron.silo.client.domain.Status;
-import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
-
 public class SiloClientApp {
-	public static void main(String[] args) {
-		System.out.println(SiloClientApp.class.getSimpleName());
+    public static void main(String[] args) {
+        System.out.println(SiloClientApp.class.getSimpleName());
 
-		final String host = args[0];
-		final Integer port = Integer.parseInt(args[1]);
-		Integer instance = -1;
+        final String host = args[0];
+        final Integer port = Integer.parseInt(args[1]);
+        int instance = -1;
 
-		if (args.length == 3)
-			instance = Integer.parseInt(args[2]);
-		
-		final SiloFrontend frontend = new SiloFrontend(host, port, instance);
+        if (args.length == 3)
+            instance = Integer.parseInt(args[2]);
 
-		Scanner scanner = new Scanner(System.in);
-		System.out.printf("> ");
-		System.out.flush();
-		String input = scanner.nextLine();
+        Scanner scanner;
+        try (SiloFrontend frontend = new SiloFrontend(host, port, instance)) {
 
-		while (!input.equals("exit")) {
-			List<String> tokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
-			String command = tokens.remove(0);
+            scanner = new Scanner(System.in);
+            System.out.printf("> ");
+            System.out.flush();
+            String input = scanner.nextLine();
 
-			try {
-				switch (command) {
-					case "help":
-						help(tokens);
-						break;
-					case "ping":
-						ping(frontend, tokens);
-						break;
-					case "init":
-						init(frontend, tokens);
-					case "clear":
-						clear(frontend, tokens);
-						break;
-					default:
-						System.out.printf("Invalid command: %s\n", input);
-						break;
-				}
-			} catch (SauronClientException e) {
-				System.out.println(e);
-			}
+            while (!input.equals("exit")) {
+                List<String> tokens = new ArrayList<>(Arrays.asList(input.split(" ")));
+                String command = tokens.remove(0);
 
-			System.out.print("> ");
-			System.out.flush();
-			input = scanner.nextLine();
-		}
+                try {
+                    switch (command) {
+                        case "help":
+                            help();
+                            break;
+                        case "ping":
+                            ping(frontend);
+                            break;
+                        case "init":
+                            init(frontend);
+                            break;
+                        case "clear":
+                            clear(frontend);
+                            break;
+                        default:
+                            System.out.printf("Invalid command: %s\n", input);
+                            break;
+                    }
+                } catch (SauronClientException e) {
+                    System.out.println(e);
+                }
 
-		scanner.close();
-	}
+                System.out.print("> ");
+                System.out.flush();
+                input = scanner.nextLine();
+            }
+        }
 
-	private static void help(List<String> tokens) {
-		System.out.println("Commands:");
-		System.out.println("\thelp - this command");
-		System.out.println("\texit - stop SILO-CLIENT");
-		System.out.println("\nControl commands:");
-		System.out.println("\tping - ping the server for status");
-		System.out.println("\tinit - initialize the server with a state");
-		System.out.println("\tclear - clear the server");
-	}
+        scanner.close();
+    }
 
-	private static void ping(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
-		Status status = frontend.ping();
-		System.out.println(status);
-	}
+    private static void help() {
+        System.out.println("Commands:");
+        System.out.println("\thelp - this command");
+        System.out.println("\texit - stop SILO-CLIENT");
+        System.out.println("\nControl commands:");
+        System.out.println("\tping - ping the server for status");
+        System.out.println("\tinit - initialize the server with a state");
+        System.out.println("\tclear - clear the server");
+    }
 
-	private static void init(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
-		frontend.init();
-	}
+    private static void ping(SiloFrontend frontend) throws SauronClientException {
+        Status status = frontend.ping();
+        System.out.println(status);
+    }
 
-	private static void clear(SiloFrontend frontend, List<String> tokens) throws SauronClientException {
-		frontend.clear();
-	}
+    private static void init(SiloFrontend frontend) {
+        frontend.init();
+    }
+
+    private static void clear(SiloFrontend frontend) throws SauronClientException {
+        frontend.clear();
+    }
 }

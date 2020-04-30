@@ -1,65 +1,33 @@
 package pt.tecnico.sauron.silo.client.domain;
 
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import com.google.protobuf.Timestamp;
-
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import pt.tecnico.sauron.silo.client.exceptions.DuplicateCameraException;
-import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraCoordinatesException;
-import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraException;
-import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
-import pt.tecnico.sauron.silo.client.exceptions.InvalidIdentifierException;
-import pt.tecnico.sauron.silo.client.exceptions.NoObservationFoundException;
-import pt.tecnico.sauron.silo.client.exceptions.SauronClientException;
-import pt.tecnico.sauron.silo.client.exceptions.UnknownException;
+import pt.tecnico.sauron.silo.client.exceptions.*;
 import pt.tecnico.sauron.silo.grpc.SauronGrpc;
 import pt.tecnico.sauron.silo.grpc.Silo;
-import pt.tecnico.sauron.silo.grpc.Silo.CamInfoRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.CamInfoResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.CamJoinRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.CamJoinResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.CtrlClearRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.CtrlClearResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.CtrlPingRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.CtrlPingResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.ReportRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.ReportResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.TraceRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.TraceResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.TrackMatchRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.TrackMatchResponse;
-import pt.tecnico.sauron.silo.grpc.Silo.TrackRequest;
-import pt.tecnico.sauron.silo.grpc.Silo.TrackResponse;
-
+import pt.tecnico.sauron.silo.grpc.Silo.*;
 import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
 import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 import pt.ulisboa.tecnico.sdis.zk.ZKRecord;
 
-public class SiloFrontend implements AutoCloseable {
-    private List<Integer> timestamp = new ArrayList<>();
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+public class SiloFrontend implements AutoCloseable {
+    private static final Logger LOGGER = Logger.getLogger(SiloFrontend.class.getName());
     private final ZKNaming zkNaming;
     private final String basePath = "/grpc/sauron/silo";
-
+    private final Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
+        Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
+        Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
+    );
+    private List<Integer> timestamp = new ArrayList<>();
     private ManagedChannel channel;
     private SauronGrpc.SauronBlockingStub stub;
-
-    private static final Logger LOGGER = Logger.getLogger(SiloFrontend.class.getName());
-
-    private final Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
-            Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
-            Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
-    );
 
     public SiloFrontend(String address, Integer port, Integer instance) {
         this.zkNaming = new ZKNaming(address, Integer.toString(port));
@@ -133,14 +101,14 @@ public class SiloFrontend implements AutoCloseable {
         throwIfNotSuccess(response.getStatus());
 
         List<Camera> cameras = response.getCamerasList()
-                .stream()
-                .map(camera -> new Camera(camera))
-                .collect(Collectors.toList());
+            .stream()
+            .map(camera -> new Camera(camera))
+            .collect(Collectors.toList());
 
         List<Observation> observations = response.getObservationsList()
-                .stream()
-                .map(observation -> new Observation(observation.getCamera(), observation.getObservation()))
-                .collect(Collectors.toList());
+            .stream()
+            .map(observation -> new Observation(observation.getCamera(), observation.getObservation()))
+            .collect(Collectors.toList());
 
         return new Status(cameras, observations);
     }
@@ -159,19 +127,19 @@ public class SiloFrontend implements AutoCloseable {
 
     public void camJoin(String name, Double latitude, Double longitude) throws SauronClientException {
         Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
-                .setLatitude(latitude)
-                .setLongitude(longitude)
-                .build();
+            .setLatitude(latitude)
+            .setLongitude(longitude)
+            .build();
 
         Silo.Camera camera = Silo.Camera.newBuilder()
-                .setName(name)
-                .setCoordinates(coordinates)
-                .build();
+            .setName(name)
+            .setCoordinates(coordinates)
+            .build();
 
         CamJoinRequest request = CamJoinRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setCamera(camera)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setCamera(camera)
+            .build();
 
         CamJoinResponse response = stub.camJoin(request);
         updateTimestamp(response.getTimestamp().getValueList());
@@ -180,9 +148,9 @@ public class SiloFrontend implements AutoCloseable {
 
     public Coordinates camInfo(String name) throws SauronClientException {
         CamInfoRequest request = CamInfoRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setName(name)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setName(name)
+            .build();
 
         CamInfoResponse response = stub.camInfo(request);
         updateTimestamp(response.getTimestamp().getValueList());
@@ -192,28 +160,28 @@ public class SiloFrontend implements AutoCloseable {
 
     public void report(String camName, List<Observation> observations) throws SauronClientException {
         List<Silo.Observation> siloObservations = observations
-                .stream()
-                .map(observation -> {
-                    Instant instant = observation.getDatetime().atZone(ZoneOffset.UTC).toInstant();
+            .stream()
+            .map(observation -> {
+                Instant instant = observation.getDatetime().atZone(ZoneOffset.UTC).toInstant();
 
-                    return Silo.Observation
-                            .newBuilder()
-                            .setIdentifier(observation.getIdentifier())
-                            .setType(typesConverter.get(observation.getType()))
-                            .setTimestamp(Timestamp.newBuilder()
-                                    .setSeconds(instant.getEpochSecond())
-                                    .setNanos(instant.getNano())
-                                    .build()
-                            )
-                            .build();
-                })
-                .collect(Collectors.toList());
+                return Silo.Observation
+                    .newBuilder()
+                    .setIdentifier(observation.getIdentifier())
+                    .setType(typesConverter.get(observation.getType()))
+                    .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(instant.getEpochSecond())
+                        .setNanos(instant.getNano())
+                        .build()
+                    )
+                    .build();
+            })
+            .collect(Collectors.toList());
 
         ReportRequest request = ReportRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setCameraName(camName)
-                .addAllObservations(siloObservations)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setCameraName(camName)
+            .addAllObservations(siloObservations)
+            .build();
 
         ReportResponse response = stub.report(request);
         updateTimestamp(response.getTimestamp().getValueList());
@@ -222,10 +190,10 @@ public class SiloFrontend implements AutoCloseable {
 
     public Observation track(ObservationType type, String identifier) throws SauronClientException {
         TrackRequest request = TrackRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setType(typesConverter.get(type))
-                .setIdentifier(identifier)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setType(typesConverter.get(type))
+            .setIdentifier(identifier)
+            .build();
 
         TrackResponse response = stub.track(request);
         updateTimestamp(response.getTimestamp().getValueList());
@@ -235,36 +203,36 @@ public class SiloFrontend implements AutoCloseable {
 
     public List<Observation> trackMatch(ObservationType type, String pattern) throws SauronClientException {
         TrackMatchRequest request = TrackMatchRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setType(typesConverter.get(type))
-                .setPattern(pattern)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setType(typesConverter.get(type))
+            .setPattern(pattern)
+            .build();
 
         TrackMatchResponse response = stub.trackMatch(request);
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
 
         return response.getObservationsList()
-                .stream()
-                .map(info -> new Observation(info.getCamera(), info.getObservation()))
-                .collect(Collectors.toList());
+            .stream()
+            .map(info -> new Observation(info.getCamera(), info.getObservation()))
+            .collect(Collectors.toList());
     }
 
     public List<Observation> trace(ObservationType type, String identifier) throws SauronClientException {
         TraceRequest request = TraceRequest.newBuilder()
-                .setTimestamp(buildTimestamp())
-                .setType(typesConverter.get(type))
-                .setIdentifier(identifier)
-                .build();
+            .setTimestamp(buildTimestamp())
+            .setType(typesConverter.get(type))
+            .setIdentifier(identifier)
+            .build();
 
         TraceResponse response = stub.trace(request);
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
 
         return response.getObservationsList()
-                .stream()
-                .map(info -> new Observation(info.getCamera(), info.getObservation()))
-                .collect(Collectors.toList());
+            .stream()
+            .map(info -> new Observation(info.getCamera(), info.getObservation()))
+            .collect(Collectors.toList());
     }
 
     private void throwIfNotSuccess(Silo.ResponseStatus status) throws SauronClientException {
