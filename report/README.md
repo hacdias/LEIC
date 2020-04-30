@@ -30,8 +30,22 @@ _(Figura da solução de tolerância a faltas)_
 
 _(Breve explicação da solução, suportada pela figura anterior)_
 
-
 ## Replication Protocol
+
+For our replication protocol between replicas, we decided to use a modified [_gossip_ protocol](https://en.wikipedia.org/wiki/Gossip_protocol). Each replica has its own Replica Manager (RM), which handles all the data operations done in each Replica. Each RM contains:
+
+- _Value_: the value that is stored on each replica, which, in this case, are the cameras and the observations.
+- _Value Timestamp_: a timestamp representing the operations done by each replica to achieve the current value on the current replica.
+- _Log_: all the update operations the replica has accepted so far. It may contain already processed operations that are yet required to be propagated to other replicas.
+- _Replica Timestamp_: represents all the operations the current replica has accepted, i.e., that were placed in the log.
+- _Executed Operations_: a list with the unique IDs of the executed operations on the current replica.
+- _Timestamp Table_: a list with the the known replica timestamps from other replicas.
+
+### Get Operations
+
+### Add Operations
+
+### Message Exchanging
 
 _(Explicação do protocolo)_
 
