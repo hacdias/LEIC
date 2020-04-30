@@ -41,15 +41,55 @@ For our replication protocol between replicas, we decided to use a modified [_go
 - _Executed Operations_: a list with the unique IDs of the executed operations on the current replica.
 - _Timestamp Table_: a list with the the known replica timestamps from other replicas.
 
+Let's define some operations `a priori`:
+
+```
+merge(tsA, tsB):
+  for each entry i in tsA
+    if tsA[i] > tsB[i]
+      tsB[i] = tsA[i]
+```
+
 ### Get Operations
+
+( TODO and include our modification )
 
 ### Add Operations
 
-### Message Exchanging
+When a client wants to add a new Camera or Observation, it generates a [UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier) _id_ to uniquely identify the request. Then, it sends the `id`, the `data` (Camera or Observations) and the `previous` timestamp that was stored in the client. When the request `req` arrives in the server, the replica checks decides whether of not to discard the request. A request is discared if:
 
-_(Explicação do protocolo)_
+- The `id` is present on the executed operations list; or
+- The `id` is present on any log record.
 
-_(descrição das trocas de mensagens)_
+If the request is accepted, then we follow the algorithm:
+
+1. Update the replica timestamp by incrementing the _i_\th entry, where `i` is the current instance number starting on 0.
+2. Create a unique `timestamp` to represent the operation from now on. This timestamp is created by duplicating `previous` and replacing the _i_\th entry with the previously calculated value.
+3. Creates a new log record with the new `timestamp`, the current instance number, the `id` and the data to add.
+4. Returns the new timestamp to the client.
+5. Checks if the operation can be executed immediately by checking if `previous` <= `valueTimestamp`. If possible, execute `merge(timestamp, valueTimestamp)`.
+
+Otherwise, wait.
+
+### Gossip Operations (Sync)
+
+The gossip operations are required to ensure all replicas end up receiving all the information, eventually. By default, we send these messages every 30 seconds, which can be customized. On a gossip request, a replica _i_ sends to the replica _j_:
+
+- The instance number _i_;
+- The `sourceTimestamp`, which is the replica timestamp of replica _i_;
+- The logs records we estimate the replica _j_ does not have:
+  - TODO: explain
+  
+When the replica _j_ receives the gossip message from the replica _i_, it then procceeds as follows:
+
+1. Updates the entry _i_ in the timestamp table with the `replicaTimestamp`;
+2. For each log record `r`:
+  - Checks if `r.id` is on the executed operations list. If so, discards.
+  - Checks if `r.timestamp` > `replicaTimestamp`. If not, discards.
+  - Adds the record to its own record log.
+3. Updates `replicaTimestamp`, by executing `merge(sourceTimestamp, replicaTimestamp)`.
+4. Goes through the log and executes all stable operations.
+5. Finally, cleans up the log, freeing some space, by comparing every timestamp on the table of timestamps with each record's timestamp. Being `c` the number of the instance where the record was initially created, if the every timestamp's _c_ entry >= record's timestamp _c_ entry, then it means the record can be safely removed from the log since all replicas already received that information.
 
 ## Implementation Specifics
 
