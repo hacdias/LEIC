@@ -1,11 +1,14 @@
 package pt.tecnico.sauron.silo.domain;
 
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraCoordinatesException;
 import pt.tecnico.sauron.silo.exceptions.InvalidCameraNameException;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Sauron {
   private final Integer instance;
@@ -38,18 +41,18 @@ public class Sauron {
   public ReplicaResponse addCamera(List<Integer> prev, String name, Double latitude, Double longitude)
       throws InvalidCameraNameException, InvalidCameraCoordinatesException {
 
-     Camera camera = getCamera(prev, name).getCamera();
-     if (camera != null && (!camera.getCoordinates().getLatitude().equals(latitude) || !camera.getCoordinates().getLongitude().equals(longitude))) {
-       // In this case, we have a duplicate camera, i.e., a camera with the same name and different coordinates.
-       // In the worst case scenario, we add a duplicate camera to the replica, but we can check that on the
-       // ReplicaManager.
-       return null;
-     }
+    Camera camera = getCamera(prev, name).getCamera();
+    if (camera != null && (!camera.getCoordinates().getLatitude().equals(latitude) || !camera.getCoordinates().getLongitude().equals(longitude))) {
+      // In this case, we have a duplicate camera, i.e., a camera with the same name and different coordinates.
+      // In the worst case scenario, we add a duplicate camera to the replica, but we can check that on the
+      // ReplicaManager.
+      return null;
+    }
 
-     if (camera != null) {
-       // The camera already exists, but is not duplicated.
-       return new ReplicaResponse(prev);
-     }
+    if (camera != null) {
+      // The camera already exists, but is not duplicated.
+      return new ReplicaResponse(prev);
+    }
 
     Coordinates coordinates = new Coordinates(latitude, longitude);
     camera = new Camera(name, coordinates);
@@ -75,9 +78,9 @@ public class Sauron {
     ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
 
     Observation lastObservation = req.getObservations().stream()
-            .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
-            .max(Comparator.comparing(Observation::getDatetime))
-            .orElse(null);
+        .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
+        .max(Comparator.comparing(Observation::getDatetime))
+        .orElse(null);
 
     res.setObservation(lastObservation);
     return res;
@@ -90,16 +93,16 @@ public class Sauron {
     String regex = buildRegex(type, pattern);
 
     Collection<List<Observation>> matches = req.getObservations().stream()
-      .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
-      .collect(Collectors.groupingBy(Observation::getIdentifier))
-      .values();
+        .filter(observation -> observation.getType().equals(type) && observation.getIdentifier().matches(regex))
+        .collect(Collectors.groupingBy(Observation::getIdentifier))
+        .values();
 
     List<Observation> firstMatches = matches.stream()
-      .map(element -> element.stream()
-        .max(Comparator.comparing(Observation::getDatetime))
-        .orElse(null))
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+        .map(element -> element.stream()
+            .max(Comparator.comparing(Observation::getDatetime))
+            .orElse(null))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
 
     res.setObservations(firstMatches);
     return res;
@@ -110,9 +113,9 @@ public class Sauron {
     ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
 
     List<Observation> observationsMatch = req.getObservations().stream()
-      .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
-      .sorted(Comparator.comparing(Observation::getDatetime).reversed())
-      .collect(Collectors.toList());
+        .filter(observation -> observation.getType().equals(type) && identifier.equals(observation.getIdentifier()))
+        .sorted(Comparator.comparing(Observation::getDatetime).reversed())
+        .collect(Collectors.toList());
 
     res.setObservations(observationsMatch);
     return res;
