@@ -75,21 +75,21 @@ public class ReplicaManager {
       } else if (o instanceof Observation) {
         log.add(new ReplicaLog(prev, (Observation)o));
       }
+    }
 
-      new Thread(() -> {
-        while (true) {
-          synchronized (lock) {
-            if (validTimestamp(prev)) {
-              // TODO: execute operation and update valueTimestamp:
-              //  - For each entry i, update valueTimestamp[i] if replicaTimestamp[i] > valueTimestamp[i]
-              return;
-            }
+    new Thread(() -> {
+      while (true) {
+        synchronized (lock) {
+          if (validTimestamp(prev)) {
+            // TODO: execute operation and update valueTimestamp:
+            //  - For each entry i, update valueTimestamp[i] if replicaTimestamp[i] > valueTimestamp[i]
+            return;
           }
         }
-      }).start();
+      }
+    }).start();
 
-      return new ReplicaResponse(prev);
-    }
+    return new ReplicaResponse(prev);
   }
 
   private ReplicaResponse get (List<Integer> prev, boolean isCameras) {
