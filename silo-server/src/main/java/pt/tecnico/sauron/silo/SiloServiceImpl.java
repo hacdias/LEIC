@@ -39,7 +39,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         try {
             Silo.Camera cam = request.getCamera();
             Silo.Coordinates coordinates = cam.getCoordinates();
-            ReplicaResponse res = sauron.addCamera(prev, cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
+            ReplicaResponse res = sauron.addCamera(prev, request.getUuid(), cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
 
             if (res == null) {
                 builder.setTimestamp(convertTimestamp(prev));
@@ -155,7 +155,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
                 observations.add(new Observation(request.getCameraName(), type, observation.getIdentifier(), LocalDateTime.now()));
             }
 
-            ReplicaResponse res = sauron.report(prev, observations);
+            ReplicaResponse res = sauron.report(prev, request.getUuid(), observations);
             builder.setTimestamp(convertTimestamp(res.getTimestamp()));
             builder.setStatus(Silo.ResponseStatus.SUCCESS);
         } catch (InvalidIdentifierException e) {

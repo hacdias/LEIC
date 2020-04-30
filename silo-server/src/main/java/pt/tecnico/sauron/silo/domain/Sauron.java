@@ -38,7 +38,7 @@ public class Sauron {
         // EMPTY
     }
 
-    public ReplicaResponse addCamera(List<Integer> prev, String name, Double latitude, Double longitude)
+    public ReplicaResponse addCamera(List<Integer> prev, String uuid, String name, Double latitude, Double longitude)
         throws InvalidCameraNameException, InvalidCameraCoordinatesException {
 
         Camera camera = getCamera(prev, name).getCamera();
@@ -56,7 +56,7 @@ public class Sauron {
 
         Coordinates coordinates = new Coordinates(latitude, longitude);
         camera = new Camera(name, coordinates);
-        return replicaManager.addCamera(prev, camera);
+        return replicaManager.addCamera(prev, uuid, camera);
     }
 
     public ReplicaResponse getCamera(List<Integer> prev, String name) {
@@ -124,8 +124,8 @@ public class Sauron {
 
     // TODO(add to report): we removed the InvalidCameraException because we can't guarantee this
     //  replica is updated in the moment we make the request. https://piazza.com/class/k6cbgwcjrk11og?cid=181
-    public ReplicaResponse report (List<Integer> prev, List<Observation> observations) {
-        return replicaManager.addObservations(prev, observations);
+    public ReplicaResponse report (List<Integer> prev, String uuid, List<Observation> observations) {
+        return replicaManager.addObservations(prev, uuid, observations);
     }
 
     private String buildRegex(ObservationType type, String pattern) {

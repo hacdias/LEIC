@@ -145,6 +145,7 @@ public class SiloFrontend implements AutoCloseable {
         CamJoinRequest request = CamJoinRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setCamera(camera)
+            .setUuid(UUID.randomUUID().toString())
             .build();
 
         CamJoinResponse response;
@@ -204,6 +205,7 @@ public class SiloFrontend implements AutoCloseable {
             .setTimestamp(buildTimestamp())
             .setCameraName(camName)
             .addAllObservations(siloObservations)
+            .setUuid(UUID.randomUUID().toString())
             .build();
 
         ReportResponse response;

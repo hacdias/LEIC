@@ -48,6 +48,7 @@ message ObservationInfo {
 message CamJoinRequest {
     Camera camera = 1;
     Timestamp timestamp = 2;
+    string uuid = 3;
 }
 
 message CamJoinResponse {
@@ -70,6 +71,7 @@ message ReportRequest {
     string cameraName = 1;
     repeated Observation observations = 2;
     Timestamp timestamp = 3;
+    string uuid = 4;
 }
 
 message ReportResponse {
