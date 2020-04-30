@@ -91,6 +91,8 @@ When the replica _j_ receives the gossip message from the replica _i_, it then p
 4. Goes through the log and executes all stable operations.
 5. Finally, cleans up the log, freeing some space, by comparing every timestamp on the table of timestamps with each record's timestamp. Being `c` the number of the instance where the record was initially created, if the every timestamp's _c_ entry >= record's timestamp _c_ entry, then it means the record can be safely removed from the log since all replicas already received that information.
 
+**Note:** since we cleanup the entry logs, we assume that the replicas store their data on a persistent storage, i.e., a storage that does not lose data when the replica shuts down or fails. In order for this implementation to fully work, we need to persist our replica's data. A possible "solution" for this would be to avoid cleaning the changes log. However, that would have the downside of wasting memory, more than duplicating the memory required for all replicas.
+
 ## Implementation Specifics
 
 _(Descrição de opções de implementação, incluindo otimizações e melhorias introduzidas)_
