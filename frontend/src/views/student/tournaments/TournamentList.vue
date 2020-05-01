@@ -19,7 +19,13 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="$emit('newTournament')" data-cy="newTournamentButton">New Tournament</v-btn>
+          <v-btn
+            color="primary"
+            dark
+            @click="$emit('newTournament')"
+            data-cy="newTournamentButton"
+            >New Tournament</v-btn
+          >
         </v-card-title>
       </template>
       <template v-slot:item.enrolled="{ item }">
@@ -27,7 +33,7 @@
           <span>{{ item.enrolled ? 'Yes' : 'No' }}</span>
         </v-chip>
       </template>
-	  <template v-slot:item.action="{ item }">
+      <template v-slot:item.action="{ item }">
         <v-tooltip bottom v-if="!item.enrolled">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="enroll(item, item.id)">
@@ -42,7 +48,7 @@
 </template>
 
 <script lang="ts">
-  import {Component, Vue, Prop, Watch} from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import Tournament from '@/models/management/Tournament';
 import RemoteServices from '@/services/RemoteServices';
 
@@ -55,7 +61,7 @@ export default class TournamentList extends Vue {
 
   headers: object = [
     { text: 'Title', value: 'title', align: 'left' },
-    { text: 'Enrolled', value: 'enrolled', align: 'left'},
+    { text: 'Enrolled', value: 'enrolled', align: 'left' },
     { text: 'Topics', value: 'topics', align: 'left', sortable: false },
     { text: 'Number of Questions', value: 'numberQuestions', align: 'center' },
     { text: 'Creation Date', value: 'creationDate', align: 'left' },
@@ -94,7 +100,7 @@ export default class TournamentList extends Vue {
     }
     await this.$store.dispatch('clearLoading');
   }
-  
+
   async enroll(tournament: Tournament, tournamentId: number) {
     if (confirm('Are you sure you want to enroll this tournament?')) {
       try {
