@@ -1,9 +1,11 @@
 package pt.tecnico.sauron.silo.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReplicaLog {
+public class ReplicaLog implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final Integer instance;
     private final List<Integer> prev;
     private final List<Integer> timestamp;

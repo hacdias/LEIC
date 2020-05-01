@@ -1,5 +1,6 @@
 package pt.tecnico.sauron.silo.domain;
 
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -13,14 +14,14 @@ public class ReplicaManager {
     private static final Object lock = new Object();
 
     // This is the data we want to keep in sync with other replicas.
-    private final List<Integer> valueTimestamp = Collections.synchronizedList(new ArrayList<>());
-    private final List<Observation> observations = Collections.synchronizedList(new ArrayList<>());
-    private final Map<String, Camera> cameras = Collections.synchronizedMap(new HashMap<>());
+    private final List<Integer> valueTimestamp;
+    private final List<Observation> observations;
+    private final Map<String, Camera> cameras;
 
     // The update information!
-    private final List<Integer> replicaTimestamp = Collections.synchronizedList(new ArrayList<>());
-    private final List<ReplicaLog> log = Collections.synchronizedList(new ArrayList<>());
-    private final List<String> operationsTable = Collections.synchronizedList(new ArrayList<>());
+    private final List<Integer> replicaTimestamp;
+    private final List<ReplicaLog> log;
+    private final List<String> operationsTable;
 
     private final List<List<Integer>> tableTimestamps;
 
@@ -31,20 +32,81 @@ public class ReplicaManager {
         LOGGER.info("Replica manager created with options: " + options.toString());
 
         this.options = options;
+
         this.tableTimestamps = new ArrayList<>();
 
+        List<Integer> cleanList = new ArrayList<>();
+
         for (int i = 0; i < options.getTotalInstances(); i++) {
-            this.replicaTimestamp.add(0);
-            this.valueTimestamp.add(0);
+            cleanList.add(0);
         }
 
         for (int i = 0; i < options.getTotalInstances(); i++) {
-            this.tableTimestamps.add(new ArrayList<>(this.replicaTimestamp));
+            this.tableTimestamps.add(new ArrayList<>(cleanList));
+        }
+
+        this.updateThread = update(options);
+        this.updateThread.start();
+
+
+        FileInputStream fis = null;
+        ObjectInputStream in = null;
+        Store store = null;
+        try {
+            String filePath = options.getStorageFile();
+            File f = new File(filePath);
+            if (f.exists() && !f.isDirectory()) {
+                fis = new FileInputStream(filePath);
+                in = new ObjectInputStream(fis);
+                store = (Store) in.readObject();
+            }
+        } catch (Exception ex) {
+            LOGGER.info("Could not read store: " + options.getStorageFile());
+        }
+
+        if (store == null) {
+            valueTimestamp = Collections.synchronizedList(new ArrayList<>(cleanList));
+            observations = Collections.synchronizedList(new ArrayList<>());
+            cameras = Collections.synchronizedMap(new HashMap<>());
+
+            // The update information!
+            replicaTimestamp = Collections.synchronizedList(new ArrayList<>(cleanList));
+            log = Collections.synchronizedList(new ArrayList<>());
+            operationsTable = Collections.synchronizedList(new ArrayList<>());
+        } else {
+            valueTimestamp = Collections.synchronizedList(new ArrayList<>(store.getValueTimestamp()));
+            observations = Collections.synchronizedList(new ArrayList<>(store.getObservations()));
+            cameras = Collections.synchronizedMap(new HashMap<>(store.getCameras()));
+
+            // The update information!
+            replicaTimestamp = Collections.synchronizedList(new ArrayList<>(store.getReplicaTimestamp()));
+            log = Collections.synchronizedList(new ArrayList<>(store.getLog()));
+            operationsTable = Collections.synchronizedList(new ArrayList<>(store.getOperationsTable()));
+
+            LOGGER.info("Information loaded from store: " + options.getStorageFile());
         }
 
         this.tableTimestamps.set(options.getInstance(), this.replicaTimestamp);
-        this.updateThread = update(options);
-        this.updateThread.start();
+    }
+
+    private void store () {
+        try {
+            File file = new File(options.getStorageFile());
+            file.createNewFile();
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream out = new ObjectOutputStream(fos);
+            out.writeObject(new Store(
+                valueTimestamp,
+                observations,
+                cameras,
+                replicaTimestamp,
+                log,
+                operationsTable
+            ));
+            out.close();
+        } catch (Exception e) {
+            LOGGER.info("Could not store file: " + e.toString());
+        }
     }
 
     private Thread update (Options options) {
@@ -209,6 +271,7 @@ public class ReplicaManager {
             }
 
             LOGGER.info("Executed (add) " + r.getUuid());
+            store();
         }
     }
 

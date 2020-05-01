@@ -28,6 +28,8 @@
 
 		<numberServers>2</numberServers>
 
+		<gossipFrequency>30000</gossipFrequency>
+		<storagePath>data/</storagePath>
 	</properties>
 
 	<dependencies>
@@ -90,6 +92,8 @@
 						<argument>${server.port}</argument>
 						<argument>${server.path}</argument>
 						<argument>${numberServers}</argument>
+						<argument>${gossipFrequency}</argument>
+						<argument>${storagePath}${instance}.data</argument>
 					</arguments>
 				</configuration>
 			</plugin>

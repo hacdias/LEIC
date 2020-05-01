@@ -26,9 +26,8 @@ public class SiloServerApp {
         final String port = Integer.toString(basePort + instance);
         final String path = args[5];
         final Integer numberServers = Integer.parseInt(args[6]);
-
-        final int updateFrequency = 1000 * 30; // TODO: make customizable.
-        final String storageFile = "/not/used/yet";
+        final int updateFrequency = Integer.parseInt(args[7]);
+        final String storageFile = args[8];
 
         Options options = new Options(instance, numberServers, host, basePort, storageFile, updateFrequency);
 
