@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Sauron {
@@ -35,7 +34,6 @@ public class Sauron {
     public void ctrlClear() {
         replicaManager.close();
         replicaManager = new ReplicaManager(instance, totalInstances, host, basePort);
-        Logger.getGlobal().info("SERVER RESET");
     }
 
     public void ctrlInit() {

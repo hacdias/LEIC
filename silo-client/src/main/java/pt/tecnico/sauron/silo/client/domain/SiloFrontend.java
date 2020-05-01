@@ -21,10 +21,12 @@ public class SiloFrontend implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(SiloFrontend.class.getName());
     private final ZKNaming zkNaming;
     private final String basePath = "/grpc/sauron/silo";
-    private final Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
+
+    private final static Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
         Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
         Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
     );
+
     private List<Integer> timestamp = new ArrayList<>();
     private ManagedChannel channel;
     private SauronGrpc.SauronBlockingStub stub;
@@ -99,7 +101,7 @@ public class SiloFrontend implements AutoCloseable {
 
         List<Camera> cameras = response.getCamerasList()
             .stream()
-            .map(camera -> new Camera(camera))
+            .map(Camera::new)
             .collect(Collectors.toList());
 
         List<Observation> observations = response.getObservationsList()

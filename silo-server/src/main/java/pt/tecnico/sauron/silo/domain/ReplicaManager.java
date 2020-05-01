@@ -27,7 +27,8 @@ public class ReplicaManager {
 
     private final List<List<Integer>> tableTimestamps;
 
-    List<Thread> threads = Collections.synchronizedList(new ArrayList<>());
+    // The update thread that runs every X time.
+    private final Thread updateThread;
 
     public ReplicaManager(Integer instance, Integer numberServers, String host, Integer basePort) {
         LOGGER.info(String.format("Replica manager created: instance %d; numberServers: %d", instance, numberServers));
@@ -46,8 +47,8 @@ public class ReplicaManager {
         }
 
         this.tableTimestamps.set(this.instance, this.replicaTimestamp);
-        this.threads.add(update(1000 * 30, numberServers, host, basePort + 1));
-        this.threads.get(0).start();
+        this.updateThread = update(1000 * 30, numberServers, host, basePort + 1);
+        this.updateThread.start();
     }
 
     private Thread update (Integer milliseconds, Integer numberServers, String host, Integer basePort) {
@@ -338,22 +339,12 @@ public class ReplicaManager {
         return true;
     }
 
-    private interface AppendFunction {
-        void run(List<Integer> timestamp);
-    }
-
-    private interface ExecuteFunction {
-        void run();
-    }
-
     public void close () {
         synchronized (lock) {
-            for (Thread thread : threads) {
-                thread.interrupt();
-                try {
-                    thread.join();
-                } catch (InterruptedException ignored) {}
-            }
+            updateThread.interrupt();
+            try {
+                updateThread.join();
+            } catch (InterruptedException ignored) {}
         }
     }
 }
