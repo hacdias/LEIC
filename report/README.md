@@ -30,6 +30,7 @@ Distributed Systems 2019/2020, Second Semester
     + [Log Clean Up](#log-clean-up)
     + [Persistent Storage](#persistent-storage)
     + [Client Consistent Reads](#client-consistent-reads)
+- [Final Remarks](#final-remarks)
 
 ## First Part Improvements
 
@@ -129,3 +130,6 @@ Since we cleanup the entry logs, we needed a way to persist the data. To do so, 
 
 To avoid a client stumbling in a situation where they talk different replicas and getting the inconsistent results, we decided to implement a request-response cache. The cache stores the last _n_ requests and if we receive a request from a replica whose timestamp is older than what the client has previously seen, we return the cached value instead.
 
+## Final Remarks
+
+Despite COVID-19, we were able to successfully complete our project in due time, which allowed us to enjoy this emmersive experience into the decentralized systems... with gossips.
