@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
@@ -57,7 +58,7 @@ public class SuggestionService {
                 .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND, courseId));
 
         if (suggestionDto.getCreationDate() == null) {
-            suggestionDto.setCreationDate(LocalDateTime.now().format(Course.formatter));
+            suggestionDto.setCreationDate(DateHandler.toISOString(LocalDateTime.now()));
             suggestionDto.getQuestion().setCreationDate(suggestionDto.getCreationDate());
         }
 

@@ -95,21 +95,21 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 case "QUIZ.ACCESS":
                     return userHasThisExecution(userId, quizService.findQuizCourseExecution(id).getCourseExecutionId());
                 case "QUERY.ALTER":
-                    return userCanAlterQuery(username, id);
+                    return userCanAlterQuery(userId, id);
                 case "ANSWER.QUERY.ALTER":
-                    return userCanAlterAnswerQuery(username, id);
+                    return userCanAlterAnswerQuery(userId, id);
                 case "QUERY.ACCESS":
-                    return userCanAddAnswerQuery(username, id);
+                    return userCanAddAnswerQuery(userId, id);
                 case "SUGGESTION.AUTHOR":
-                    return userIsSuggestionAuthor(username, id);
+                    return userIsSuggestionAuthor(userId, id);
                 case "SUGGESTION.ACCESS":
-                    return userHasAnExecutionOfTheCourse(username, suggestionService.getSuggestionCourse(id).getCourseId());
+                    return userHasAnExecutionOfTheCourse(userId, suggestionService.getSuggestionCourse(id).getCourseId());
                 case "SUGGESTIONREVIEW.RECEPTOR":
-                    return userIsSuggestionReviewReceptor(username, id);
+                    return userIsSuggestionReviewReceptor(userId, id);
                 case "SUGGESTIONREVIEW.ACCESS":
-                    return userHasAnExecutionOfTheCourse(username, suggestionReviewService.getSuggestionReviewCourse(id).getCourseId());
+                    return userHasAnExecutionOfTheCourse(userId, suggestionReviewService.getSuggestionReviewCourse(id).getCourseId());
                 case "TOURNAMENT.CREATOR":
-                    return userIsTournamentCreator(username, id);
+                    return userIsTournamentCreator(userId, id);
                 default: return false;
             }
         }
@@ -117,12 +117,12 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
-    private boolean userIsSuggestionAuthor(String username, int suggestionId) {
-        return suggestionService.getSuggestionUser(suggestionId).getUsername().equals(username);
+    private boolean userIsSuggestionAuthor(int userId, int suggestionId) {
+        return suggestionService.getSuggestionUser(suggestionId).getId() == userId;
     }
 
-    private boolean userIsSuggestionReviewReceptor(String username, int suggestionReviewId) {
-        return suggestionReviewService.getSuggestionReviewReceptor(suggestionReviewId).getUsername().equals(username);
+    private boolean userIsSuggestionReviewReceptor(int userId, int suggestionReviewId) {
+        return suggestionReviewService.getSuggestionReviewReceptor(suggestionReviewId).getId() == userId;
     }
 
     private boolean userHasAnExecutionOfTheCourse(int userId, int courseId) {
@@ -135,27 +135,23 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 .anyMatch(course -> course.getCourseExecutionId() == courseExecutionId);
     }
 
-    private boolean userCanAlterQuery(String username, int queryId) {
-        Integer studentId = userService.findByUsername(username).getId();
-        List<QueryDto> queries = queryService.getQueriesByStudent(studentId);
+    private boolean userCanAlterQuery(int userId, int queryId) {
+        List<QueryDto> queries = queryService.getQueriesByStudent(userId);
         return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
     }
 
-    private boolean userCanAlterAnswerQuery(String username, int answerQueryId) {
-        Integer userNameId = userService.findByUsername(username).getId();
-        List<AnswerQueryDto> answers = answerQueryService.getAnswersByTeacher(userNameId);
+    private boolean userCanAlterAnswerQuery(int userId, int answerQueryId) {
+        List<AnswerQueryDto> answers = answerQueryService.getAnswersByTeacher(userId);
         return answers.stream().anyMatch(answerQueryDto -> answerQueryDto.getId() == answerQueryId);
     }
 
-    private boolean userCanAddAnswerQuery(String username, int queryId) {
-        Integer teacherId = userService.findByUsername(username).getId();
-
-        List<QueryDto> queries = queryService.getQueriesInTeachersCourse(teacherId);
+    private boolean userCanAddAnswerQuery(int userId, int queryId) {
+        List<QueryDto> queries = queryService.getQueriesInTeachersCourse(userId);
         return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
     }
 
-    private boolean userIsTournamentCreator(String username, int tournamentId) {
-        return tournamentService.getCreator(tournamentId).getUsername() == username;
+    private boolean userIsTournamentCreator(int userId, int tournamentId) {
+        return tournamentService.getCreator(tournamentId).getId() == userId;
     }
 
      @Override
