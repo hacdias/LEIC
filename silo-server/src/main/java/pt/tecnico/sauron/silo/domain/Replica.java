@@ -40,10 +40,8 @@ public class Replica implements Closeable {
         stub = SauronGrpc.newBlockingStub(channel);
     }
 
-    public void gossip (List<ReplicaLog> log, List<Integer> replicaTimestamp) {
+    public void gossip (List<ReplicaLog> log, List<Integer> currentReplicaTimestamp) {
         LOGGER.info("Gossipping to " + instance.toString());
-
-        // TODO: filter
 
         List<Silo.Log> siloLogs = new ArrayList<>();
 
@@ -56,7 +54,7 @@ public class Replica implements Closeable {
         }
 
         Silo.GossipRequest gossip = Silo.GossipRequest.newBuilder()
-            .setTimestamp(Silo.Timestamp.newBuilder().addAllValue(replicaTimestamp))
+            .setTimestamp(Silo.Timestamp.newBuilder().addAllValue(currentReplicaTimestamp))
             .addAllLog(siloLogs)
             .setInstance(this.currentInstance)
             .build();
@@ -122,6 +120,10 @@ public class Replica implements Closeable {
             .setTimestamp(Silo.Timestamp.newBuilder().addAllValue(log.getTimestamp()).build())
             .setPrev(Silo.Timestamp.newBuilder().addAllValue(log.getPrev()).build())
             .build();
+    }
+
+    public Integer getInstance() {
+        return instance;
     }
 
     @Override

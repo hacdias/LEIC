@@ -127,7 +127,16 @@ public class ReplicaManager {
                 LOGGER.info("UPDATE THREAD");
 
                 for (Replica replica : replicas) {
-                    replica.gossip(this.log, this.replicaTimestamp);
+                    List<Integer> thisTS = this.tableTimestamps.get(replica.getInstance());
+                    List<ReplicaLog> toSend = new ArrayList<>();
+
+                    for (ReplicaLog r : this.log) {
+                        if (thisTS.get(r.getInstance()) < r.getTimestamp().get(r.getInstance())) {
+                            toSend.add(r);
+                        }
+                    }
+
+                    replica.gossip(toSend, this.replicaTimestamp);
                 }
 
                 try {
