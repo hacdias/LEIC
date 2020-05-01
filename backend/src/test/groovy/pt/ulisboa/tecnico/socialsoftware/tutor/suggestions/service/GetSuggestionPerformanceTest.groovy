@@ -14,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -85,7 +86,7 @@ class GetSuggestionPerformanceTest extends Specification {
 
             def suggestionDto = new SuggestionDto()
             suggestionDto.setQuestion(questionDto)
-            suggestionDto.setApproved(false)
+            suggestionDto.setStatus(Suggestion.Status.PENDING.name())
             suggestionService.createSuggestion(student.getId(), course.getId(), suggestionDto)
         })
 

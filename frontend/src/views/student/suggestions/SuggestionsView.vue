@@ -44,7 +44,7 @@
 
       <template v-slot:item.image="{ item }">
         <v-file-input
-          v-if="!item.approved"
+          v-if="item.status !== 'APPROVED'"
           show-size
           dense
           small-chips
@@ -53,9 +53,9 @@
         />
       </template>
 
-      <template v-slot:item.approved="{ item }">
-        <v-chip :color="item.approved ? 'green' : 'red'" small>
-          <span>{{ item.approved ? 'Yes' : 'No' }}</span>
+      <template v-slot:item.status="{ item }">
+        <v-chip :color="getStatusColor(item.status)" small>
+          <span>{{ item.status }}</span>
         </v-chip>
       </template>
 
@@ -72,7 +72,7 @@
           </template>
           <span>Show Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="!item.approved">
+        <v-tooltip bottom v-if="item.status !== 'APPROVED'">
           <template v-slot:activator="{ on }">
             <v-icon small class="mr-2" v-on="on" @click="editSuggestion(item)"
               >edit</v-icon
@@ -80,7 +80,7 @@
           </template>
           <span>Edit Suggestion</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="!item.approved">
+        <v-tooltip bottom v-if="item.status !== 'APPROVED'">
           <template v-slot:activator="{ on }">
             <v-icon
               small
@@ -162,7 +162,7 @@ export default class SuggestionsView extends Vue {
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
-    { text: 'Approved', value: 'approved', align: 'center' },
+    { text: 'Status', value: 'status', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -197,6 +197,12 @@ export default class SuggestionsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  getStatusColor(status: string) {
+    if (status === 'REJECTED') return 'red';
+    else if (status === 'PENDING') return 'orange';
+    else return 'green';
   }
 
   customFilter(value: string, search: string, suggestion: Suggestion) {
@@ -272,7 +278,7 @@ export default class SuggestionsView extends Vue {
   async deleteSuggestion(toDelete: Suggestion) {
     if (
       toDelete.id &&
-      !toDelete.approved &&
+      toDelete.status !== 'APPROVED' &&
       confirm('Are you sure you want to delete this suggestion?')
     ) {
       try {

@@ -89,7 +89,7 @@ class UpdateSuggestionTest extends Specification {
 
         suggestion = new Suggestion()
         suggestion.setStudent(student)
-        suggestion.setApproved(false)
+        suggestion.setStatus(Suggestion.Status.PENDING)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
 
@@ -99,7 +99,7 @@ class UpdateSuggestionTest extends Specification {
     def "update suggestion to approved"() {
         given: "an updated suggestion"
         def suggestionDto = new SuggestionDto(suggestion)
-        suggestionDto.setApproved(true)
+        suggestionDto.setStatus(Suggestion.Status.APPROVED.name())
         suggestionDto.setQuestion(new QuestionDto(question))
 
         when:
@@ -109,7 +109,7 @@ class UpdateSuggestionTest extends Specification {
         suggestionRepository.count() == 1L
         def result = suggestionRepository.findAll().get(0)
         result.getId() != null
-        result.getApproved() == true
+        result.getStatus() == Suggestion.Status.APPROVED
     }
 
     @TestConfiguration

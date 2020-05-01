@@ -12,10 +12,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.SuggestionReview;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionReviewDto;
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionReviewRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
@@ -53,9 +52,13 @@ public class SuggestionReviewService {
         SuggestionReview suggestionReview = new SuggestionReview(teacher, suggestion, suggestionReviewDto);
         suggestionReview.setCreationDate(LocalDateTime.now());
 
-        if (!suggestionReview.getSuggestion().getApproved() && suggestionReview.getApproved()) {
-            suggestion.setApproved(true);
+        if (suggestionReview.getSuggestion().getStatus() != Suggestion.Status.APPROVED && suggestionReview.getApproved()) {
+            suggestion.setStatus(Suggestion.Status.APPROVED);
             suggestion.getQuestion().setStatus(Question.Status.DISABLED);
+        }
+
+        if (!suggestionReview.getApproved()) {
+            suggestion.setStatus(Suggestion.Status.REJECTED);
         }
 
         suggestionReviewRepository.save(suggestionReview);
@@ -73,8 +76,16 @@ public class SuggestionReviewService {
 
         suggestionReview.setJustification(suggestionReviewDto.getJustification());
         suggestionReview.setApproved(suggestionReviewDto.getApproved());
-        if (!suggestionReview.getSuggestion().getApproved() && suggestionReview.getApproved()) {
-            suggestionReview.getSuggestion().setApproved(suggestionReviewDto.getApproved());
+
+        Suggestion suggestion = suggestionReview.getSuggestion();
+
+        if (suggestionReview.getSuggestion().getStatus() != Suggestion.Status.APPROVED && suggestionReview.getApproved()) {
+            suggestion.setStatus(Suggestion.Status.APPROVED);
+            suggestion.getQuestion().setStatus(Question.Status.DISABLED);
+        }
+
+        if (!suggestionReview.getApproved()) {
+            suggestion.setStatus(Suggestion.Status.REJECTED);
         }
 
         return new SuggestionReviewDto(suggestionReview);

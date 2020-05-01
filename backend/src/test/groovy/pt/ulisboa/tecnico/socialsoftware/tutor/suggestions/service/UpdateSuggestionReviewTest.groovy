@@ -94,7 +94,7 @@ class UpdateSuggestionReviewTest extends Specification {
 
         suggestion = new Suggestion()
         suggestion.setStudent(student)
-        suggestion.setApproved(false)
+        suggestion.setStatus(Suggestion.Status.PENDING)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
 
@@ -133,13 +133,13 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
         result.getId() != null
-        suggestionReview.getSuggestion().getApproved()
+        suggestionReview.getSuggestion().getStatus() == Suggestion.Status.APPROVED
         suggestionReview.getApproved()
     }
 
     def "change suggestion review approval to rejected when suggestion is already approved"() {
         given: "an updated SuggestionReviewDto"
-        suggestion.setApproved(true)
+        suggestion.setStatus(Suggestion.Status.APPROVED)
         def suggestionReviewDto = new SuggestionReviewDto(suggestionReview)
 
         when:
@@ -149,7 +149,7 @@ class UpdateSuggestionReviewTest extends Specification {
         suggestionReviewRepository.count() == 1L
         def result = suggestionReviewRepository.findAll().get(0)
         result.getId() != null
-        suggestionReview.getSuggestion().getApproved()
+        suggestionReview.getSuggestion().getStatus() == Suggestion.Status.REJECTED
         !suggestionReview.getApproved()
     }
 
