@@ -35,7 +35,7 @@ public class EyeApp {
         if (args.length == 6)
             instance = Integer.parseInt(args[5]);
 
-        try (SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance)) {
+        try (SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance, 10)) {
             try {
                 System.out.print("Registering camera...");
                 api.camJoin(cameraName, coordinatesLatitude, coordinatesLongitude);

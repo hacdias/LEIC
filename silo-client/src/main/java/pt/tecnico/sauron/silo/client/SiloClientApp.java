@@ -22,7 +22,7 @@ public class SiloClientApp {
             instance = Integer.parseInt(args[2]);
 
         Scanner scanner = null;
-        try (SiloFrontend frontend = new SiloFrontend(host, port, instance)) {
+        try (SiloFrontend frontend = new SiloFrontend(host, port, instance, 50)) {
 
             scanner = new Scanner(System.in);
             System.out.printf("> ");

@@ -30,7 +30,7 @@ public class SpotterApp {
             instance = Integer.parseInt(args[2]);
 
         Scanner scanner = null;
-        try (SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance)) {
+        try (SiloFrontend api = new SiloFrontend(zooHost, zooPort, instance, 50)) {
             System.out.printf("Server address: %s%n", zooHost);
             System.out.printf("Server port: %s%n", zooPort);
 

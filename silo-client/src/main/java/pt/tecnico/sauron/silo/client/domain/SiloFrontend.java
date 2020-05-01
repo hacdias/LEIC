@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
 import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 import pt.ulisboa.tecnico.sdis.zk.ZKRecord;
 
+import javax.sound.midi.Track;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -28,9 +29,40 @@ public class SiloFrontend implements AutoCloseable {
 
     private Camera ourselves = null;
 
-    public SiloFrontend(String address, Integer port, Integer instance) throws ZKNamingException, SauronClientException {
+    private final Integer cacheSize;
+    private final Queue<Request> queue = new LinkedList<>();
+    private final Map<Request,Object> cache = new HashMap<>();
+
+    public SiloFrontend(String address, Integer port, Integer instance, Integer cacheSize) throws ZKNamingException, SauronClientException {
         this.zkNaming = new ZKNaming(address, Integer.toString(port));
+        this.cacheSize = cacheSize;
         connectToReplica(instance);
+    }
+
+    private void putInCache (Request req, Object data) {
+        if (cacheSize == 0) return;
+
+        if (queue.size() >= cacheSize) {
+            LOGGER.info("Removed old cache element.");
+            cache.remove(queue.remove());
+        }
+
+        LOGGER.info("Added req to cache.");
+
+        if (!cache.containsKey(req)) {
+            queue.add(req);
+        }
+
+        cache.put(req, data);
+    }
+
+    private Object getObjectOrDefault (Request req, List<Integer> timestamp, Object response) {
+        if (cache.containsKey(req) && isTimestampOlder(timestamp)) {
+            return cache.get(req);
+        } else {
+            putInCache(req, response);
+            return response;
+        }
     }
 
     private void connectToReplica(Integer instance) throws ZKNamingException, SauronClientException {
@@ -83,6 +115,16 @@ public class SiloFrontend implements AutoCloseable {
                 this.timestamp.set(i, timestamp.get(i));
             }
         }
+    }
+
+    private boolean isTimestampOlder (List<Integer> timestamp) {
+        for (int i = 0; i < timestamp.size(); i++) {
+            if (timestamp.get(i) < this.timestamp.get(i)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public Status ping() throws SauronClientException, ZKNamingException {
@@ -168,6 +210,10 @@ public class SiloFrontend implements AutoCloseable {
             .setName(name)
             .build();
 
+        Request r = new Request();
+        r.setRequestType(CamInfoRequest.getDescriptor().getFullName());
+        r.setCameraName(name);
+
         CamInfoResponse response;
 
         try {
@@ -177,6 +223,7 @@ public class SiloFrontend implements AutoCloseable {
             return camInfo(name);
         }
 
+        response = (CamInfoResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
         return new Camera(response.getCamera());
@@ -229,6 +276,11 @@ public class SiloFrontend implements AutoCloseable {
             .setIdentifier(identifier)
             .build();
 
+        Request r = new Request();
+        r.setRequestType(TrackRequest.getDescriptor().getFullName());
+        r.setObservationType(type);
+        r.setIdentifier(identifier);
+
         TrackResponse response;
         try {
             response = stub.track(request);
@@ -236,6 +288,8 @@ public class SiloFrontend implements AutoCloseable {
             connectToReplica(-1);
             return track(type, identifier);
         }
+
+        response = (TrackResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
@@ -251,12 +305,19 @@ public class SiloFrontend implements AutoCloseable {
 
         TrackMatchResponse response;
 
+        Request r = new Request();
+        r.setRequestType(TrackMatchRequest.getDescriptor().getFullName());
+        r.setObservationType(type);
+        r.setPattern(pattern);
+
         try {
             response = stub.trackMatch(request);
         } catch (io.grpc.StatusRuntimeException e) {
             connectToReplica(-1);
             return trackMatch(type, pattern);
         }
+
+        response = (TrackMatchResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
@@ -274,6 +335,11 @@ public class SiloFrontend implements AutoCloseable {
             .setIdentifier(identifier)
             .build();
 
+        Request r = new Request();
+        r.setRequestType(TraceRequest.getDescriptor().getFullName());
+        r.setObservationType(type);
+        r.setIdentifier(identifier);
+
         TraceResponse response;
 
         try {
@@ -282,6 +348,8 @@ public class SiloFrontend implements AutoCloseable {
             connectToReplica(-1);
             return trace(type, identifier);
         }
+
+        response = (TraceResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
@@ -310,6 +378,52 @@ public class SiloFrontend implements AutoCloseable {
                 throw new NoObservationFoundException();
             default:
                 throw new UnknownException();
+        }
+    }
+
+    private class Request {
+        private String requestType = null;
+        private ObservationType observationType = null;
+        private String identifier = null;
+        private String pattern = null;
+        private String cameraName = null;
+
+        public void setIdentifier(String identifier) {
+            this.identifier = identifier;
+        }
+
+        public void setCameraName(String cameraName) {
+            this.cameraName = cameraName;
+        }
+
+        public void setObservationType(ObservationType observationType) {
+            this.observationType = observationType;
+        }
+
+        public void setPattern(String pattern) {
+            this.pattern = pattern;
+        }
+
+        public void setRequestType(String requestType) {
+            this.requestType = requestType;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Request request = (Request) o;
+
+            return Objects.equals(requestType, request.requestType) &&
+                observationType == request.observationType &&
+                Objects.equals(identifier, request.identifier) &&
+                Objects.equals(pattern, request.pattern) &&
+                Objects.equals(cameraName, request.cameraName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(requestType, observationType, identifier, pattern, cameraName);
         }
     }
 
