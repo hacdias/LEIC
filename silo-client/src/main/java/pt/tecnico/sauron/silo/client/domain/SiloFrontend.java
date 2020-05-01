@@ -22,11 +22,6 @@ public class SiloFrontend implements AutoCloseable {
     private final ZKNaming zkNaming;
     private final String basePath = "/grpc/sauron/silo";
 
-    private final static Map<ObservationType, Silo.ObservationType> typesConverter = Map.ofEntries(
-        Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
-        Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
-    );
-
     private List<Integer> timestamp = new ArrayList<>();
     private ManagedChannel channel;
     private SauronGrpc.SauronBlockingStub stub;
@@ -134,14 +129,10 @@ public class SiloFrontend implements AutoCloseable {
     }
 
     public void camJoin(String name, Double latitude, Double longitude) throws SauronClientException, ZKNamingException {
-        Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
-            .setLatitude(latitude)
-            .setLongitude(longitude)
-            .build();
-
         Silo.Camera camera = Silo.Camera.newBuilder()
             .setName(name)
-            .setCoordinates(coordinates)
+            .setLatitude(latitude)
+            .setLongitude(longitude)
             .build();
 
         CamJoinRequest request = CamJoinRequest.newBuilder()
@@ -164,7 +155,7 @@ public class SiloFrontend implements AutoCloseable {
         throwIfNotSuccess(response.getStatus());
     }
 
-    public Coordinates camInfo(String name) throws SauronClientException, ZKNamingException {
+    public Camera camInfo(String name) throws SauronClientException, ZKNamingException {
         CamInfoRequest request = CamInfoRequest.newBuilder()
             .setTimestamp(buildTimestamp())
             .setName(name)
@@ -181,7 +172,7 @@ public class SiloFrontend implements AutoCloseable {
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
-        return new Coordinates(response.getCoordinates());
+        return new Camera(response.getCamera());
     }
 
     public void report(String camName, List<Observation> observations) throws SauronClientException, ZKNamingException {
@@ -193,7 +184,7 @@ public class SiloFrontend implements AutoCloseable {
                 return Silo.Observation
                     .newBuilder()
                     .setIdentifier(observation.getIdentifier())
-                    .setType(typesConverter.get(observation.getType()))
+                    .setType(ObservationType.toSilo.get(observation.getType()))
                     .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(instant.getEpochSecond())
                         .setNanos(instant.getNano())
@@ -227,7 +218,7 @@ public class SiloFrontend implements AutoCloseable {
     public Observation track(ObservationType type, String identifier) throws SauronClientException, ZKNamingException {
         TrackRequest request = TrackRequest.newBuilder()
             .setTimestamp(buildTimestamp())
-            .setType(typesConverter.get(type))
+            .setType(ObservationType.toSilo.get(type))
             .setIdentifier(identifier)
             .build();
 
@@ -247,7 +238,7 @@ public class SiloFrontend implements AutoCloseable {
     public List<Observation> trackMatch(ObservationType type, String pattern) throws SauronClientException, ZKNamingException {
         TrackMatchRequest request = TrackMatchRequest.newBuilder()
             .setTimestamp(buildTimestamp())
-            .setType(typesConverter.get(type))
+            .setType(ObservationType.toSilo.get(type))
             .setPattern(pattern)
             .build();
 
@@ -272,7 +263,7 @@ public class SiloFrontend implements AutoCloseable {
     public List<Observation> trace(ObservationType type, String identifier) throws SauronClientException, ZKNamingException {
         TraceRequest request = TraceRequest.newBuilder()
             .setTimestamp(buildTimestamp())
-            .setType(typesConverter.get(type))
+            .setType(ObservationType.toSilo.get(type))
             .setIdentifier(identifier)
             .build();
 

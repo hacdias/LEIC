@@ -2,18 +2,19 @@ package pt.tecnico.sauron.silo.domain;
 
 import pt.tecnico.sauron.silo.exceptions.InvalidIdentifierException;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Observation {
-    private ObservationType type;
-    private String identifier;
-    private String cameraName;
-    private LocalDateTime datetime;
+public class Observation implements Serializable {
+    private final ObservationType type;
+    private final String identifier;
+    private final String cameraName;
+    private final LocalDateTime datetime;
     private Camera camera;
 
-    private Observation (ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
+    public Observation(String cameraName, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
         this.type = type;
         this.identifier = identifier;
         this.datetime = datetime;
@@ -22,10 +23,7 @@ public class Observation {
             (type == ObservationType.PERSON && !identifier.matches("^\\d+$"))) {
             throw new InvalidIdentifierException(identifier);
         }
-    }
 
-    public Observation(String cameraName, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
-        this(type, identifier, datetime);
         this.cameraName = cameraName;
     }
 
@@ -56,25 +54,13 @@ public class Observation {
         return cameraName;
     }
 
-    public void setType(ObservationType type) {
-        this.type = type;
-    }
-
-    public void setDatetime(LocalDateTime datetime) {
-        this.datetime = datetime;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
     public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
     @Override
     public String toString() {
-        return "Observation(" + type + "," +identifier + ")@" + datetime.toString() + " by " + camera.toString();
+        return "Observation(" + type + "," +identifier + ")@" + datetime.toString() + " by " + cameraName;
     }
 
     private static class PatternMatcher {

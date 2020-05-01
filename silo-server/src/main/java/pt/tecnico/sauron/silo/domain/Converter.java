@@ -4,17 +4,14 @@ import com.google.protobuf.Timestamp;
 import pt.tecnico.sauron.silo.grpc.Silo;
 
 import java.time.ZoneOffset;
-import java.util.Map;
 
 public class Converter {
     public static Silo.ObservationInfo convertToMessage(Observation observation) {
         return Silo.ObservationInfo.newBuilder()
             .setCamera(Silo.Camera.newBuilder()
                 .setName(observation.getCamera().getName())
-                .setCoordinates(Silo.Coordinates.newBuilder()
-                    .setLatitude(observation.getCamera().getCoordinates().getLatitude())
-                    .setLongitude(observation.getCamera().getCoordinates().getLongitude())
-                    .build())
+                .setLatitude(observation.getCamera().getLatitude())
+                .setLongitude(observation.getCamera().getLongitude())
                 .build())
             .setObservation(Silo.Observation.newBuilder()
                 .setIdentifier(observation.getIdentifier())
@@ -29,14 +26,8 @@ public class Converter {
     public static Silo.Camera convertToMessage(Camera camera) {
         return Silo.Camera.newBuilder()
             .setName(camera.getName())
-            .setCoordinates(convertToMessage(camera.getCoordinates()))
-            .build();
-    }
-
-    public static Silo.Coordinates convertToMessage(Coordinates coordinates) {
-        return Silo.Coordinates.newBuilder()
-            .setLatitude(coordinates.getLatitude())
-            .setLongitude(coordinates.getLongitude())
+            .setLatitude(camera.getLatitude())
+            .setLongitude(camera.getLongitude())
             .build();
     }
 }

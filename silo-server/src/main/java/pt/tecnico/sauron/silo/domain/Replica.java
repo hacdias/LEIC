@@ -22,7 +22,6 @@ public class Replica implements Closeable {
 
     private final SauronGrpc.SauronBlockingStub stub;
     private final ManagedChannel channel;
-    private final String target;
 
     private static final Logger LOGGER = Logger.getLogger(Replica.class.getName());
 
@@ -34,7 +33,6 @@ public class Replica implements Closeable {
     public Replica (Integer currentInstance, Integer instance, String target) {
         this.currentInstance = currentInstance;
         this.instance = instance;
-        this.target = target;
 
         channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
         stub = SauronGrpc.newBlockingStub(channel);
@@ -72,14 +70,10 @@ public class Replica implements Closeable {
     private Silo.Log getCameraLog (ReplicaLog log) {
         Camera burraNasCouves = log.getCamera();
 
-        Silo.Coordinates coordinates = Silo.Coordinates.newBuilder()
-            .setLatitude(burraNasCouves.getCoordinates().getLatitude())
-            .setLongitude(burraNasCouves.getCoordinates().getLongitude())
-            .build();
-
         Silo.Camera camera = Silo.Camera.newBuilder()
             .setName(burraNasCouves.getName())
-            .setCoordinates(coordinates)
+            .setLatitude(burraNasCouves.getLatitude())
+            .setLongitude(burraNasCouves.getLongitude())
             .build();
 
         return Silo.Log.newBuilder()

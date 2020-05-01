@@ -40,7 +40,7 @@ public class Options {
     }
 
     public String getInstanceTarget (Integer n) {
-        return getHost() + ":" + Integer.toString(getBasePort() + n);
+        return getHost() + ":" + (getBasePort() + n);
     }
 
     public String getStorageFile() {

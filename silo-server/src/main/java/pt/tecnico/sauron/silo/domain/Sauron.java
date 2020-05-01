@@ -38,7 +38,7 @@ public class Sauron {
         throws InvalidCameraNameException, InvalidCameraCoordinatesException {
 
         Camera camera = getCamera(prev, name).getCamera();
-        if (camera != null && (!camera.getCoordinates().getLatitude().equals(latitude) || !camera.getCoordinates().getLongitude().equals(longitude))) {
+        if (camera != null && (!camera.getLatitude().equals(latitude) || !camera.getLongitude().equals(longitude))) {
             // In this case, we have a duplicate camera, i.e., a camera with the same name and different coordinates.
             // In the worst case scenario, we add a duplicate camera to the replica, but we can check that on the
             // ReplicaManager.
@@ -50,22 +50,14 @@ public class Sauron {
             return new ReplicaResponse(prev);
         }
 
-        Coordinates coordinates = new Coordinates(latitude, longitude);
-        camera = new Camera(name, coordinates);
+        camera = new Camera(name, latitude, longitude);
         return replicaManager.addCamera(prev, uuid, camera);
     }
 
     public ReplicaResponse getCamera(List<Integer> prev, String name) {
         ReplicaResponse req = replicaManager.getCameras(prev);
         ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
-
-        for (Camera cam : req.getCameras()) {
-            if (cam.getName().equals(name)) {
-                res.setCamera(cam);
-                break;
-            }
-        }
-
+        res.setCamera(req.getCameras().getOrDefault(name, null));
         return res;
     }
 

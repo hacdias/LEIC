@@ -1,8 +1,6 @@
 package pt.tecnico.sauron.silo.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ReplicaManager {
@@ -17,7 +15,7 @@ public class ReplicaManager {
     // This is the data we want to keep in sync with other replicas.
     private final List<Integer> valueTimestamp = Collections.synchronizedList(new ArrayList<>());
     private final List<Observation> observations = Collections.synchronizedList(new ArrayList<>());
-    private final List<Camera> cameras = Collections.synchronizedList(new ArrayList<>());
+    private final Map<String, Camera> cameras = Collections.synchronizedMap(new HashMap<>());
 
     // The update information!
     private final List<Integer> replicaTimestamp = Collections.synchronizedList(new ArrayList<>());
@@ -165,6 +163,7 @@ public class ReplicaManager {
             for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (tableTimestamps.get(i).get(c) < r.getTimestamp().get(c)) {
                     canRemove = false;
+                    break;
                 }
             }
 
@@ -215,7 +214,7 @@ public class ReplicaManager {
 
     private void executeAux (ReplicaLog r) {
         if (r.getCamera() != null) {
-            this.cameras.add(r.getCamera());
+            this.cameras.put(r.getCamera().getName(), r.getCamera());
             LOGGER.info("Camera added to the stable value: " + r.getCamera().toString());
         } else if (r.getObservations() != null) {
             if (r.getObservations().isEmpty()) {
@@ -224,17 +223,12 @@ public class ReplicaManager {
             }
 
             String cameraName = r.getObservations().get(0).getCameraName();
-            Camera camera = null;
-
-            for (Camera cam : cameras) {
-                if (cam.getName().equals(cameraName)) {
-                    camera = cam;
-                    break;
-                }
-            }
+            Camera camera = cameras.getOrDefault(cameraName, null);
 
             if (camera == null) {
-                LOGGER.severe("Camera " + cameraName + "does not exist. THIS SHOULD NOT HAPPEN");
+                // NOTE: this must not happen. If it does, there is some _big_ error on the code.
+                // At this point, the cameras map must be correctly synchronized.
+                LOGGER.severe("Camera " + cameraName + "does not exist.");
                 return;
             }
 

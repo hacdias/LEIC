@@ -16,11 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import pt.tecnico.sauron.silo.client.domain.Camera;
-import pt.tecnico.sauron.silo.client.domain.Coordinates;
 import pt.tecnico.sauron.silo.client.domain.Observation;
 import pt.tecnico.sauron.silo.client.domain.ObservationType;
 import pt.tecnico.sauron.silo.client.domain.SiloFrontend;
-import pt.tecnico.sauron.silo.client.exceptions.DuplicateCameraException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraCoordinatesException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraException;
 import pt.tecnico.sauron.silo.client.exceptions.InvalidCameraNameException;
@@ -94,10 +92,10 @@ public class SiloIT extends BaseIT {
 		Double longitude = 50.94;
 
 		api.camJoin(name, latitude, longitude);
-		Coordinates coordinates = api.camInfo(name);
+		Camera camera = api.camInfo(name);
 
-		assertEquals(coordinates.getLatitude(), latitude, "correct latitude");
-		assertEquals(coordinates.getLongitude(), longitude, "correct longitude");
+		assertEquals(camera.getLatitude(), latitude, "correct latitude");
+		assertEquals(camera.getLongitude(), longitude, "correct longitude");
 	}
 
 	@Test
@@ -110,8 +108,7 @@ public class SiloIT extends BaseIT {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera camera = new Camera(camName, coordinates);
+		Camera camera = new Camera(camName, latitude, longitude);
 		api.camJoin(camName, latitude, longitude);
 
 		List<Observation> observations = new ArrayList<>();
@@ -132,8 +129,7 @@ public class SiloIT extends BaseIT {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera camera = new Camera(camName, coordinates);
+		Camera camera = new Camera(camName, latitude, longitude);
 		api.camJoin(camName, latitude, longitude);
 
 		List<String> identifiers = List.of("AAAA", "1A1");
@@ -153,8 +149,7 @@ public class SiloIT extends BaseIT {
 		String camName = "Camera1";
 		Double latitude = 45.0;
 		Double longitude = 45.0;
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera camera = new Camera(camName, coordinates);
+		Camera camera = new Camera(camName, latitude, longitude);
 		api.camJoin(camName, latitude, longitude);
 
 		List<String> identifiers = List.of("AAZZAA", "112211", "11A211", "1ABBCC", "11aa11");
@@ -176,8 +171,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;
@@ -206,16 +200,16 @@ public class SiloIT extends BaseIT {
 		assertTrue(personObservation.getDatetime().isAfter(observationPerson.getDatetime().minus(Duration.ofMillis(rtt))));
 		assertTrue(personObservation.getDatetime().isBefore(observationPerson.getDatetime().plus(Duration.ofMillis(rtt))));
 		assertEquals(name, personObservation.getCamera().getName());
-		assertEquals(latitude, personObservation.getCamera().getCoordinates().getLatitude());
-		assertEquals(longitude, personObservation.getCamera().getCoordinates().getLongitude());
+		assertEquals(latitude, personObservation.getCamera().getLatitude());
+		assertEquals(longitude, personObservation.getCamera().getLongitude());
 
 		assertEquals(observationCar.getIdentifier(), carObservation.getIdentifier());
 		assertEquals(observationCar.getType(), carObservation.getType());
 		assertTrue(carObservation.getDatetime().isAfter(observationCar.getDatetime().minus(Duration.ofMillis(rtt))));
 		assertTrue(carObservation.getDatetime().isBefore(observationCar.getDatetime().plus(Duration.ofMillis(rtt))));
 		assertEquals(name, carObservation.getCamera().getName());
-		assertEquals(latitude, carObservation.getCamera().getCoordinates().getLatitude());
-		assertEquals(longitude, carObservation.getCamera().getCoordinates().getLongitude());
+		assertEquals(latitude, carObservation.getCamera().getLatitude());
+		assertEquals(longitude, carObservation.getCamera().getLongitude());
 	}
 
 	@Test
@@ -224,8 +218,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;
@@ -256,8 +249,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;
@@ -287,8 +279,8 @@ public class SiloIT extends BaseIT {
 		assertTrue(personObservations.get(0).getDatetime().isAfter(observationPerson.getDatetime().minus(Duration.ofMillis(rtt))));
 		assertTrue(personObservations.get(0).getDatetime().isBefore(observationPerson.getDatetime().plus(Duration.ofMillis(rtt))));
 		assertEquals(name, personObservations.get(0).getCamera().getName());
-		assertEquals(latitude, personObservations.get(0).getCamera().getCoordinates().getLatitude());
-		assertEquals(longitude, personObservations.get(0).getCamera().getCoordinates().getLongitude());
+		assertEquals(latitude, personObservations.get(0).getCamera().getLatitude());
+		assertEquals(longitude, personObservations.get(0).getCamera().getLongitude());
 
 		assertEquals(1, carObservations.size());
 		assertEquals(observationCar.getIdentifier(), carObservations.get(0).getIdentifier());
@@ -296,8 +288,8 @@ public class SiloIT extends BaseIT {
 		assertTrue(carObservations.get(0).getDatetime().isAfter(observationCar.getDatetime().minus(Duration.ofMillis(rtt))));
 		assertTrue(carObservations.get(0).getDatetime().isBefore(observationCar.getDatetime().plus(Duration.ofMillis(rtt))));
 		assertEquals(name, carObservations.get(0).getCamera().getName());
-		assertEquals(latitude, carObservations.get(0).getCamera().getCoordinates().getLatitude());
-		assertEquals(longitude, carObservations.get(0).getCamera().getCoordinates().getLongitude());
+		assertEquals(latitude, carObservations.get(0).getCamera().getLatitude());
+		assertEquals(longitude, carObservations.get(0).getCamera().getLongitude());
 	}
 
 	@Test
@@ -306,8 +298,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;
@@ -321,7 +312,7 @@ public class SiloIT extends BaseIT {
 		datetime = LocalDateTime.now();
 
 		Observation observationCar = new Observation(cam, type, identifier, datetime);
-		List<Observation> observations = new ArrayList<Observation>();
+		List<Observation> observations = new ArrayList<>();
 
 		observations.add(observationPerson);
 		observations.add(observationCar);
@@ -337,8 +328,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;
@@ -373,10 +363,10 @@ public class SiloIT extends BaseIT {
 		assertTrue(personObservations.get(0).getDatetime().isBefore(observationPerson2.getDatetime().plus(Duration.ofMillis(rtt))));
 		assertEquals(name, personObservations.get(0).getCamera().getName());
 		assertEquals(name, personObservations.get(1).getCamera().getName());
-		assertEquals(latitude, personObservations.get(0).getCamera().getCoordinates().getLatitude());
-		assertEquals(latitude, personObservations.get(1).getCamera().getCoordinates().getLatitude());
-		assertEquals(longitude, personObservations.get(0).getCamera().getCoordinates().getLongitude());
-		assertEquals(longitude, personObservations.get(1).getCamera().getCoordinates().getLongitude());
+		assertEquals(latitude, personObservations.get(0).getCamera().getLatitude());
+		assertEquals(latitude, personObservations.get(1).getCamera().getLatitude());
+		assertEquals(longitude, personObservations.get(0).getCamera().getLongitude());
+		assertEquals(longitude, personObservations.get(1).getCamera().getLongitude());
 	}
 
 	@Test
@@ -385,8 +375,7 @@ public class SiloIT extends BaseIT {
 		Double latitude = -35.45;
 		Double longitude = 66.16;
 
-		Coordinates coordinates = new Coordinates(latitude, longitude);
-		Camera cam = new Camera(name, coordinates);
+		Camera cam = new Camera(name, latitude, longitude);
 		api.camJoin(name, latitude, longitude);
 
 		ObservationType type = ObservationType.PERSON;

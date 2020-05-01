@@ -46,8 +46,7 @@ public class EyeApp {
                 System.exit(1);
             }
 
-            Coordinates coordinates = new Coordinates(coordinatesLatitude, coordinatesLongitude);
-            camera = new Camera(cameraName, coordinates);
+            camera = new Camera(cameraName, coordinatesLatitude, coordinatesLongitude);
 
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();

@@ -33,8 +33,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         try {
             Silo.Camera cam = request.getCamera();
-            Silo.Coordinates coordinates = cam.getCoordinates();
-            ReplicaResponse res = sauron.addCamera(prev, request.getUuid(), cam.getName(), coordinates.getLatitude(),coordinates.getLongitude());
+            ReplicaResponse res = sauron.addCamera(prev, request.getUuid(), cam.getName(), cam.getLatitude(),cam.getLongitude());
 
             if (res == null) {
                 builder.setTimestamp(convertTimestamp(prev));
@@ -63,7 +62,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         if (res.getCamera() == null) {
             builder.setStatus(Silo.ResponseStatus.INVALID_CAMERA);
         } else {
-            builder.setCoordinates(Converter.convertToMessage(res.getCamera().getCoordinates()));
+            builder.setCamera(Converter.convertToMessage(res.getCamera()));
         }
 
         builder.setTimestamp(convertTimestamp(res.getTimestamp()));
@@ -171,7 +170,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         ReplicaResponse res = sauron.ctrlPing(prev);
         builder.setTimestamp(convertTimestamp(res.getTimestamp()));
 
-        List<Silo.Camera> cameras = res.getCameras().stream()
+        List<Silo.Camera> cameras = res.getCameras().values().stream()
             .map(Converter::convertToMessage)
             .collect(Collectors.toList());
         builder.addAllCameras(cameras);
@@ -222,8 +221,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
                 List<Integer> lts = l.getTimestamp().getValueList();
 
                 if (l.hasCamera()) {
-                    Coordinates coordinates = new Coordinates(l.getCamera().getCoordinates().getLatitude(), l.getCamera().getCoordinates().getLongitude());
-                    Camera camera = new Camera(l.getCamera().getName(), coordinates);
+                    Camera camera = new Camera(l.getCamera().getName(), l.getCamera().getLatitude(), l.getCamera().getLongitude());
                     log.add(new ReplicaLog(l.getInstance(), prev, lts, l.getUuid(), camera));
                 } else if (!l.getObservationsList().isEmpty()) {
                     List<Observation> observations = new ArrayList<>();

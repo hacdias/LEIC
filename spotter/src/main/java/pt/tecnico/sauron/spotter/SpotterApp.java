@@ -177,8 +177,8 @@ public class SpotterApp {
                 observation.getIdentifier(),
                 observation.getDatetime().format(DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss")),
                 observation.getCamera().getName(),
-                observation.getCamera().getCoordinates().getLatitude(),
-                observation.getCamera().getCoordinates().getLongitude()
+                observation.getCamera().getLatitude(),
+                observation.getCamera().getLongitude()
             );
         }
     }

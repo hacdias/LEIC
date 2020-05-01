@@ -3,29 +3,36 @@ package pt.tecnico.sauron.silo.client.domain;
 import pt.tecnico.sauron.silo.grpc.Silo;
 
 public class Camera {
-    private String name;
-    private Coordinates coordinates;
+    private final String name;
+    private final Double latitude;
+    private final Double longitude;
 
-    public Camera(String name, Coordinates coordinates) {
+    public Camera(String name, Double latitude, Double longitude) {
         this.name = name;
-        this.coordinates = coordinates;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Camera(Silo.Camera camera) {
         this.name = camera.getName();
-        this.coordinates = new Coordinates(camera.getCoordinates());
+        this.latitude = camera.getLatitude();
+        this.longitude = camera.getLongitude();
     }
 
     public String getName() {
         return name;
     }
 
-    public Coordinates getCoordinates() {
-        return coordinates;
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
     }
 
     @Override
     public String toString() {
-        return "Camera(" + name + ")@" + coordinates.toString();
+        return "Camera(" + name + ")@" + "(" + latitude + "," + longitude + ")";
     }
 }

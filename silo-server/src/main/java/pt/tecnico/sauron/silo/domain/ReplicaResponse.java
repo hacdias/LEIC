@@ -1,13 +1,15 @@
 package pt.tecnico.sauron.silo.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReplicaResponse {
     private List<Integer> timestamp;
     private Observation observation;
     private Camera camera;
-    private List<Camera> cameras = new ArrayList<>();
+    private Map<String,Camera> cameras = new HashMap<>();
     private List<Observation> observations = new ArrayList<>();
 
     public ReplicaResponse(List<Integer> timestamp) {
@@ -22,8 +24,8 @@ public class ReplicaResponse {
         this.observation = observation;
     }
 
-    public void setCameras(List<Camera> cameras) {
-        this.cameras = new ArrayList<>(cameras);
+    public void setCameras(Map<String,Camera> cameras) {
+        this.cameras = new HashMap<>(cameras);
     }
 
     public void setObservations(List<Observation> observations) {
@@ -42,7 +44,7 @@ public class ReplicaResponse {
         return camera;
     }
 
-    public List<Camera> getCameras() {
+    public Map<String, Camera> getCameras() {
         return cameras;
     }
 

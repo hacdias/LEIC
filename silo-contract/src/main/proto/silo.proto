@@ -31,14 +31,10 @@ message Observation {
     string cameraName = 4;
 }
 
-message Coordinates {
-    double latitude = 1;
-    double longitude = 2;
-}
-
 message Camera {
     string name = 1;
-    Coordinates coordinates = 2;
+    double latitude = 2;
+    double longitude = 3;
 }
 
 message ObservationInfo {
@@ -63,7 +59,7 @@ message CamInfoRequest {
 }
 
 message CamInfoResponse {
-    Coordinates coordinates = 1;
+    Camera camera = 1;
     ResponseStatus status = 2;
     Timestamp timestamp = 3;
 }
