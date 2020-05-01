@@ -80,6 +80,7 @@ class UpdateSuggestionTest extends Specification {
         def option = new Option()
         option.setContent(OPTION_CONTENT)
         option.setCorrect(true)
+        option.setSequence(0)
         option.setQuestion(question)
 
         question.setCourse(course)
