@@ -48,7 +48,14 @@ We do not tolerate all other faults not mentioned above.
 ## Solution
 
 ![Diagram Get](diagram_get.png)
+
+> Read Request Diagram
+
 ![Diagram Update](diagram_update.png)
+
+> Update Request Diagram
+
+For our solution, we decided to implement the Gossip protocol (described [bellow](#replication-protocol)) with a Front End, that is the library that clients must use to connect with the server and a server composed by three main classes: `SiloServer`, `Sauron` and a `ReplicaManager`. The Front End contacts with a `SiloServer`, which unpacks the [GRPC](https://grpc.io/) calls into a `Sauron` request which, in turn, makes the data requests to the `ReplicaManager`. Then, every 30 seconds, each `ReplicaManager` contacts with other Replica, sending them gossips 💬.
 
 ## Replication Protocol
 
