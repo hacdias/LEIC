@@ -36,7 +36,6 @@ export default class TournamentView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
-
       this.tournaments = await RemoteServices.getOpenTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -54,14 +53,18 @@ export default class TournamentView extends Vue {
   }
 
   updateTournament(updatedTournament: Tournament) {
-    this.tournaments = this.tournaments.filter(tournament => tournament.id !== updatedTournament.id);
+    this.tournaments = this.tournaments.filter(
+      tournament => tournament.id !== updatedTournament.id
+    );
     this.tournaments.unshift(updatedTournament);
     this.editMode = false;
     this.tournament = null;
   }
 
   deleteTournament(tournamentId: number) {
-    this.tournaments = this.tournaments.filter(tournament => tournament.id !== tournamentId);
+    this.tournaments = this.tournaments.filter(
+      tournament => tournament.id !== tournamentId
+    );
   }
 
   newTournament() {
