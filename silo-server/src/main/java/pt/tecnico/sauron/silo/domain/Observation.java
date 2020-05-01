@@ -12,7 +12,6 @@ public class Observation implements Serializable {
     private final String identifier;
     private final String cameraName;
     private final LocalDateTime datetime;
-    private Camera camera;
 
     public Observation(String cameraName, ObservationType type, String identifier, LocalDateTime datetime) throws InvalidIdentifierException {
         this.type = type;
@@ -46,16 +45,8 @@ public class Observation implements Serializable {
         return identifier;
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
-
     public String getCameraName() {
         return cameraName;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
     }
 
     @Override

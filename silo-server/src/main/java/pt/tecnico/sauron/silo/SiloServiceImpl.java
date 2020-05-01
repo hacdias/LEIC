@@ -82,7 +82,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         if (res.getObservation() == null) {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
         } else {
-            Silo.ObservationInfo observationInfo = Converter.convertToMessage(res.getObservation());
+            Silo.ObservationInfo observationInfo = Converter.convertToMessage(res.getObservation(), res.getCameras());
             builder.setObservation(observationInfo);
         }
 
@@ -104,7 +104,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
         } else {
             List<Silo.ObservationInfo> observationsInfo = res.getObservations().stream()
-                .map(Converter::convertToMessage)
+                .map(observation -> Converter.convertToMessage(observation, res.getCameras()))
                 .collect(Collectors.toList());
 
             builder.addAllObservations(observationsInfo);
@@ -127,7 +127,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
             builder.setStatus(Silo.ResponseStatus.NO_OBSERVATION_FOUND);
         } else {
             List<Silo.ObservationInfo> observationInfos = res.getObservations().stream()
-                .map(Converter::convertToMessage)
+                .map(observation -> Converter.convertToMessage(observation, res.getCameras()))
                 .collect(Collectors.toList());
 
             builder.addAllObservations(observationInfos);
@@ -176,7 +176,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         builder.addAllCameras(cameras);
 
         List<Silo.ObservationInfo> observations = res.getObservations().stream()
-            .map(Converter::convertToMessage)
+            .map(observation -> Converter.convertToMessage(observation, res.getCameras()))
             .collect(Collectors.toList());
         builder.addAllObservations(observations);
 

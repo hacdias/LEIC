@@ -62,7 +62,7 @@ public class Sauron {
     }
 
     public ReplicaResponse track(List<Integer> prev, ObservationType type, String identifier) {
-        ReplicaResponse req = replicaManager.getObservations(prev);
+        ReplicaResponse req = replicaManager.getAll(prev);
         ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
 
         Observation lastObservation = req.getObservations().stream()
@@ -71,11 +71,12 @@ public class Sauron {
             .orElse(null);
 
         res.setObservation(lastObservation);
+        res.setCameras(req.getCameras());
         return res;
     }
 
     public ReplicaResponse trackMatch(List<Integer> prev, ObservationType type, String pattern) {
-        ReplicaResponse req = replicaManager.getObservations(prev);
+        ReplicaResponse req = replicaManager.getAll(prev);
         ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
 
         String regex = buildRegex(type, pattern);
@@ -93,11 +94,12 @@ public class Sauron {
             .collect(Collectors.toList());
 
         res.setObservations(firstMatches);
+        res.setCameras(req.getCameras());
         return res;
     }
 
     public ReplicaResponse trace(List<Integer> prev, ObservationType type, String identifier) {
-        ReplicaResponse req = replicaManager.getObservations(prev);
+        ReplicaResponse req = replicaManager.getAll(prev);
         ReplicaResponse res = new ReplicaResponse(req.getTimestamp());
 
         List<Observation> observationsMatch = req.getObservations().stream()
@@ -106,6 +108,7 @@ public class Sauron {
             .collect(Collectors.toList());
 
         res.setObservations(observationsMatch);
+        res.setCameras(req.getCameras());
         return res;
     }
 

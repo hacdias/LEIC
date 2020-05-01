@@ -233,7 +233,6 @@ public class ReplicaManager {
             }
 
             for (Observation observation : r.getObservations()) {
-                observation.setCamera(camera);
                 this.observations.add(observation);
                 LOGGER.info("Observation added to the stable value: " + observation.toString());
             }
