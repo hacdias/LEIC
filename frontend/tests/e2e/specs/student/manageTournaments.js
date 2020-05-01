@@ -1,18 +1,18 @@
 describe('Tournament walkthrough', () => {
   beforeEach(() => {
-    cy.demoStudentLogin()
-    cy.navigateTournaments()
-  })
+    cy.demoStudentLogin();
+    cy.navigateTournaments();
+  });
 
   afterEach(() => {
-    cy.contains('Logout').click()
-  })
+    cy.contains('Logout').click();
+  });
 
   it('login sees and creates a tournament', () => {
-    cy.createTournament('Test-Tournament', '3')
-  })
+    cy.createTournament('Test-Tournament', '3');
+  });
 
   it('login sees and enrolls a tournament', () => {
-    cy.enrollTournament()
-  })
+    cy.enrollTournament();
+  });
 });

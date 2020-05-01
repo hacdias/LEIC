@@ -1,5 +1,5 @@
 <template>
- <v-card v-if="editMode && tournament" class="table">
+  <v-card v-if="editMode && tournament" class="table">
     <v-card-title>
       <span>New Tournament</span>
 
@@ -9,17 +9,32 @@
         {{ editMode ? 'Close' : 'Create' }}
       </v-btn>
 
-      <v-btn color="primary" data-cy="saveTournamentButton" dark v-if="editMode && canSave" @click="save"
+      <v-btn
+        color="primary"
+        data-cy="saveTournamentButton"
+        dark
+        v-if="editMode && canSave"
+        @click="save"
         >Save</v-btn
       >
     </v-card-title>
     <v-card-text>
       <v-row>
         <v-col cols="12" sm="10">
-          <v-text-field v-model="tournament.title" label="*Title" data-cy="Title"/>
+          <v-text-field
+            v-model="tournament.title"
+            label="*Title"
+            data-cy="Title"
+          />
         </v-col>
         <v-col cols="12" sm="2">
-          <v-text-field v-model="tournament.numberQuestions" label="*Number of Questions" type="number" min="1" data-cy="numberQuestions"/>
+          <v-text-field
+            v-model="tournament.numberQuestions"
+            label="*Number of Questions"
+            type="number"
+            min="1"
+            data-cy="numberQuestions"
+          />
         </v-col>
       </v-row>
       <v-row>
@@ -60,7 +75,8 @@
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
       >
         <template v-slot:item.topics="{ item }">
-          <span v-for="topic in item.topics" :key="topic.id">           //check if topic or TournamentTopic
+          <span v-for="topic in item.topics" :key="topic.id">
+            //check if topic or TournamentTopic
             {{ topic.name }}
           </span>
         </template>
@@ -68,7 +84,12 @@
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom v-if="!tournamentTopics.includes(item)">
             <template v-slot:activator="{ on }">
-              <v-icon small class="mr-2" v-on="on" @click="addToTournament(item)">
+              <v-icon
+                small
+                class="mr-2"
+                v-on="on"
+                @click="addToTournament(item)"
+              >
                 add</v-icon
               >
             </template>
@@ -109,7 +130,6 @@ export default class TournamentForm extends Vue {
   topics: Topic[] = [];
   search: string = '';
   tournamentTopics: Topic[] = [];
-
 
   headers: object = [
     {
@@ -157,7 +177,9 @@ export default class TournamentForm extends Vue {
   async save() {
     try {
       this.tournament.topics = this.tournamentTopics;
-      let updatedTournament = await RemoteServices.saveTournament(this.tournament);
+      let updatedTournament = await RemoteServices.saveTournament(
+        this.tournament
+      );
       this.tournament.enrolled = true;
       this.cleanTournamentTopics();
       this.$emit('updateTournament', updatedTournament);
@@ -187,10 +209,7 @@ export default class TournamentForm extends Vue {
   cleanTournamentTopics() {
     this.tournamentTopics = [];
   }
-
 }
 </script>
 
 <style lang="scss" scoped></style>
-
-
