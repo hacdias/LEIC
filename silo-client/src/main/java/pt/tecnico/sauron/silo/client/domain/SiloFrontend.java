@@ -11,7 +11,6 @@ import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
 import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 import pt.ulisboa.tecnico.sdis.zk.ZKRecord;
 
-import javax.sound.midi.Track;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -56,13 +55,15 @@ public class SiloFrontend implements AutoCloseable {
         cache.put(req, data);
     }
 
-    private Object getObjectOrDefault (Request req, List<Integer> timestamp, Object response) {
-        if (cache.containsKey(req) && isTimestampOlder(timestamp)) {
-            return cache.get(req);
-        } else {
-            putInCache(req, response);
-            return response;
+    private Object getObjectOrDefault (Request req, List<Integer> timestamp, List<Integer> other, Object response) {
+        if (cache.containsKey(req)) {
+            if (isTimestampOlder(timestamp, other)) {
+                return cache.get(req);
+            }
         }
+
+        putInCache(req, response);
+        return response;
     }
 
     private void connectToReplica(Integer instance) throws ZKNamingException, SauronClientException {
@@ -70,7 +71,7 @@ public class SiloFrontend implements AutoCloseable {
         ZKRecord record = null;
 
         if (instance != -1) {
-            path += "/" + Integer.toString(instance);
+            path += "/" + instance;
             record = zkNaming.lookup(path);
         } else {
             Collection<ZKRecord> available = zkNaming.listRecords(path);
@@ -117,9 +118,9 @@ public class SiloFrontend implements AutoCloseable {
         }
     }
 
-    private boolean isTimestampOlder (List<Integer> timestamp) {
+    private boolean isTimestampOlder (List<Integer> timestamp, List<Integer> other) {
         for (int i = 0; i < timestamp.size(); i++) {
-            if (timestamp.get(i) < this.timestamp.get(i)) {
+            if (timestamp.get(i) < other.get(i)) {
                 return true;
             }
         }
@@ -223,7 +224,8 @@ public class SiloFrontend implements AutoCloseable {
             return camInfo(name);
         }
 
-        response = (CamInfoResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
+
+        response = (CamInfoResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response.getTimestamp().getValueList(), response);
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
         return new Camera(response.getCamera());
@@ -289,7 +291,7 @@ public class SiloFrontend implements AutoCloseable {
             return track(type, identifier);
         }
 
-        response = (TrackResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
+        response = (TrackResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response.getTimestamp().getValueList(), response);
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
@@ -317,7 +319,7 @@ public class SiloFrontend implements AutoCloseable {
             return trackMatch(type, pattern);
         }
 
-        response = (TrackMatchResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
+        response = (TrackMatchResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response.getTimestamp().getValueList(), response);
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
@@ -349,7 +351,8 @@ public class SiloFrontend implements AutoCloseable {
             return trace(type, identifier);
         }
 
-        response = (TraceResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response);
+        response = (TraceResponse)getObjectOrDefault(r, response.getTimestamp().getValueList(), response.getTimestamp().getValueList(), response);
+
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
