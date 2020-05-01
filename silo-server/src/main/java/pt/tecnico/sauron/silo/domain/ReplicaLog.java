@@ -56,4 +56,16 @@ public class ReplicaLog implements Serializable {
     public String getUuid() {
         return uuid;
     }
+
+    @Override
+    public String toString() {
+        return "ReplicaLog{" +
+            "instance=" + instance +
+            ", prev=" + prev +
+            ", timestamp=" + timestamp +
+            ", uuid='" + uuid + '\'' +
+            ", camera=" + (camera == null ? "NO CAM " : camera.toString()) +
+            ", observations=" + (observations == null ? "NO OBS": observations.toString()) +
+            '}';
+    }
 }

@@ -29,7 +29,8 @@
 		<numberServers>2</numberServers>
 
 		<gossipFrequency>30000</gossipFrequency>
-		<storagePath>data/</storagePath>
+		<storagePath>data</storagePath>
+		<storageFile>${storagePath}/${instance}.data</storageFile>
 	</properties>
 
 	<dependencies>
@@ -93,7 +94,7 @@
 						<argument>${server.path}</argument>
 						<argument>${numberServers}</argument>
 						<argument>${gossipFrequency}</argument>
-						<argument>${storagePath}${instance}.data</argument>
+						<argument>${storageFile}</argument>
 					</arguments>
 				</configuration>
 			</plugin>

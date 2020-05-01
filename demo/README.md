@@ -28,5 +28,5 @@ please take a look at their READMEs!
 
 
 ```
-mvn compile exec:java -Dinstance=1 -DnumberServers=1
+mvn compile exec:java -Dinstance=1 -DnumberServers=1 -DstorageFile="ignore"
 ```

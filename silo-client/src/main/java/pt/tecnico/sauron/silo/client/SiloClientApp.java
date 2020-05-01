@@ -59,7 +59,7 @@ public class SiloClientApp {
                 System.out.flush();
                 input = scanner.nextLine();
             }
-        } catch (ZKNamingException e) {
+        } catch (ZKNamingException | SauronClientException e) {
             System.err.println("Could not connect to ZooKeeper");
             System.err.print(e.toString());
             System.exit(1);

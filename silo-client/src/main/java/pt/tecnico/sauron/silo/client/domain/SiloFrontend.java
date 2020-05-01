@@ -26,12 +26,14 @@ public class SiloFrontend implements AutoCloseable {
     private ManagedChannel channel;
     private SauronGrpc.SauronBlockingStub stub;
 
-    public SiloFrontend(String address, Integer port, Integer instance) throws ZKNamingException {
+    private Camera ourselves = null;
+
+    public SiloFrontend(String address, Integer port, Integer instance) throws ZKNamingException, SauronClientException {
         this.zkNaming = new ZKNaming(address, Integer.toString(port));
         connectToReplica(instance);
     }
 
-    private void connectToReplica(Integer instance) throws ZKNamingException {
+    private void connectToReplica(Integer instance) throws ZKNamingException, SauronClientException {
         String path = basePath;
         ZKRecord record = null;
 
@@ -55,6 +57,10 @@ public class SiloFrontend implements AutoCloseable {
         String target = record.getURI();
         channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
         stub = SauronGrpc.newBlockingStub(channel);
+
+        if (ourselves != null) {
+            camJoin(ourselves.getName(), ourselves.getLatitude(), ourselves.getLongitude());
+        }
     }
 
     private Silo.Timestamp buildTimestamp() {
@@ -153,6 +159,7 @@ public class SiloFrontend implements AutoCloseable {
 
         updateTimestamp(response.getTimestamp().getValueList());
         throwIfNotSuccess(response.getStatus());
+        ourselves = new Camera(name, latitude, longitude);
     }
 
     public Camera camInfo(String name) throws SauronClientException, ZKNamingException {

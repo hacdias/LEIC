@@ -32,7 +32,7 @@ public class SiloIT extends BaseIT {
 	public static Integer rtt;
 
 	@BeforeAll
-	public static void oneTimeSetUp() throws ZKNamingException {
+	public static void oneTimeSetUp() throws ZKNamingException, SauronClientException {
 		String host = testProps.getProperty("server.host");
 		Integer port = Integer.parseInt(testProps.getProperty("server.port"));
 		rtt = Integer.parseInt(testProps.getProperty("server.rtt"));

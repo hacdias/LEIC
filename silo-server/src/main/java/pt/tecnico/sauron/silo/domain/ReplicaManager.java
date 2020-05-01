@@ -48,20 +48,19 @@ public class ReplicaManager {
         this.updateThread = update(options);
         this.updateThread.start();
 
-
-        FileInputStream fis = null;
-        ObjectInputStream in = null;
         Store store = null;
-        try {
-            String filePath = options.getStorageFile();
-            File f = new File(filePath);
-            if (f.exists() && !f.isDirectory()) {
-                fis = new FileInputStream(filePath);
-                in = new ObjectInputStream(fis);
-                store = (Store) in.readObject();
+        if (!options.getStorageFile().equals("ignore")) {
+            try {
+                String filePath = options.getStorageFile();
+                File f = new File(filePath);
+                if (f.exists() && !f.isDirectory()) {
+                    FileInputStream fis = new FileInputStream(filePath);
+                    ObjectInputStream in = new ObjectInputStream(fis);
+                    store = (Store) in.readObject();
+                }
+            } catch (Exception ex) {
+                LOGGER.info("Could not read store: " + options.getStorageFile());
             }
-        } catch (Exception ex) {
-            LOGGER.info("Could not read store: " + options.getStorageFile());
         }
 
         if (store == null) {
@@ -90,6 +89,10 @@ public class ReplicaManager {
     }
 
     private void store () {
+        if (options.getStorageFile().equals("ignore")) {
+            return;
+        }
+
         try {
             File file = new File(options.getStorageFile());
             file.createNewFile();
@@ -209,18 +212,10 @@ public class ReplicaManager {
         LOGGER.info("Cleaning up logs...");
         List<ReplicaLog> toRemove = new ArrayList<>();
 
-        for (int i = 0; i < options.getTotalInstances(); i++) {
-            System.out.println(tableTimestamps.get(i).toString());
-        }
-
-        System.out.println("LOGS;::::::");
-
         for (ReplicaLog r : this.log) {
             int c = r.getInstance();
 
             boolean canRemove = true;
-
-            System.out.println(r.getTimestamp().toString());
 
             for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (tableTimestamps.get(i).get(c) < r.getTimestamp().get(c)) {
@@ -303,6 +298,12 @@ public class ReplicaManager {
     }
 
     private ReplicaResponse add (List<Integer> prev, String uuid, Camera camera, List<Observation> observations) {
+        if (prev == null || prev.size() != options.getTotalInstances()) {
+            prev = new ArrayList<>();
+            for (int i = 0; i < options.getTotalInstances(); i++) prev.add(0);
+        }
+
+
         List<Integer> newTimestamp = parsePrev(prev);
 
         synchronized (lock) {

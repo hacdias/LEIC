@@ -19,9 +19,10 @@ import java.util.stream.Collectors;
 public class Replica implements Closeable {
     private final Integer instance;
     private final Integer currentInstance;
+    private final String target;
 
-    private final SauronGrpc.SauronBlockingStub stub;
-    private final ManagedChannel channel;
+    private SauronGrpc.SauronBlockingStub stub;
+    private ManagedChannel channel;
 
     private static final Logger LOGGER = Logger.getLogger(Replica.class.getName());
 
@@ -33,6 +34,7 @@ public class Replica implements Closeable {
     public Replica (Integer currentInstance, Integer instance, String target) {
         this.currentInstance = currentInstance;
         this.instance = instance;
+        this.target = target;
 
         channel = ManagedChannelBuilder.forTarget(target).usePlaintext().build();
         stub = SauronGrpc.newBlockingStub(channel);
@@ -63,6 +65,12 @@ public class Replica implements Closeable {
             stub.gossip(gossip);
             LOGGER.info("Gossiped to instance " + instance.toString());
         } catch (io.grpc.StatusRuntimeException e) {
+            channel.shutdown();
+
+            // Recreate channel and stub.
+            channel = ManagedChannelBuilder.forTarget(this.target).usePlaintext().build();
+            stub = SauronGrpc.newBlockingStub(channel);
+
             LOGGER.info("Gossip error on instance " + instance.toString() + ": " + e.toString());
         }
     }
