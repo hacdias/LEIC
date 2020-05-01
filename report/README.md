@@ -1,5 +1,7 @@
 # Sauron Project Report
 
+[![DEI](dei.jpg)](https://dei.tecnico.ulisboa.pt)
+
 Distributed Systems 2019/2020, Second Semester
 
 ## Authors
