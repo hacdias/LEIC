@@ -10,6 +10,14 @@ git pull
 mvn clean install -DskipTests
 ```
 
+## Table of Contents
+
+- [Server Usage](#server-usage)
+- [Spotter Usage](#spotter-usage)
+- [Eye Usage](#eye-usage)
+- [Observing Gossips](#observing-gossips)
+- [Run Tests](#run-tests)
+
 ## Server Usage
 
 To run a _n_ number of replicas, you will need to first install the dependencies and make sure everything compiles. Then, navigate to `silo-server` and create a directory `data` where each of your replicas will be storing their state. This will allow us to shut down the replicas and restart them without losing consistency between them. You can read more on the [report](../report/README.md) for why we made this decision.
