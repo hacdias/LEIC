@@ -16,6 +16,21 @@ Distributed Systems 2019/2020, Second Semester
 
 ![Henrique Dias](henrique.png) ![Isabel Soares](isabel.png) ![Rodrigo Sousa](rodrigo.png)
 
+## Table of Contents
+
+- [Authors](#authors)
+- [First Part Improvements](#first-part-improvements)
+- [Fault Model](#fault-model)
+- [Solution](#solution)
+- [Replication Protocol](#replication-protocol)
+    + [Get Operations](#get-operations)
+    + [Add Operations](#add-operations)
+    + [Gossip Operations](#gossip-operations)
+- [Implementation Specifics](#implementation-specifics)
+    + [Log Clean Up](#log-clean-up)
+    + [Persistent Storage](#persistent-storage)
+    + [Client Consistent Reads](#client-consistent-reads)
+
 ## First Part Improvements
 
 - [Add tests for invalid camera names](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
@@ -24,9 +39,10 @@ Distributed Systems 2019/2020, Second Semester
 
 ## Fault Model
 
-- We don't tolerate bizantine faults.
-- We tolerate transient faults by the server meaning that if a server crashes (silently): the client reconnects with another server instance and that when the server comes back it will recover.
-- We don't tolerate all other faults not mentioned above.
+- We do not tolerate byzantine faults.
+- We tolerate transient faults by the server, i.e., if a server crashes silently, the client reconnects with another server instance and when the server comes back it will recover successfully.
+
+We do not tolerate all other faults not mentioned above.
 
 ## Solution
 
@@ -80,14 +96,13 @@ If the request is accepted, then we follow the algorithm:
 
 Otherwise, wait.
 
-### Gossip Operations (Sync)
+### Gossip Operations
 
 The gossip operations are required to ensure all replicas end up receiving all the information, eventually. By default, we send these messages every 30 seconds, which can be customized. On a gossip request, a replica _i_ sends to the replica _j_:
 
 - The instance number _i_;
 - The `sourceTimestamp`, which is the replica timestamp of replica _i_;
-- The logs records we estimate the replica _j_ does not have:
-  TODO: LINK
+- The logs records we estimate the replica _j_ does not have. [See bellow.](#client-consistent-reads)
   
 When the replica _j_ receives the gossip message from the replica _i_, it then proceeds as follows:
 
@@ -98,8 +113,7 @@ When the replica _j_ receives the gossip message from the replica _i_, it then p
     - Adds the record to its own record log.
 3. Updates `replicaTimestamp`, by executing `merge(sourceTimestamp, replicaTimestamp)`.
 4. Goes through the log and executes all stable operations.
-5. Finally, cleans up the log.
-TODO LINK
+5. Finally, cleans up the log. [See bellow.](#log-clean-up)
 
 ## Implementation Specifics
 
@@ -114,5 +128,4 @@ Since we cleanup the entry logs, we needed a way to persist the data. To do so, 
 ### Client Consistent Reads
 
 To avoid a client stumbling in a situation where they talk different replicas and getting the inconsistent results, we decided to implement a request-response cache. The cache stores the last _n_ requests and if we receive a request from a replica whose timestamp is older than what the client has previously seen, we return the cached value instead.
-
 
