@@ -24,7 +24,9 @@ Distributed Systems 2019/2020, Second Semester
 
 ## Fault Model
 
-_(que faltas são toleradas, que faltas não são toleradas)_
+- We don't tolerate bizantine faults.
+- We tolerate transient faults by the server meaning that if a server crashes (silently): the client reconnects with another server instance and that when the server comes back it will recover.
+- We don't tolerate all other faults not mentioned above.
 
 ## Solution
 
@@ -54,7 +56,12 @@ merge(tsA, tsB):
 
 ### Get Operations
 
-( TODO and include our modification )
+When a client wants to fetch a Camera information or Observations, it sends the `previous` timestamp as well as the request information. Then, the server proceeds as follows:
+
+1. Compares the `previous` timestamp with the `valueTimestamp` to see if we can safely read the value to ensure consistency, i.e., if `previous` <= `valueTimestamp`.
+2. If the previous condition is met, the server replies the required information.
+
+Otherwise, wait.
 
 ### Add Operations
 
@@ -80,7 +87,7 @@ The gossip operations are required to ensure all replicas end up receiving all t
 - The instance number _i_;
 - The `sourceTimestamp`, which is the replica timestamp of replica _i_;
 - The logs records we estimate the replica _j_ does not have:
-    - TODO: explain
+  TODO: LINK
   
 When the replica _j_ receives the gossip message from the replica _i_, it then proceeds as follows:
 
@@ -91,14 +98,21 @@ When the replica _j_ receives the gossip message from the replica _i_, it then p
     - Adds the record to its own record log.
 3. Updates `replicaTimestamp`, by executing `merge(sourceTimestamp, replicaTimestamp)`.
 4. Goes through the log and executes all stable operations.
-5. Finally, cleans up the log, freeing some space, by comparing every timestamp on the table of timestamps with each record's timestamp. Being `c` the number of the instance where the record was initially created, if the every timestamp's _c_ entry >= record's timestamp _c_ entry, then it means the record can be safely removed from the log since all replicas already received that information.
-
-**Note:** since we cleanup the entry logs, we assume that the replicas store their data on a persistent storage, i.e., a storage that does not lose data when the replica shuts down or fails. In order for this implementation to fully work, we need to persist our replica's data. A possible "solution" for this would be to avoid cleaning the changes log. However, that would have the downside of wasting memory, more than duplicating the memory required for all replicas.
+5. Finally, cleans up the log.
+TODO LINK
 
 ## Implementation Specifics
 
-_(Descrição de opções de implementação, incluindo otimizações e melhorias introduzidas)_
+### Log Clean Up
 
-## Final Remarks
+We decided to implement a log purge, freeing some space, by comparing every timestamp on the table of timestamps with each record's timestamp. Being `c` the number of the instance where the record was initially created, if the every timestamp's _c_ entry >= record's timestamp _c_ entry, then it means the record can be safely removed from the log since all replicas already received that information.
 
-_(Algo mais a dizer?)_
+### Persistent Storage
+
+Since we cleanup the entry logs, we needed a way to persist the data. To do so, we are using Java's native [Serialization library](https://docs.oracle.com/javase/10/docs/api/java/io/Serializable.html). Each replica has its own data file, allowing for transient faults or even complete shutdowns or restarts a replica. 
+
+### Client Consistent Reads
+
+To avoid a client stumbling in a situation where they talk different replicas and getting the inconsistent results, we decided to implement a request-response cache. The cache stores the last _n_ requests and if we receive a request from a replica whose timestamp is older than what the client has previously seen, we return the cached value instead.
+
+
