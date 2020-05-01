@@ -339,7 +339,7 @@ public class ReplicaManager {
                 r = new ReplicaLog(options.getInstance(), prev, newTimestamp, uuid, camera);
                 log.add(r);
             } else if (observations != null) {
-                LOGGER.info("Adding observations to log" + uuid);
+                LOGGER.info("Adding observations to log " + uuid);
                 r = new ReplicaLog(options.getInstance(), prev, newTimestamp, uuid, observations);
                 log.add(r);
             }
