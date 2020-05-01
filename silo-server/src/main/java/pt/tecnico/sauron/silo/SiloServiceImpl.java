@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
     private Sauron sauron;
 
-    public SiloServiceImpl(Integer instance, Integer numberServers, String host, Integer basePort) {
+    public SiloServiceImpl(Options options) {
         super();
-        this.sauron = new Sauron(instance, numberServers, host, basePort);
+        this.sauron = new Sauron(options);
     }
 
     private Silo.Timestamp convertTimestamp (List<Integer> timestamp) {

@@ -3,6 +3,7 @@ package pt.tecnico.sauron.silo;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import pt.tecnico.sauron.silo.domain.Options;
 import pt.ulisboa.tecnico.sdis.zk.ZKNaming;
 import pt.ulisboa.tecnico.sdis.zk.ZKNamingException;
 
@@ -26,6 +27,11 @@ public class SiloServerApp {
         final String path = args[5];
         final Integer numberServers = Integer.parseInt(args[6]);
 
+        final int updateFrequency = 1000 * 30; // TODO: make customizable.
+        final String storageFile = "/not/used/yet";
+
+        Options options = new Options(instance, numberServers, host, basePort, storageFile, updateFrequency);
+
         try {
             System.out.print("Connecting to zookeeper...");
             final ZKNaming zkNaming = new ZKNaming(zooHost, zooPort);
@@ -41,7 +47,7 @@ public class SiloServerApp {
                 }
             }));
 
-            final BindableService impl = new SiloServiceImpl(instance, numberServers, host, basePort);
+            final BindableService impl = new SiloServiceImpl(options);
 
             System.out.print("Server starting...");
             Server server = ServerBuilder.forPort(Integer.parseInt(port)).addService(impl).build();

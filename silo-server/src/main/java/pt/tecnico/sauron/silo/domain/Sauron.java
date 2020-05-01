@@ -10,21 +10,15 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Sauron {
-    private final Integer instance;
-    private final Integer totalInstances;
-    private final String host;
-    private final Integer basePort;
+    private final Options options;
     private ReplicaManager replicaManager;
 
     // TODO(add to report): control operations are not distributed since
     //  they're only used for testing purposes https://piazza.com/class/k6cbgwcjrk11og?cid=194
 
-    public Sauron (Integer instance, Integer totalInstances, String host, Integer basePort) {
-        this.instance = instance;
-        this.totalInstances = totalInstances;
-        this.host = host;
-        this.basePort = basePort;
-        replicaManager = new ReplicaManager(instance, totalInstances, host, basePort);
+    public Sauron (Options options) {
+        this.options = options;
+        replicaManager = new ReplicaManager(options);
     }
 
     public ReplicaResponse ctrlPing(List<Integer> prev) {
@@ -33,7 +27,7 @@ public class Sauron {
 
     public void ctrlClear() {
         replicaManager.close();
-        replicaManager = new ReplicaManager(instance, totalInstances, host, basePort);
+        replicaManager = new ReplicaManager(options);
     }
 
     public void ctrlInit() {

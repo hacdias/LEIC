@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class ReplicaManager {
-    private final Integer instance;
-    private final Integer numberServers;
+    private final Options options;
 
     private static final Logger LOGGER = Logger.getLogger(ReplicaManager.class.getName());
 
@@ -30,36 +29,35 @@ public class ReplicaManager {
     // The update thread that runs every X time.
     private final Thread updateThread;
 
-    public ReplicaManager(Integer instance, Integer numberServers, String host, Integer basePort) {
-        LOGGER.info(String.format("Replica manager created: instance %d; numberServers: %d", instance, numberServers));
+    public ReplicaManager(Options options) {
+        LOGGER.info("Replica manager created with options: " + options.toString());
 
-        this.instance = instance - 1;
-        this.numberServers = numberServers;
+        this.options = options;
         this.tableTimestamps = new ArrayList<>();
 
-        for (int i = 0; i < numberServers; i++) {
+        for (int i = 0; i < options.getTotalInstances(); i++) {
             this.replicaTimestamp.add(0);
             this.valueTimestamp.add(0);
         }
 
-        for (int i = 0; i < numberServers; i++) {
+        for (int i = 0; i < options.getTotalInstances(); i++) {
             this.tableTimestamps.add(new ArrayList<>(this.replicaTimestamp));
         }
 
-        this.tableTimestamps.set(this.instance, this.replicaTimestamp);
-        this.updateThread = update(1000 * 30, numberServers, host, basePort + 1);
+        this.tableTimestamps.set(options.getInstance(), this.replicaTimestamp);
+        this.updateThread = update(options);
         this.updateThread.start();
     }
 
-    private Thread update (Integer milliseconds, Integer numberServers, String host, Integer basePort) {
+    private Thread update (Options options) {
         return new Thread(() -> {
             List<Replica> replicas = new ArrayList<>();
 
-            for (int i = 0; i < numberServers; i++) {
-                if (i == this.instance) {
+            for (int i = 0; i < options.getTotalInstances(); i++) {
+                if (i == options.getInstance()) {
                     continue;
                 }
-                replicas.add(new Replica(this.instance, i, host + ":" + Integer.toString(basePort + i)));
+                replicas.add(new Replica(options.getInstance(), i, options.getInstanceTarget(i)));
             }
 
             while (true)  {
@@ -70,7 +68,7 @@ public class ReplicaManager {
                 }
 
                 try {
-                    Thread.sleep(milliseconds);
+                    Thread.sleep(options.getUpdateFrequency());
                 } catch (InterruptedException e) {
                     LOGGER.info("Thread interrupted.");
                     return;
@@ -120,7 +118,7 @@ public class ReplicaManager {
                 }
 
                 boolean add = false;
-                for (int i = 0; i < numberServers; i++) {
+                for (int i = 0; i < options.getTotalInstances(); i++) {
                     if (r.getTimestamp().get(i) > this.replicaTimestamp.get(i)) {
                         add = true;
                         break;
@@ -135,7 +133,7 @@ public class ReplicaManager {
                 }
             }
 
-            for (int i = 0; i < numberServers; i++) {
+            for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (sourceTimestamp.get(i) > this.replicaTimestamp.get(i)) {
                     this.replicaTimestamp.set(i, sourceTimestamp.get(i));
                 }
@@ -151,7 +149,7 @@ public class ReplicaManager {
         LOGGER.info("Cleaning up logs...");
         List<ReplicaLog> toRemove = new ArrayList<>();
 
-        for (int i = 0; i < numberServers; i++) {
+        for (int i = 0; i < options.getTotalInstances(); i++) {
             System.out.println(tableTimestamps.get(i).toString());
         }
 
@@ -164,7 +162,7 @@ public class ReplicaManager {
 
             System.out.println(r.getTimestamp().toString());
 
-            for (int i = 0; i < numberServers; i++) {
+            for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (tableTimestamps.get(i).get(c) < r.getTimestamp().get(c)) {
                     canRemove = false;
                 }
@@ -180,7 +178,7 @@ public class ReplicaManager {
     }
 
     private List<Integer> parsePrev (List<Integer> prev) {
-        if (prev == null || prev.size() != numberServers) {
+        if (prev == null || prev.size() != options.getTotalInstances()) {
             return new ArrayList<>(valueTimestamp);
         }
 
@@ -205,7 +203,7 @@ public class ReplicaManager {
             executeAux(r);
             operationsTable.add(r.getUuid());
 
-            for (int i = 0; i < numberServers; i++) {
+            for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (r.getTimestamp().get(i) > valueTimestamp.get(i)) {
                     valueTimestamp.set(i, r.getTimestamp().get(i));
                 }
@@ -265,18 +263,18 @@ public class ReplicaManager {
                 }
             }
 
-            this.replicaTimestamp.set(this.instance, this.replicaTimestamp.get(this.instance) + 1);
-            newTimestamp.set(this.instance, this.replicaTimestamp.get(this.instance));
+            this.replicaTimestamp.set(options.getInstance(), this.replicaTimestamp.get(options.getInstance()) + 1);
+            newTimestamp.set(options.getInstance(), this.replicaTimestamp.get(options.getInstance()));
 
             ReplicaLog r = null;
 
             if (camera != null) {
                 LOGGER.info("Adding camera to log: " + uuid);
-                r = new ReplicaLog(this.instance, prev, newTimestamp, uuid, camera);
+                r = new ReplicaLog(options.getInstance(), prev, newTimestamp, uuid, camera);
                 log.add(r);
             } else if (observations != null) {
                 LOGGER.info("Adding observations to log" + uuid);
-                r = new ReplicaLog(this.instance, prev, newTimestamp, uuid, observations);
+                r = new ReplicaLog(options.getInstance(), prev, newTimestamp, uuid, observations);
                 log.add(r);
             }
 
@@ -318,7 +316,7 @@ public class ReplicaManager {
 
     private void sortLog () {
         log.sort((r1, r2) -> {
-            for (int i = 0; i < this.numberServers; i++) {
+            for (int i = 0; i < options.getTotalInstances(); i++) {
                 if (r1.getPrev().get(i) < r2.getPrev().get(i)) {
                     return -1;
                 }
