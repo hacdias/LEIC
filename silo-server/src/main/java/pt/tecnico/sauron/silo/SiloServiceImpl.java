@@ -11,14 +11,9 @@ import pt.tecnico.sauron.silo.grpc.Silo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
-    private final Map<Silo.ObservationType, ObservationType> typesConverter = Map.ofEntries(
-        Map.entry(Silo.ObservationType.PERSON, ObservationType.PERSON),
-        Map.entry(Silo.ObservationType.CAR, ObservationType.CAR)
-    );
     private Sauron sauron;
 
     public SiloServiceImpl(Integer instance, Integer numberServers, String host, Integer basePort) {
@@ -82,7 +77,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         builder.setStatus(Silo.ResponseStatus.SUCCESS);
         List<Integer> prev = request.getTimestamp().getValueList();
 
-        ObservationType type = typesConverter.get(request.getType());
+        ObservationType type = ObservationType.fromSilo.get(request.getType());
         ReplicaResponse res = sauron.track(prev, type, request.getIdentifier());
 
         if (res.getObservation() == null) {
@@ -103,7 +98,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         builder.setStatus(Silo.ResponseStatus.SUCCESS);
         List<Integer> prev = request.getTimestamp().getValueList();
 
-        ObservationType type = typesConverter.get(request.getType());
+        ObservationType type = ObservationType.fromSilo.get(request.getType());
         ReplicaResponse res = sauron.trackMatch(prev, type, request.getPattern());
 
         if (res.getObservations().isEmpty()) {
@@ -126,7 +121,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
         builder.setStatus(Silo.ResponseStatus.SUCCESS);
         List<Integer> prev = request.getTimestamp().getValueList();
 
-        ObservationType type = typesConverter.get(request.getType());
+        ObservationType type = ObservationType.fromSilo.get(request.getType());
         ReplicaResponse res = sauron.trace(prev, type, request.getIdentifier());
 
         if (res.getObservations().isEmpty()) {
@@ -151,7 +146,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
 
         try {
             for (Silo.Observation observation : request.getObservationsList()) {
-                ObservationType type = typesConverter.get(observation.getType());
+                ObservationType type = ObservationType.fromSilo.get(observation.getType());
                 observations.add(new Observation(request.getCameraName(), type, observation.getIdentifier(), LocalDateTime.now()));
             }
 
@@ -233,7 +228,7 @@ public class SiloServiceImpl extends SauronGrpc.SauronImplBase {
                 } else if (!l.getObservationsList().isEmpty()) {
                     List<Observation> observations = new ArrayList<>();
                     for (Silo.Observation observation : l.getObservationsList()) {
-                        ObservationType type = typesConverter.get(observation.getType());
+                        ObservationType type = ObservationType.fromSilo.get(observation.getType());
                         Observation obs = new Observation(observation.getCameraName(), type, observation.getIdentifier(), LocalDateTime.now());
                         observations.add(obs);
                     }

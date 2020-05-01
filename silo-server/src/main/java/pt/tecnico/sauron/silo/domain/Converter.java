@@ -7,11 +7,6 @@ import java.time.ZoneOffset;
 import java.util.Map;
 
 public class Converter {
-    private static final Map<ObservationType, Silo.ObservationType> inverseTypeConverter = Map.ofEntries(
-        Map.entry(ObservationType.PERSON, Silo.ObservationType.PERSON),
-        Map.entry(ObservationType.CAR, Silo.ObservationType.CAR)
-    );
-
     public static Silo.ObservationInfo convertToMessage(Observation observation) {
         return Silo.ObservationInfo.newBuilder()
             .setCamera(Silo.Camera.newBuilder()
@@ -27,7 +22,7 @@ public class Converter {
                     .setSeconds(observation.getDatetime().toInstant(ZoneOffset.UTC).getEpochSecond())
                     .setNanos(observation.getDatetime().toInstant(ZoneOffset.UTC).getNano())
                     .build())
-                .setType(inverseTypeConverter.get(observation.getType())))
+                .setType(ObservationType.toSiloType.get(observation.getType())))
             .build();
     }
 
