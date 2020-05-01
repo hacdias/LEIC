@@ -47,9 +47,8 @@ We do not tolerate all other faults not mentioned above.
 
 ## Solution
 
-_(Figura da solução de tolerância a faltas)_
-
-_(Breve explicação da solução, suportada pela figura anterior)_
+![Diagram Get](diagram_get.png)
+![Diagram Update](diagram_update.png)
 
 ## Replication Protocol
 
