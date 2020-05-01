@@ -187,6 +187,16 @@ INFO: Removed log: 89910600-5478-4cb9-87a5-26431dfe566c
 
 Here, we see that when the instance 1 received both operations ("Operation added...") identified by the ids above and then they are executed as soon as possible. You can also visualize that we cleanup the logs, which is something we advise you to take a look at in our [report](../report/README.md).
 
+**When a replica goes down... or crashes...** we simply stop communicating with it. All other replicas will try sending it gossips, failing. However, that is not a problem since our faults are transient and the server is expected to get back on track soon, recovering from the previous incident.
+
+When a replica tries to gossip to a replica that is not available, an error of this sort will be visible on the logs:
+
+```shell
+Gossip error on instance 2: io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
+```
+
+You can simulate this by running the previous example, shutting down a replica during execution (the one you're connected to preferably) and then your client will automagically switch to an available replica and keep sending requests. Then, you can restart the replica you shut down before and see the gossip messages filling the missing data.
+
 ## Run Tests
 
 Open a terminal window and execute the following commands:
