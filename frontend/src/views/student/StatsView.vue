@@ -62,13 +62,28 @@
           <p>Suggestions</p>
         </div>
         <div class="small-info">
-          <p data-cy="totalSuggestions">{{ stats.totalProposedSuggestions }} Total</p>
-          <p data-cy="approvedSuggestions">{{ stats.approvedProposedSuggestions }} Approved</p>
-          <p v-if="stats.totalProposedSuggestions > 0">{{ stats.approvedProposedSuggestions === 0 ? 0 : (stats.approvedProposedSuggestions / stats.totalProposedSuggestions) * 100 }}% Approval Rate</p>
+          <p data-cy="totalSuggestions">
+            {{ stats.totalProposedSuggestions }} Total
+          </p>
+          <p data-cy="approvedSuggestions">
+            {{ stats.approvedProposedSuggestions }} Approved
+          </p>
+          <p v-if="stats.totalProposedSuggestions > 0">
+            {{
+              stats.approvedProposedSuggestions === 0
+                ? 0
+                : (stats.approvedProposedSuggestions /
+                    stats.totalProposedSuggestions) *
+                  100
+            }}% Approval Rate
+          </p>
         </div>
         <v-checkbox
           @change="toggleSuggestionPrivacy()"
-          v-model="stats.privateSuggestionStats" label="Private" data-cy="suggestionPrivacyToggler"></v-checkbox>
+          v-model="stats.privateSuggestionStats"
+          label="Private"
+          data-cy="suggestionPrivacyToggler"
+        ></v-checkbox>
       </div>
     </div>
   </div>
@@ -100,8 +115,13 @@ export default class StatsView extends Vue {
     try {
       await RemoteServices.toggleSuggestionStatPrivacy();
     } catch (error) {
-      await this.$store.dispatch('error', new Error("Could not toggle suggestions privacy."));
-      this.stats.privateSuggestionStats = !this.stats.privateSuggestionStats;
+      await this.$store.dispatch(
+        'error',
+        new Error('Could not toggle suggestions privacy.')
+      );
+      if (this.stats !== null) {
+        this.stats.privateSuggestionStats = !this.stats.privateSuggestionStats;
+      }
     }
   }
 }

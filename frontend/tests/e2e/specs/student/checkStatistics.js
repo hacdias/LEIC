@@ -9,12 +9,16 @@ describe('Check Statistics', () => {
   });
 
   it('see suggestions statistics', () => {
-    cy.get('[data-cy="totalSuggestions"]').invoke('text').then((text => {
-      expect(text.trim()).to.match(/^[0-9]+ Total$/)
-    }))
+    cy.get('[data-cy="totalSuggestions"]')
+      .invoke('text')
+      .then(text => {
+        expect(text.trim()).to.match(/^[0-9]+ Total$/);
+      });
 
-    cy.get('[data-cy="approvedSuggestions"]').invoke('text').then((text => {
-      expect(text.trim()).to.match(/^[0-9]+ Approved$/)
-    }))
+    cy.get('[data-cy="approvedSuggestions"]')
+      .invoke('text')
+      .then(text => {
+        expect(text.trim()).to.match(/^[0-9]+ Approved$/);
+      });
   });
 });
