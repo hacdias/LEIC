@@ -1,4 +1,4 @@
-describe('Suggestion reviews walkthrough', () => {
+describe('Questions walkthrough', () => {
   beforeEach(() => {
     cy.demoTeacherLogin();
     cy.navigateQuestions();
