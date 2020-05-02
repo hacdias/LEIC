@@ -168,6 +168,14 @@ public class QueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<QueryDto> getSharedQueries(Integer questionId) {
-        return null;
+        questionRepository.findById(questionId)
+                .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
+
+        return queryRepository.findAll()
+                .stream()
+                .filter(query -> query.getQuestion().getId() == questionId && query.getShared())
+                .map(QueryDto::new)
+                .sorted(Comparator.comparing(QueryDto::getCreationDate))
+                .collect(Collectors.toList());
     }
 }
