@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -87,6 +88,12 @@ public class StatsService {
                 .filter(Option::getCorrect)
                 .count();
 
+        int totalProposedSuggestions = (int) user.getSuggestions().stream().count();
+
+        int approvedProposedSuggestions = (int) user.getSuggestions().stream()
+                .filter(suggestion -> suggestion.getStatus() == Suggestion.Status.APPROVED)
+                .count();
+
         Course course = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId)).getCourse();
 
         int totalAvailableQuestions = questionRepository.getAvailableQuestionsSize(course.getId());
@@ -95,6 +102,9 @@ public class StatsService {
         statsDto.setTotalAnswers(totalAnswers);
         statsDto.setTotalUniqueQuestions(uniqueQuestions);
         statsDto.setTotalAvailableQuestions(totalAvailableQuestions);
+        statsDto.setTotalProposedSuggestions(totalProposedSuggestions);
+        statsDto.setApprovedProposedSuggestions(approvedProposedSuggestions);
+        statsDto.setPrivateSuggestionStats(user.getPrivateSuggestionStats());
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);
             statsDto.setImprovedCorrectAnswers(((float)uniqueCorrectAnswers)*100/uniqueQuestions);

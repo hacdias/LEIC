@@ -17,6 +17,10 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.SU
 @Entity
 @Table(name = "suggestions")
 public class Suggestion {
+    public enum Status {
+        APPROVED, REJECTED, PENDING;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -32,8 +36,8 @@ public class Suggestion {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "suggestion", fetch= FetchType.LAZY, orphanRemoval = true)
     private Set<SuggestionReview> suggestionReviews = new HashSet<>();
 
-    @Column(name = "approved")
-    private Boolean approved;
+    @Column(name = "status")
+    private Status status;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -43,7 +47,7 @@ public class Suggestion {
 
     public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
         setId(suggestionDto.getId());
-        setApproved(suggestionDto.getApproved());
+        setStatus(Suggestion.Status.valueOf(suggestionDto.getStatus()));
         setStudent(student);
         setQuestion(new Question(course, suggestionDto.getQuestion()));
         setCreationDate(DateHandler.toLocalDateTime(suggestionDto.getCreationDate()));
@@ -82,12 +86,12 @@ public class Suggestion {
         this.suggestionReviews.add(suggestionReview);
     }
 
-    public Boolean getApproved() {
-        return approved;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setApproved(Boolean approved) {
-        this.approved = approved;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreationDate() {
@@ -99,13 +103,13 @@ public class Suggestion {
     }
 
     private void canRemove() {
-        if (getApproved()) {
+        if (getStatus() == Status.APPROVED) {
             throw new TutorException(SUGGESTION_ALREADY_APPROVED, getId());
         }
     }
 
     public void update(SuggestionDto suggestionDto) {
-        setApproved(suggestionDto.getApproved());
+        setStatus(Status.valueOf(suggestionDto.getStatus()));
     }
 
     public void remove() {
@@ -119,13 +123,13 @@ public class Suggestion {
     @Override
     public String toString() {
         return "Suggestion{" +
-                "id=" + id +
-                ", student=" + student +
-                ", question=" + question +
-                ", suggestionReviews=" + suggestionReviews +
-                ", approved=" + approved +
-                ", creationDate=" + creationDate +
-                '}';
+            "id=" + id +
+            ", student=" + student +
+            ", question=" + question +
+            ", suggestionReviews=" + suggestionReviews +
+            ", status=" + status +
+            ", creationDate=" + creationDate +
+            '}';
     }
 }
 

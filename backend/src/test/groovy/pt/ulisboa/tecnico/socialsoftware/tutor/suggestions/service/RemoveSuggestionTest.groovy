@@ -79,7 +79,7 @@ class RemoveSuggestionTest extends Specification {
 
         suggestion = new Suggestion()
         suggestion.setStudent(student)
-        suggestion.setApproved(false)
+        suggestion.setStatus(Suggestion.Status.PENDING)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
     }
@@ -95,7 +95,7 @@ class RemoveSuggestionTest extends Specification {
 
     def "remove a suggestion for an approved question" () {
         given: "an approved suggestion"
-        suggestion.setApproved(true)
+        suggestion.setStatus(Suggestion.Status.APPROVED)
         suggestionRepository.save(suggestion)
 
         when:

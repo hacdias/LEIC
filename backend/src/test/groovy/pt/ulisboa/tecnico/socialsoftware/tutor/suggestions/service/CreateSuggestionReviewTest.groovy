@@ -91,7 +91,7 @@ class CreateSuggestionReviewTest extends Specification {
 
         suggestion = new Suggestion()
         suggestion.setStudent(student)
-        suggestion.setApproved(false)
+        suggestion.setStatus(Suggestion.Status.PENDING)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
     }
@@ -116,7 +116,7 @@ class CreateSuggestionReviewTest extends Specification {
         result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
         result.getSuggestion().getStudent().getName() == STUDENT_NAME
         result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        result.getSuggestion().getApproved()
+        result.getSuggestion().getStatus() == Suggestion.Status.APPROVED
         result.getApproved()
         result.getJustification() == SUGGESTION_REVIEW_JUSTIFICATION
     }
@@ -137,7 +137,7 @@ class CreateSuggestionReviewTest extends Specification {
         result.getSuggestion().getQuestion().getContent() == QUESTION_CONTENT
         result.getSuggestion().getStudent().getName() == STUDENT_NAME
         result.getSuggestion().getStudent().getUsername() == STUDENT_USERNAME
-        !result.getSuggestion().getApproved()
+        result.getSuggestion().getStatus() == Suggestion.Status.REJECTED
         !result.getApproved()
         result.getJustification() == ""
     }

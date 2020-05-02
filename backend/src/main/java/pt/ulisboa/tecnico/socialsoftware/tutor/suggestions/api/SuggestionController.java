@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -44,6 +45,13 @@ public class SuggestionController {
         return suggestionService.findSuggestionsByStudent(studentId);
     }
 
+    @PostMapping("/suggestions/toggle-privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void togglePrivacy(Authentication authentication) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+        suggestionService.toggleStatsPrivacy(studentId);
+    }
+
     @GetMapping("/suggestions/{suggestionId}")
     @PreAuthorize("(hasRole('ROLE_STUDENT') and hasPermission(#suggestionId, 'SUGGESTION.AUTHOR')) or" +
         "(hasRole('ROLE_TEACHER') and hasPermission(#suggestionId, 'SUGGESTION.ACCESS'))")
@@ -62,7 +70,7 @@ public class SuggestionController {
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public SuggestionDto createSuggestion(Authentication authentication, @PathVariable int courseId, @Valid @RequestBody SuggestionDto suggestion) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
-        suggestion.setApproved(false);
+        suggestion.setStatus(Suggestion.Status.PENDING.name());
         suggestion.getQuestion().setStatus(Question.Status.PENDING_APPROVAL.name());
         return suggestionService.createSuggestion(studentId, courseId, suggestion);
     }
@@ -73,7 +81,7 @@ public class SuggestionController {
     public SuggestionDto updateSuggestion(Authentication authentication, @PathVariable Integer suggestionId, @Valid @RequestBody SuggestionDto suggestion) {
         User.Role role = ((User) authentication.getPrincipal()).getRole();
         if (role == User.Role.STUDENT) {
-            suggestion.setApproved(false);
+            suggestion.setStatus(Suggestion.Status.PENDING.name());
         }
         return suggestionService.updateSuggestion(suggestionId, suggestion);
     }

@@ -52,6 +52,8 @@ public class User implements UserDetails, DomainEntity {
     private Integer numberOfCorrectInClassAnswers;
     private Integer numberOfCorrectStudentAnswers;
 
+    private Boolean privateSuggestionStats;
+
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
@@ -100,6 +102,7 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectTeacherAnswers = 0;
         this.numberOfCorrectInClassAnswers = 0;
         this.numberOfCorrectStudentAnswers = 0;
+        this.privateSuggestionStats = true;
     }
 
     @Override
@@ -318,6 +321,17 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
 
+    public Boolean getPrivateSuggestionStats() {
+        if (privateSuggestionStats == null) {
+            return false;
+        }
+        return privateSuggestionStats;
+    }
+
+    public void setPrivateSuggestionStats(Boolean privateSuggestionStats) {
+        this.privateSuggestionStats = privateSuggestionStats;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -336,8 +350,17 @@ public class User implements UserDetails, DomainEntity {
                 ", numberOfCorrectTeacherAnswers=" + numberOfCorrectTeacherAnswers +
                 ", numberOfCorrectInClassAnswers=" + numberOfCorrectInClassAnswers +
                 ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
+                ", privateSuggestionStats=" + privateSuggestionStats +
                 ", creationDate=" + creationDate +
                 ", lastAccess=" + lastAccess +
+                ", quizAnswers=" + quizAnswers +
+                ", suggestions=" + suggestions +
+                ", suggestionReviews=" + suggestionReviews +
+                ", createdTournaments=" + createdTournaments +
+                ", enrolledTournaments=" + enrolledTournaments +
+                ", courseExecutions=" + courseExecutions +
+                ", queries=" + queries +
+                ", queryAnswers=" + queryAnswers +
                 '}';
     }
 

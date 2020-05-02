@@ -79,7 +79,7 @@ class FindSuggestionTest extends Specification {
 
         suggestion = new Suggestion()
         suggestion.setStudent(student)
-        suggestion.setApproved(false)
+        suggestion.setStatus(Suggestion.Status.PENDING)
         suggestion.setQuestion(question)
         suggestionRepository.save(suggestion)
     }
@@ -101,7 +101,7 @@ class FindSuggestionTest extends Specification {
         suggestions.size() == 1
         suggestions.get(0).getCreationDate() == suggestion.getCreationDate()
         suggestions.get(0).getId() == suggestion.getId()
-        suggestions.get(0).getApproved() == suggestion.getApproved()
+        suggestions.get(0).getStatus() == suggestion.getStatus().name()
     }
 
     def "find suggestions for non-existing user"() {
@@ -121,7 +121,7 @@ class FindSuggestionTest extends Specification {
         suggestions.size() == 1
         suggestions.get(0).getCreationDate() == suggestion.getCreationDate()
         suggestions.get(0).getId() == suggestion.getId()
-        suggestions.get(0).getApproved() == suggestion.getApproved()
+        suggestions.get(0).getStatus() == suggestion.getStatus().name()
     }
 
     def "find suggestion by id"() {
@@ -134,7 +134,7 @@ class FindSuggestionTest extends Specification {
 
         then: "correct suggestion is fetched"
         sug.getId() == suggestion.getId()
-        sug.getApproved() == suggestion.getApproved()
+        sug.getStatus() == suggestion.getStatus().name()
         sug.getCreationDate() == suggestion.getCreationDate()
     }
 

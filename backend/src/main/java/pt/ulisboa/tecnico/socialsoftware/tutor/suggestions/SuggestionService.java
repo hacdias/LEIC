@@ -66,6 +66,17 @@ public class SuggestionService {
         suggestionRepository.save(suggestion);
         return new SuggestionDto(suggestion);
     }
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void toggleStatsPrivacy (Integer studentId) {
+        User student = userRepository
+                .findById(studentId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        student.setPrivateSuggestionStats(!student.getPrivateSuggestionStats());
+    }
 
     @Retryable(
             value = { SQLException.class },

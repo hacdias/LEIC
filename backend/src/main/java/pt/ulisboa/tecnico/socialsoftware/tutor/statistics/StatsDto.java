@@ -11,6 +11,18 @@ public class StatsDto implements Serializable {
     private Integer uniqueCorrectAnswers = 0;
     private Integer uniqueWrongAnswers = 0;
     private Integer totalAvailableQuestions = 0;
+    private Integer totalProposedSuggestions = 0;
+    private Integer approvedProposedSuggestions = 0;
+
+    private Boolean privateSuggestionStats = false;
+
+    public Boolean getPrivateSuggestionStats() {
+        return privateSuggestionStats;
+    }
+
+    public void setPrivateSuggestionStats(Boolean privateSuggestionStats) {
+        this.privateSuggestionStats = privateSuggestionStats;
+    }
 
     public Integer getTotalQuizzes() {
         return totalQuizzes;
@@ -76,6 +88,22 @@ public class StatsDto implements Serializable {
         this.totalAvailableQuestions = totalAvailableQuestions;
     }
 
+    public Integer getApprovedProposedSuggestions() {
+        return approvedProposedSuggestions;
+    }
+
+    public Integer getTotalProposedSuggestions() {
+        return totalProposedSuggestions;
+    }
+
+    public void setApprovedProposedSuggestions(Integer approvedProposedSuggestions) {
+        this.approvedProposedSuggestions = approvedProposedSuggestions;
+    }
+
+    public void setTotalProposedSuggestions(Integer totalProposedSuggestions) {
+        this.totalProposedSuggestions = totalProposedSuggestions;
+    }
+
     @Override
     public String toString() {
         return "StatsDto{" +
@@ -86,6 +114,9 @@ public class StatsDto implements Serializable {
                 ", improvedCorrectAnswers=" + improvedCorrectAnswers +
                 ", uniqueCorrectAnswers=" + uniqueCorrectAnswers +
                 ", uniqueWrongAnswers=" + uniqueWrongAnswers +
+                ", totalAvailableQuestions=" + totalAvailableQuestions +
+                ", totalProposedSuggestions=" + totalProposedSuggestions +
+                ", approvedProposedSuggestions=" + approvedProposedSuggestions +
                 '}';
     }
 }

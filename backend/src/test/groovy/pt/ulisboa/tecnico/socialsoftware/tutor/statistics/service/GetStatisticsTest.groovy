@@ -1,19 +1,21 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.statistics.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.statistics.StatsService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.dto.SuggestionDto
@@ -23,7 +25,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class UpdateSuggestionTest extends Specification {
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
+class GetStatisticsTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -46,18 +49,20 @@ class UpdateSuggestionTest extends Specification {
     SuggestionRepository suggestionRepository
 
     @Autowired
+    SuggestionService suggestionService
+
+    @Autowired
     UserRepository userRepository
 
     @Autowired
-    SuggestionService suggestionService
+    StatsService statsService
 
     def course
     def courseExecution
     def student
-    def suggestion
-    def question
+    def questionDto
 
-    def setup() {
+    def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
@@ -68,56 +73,45 @@ class UpdateSuggestionTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)
-
-
-        question = new Question()
-        question.setKey(1)
-        question.setTitle(QUESTION_TITLE)
-        question.setContent(QUESTION_CONTENT)
-        question.setStatus(Question.Status.AVAILABLE)
-        question.setNumberOfAnswers(1)
-        question.setNumberOfCorrect(1)
-
-        def option = new OptionDto()
-        option.setContent(OPTION_CONTENT)
-        option.setCorrect(true)
-        option.setSequence(0)
-
-        def options = new ArrayList<OptionDto>()
-        options.add(option)
-
-        question.setCourse(course)
-        question.setOptions(options)
-        course.addQuestion(question)
-        questionRepository.save(question)
-
-        suggestion = new Suggestion()
-        suggestion.setStudent(student)
-        suggestion.setStatus(Suggestion.Status.PENDING)
-        suggestion.setQuestion(question)
-        suggestionRepository.save(suggestion)
-
-        question.setSuggestion(suggestion)
     }
 
-    def "update suggestion to approved"() {
-        given: "an updated suggestion"
-        def suggestionDto = new SuggestionDto(suggestion)
+    def "get statistics and make sure suggestions info is correct"() {
+        given: "2 suggestions, 1 approved"
+
+        questionDto = new QuestionDto()
+        questionDto.setKey(1)
+        questionDto.setTitle(QUESTION_TITLE)
+        questionDto.setContent(QUESTION_CONTENT)
+        questionDto.setStatus(Question.Status.DISABLED.name())
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        questionDto.setOptions(options)
+
+        def suggestionDto = new SuggestionDto()
+        suggestionDto.setStatus(Suggestion.Status.PENDING.name())
+        suggestionDto.setQuestion(questionDto)
+
+        def s1 = new Suggestion(student, course, suggestionDto)
+
         suggestionDto.setStatus(Suggestion.Status.APPROVED.name())
-        suggestionDto.setQuestion(new QuestionDto(question))
+        def s2 = new Suggestion(student, course, suggestionDto)
+
+        suggestionRepository.saveAndFlush(s1)
+        suggestionRepository.saveAndFlush(s2)
 
         when:
-        suggestionService.updateSuggestion(suggestion.getId(), suggestionDto)
+        def stats = statsService.getStats(student.getId(), courseExecution.getId())
 
-        then: "the suggested must be approved"
-        suggestionRepository.count() == 1L
-        def result = suggestionRepository.findAll().get(0)
-        result.getId() != null
-        result.getStatus() == Suggestion.Status.APPROVED
+        then: "the statistics are correct"
+        stats.getTotalProposedSuggestions() == 2
+        stats.getApprovedProposedSuggestions() == 1
     }
 
     @TestConfiguration
-    static class SuggestionServiceImplTestContextConfiguration {
+    static class TestContextConfiguration {
 
         @Bean
         SuggestionService suggestionService() {
@@ -127,6 +121,11 @@ class UpdateSuggestionTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        StatsService statsService() {
+            return new StatsService()
         }
     }
 }

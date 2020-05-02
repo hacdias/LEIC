@@ -764,6 +764,17 @@ export default class RemoteServices {
       });
   }
 
+  static toggleSuggestionStatPrivacy(): Promise<void> {
+    return httpClient
+      .post('/suggestions/toggle-privacy')
+      .then(() => {
+        return;
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static createSuggestionReview(
     suggestionReview: SuggestionReview
   ): Promise<SuggestionReview> {

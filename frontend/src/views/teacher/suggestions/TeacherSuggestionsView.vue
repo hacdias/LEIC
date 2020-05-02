@@ -33,9 +33,9 @@
           @click="showSuggestionDialog(item)"
       /></template>
 
-      <template v-slot:item.approved="{ item }">
-        <v-chip :color="item.approved ? 'green' : 'red'" small>
-          <span>{{ item.approved ? 'Yes' : 'No' }}</span>
+      <template v-slot:item.status="{ item }">
+        <v-chip :color="getStatusColor(item.status)" small>
+          <span>{{ item.status }}</span>
         </v-chip>
       </template>
 
@@ -110,7 +110,7 @@ export default class TeacherSuggestionsView extends Vue {
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
-    { text: 'Approved', value: 'approved', align: 'center' },
+    { text: 'Status', value: 'status', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -148,6 +148,12 @@ export default class TeacherSuggestionsView extends Vue {
         .toLowerCase()
         .indexOf(search.toLowerCase()) !== -1
     );
+  }
+
+  getStatusColor(status: string) {
+    if (status === 'REJECTED') return 'red';
+    else if (status === 'PENDING') return 'orange';
+    else return 'green';
   }
 
   convertMarkDown(text: string, image: Image | null = null): string {
