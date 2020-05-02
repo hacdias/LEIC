@@ -38,14 +38,14 @@ public class QueryController {
         return this.queryService.getQueriesByStudent(student.getId());
     }
 
-    @GetMapping("/teacher/queriesInCourses")
+    @GetMapping("/teacher/queries-in-courses")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<QueryDto> getQueriesInTeachersCourse(Principal principal) {
         User teacher = (User) ((Authentication) principal).getPrincipal();
         return this.queryService.getQueriesInTeachersCourse(teacher.getId());
     }
 
-    @PostMapping("/question/{questionId}/questionAnswer/{questionAnswerId}/queries")
+    @PostMapping("/question/{questionId}/question-answer/{questionAnswerId}/queries")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public QueryDto createQuery(Principal principal, @PathVariable int questionId, @PathVariable int questionAnswerId, @Valid @RequestBody QueryDto queryDto) {
         User student = (User) ((Authentication) principal).getPrincipal();

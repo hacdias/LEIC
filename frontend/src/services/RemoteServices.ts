@@ -573,7 +573,7 @@ export default class RemoteServices {
   static createQuery(query: Query): Promise<Query> {
     return httpClient
       .post(
-        `/question/${Store.getters.getCurrentQuestion.questionId}/questionAnswer/${Store.getters.getCurrentQuestion.id}/queries`,
+        `/question/${Store.getters.getCurrentQuestion.questionId}/question-answer/${Store.getters.getCurrentQuestion.id}/queries`,
         query
       )
       .then(response => {
@@ -616,7 +616,7 @@ export default class RemoteServices {
 
   static getSubmittedQueriesInCourse(): Promise<Query[]> {
     return httpClient
-      .get('/teacher/queriesInCourses')
+      .get('/teacher/queries-in-courses')
       .then(response => {
         return response.data.map((query: any) => {
           return new Query(query);
@@ -655,7 +655,7 @@ export default class RemoteServices {
     queryAnswer: QueryAnswer
   ): Promise<QueryAnswer> {
     return httpClient
-      .put(`/answerQueries/${queryAnswer.id}`, queryAnswer)
+      .put(`/answer-queries/${queryAnswer.id}`, queryAnswer)
       .then(response => {
         return new Query(response.data);
       })
@@ -666,7 +666,7 @@ export default class RemoteServices {
 
   static async deleteQueryAnswer(queryAnswerId: number) {
     return httpClient
-      .delete(`/answerQueries/${queryAnswerId}`)
+      .delete(`/answer-queries/${queryAnswerId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
