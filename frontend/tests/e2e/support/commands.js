@@ -24,18 +24,12 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 /// <reference types="Cypress" />
-Cypress.Commands.add('demoAdminLogin', () => {
-  cy.visit('/');
-  cy.get('[data-cy="adminButton"]').click();
-  cy.contains('Administration').click();
-  cy.contains('Manage Courses').click();
-});
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
-  cy.get('[data-cy="Name"]').type(name);
-  cy.get('[data-cy="Acronym"]').type(acronym);
-  cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+  cy.get('[data-cy="courseExecutionNameInput"]').type(name);
+  cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+  cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
   cy.get('[data-cy="saveButton"]').click();
 });
 
@@ -66,20 +60,20 @@ Cypress.Commands.add(
       .should('have.length', 7)
       .find('[data-cy="createFromCourse"]')
       .click();
-    cy.get('[data-cy="Acronym"]').type(acronym);
-    cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+    cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+    cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
     cy.get('[data-cy="saveButton"]').click();
   }
 );
 
 Cypress.Commands.add('demoStudentLogin', () => {
   cy.visit('/');
-  cy.get('[data-cy="studentButton"]').click();
+  cy.get('[data-cy="demoStudentLoginButton"]').click();
 });
 
 Cypress.Commands.add('demoTeacherLogin', () => {
   cy.visit('/');
-  cy.get('[data-cy="teacherButton"]').click();
+  cy.get('[data-cy="demoTeacherLoginButton"]').click();
 });
 
 Cypress.Commands.add('navigateSuggestions', () => {
@@ -116,6 +110,7 @@ Cypress.Commands.add('answerQuiz', quizNumber => {
 
 Cypress.Commands.add('deleteSuggestion', title => {
   cy.contains(title)
+    .parent()
     .parent()
     .parent()
     .should('have.length', 1)
@@ -262,34 +257,35 @@ Cypress.Commands.add('createTournament', (name, numberQuestions) => {
   cy.get('[data-cy="numberQuestions"]').type(numberQuestions);
 
   cy.get('[data-cy="availableDate"]').click();
-  cy.get('.v-date-picker-header')
-    .children('.v-btn')
+  cy.get('.datepicker-controls')
+    .first()
+    .find('.datepicker-button')
     .first()
     .click({ force: true });
-  cy.get('tbody')
-    .find('.v-btn')
-    .last()
+  cy.get('.slideprev-enter-active')
+    .find(':nth-child(25)')
     .click({ force: true });
-  cy.get('.v-card__actions')
-    .children('.v-btn')
-    .last()
+  cy.get('.datepicker-buttons-container')
+    .find('.validate')
+    .first()
     .click({ force: true });
 
-  cy.contains('*Conclusion Date')
-    .parent()
-    .children('input')
-    .click();
-  cy.get('.v-date-picker-header')
-    .children('.v-btn')
-    .last()
+  cy.get('[data-cy="conclusionDate"]').click();
+  cy.get('#conclusionDateInput-picker-container-DatePicker')
+    .find('.calendar')
+    .find('.datepicker-controls')
+    .find('.text-right')
+    .find('.datepicker-button')
+    .find('svg')
     .click({ force: true });
-  cy.get('tbody')
-    .find('.v-btn')
-    .last()
+  cy.get('.slidenext-enter-active')
+    .find(':nth-child(26)')
     .click({ force: true });
-  cy.get('.v-card__actions')
-    .children('.v-btn')
-    .last()
+  cy.get('#conclusionDateInput-wrapper')
+    .find('.datetimepicker')
+    .find('.datepicker')
+    .find('.datepicker-buttons-container')
+    .find('.validate')
     .click({ force: true });
 
   cy.contains('add').click();
@@ -320,6 +316,7 @@ Cypress.Commands.add(
     cy.contains(title)
       .parent()
       .parent()
+      .parent()
       .should('have.length', 1)
       .children()
       .should('have.length', 6)
@@ -339,6 +336,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('deleteSuggestionReview', title => {
   cy.contains(title)
+    .parent()
     .parent()
     .parent()
     .should('have.length', 1)

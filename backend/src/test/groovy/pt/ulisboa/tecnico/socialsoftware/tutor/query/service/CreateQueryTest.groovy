@@ -295,7 +295,7 @@ class CreateQueryTest extends Specification {
 
         and: "answer to the question by student"
         def quizAnswer = new QuizAnswer()
-        quizAnswer.setUser()
+        quizAnswer.setUser(student)
         user.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class StatementQuestionDto implements Serializable {
     private Integer id;
     private Integer questionId;
