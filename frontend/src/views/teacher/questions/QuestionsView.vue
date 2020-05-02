@@ -7,6 +7,7 @@
       :search="search"
       :sort-by="['creationDate']"
       sort-desc
+      data-cy="questionsTable"
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -60,6 +61,7 @@
           v-model="item.status"
           :items="statusList"
           dense
+          data-cy="statusSelect"
           @change="setStatus(item.id, item.status)"
         >
           <template v-slot:selection="{ item }">

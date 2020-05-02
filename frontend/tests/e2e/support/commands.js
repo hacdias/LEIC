@@ -80,6 +80,11 @@ Cypress.Commands.add('navigateSuggestions', () => {
   cy.get('[data-cy="suggestionsButton"]').click();
 });
 
+Cypress.Commands.add('navigateQuestions', () => {
+  cy.get('[data-cy="managementButton"]').click();
+  cy.get('[data-cy="questionsButton"]').click();
+});
+
 Cypress.Commands.add('createSuggestion', (name, content, options) => {
   cy.get('[data-cy="createSuggestionButton"]').click();
   cy.get('[data-cy="Title"]').focus();
