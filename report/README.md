@@ -34,9 +34,11 @@ Distributed Systems 2019/2020, Second Semester
 
 ## First Part Improvements
 
-- [Add tests for invalid camera names](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)
-- [Synchronize shared variables](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)
-- [Accept camera with same specifications](https://github.com/tecnico-distsys/A46-Sauron/commit/02b35fdd471efb15a3194e2333990e55f34a845f)
+We made some slight improvements relatively to the first delivery, taking into account what the teachers told us.
+
+- **Add tests for invalid camera names** ([commit](https://github.com/tecnico-distsys/A46-Sauron/commit/d0cd7d18ceae2f04ab60c559351ddf7535217451)) - we were not testing whether or not Sauron was throwing an exception when we gave a name with special characters so we added a new test for it. We already tested names with too much characters.
+- **Synchronize shared variables** ([commit](https://github.com/tecnico-distsys/A46-Sauron/commit/9bbd41ce74a592654d572a0b59faeb222d213a06)) - we were not correctly synchronizing shared variables because we did not notice that our server could handle asynchronous requests from the clients. The linked commit does not handle all the fixes so we advise you to take a look at our [`ReplicaManager`](../silo-server/src/main/java/pt/tecnico/sauron/silo/domain/ReplicaManager.java) to see how we handle correctness between shared variables.
+- **Accept camera with same specifications** ([commit](https://github.com/tecnico-distsys/A46-Sauron/commit/02b35fdd471efb15a3194e2333990e55f34a845f)) - we were considering two camera joins with the same specifications (name and coordinates) as a duplicate camera. In the meanwhile, we were informed that the camera join operation should be considered as a login, thus we should accept cameras with the same specifications. Only if the camera has the same name but different coordinates, it is considered duplicated.
 
 ## Fault Model
 
