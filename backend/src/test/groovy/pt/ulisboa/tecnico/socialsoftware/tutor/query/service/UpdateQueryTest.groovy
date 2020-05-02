@@ -125,7 +125,7 @@ class UpdateQueryTest extends Specification {
         result.getAnswers() == query.getAnswers()
         result.getCreationDate() == query.getCreationDate()
         result.getQuestion() == query.getQuestion()
-        result.getShared() == false;
+        !result.getShared();
     }
 
     def "update a query with answers"() {
@@ -158,7 +158,7 @@ class UpdateQueryTest extends Specification {
         queryRepository.count() == 1L
         def result = queryRepository.findAll().get(0)
         result.getId() == query.getId()
-        result.getShared() == true;
+        result.getShared();
         and: 'are not changed'
         result.getTitle() == QUERY_TITLE
         result.getContent() == QUERY_CONTENT

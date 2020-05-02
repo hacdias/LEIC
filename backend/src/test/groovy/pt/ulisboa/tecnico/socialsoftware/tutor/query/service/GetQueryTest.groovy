@@ -98,6 +98,7 @@ class GetQueryTest extends Specification {
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
+        query.setShared(false)
         question.addQuery(query)
         query.setStudent(student)
         student.addQuery(query)
@@ -115,10 +116,12 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDto.getTitle() == query.getTitle()
         queryDto.getContent() == query.getContent()
         queryDto.getId() == result.getId()
+        queryDto.getShared() == result.getShared()
     }
 
     def 'get queries to a question'() {
@@ -132,12 +135,14 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
     }
 
     def 'get queries by a student'() {
@@ -151,12 +156,14 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
     }
 
     def 'get queries in teacher courses'() {
@@ -170,12 +177,39 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
+    }
+
+    def 'get shared queries to question'() {
+        given: 'a shared query'
+        query.share()
+
+        when:
+        def queryDtos = queryService.getSharedQueries(question.getId())
+
+        then: 'the query is retrieved'
+        queryRepository.count() == 1L
+        def result = queryRepository.findAll().get(0)
+        result.getStudent() == student
+        student.getQueries().size() == 1
+        result.getQuestion() == question
+        question.getQueries().size() == 1
+        result.getShared()
+        and: 'the return statement contains one query'
+        queryDtos.size() == 1
+        def queryResult = queryDtos.get(0)
+        queryResult.getTitle() == query.getTitle()
+        queryResult.getContent() == query.getContent()
+        queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
+
     }
 
     def 'get query by id with invalid id'() {

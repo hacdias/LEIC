@@ -162,4 +162,12 @@ public class QueryService {
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());
     }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<QueryDto> getSharedQueries(Integer questionId) {
+        return null;
+    }
 }
