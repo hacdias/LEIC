@@ -68,12 +68,12 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('demoStudentLogin', () => {
   cy.visit('/');
-  cy.get('[data-cy="studentButton"]').click();
+  cy.get('[data-cy="demoStudentLoginButton"]').click();
 });
 
 Cypress.Commands.add('demoTeacherLogin', () => {
   cy.visit('/');
-  cy.get('[data-cy="teacherButton"]').click();
+  cy.get('[data-cy="demoTeacherLoginButton"]').click();
 });
 
 Cypress.Commands.add('navigateSuggestions', () => {
@@ -110,6 +110,7 @@ Cypress.Commands.add('answerQuiz', quizNumber => {
 
 Cypress.Commands.add('deleteSuggestion', title => {
   cy.contains(title)
+    .parent()
     .parent()
     .parent()
     .should('have.length', 1)
@@ -314,6 +315,7 @@ Cypress.Commands.add(
     cy.contains(title)
       .parent()
       .parent()
+      .parent()
       .should('have.length', 1)
       .children()
       .should('have.length', 6)
@@ -333,6 +335,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('deleteSuggestionReview', title => {
   cy.contains(title)
+    .parent()
     .parent()
     .parent()
     .should('have.length', 1)

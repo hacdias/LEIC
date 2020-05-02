@@ -209,6 +209,10 @@ export default class SuggestionsView extends Vue {
     );
   }
 
+  convertMarkDown(text: string, image: Image | null = null): string {
+    return convertMarkDown(text, image);
+  }
+
   async handleFileUpload(event: File, suggestion: Suggestion) {
     if (suggestion.id) {
       try {

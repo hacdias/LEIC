@@ -150,6 +150,10 @@ export default class TeacherSuggestionsView extends Vue {
     );
   }
 
+  convertMarkDown(text: string, image: Image | null = null): string {
+    return convertMarkDown(text, image);
+  }
+
   showSuggestionDialog(suggestion: Suggestion) {
     this.currentSuggestion = suggestion;
     this.suggestionDialog = true;
