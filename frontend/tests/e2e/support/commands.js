@@ -247,6 +247,10 @@ Cypress.Commands.add('navigateTournaments', () => {
   cy.get('[data-cy="tournamentsButton"]').click();
 });
 
+Cypress.Commands.add('navigateToStats', () => {
+  cy.get('[data-cy="statsButton"]').click();
+});
+
 Cypress.Commands.add('createTournament', (name, numberQuestions) => {
   cy.get('[data-cy="newTournamentButton"]').click();
 

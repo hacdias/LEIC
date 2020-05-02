@@ -57,6 +57,16 @@
           <p>Percentage of questions seen</p>
         </div>
       </div>
+      <div class="items" data-cy="suggestionsStats">
+        <div class="small-info">
+          <p data-cy="totalSuggestions">{{ stats.totalProposedSuggestions }} Total</p>
+          <p data-cy="approvedSuggestions">{{ stats.approvedProposedSuggestions }} Approved</p>
+          <p v-if="stats.totalProposedSuggestions > 0">{{ stats.approvedProposedSuggestions === 0 ? 0 : (stats.approvedProposedSuggestions / stats.totalProposedSuggestions) * 100 }}% Approval Rate</p>
+        </div>
+        <div class="project-name">
+          <p>Suggestions</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -143,5 +153,13 @@ export default class StatsView extends Vue {
   & .icon-wrapper i {
     transform: translateY(5px);
   }
+}
+
+.small-info {
+  margin: 1rem 0;
+}
+
+.small-info p {
+  margin: 0;
 }
 </style>

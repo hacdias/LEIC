@@ -218,7 +218,7 @@
           <v-icon>fas fa-lightbulb</v-icon>
         </v-btn>
 
-        <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
+        <v-btn to="/student/stats" v-if="isStudent && currentCourse"  data-cy="statsButton" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
         </v-btn>
