@@ -117,6 +117,8 @@ public class Query {
         else { setShared(false); }
     }
 
+    public void share() { setShared(true); }
+
     public void remove() {
         canRemove();
 

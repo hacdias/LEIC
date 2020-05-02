@@ -105,7 +105,9 @@ public class QueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public QueryDto shareQuery(Integer queryId) {
-        return null;
+        Query query = queryRepository.findById(queryId).orElseThrow(() -> new TutorException(QUERY_NOT_FOUND, queryId));
+        query.share();
+        return new QueryDto(query);
     }
 
 
