@@ -14,6 +14,16 @@ public class StatsDto implements Serializable {
     private Integer totalProposedSuggestions = 0;
     private Integer approvedProposedSuggestions = 0;
 
+    private Boolean privateSuggestionStats = false;
+
+    public Boolean getPrivateSuggestionStats() {
+        return privateSuggestionStats;
+    }
+
+    public void setPrivateSuggestionStats(Boolean privateSuggestionStats) {
+        this.privateSuggestionStats = privateSuggestionStats;
+    }
+
     public Integer getTotalQuizzes() {
         return totalQuizzes;
     }

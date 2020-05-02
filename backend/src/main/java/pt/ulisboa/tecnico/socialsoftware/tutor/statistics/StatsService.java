@@ -104,6 +104,7 @@ public class StatsService {
         statsDto.setTotalAvailableQuestions(totalAvailableQuestions);
         statsDto.setTotalProposedSuggestions(totalProposedSuggestions);
         statsDto.setApprovedProposedSuggestions(approvedProposedSuggestions);
+        statsDto.setPrivateSuggestionStats(user.getPrivateSuggestionStats());
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);
             statsDto.setImprovedCorrectAnswers(((float)uniqueCorrectAnswers)*100/uniqueQuestions);

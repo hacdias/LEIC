@@ -57,15 +57,18 @@
           <p>Percentage of questions seen</p>
         </div>
       </div>
-      <div class="items" data-cy="suggestionsStats">
+      <div class="items custom" data-cy="suggestionsStats">
+        <div class="project-name ">
+          <p>Suggestions</p>
+        </div>
         <div class="small-info">
           <p data-cy="totalSuggestions">{{ stats.totalProposedSuggestions }} Total</p>
           <p data-cy="approvedSuggestions">{{ stats.approvedProposedSuggestions }} Approved</p>
           <p v-if="stats.totalProposedSuggestions > 0">{{ stats.approvedProposedSuggestions === 0 ? 0 : (stats.approvedProposedSuggestions / stats.totalProposedSuggestions) * 100 }}% Approval Rate</p>
         </div>
-        <div class="project-name">
-          <p>Suggestions</p>
-        </div>
+        <v-checkbox
+          @change="toggleSuggestionPrivacy()"
+          v-model="stats.privateSuggestionStats" label="Private" data-cy="suggestionPrivacyToggler"></v-checkbox>
       </div>
     </div>
   </div>
@@ -91,6 +94,15 @@ export default class StatsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async toggleSuggestionPrivacy() {
+    try {
+      await RemoteServices.toggleSuggestionStatPrivacy();
+    } catch (error) {
+      await this.$store.dispatch('error', new Error("Could not toggle suggestions privacy."));
+      this.stats.privateSuggestionStats = !this.stats.privateSuggestionStats;
+    }
   }
 }
 </script>
@@ -161,5 +173,9 @@ export default class StatsView extends Vue {
 
 .small-info p {
   margin: 0;
+}
+
+.custom .project-name {
+  margin: 1rem;
 }
 </style>

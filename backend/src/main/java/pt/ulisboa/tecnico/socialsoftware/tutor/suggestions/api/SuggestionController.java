@@ -45,6 +45,13 @@ public class SuggestionController {
         return suggestionService.findSuggestionsByStudent(studentId);
     }
 
+    @PostMapping("/suggestions/toggle-privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void togglePrivacy(Authentication authentication) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+        suggestionService.toggleStatsPrivacy(studentId);
+    }
+
     @GetMapping("/suggestions/{suggestionId}")
     @PreAuthorize("(hasRole('ROLE_STUDENT') and hasPermission(#suggestionId, 'SUGGESTION.AUTHOR')) or" +
         "(hasRole('ROLE_TEACHER') and hasPermission(#suggestionId, 'SUGGESTION.ACCESS'))")
