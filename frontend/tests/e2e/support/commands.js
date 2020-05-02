@@ -257,7 +257,7 @@ Cypress.Commands.add('createTournament', (name, numberQuestions) => {
   cy.get('[data-cy="numberQuestions"]').type(numberQuestions);
 
   cy.get('[data-cy="availableDate"]').click();
-  cy.get('.v-date-picker-header')
+  cy.get('.header-picker')
     .children('.v-btn')
     .first()
     .click({ force: true });
