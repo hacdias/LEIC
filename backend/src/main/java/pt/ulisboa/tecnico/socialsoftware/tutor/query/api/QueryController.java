@@ -58,6 +58,12 @@ public class QueryController {
         return this.queryService.updateQuery(queryId, queryDto);
     }
 
+    @PutMapping("/queries/{queryId}/share")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#queryId, 'QUERY.ACCESS')")
+    public QueryDto shareQuery(@PathVariable Integer queryId) {
+        return this.queryService.shareQuery(queryId);
+    }
+
     @DeleteMapping("/queries/{queryId}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#queryId, 'QUERY.ALTER')")
     public ResponseEntity removeQuery(@PathVariable Integer queryId) throws IOException {
