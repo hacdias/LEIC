@@ -257,34 +257,35 @@ Cypress.Commands.add('createTournament', (name, numberQuestions) => {
   cy.get('[data-cy="numberQuestions"]').type(numberQuestions);
 
   cy.get('[data-cy="availableDate"]').click();
-  cy.get('.header-picker')
-    .children('.v-btn')
+  cy.get('.datepicker-controls')
+    .first()
+    .find('.datepicker-button')
     .first()
     .click({ force: true });
-  cy.get('tbody')
-    .find('.v-btn')
-    .last()
+  cy.get('.slideprev-enter-active')
+    .find(':nth-child(25)')
     .click({ force: true });
-  cy.get('.v-card__actions')
-    .children('.v-btn')
-    .last()
+  cy.get('.datepicker-buttons-container')
+    .find('.validate')
+    .first()
     .click({ force: true });
 
-  cy.contains('*Conclusion Date')
-    .parent()
-    .children('input')
-    .click();
-  cy.get('.v-date-picker-header')
-    .children('.v-btn')
-    .last()
+  cy.get('[data-cy="conclusionDate"]').click();
+  cy.get('#conclusionDateInput-picker-container-DatePicker')
+    .find('.calendar')
+    .find('.datepicker-controls')
+    .find('.text-right')
+    .find('.datepicker-button')
+    .find('svg')
     .click({ force: true });
-  cy.get('tbody')
-    .find('.v-btn')
-    .last()
+  cy.get('.slidenext-enter-active')
+    .find(':nth-child(26)')
     .click({ force: true });
-  cy.get('.v-card__actions')
-    .children('.v-btn')
-    .last()
+  cy.get('#conclusionDateInput-wrapper')
+    .find('.datetimepicker')
+    .find('.datepicker')
+    .find('.datepicker-buttons-container')
+    .find('.validate')
     .click({ force: true });
 
   cy.contains('add').click();

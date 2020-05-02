@@ -43,22 +43,18 @@
             label="*Available Date"
             id="availableDateInput"
             v-model="tournament.availableDate"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
-            format="yyyy-MM-dd HH:mm"
+            format="YYYY-MM-DD HH:mm"
             data-cy="availableDateInput"
           ></VueCtkDateTimePicker>
         </v-col>
         <v-spacer></v-spacer>
-        <v-col cols="12" sm="6">
+        <v-col cols="12" sm="6" data-cy="conclusionDate">
           <VueCtkDateTimePicker
             label="*Conclusion Date"
             id="conclusionDateInput"
             v-model="tournament.conclusionDate"
-            date-format="yyyy-MM-dd"
-            time-format="HH:mm"
-            format="yyyy-MM-dd HH:mm"
-            data-cy="conclusionDate"
+            format="YYYY-MM-DD HH:mm"
+            data-cy="conclusionDateInput"
           ></VueCtkDateTimePicker>
         </v-col>
       </v-row>
@@ -122,6 +118,10 @@ import RemoteServices from '@/services/RemoteServices';
 import { convertMarkDown } from '@/services/ConvertMarkdownService';
 import Tournament from '@/models/management/Tournament';
 import Topic from '@/models/management/Topic';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
+
+Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
 
 @Component
 export default class TournamentForm extends Vue {
