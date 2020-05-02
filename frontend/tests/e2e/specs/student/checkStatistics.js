@@ -21,4 +21,8 @@ describe('Check Statistics', () => {
         expect(text.trim()).to.match(/^[0-9]+ Approved$/);
       });
   });
+
+  it('toggle suggestions stats privacy', () => {
+    cy.get('[data-cy="suggestionPrivacyToggler"]').check({ force: true }).should('be.checked')      
+  });
 });
