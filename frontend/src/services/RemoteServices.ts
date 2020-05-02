@@ -764,7 +764,7 @@ export default class RemoteServices {
       });
   }
 
-  static toggleSuggestionStatPrivacy(suggestion: Suggestion): Promise<void> {
+  static toggleSuggestionStatPrivacy(): Promise<void> {
     return httpClient
       .post('/suggestions/toggle-privacy')
       .then(() => {
