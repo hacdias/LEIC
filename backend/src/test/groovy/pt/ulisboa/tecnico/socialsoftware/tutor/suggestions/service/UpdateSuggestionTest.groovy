@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
@@ -74,17 +75,19 @@ class UpdateSuggestionTest extends Specification {
         question.setTitle(QUESTION_TITLE)
         question.setContent(QUESTION_CONTENT)
         question.setStatus(Question.Status.AVAILABLE)
-        question.setNumberOfAnswers(2)
+        question.setNumberOfAnswers(1)
         question.setNumberOfCorrect(1)
 
-        def option = new Option()
+        def option = new OptionDto()
         option.setContent(OPTION_CONTENT)
         option.setCorrect(true)
         option.setSequence(0)
-        option.setQuestion(question)
+
+        def options = new ArrayList<OptionDto>()
+        options.add(option)
 
         question.setCourse(course)
-        question.addOption(option)
+        question.setOptions(options)
         course.addQuestion(question)
         questionRepository.save(question)
 
