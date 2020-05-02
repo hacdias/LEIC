@@ -23,13 +23,13 @@
 
       <template v-slot:item.title="{ item }">
         <p
-          v-html="convertMarkDownNoFigure(item.question.title, null)"
+          v-html="convertMarkDown(item.question.title, null)"
           @click="showSuggestionDialog(item)"
       /></template>
 
       <template v-slot:item.content="{ item }">
         <p
-          v-html="convertMarkDownNoFigure(item.question.content, null)"
+          v-html="convertMarkDown(item.question.content, null)"
           @click="showSuggestionDialog(item)"
       /></template>
 
@@ -86,7 +86,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
+import { convertMarkDown } from '@/services/ConvertMarkdownService';
 import Image from '@/models/management/Image';
 import Suggestion from '@/models/management/Suggestion';
 import SuggestionReview from '@/models/management/SuggestionReview';
@@ -156,8 +156,8 @@ export default class TeacherSuggestionsView extends Vue {
     else return 'green';
   }
 
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
+  convertMarkDown(text: string, image: Image | null = null): string {
+    return convertMarkDown(text, image);
   }
 
   showSuggestionDialog(suggestion: Suggestion) {

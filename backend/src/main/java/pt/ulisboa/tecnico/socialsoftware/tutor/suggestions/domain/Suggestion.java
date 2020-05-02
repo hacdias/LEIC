@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -45,11 +46,11 @@ public class Suggestion {
     }
 
     public Suggestion (User student, Course course, SuggestionDto suggestionDto) {
-        this.id = suggestionDto.getId();
-        this.status = Suggestion.Status.valueOf(suggestionDto.getStatus());
-        this.student = student;
-        this.question = new Question(course, suggestionDto.getQuestion());
-        this.creationDate = LocalDateTime.parse(suggestionDto.getCreationDate(), Course.formatter);
+        setId(suggestionDto.getId());
+        setStatus(Suggestion.Status.valueOf(suggestionDto.getStatus()));
+        setStudent(student);
+        setQuestion(new Question(course, suggestionDto.getQuestion()));
+        setCreationDate(DateHandler.toLocalDateTime(suggestionDto.getCreationDate()));
         this.question.setSuggestion(this);
     }
 

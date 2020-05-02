@@ -22,8 +22,7 @@
       </template>
 
       <template v-slot:item.title="{ item }">
-        <p
-          v-html="convertMarkDownNoFigure(item.suggestion.question.title, null)"
+        <p v-html="convertMarkDown(item.suggestion.question.title, null)"
       /></template>
 
       <template v-slot:item.approved="{ item }">
@@ -33,7 +32,7 @@
       </template>
 
       <template v-slot:item.justification="{ item }">
-        <p v-html="convertMarkDownNoFigure(item.justification, null)"
+        <p v-html="convertMarkDown(item.justification, null)"
       /></template>
 
       <template v-slot:item.action="{ item }">
@@ -77,7 +76,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
+import { convertMarkDown } from '@/services/ConvertMarkdownService';
 import Image from '@/models/management/Image';
 import Suggestion from '@/models/management/Suggestion';
 import SuggestionReview from '@/models/management/SuggestionReview';
@@ -127,8 +126,8 @@ export default class SuggestionReviewsView extends Vue {
     );
   }
 
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
+  convertMarkDown(text: string, image: Image | null = null): string {
+    return convertMarkDown(text, image);
   }
 
   showSuggestionDialog(suggestion: Suggestion) {
