@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.AnswerQueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -33,12 +34,13 @@ public class AnswerQuery {
 
     public AnswerQuery(){}
 
-    public AnswerQuery(Query query, User teacher, AnswerQueryDto answerQuery) {
-        this.content = answerQuery.getContent();
-        this.query = query;
+    public AnswerQuery(Query query, User teacher, AnswerQueryDto answerQueryDto) {
+        setContent(answerQueryDto.getContent());
+        setQuery(query);
         query.addAnswer(this);
-        this.teacher = teacher;
+        setTeacher(teacher);
         teacher.addAnswer(this);
+        setCreationDate(DateHandler.toLocalDateTime(answerQueryDto.getCreationDate()));
     }
 
     public String getContent() { return content; }
@@ -83,5 +85,16 @@ public class AnswerQuery {
     }
 
     private void canRemove() { /* for future feature */  }
+
+    @Override
+    public String toString() {
+        return "AnswerQuery{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", query=" + query +
+                ", teacher=" + teacher +
+                ", creationDate=" + creationDate +
+                '}';
+    }
 
 }

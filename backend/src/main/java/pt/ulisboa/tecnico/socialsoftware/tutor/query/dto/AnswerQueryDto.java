@@ -1,9 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.AnswerQuery;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 
 public class AnswerQueryDto implements Serializable {
     private Integer id;
@@ -16,13 +16,13 @@ public class AnswerQueryDto implements Serializable {
     }
 
     public AnswerQueryDto(AnswerQuery answerQuery) {
-        this.id = answerQuery.getId();
-        this.content = answerQuery.getContent();
-        this.byName = answerQuery.getTeacher().getName();
-        this.byUsername = answerQuery.getTeacher().getUsername();
+        setId(answerQuery.getId());
+        setContent(answerQuery.getContent());
+        setByName(answerQuery.getTeacher().getName());
+        setByUsername(answerQuery.getTeacher().getUsername());
 
         if (answerQuery.getCreationDate() != null)
-            this.creationDate = answerQuery.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            setCreationDate(DateHandler.toISOString(answerQuery.getCreationDate()));
     }
 
     public Integer getId() { return id; }
@@ -37,13 +37,13 @@ public class AnswerQueryDto implements Serializable {
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
 
-    public String getbyName() { return this.byName; }
+    public String getByName() { return byName; }
 
-    public void setbyName(String byName) { this.byName = byName; }
+    public void setByName(String byName) { this.byName = byName; }
 
-    public String getbyUsername() { return this.byUsername; }
+    public String getByUsername() { return byUsername; }
 
-    public void setbyUsername(String byUsername) { this.byUsername = byUsername; }
+    public void setByUsername(String byUsername) { this.byUsername = byUsername; }
 
     @Override
     public String toString() {
@@ -51,6 +51,8 @@ public class AnswerQueryDto implements Serializable {
                 "id=" + id +
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +
+                ", byName='" + byName + '\'' +
+                ", byUsername='" + byUsername + '\'' +
                 '}';
     }
 }

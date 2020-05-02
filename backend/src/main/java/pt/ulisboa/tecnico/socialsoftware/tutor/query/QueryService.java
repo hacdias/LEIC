@@ -104,6 +104,15 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public QueryDto shareQuery(Integer queryId) {
+        return null;
+    }
+
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<QueryDto> getQueriesToQuestion(Integer questionId) {
             questionRepository.findById(questionId)
                     .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
