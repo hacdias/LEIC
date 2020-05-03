@@ -31,6 +31,20 @@
                 <span>Delete Query</span>
               </v-tooltip>
             </div>
+            <div class="float-right" v-if="isTeacher && !query.shared">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    data-cy="shareQueryButton"
+                    class="mr-1"
+                    v-on="on"
+                    @click="$emit('share-query')"
+                    >fas fa-share-alt
+                  </v-icon>
+                </template>
+                <span>Share Query</span>
+              </v-tooltip>
+            </div>
             <p class="display-1 text--primary" data-cy="queryTitle">
               {{ query.title }}
             </p>
@@ -39,6 +53,7 @@
             {{ query.creationDate }} <b>by</b> {{ query.byName }} ({{
               query.byUsername
             }})
+            <br> {{ query.shared ? "Shared" : "Not Shared" }}  
           </p>
           <div class="text--primary pre-formatted" data-cy="queryContent">
             {{ query.content }}
@@ -62,6 +77,10 @@ export default class QueryComponent extends Vue {
   get isAuthor() {
     let activeUser = this.$store.getters.getUser;
     return activeUser && activeUser.username == this.query.byUsername;
+  }
+
+  get isTeacher() {
+    return this.$store.getters.isTeacher;
   }
 }
 </script>

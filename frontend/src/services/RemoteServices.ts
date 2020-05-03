@@ -601,6 +601,12 @@ export default class RemoteServices {
     });
   }
 
+  static async shareQuery(queryId: number) {
+    return httpClient.put(`/queries/${queryId}/share`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
+  }
+
   static getSubmittedQueries(): Promise<Query[]> {
     return httpClient
       .get('/user/queries')

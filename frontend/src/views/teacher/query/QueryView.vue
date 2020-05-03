@@ -3,7 +3,10 @@
     <h2>Query History</h2>
     <question-of-query-component :question="question" />
     <br />
-    <query-component :query="query" />
+    <query-component
+      :query="query"
+      @share-query="shareQuery"
+    />
     <br />
     <show-query-answer-list
       :answers="answers"
@@ -104,6 +107,20 @@ export default class QueryView extends Vue {
       try {
         await RemoteServices.deleteQueryAnswer(answer.id);
         this.answers = this.answers.filter(a => a.id !== answer.id);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+  }
+
+  async shareQuery() {
+    if (
+      this.query &&
+      this.query.id &&
+      confirm('Are you sure you want to share this query?')
+    ) { 
+      try {
+        this.query = (await RemoteServices.shareQuery(this.query.id)).data;
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
