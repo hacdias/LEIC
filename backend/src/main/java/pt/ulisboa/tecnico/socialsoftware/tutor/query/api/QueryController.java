@@ -45,6 +45,12 @@ public class QueryController {
         return this.queryService.getQueriesInTeachersCourse(teacher.getId());
     }
 
+    @GetMapping("/question/{questionId}/shared-queries")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public List<QueryDto> getSharedQueries(@PathVariable int questionId) {
+        return this.queryService.getSharedQueries(questionId);
+    }
+
     @PostMapping("/question/{questionId}/question-answer/{questionAnswerId}/queries")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public QueryDto createQuery(Principal principal, @PathVariable int questionId, @PathVariable int questionAnswerId, @Valid @RequestBody QueryDto queryDto) {
