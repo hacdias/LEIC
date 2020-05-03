@@ -49,6 +49,18 @@
     />
     <div class="query-content">
       <v-btn
+        :style="'margin: 10px'"
+        data-cy="showQueriesButton"
+        color="primary"
+        dark
+        @click="
+          seeSharedQueries(statementManager.statementQuiz.questions[questionOrder])
+        "
+      >
+        Check Queries
+      </v-btn>
+      <v-btn
+        :style="'margin: 10px'"
         data-cy="createQueryButton"
         color="primary"
         dark
@@ -56,7 +68,7 @@
           newQuery(statementManager.statementQuiz.questions[questionOrder])
         "
       >
-        I have a doubt about this question!
+        Create Query
       </v-btn>
     </div>
     <create-query-dialog
@@ -133,6 +145,11 @@ export default class ResultsView extends Vue {
   async onSaveQuery(query: Query) {
     this.createQueryDialog = false;
     this.currentQuery = null;
+  }
+
+  async seeSharedQueries(currentQuestion: StatementQuestion) {
+    await this.$store.dispatch('currentQuestion', currentQuestion);
+    await this.$router.push({ name: 'see-shared-queries' });
   }
 
   @Watch('createQueryDialog')
