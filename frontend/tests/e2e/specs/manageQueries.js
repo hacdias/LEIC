@@ -82,6 +82,31 @@ describe('Queries and Answers walkthrough', () => {
     cy.contains('Logout').click();
   });
 
+  it('login teacher share a query', () => {
+    cy.demoTeacherLogin();
+    cy.navigateQueriesTeachers();
+    cy.navigateQuery('Test Query Updated Again');
+
+    cy.shareQuery();
+
+    cy.contains('Logout').click();
+  });
+
+  it('login student check shared queries', () => {
+    cy.demoStudentLogin();
+    cy.navigateSolvedQuizzes();
+    cy.checkSharedQueries();
+
+    cy.navigateQuery('Test Query Updated Again');
+    cy.verifyQuery(
+      'Test Query Updated Again',
+      'Test Query Content Updated Again'
+    );
+    cy.verifyQueryAnswer('Test Query Answer Content Updated Again');
+
+    cy.contains('Logout').click();
+  });
+
   it('login student visualizes an answer of teacher', () => {
     cy.demoStudentLogin();
     cy.navigateQueriesStudents();

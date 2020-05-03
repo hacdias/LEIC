@@ -125,6 +125,11 @@ Cypress.Commands.add('navigateAvailableQuizzes', () => {
   cy.get('[data-cy="quizzesAvailableButton"]').click();
 });
 
+Cypress.Commands.add('navigateSolvedQuizzes', () => {
+  cy.get('[data-cy="quizzesButton"]').click();
+  cy.get('[data-cy="quizzesSolvedButton"]').click();
+});
+
 Cypress.Commands.add('navigateQueriesStudents', () => {
   cy.get('[data-cy="queriesButton"]').click();
   cy.get('[data-cy="queriesSubmittedButton"]').click();
@@ -188,6 +193,18 @@ Cypress.Commands.add('appendQuery', (name, content) => {
   cy.get('[data-cy="Content"]').type(content);
 
   cy.get('[data-cy="saveQueryButton"]').click();
+});
+
+Cypress.Commands.add('shareQuery', () => {
+  cy.get('[data-cy="shareQueryButton"]')
+    .click();
+});
+
+Cypress.Commands.add('checkSharedQueries', () => {
+  cy.get('ul > :nth-child(2)')
+    .click();
+  cy.get('[data-cy="showQueriesButton"]')
+    .click();
 });
 
 Cypress.Commands.add('deleteQuery', () => {
