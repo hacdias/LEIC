@@ -635,7 +635,9 @@ export default class RemoteServices {
 
   static getSharedQueries(): Promise<Query[]> {
     return httpClient
-      .get(`/question/${Store.getters.getCurrentQuestion.questionId}/shared-queries`)
+      .get(
+        `/question/${Store.getters.getCurrentQuestion.questionId}/shared-queries`
+      )
       .then(response => {
         return response.data.map((query: any) => {
           return new Query(query);

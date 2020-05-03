@@ -54,7 +54,9 @@
         color="primary"
         dark
         @click="
-          seeSharedQueries(statementManager.statementQuiz.questions[questionOrder])
+          seeSharedQueries(
+            statementManager.statementQuiz.questions[questionOrder]
+          )
         "
       >
         Check Queries

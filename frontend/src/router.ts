@@ -22,7 +22,7 @@ import SuggestionsView from './views/student/suggestions/SuggestionsView.vue';
 
 import SubmittedQueriesView from './views/student/query/SubmittedQueriesView.vue';
 import QueryStudentView from './views/student/query/QueryView.vue';
-import SharedQueriesView from './views/student/query/SharedQueriesView.vue'
+import SharedQueriesView from './views/student/query/SharedQueriesView.vue';
 
 import SubmittedQueriesInCourseView from './views/teacher/query/SubmittedQueriesInCourseView.vue';
 import QueryTeacherView from './views/teacher/query/QueryView.vue';
@@ -230,7 +230,7 @@ let router = new Router({
           meta: {
             title: process.env.VUE_APP_NAME + ' - Results',
             requiredAuth: 'Student'
-          },
+          }
         },
         {
           path: 'see-shared-queries',

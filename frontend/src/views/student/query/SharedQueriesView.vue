@@ -9,10 +9,7 @@
         <div class="col">Shared</div>
         <div class="col last-col"></div>
       </li>
-      <show-query-list
-        :queries="queries"
-        @see-query="seeQuery"
-      />
+      <show-query-list :queries="queries" @see-query="seeQuery" />
     </ul>
   </div>
 </template>
@@ -34,9 +31,7 @@ export default class SubmittedQueriesView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.queries = (
-        await RemoteServices.getSharedQueries()
-      ).reverse();
+      this.queries = (await RemoteServices.getSharedQueries()).reverse();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
