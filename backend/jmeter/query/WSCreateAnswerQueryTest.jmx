@@ -441,7 +441,7 @@ vars.put(&quot;demoQuery&quot;, props.get(&quot;demoQuery&quot;));
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/user/answersQueries</stringProp>
+            <stringProp name="HTTPSampler.path">/user/answers-queries</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

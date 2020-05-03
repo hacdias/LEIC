@@ -320,7 +320,7 @@ vars.put(&quot;quizAnswer&quot;, props.get(&quot;demoQuizAnswer&quot;));</string
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/question/${questionId}/questionAnswer/${questionAnswer}/queries</stringProp>
+            <stringProp name="HTTPSampler.path">/question/${questionId}/question-answer/${questionAnswer}/queries</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
