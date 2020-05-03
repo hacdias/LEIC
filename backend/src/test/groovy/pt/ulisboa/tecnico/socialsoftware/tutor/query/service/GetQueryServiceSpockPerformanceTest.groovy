@@ -128,6 +128,39 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         true
     }
 
+    def "create and share 1000 queries and fetch them 10 000 times" () {
+        given: "answer to the question by student"
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student)
+        student.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "1000 queries"
+        1.upto(1, {
+            and: "a queryDTO"
+            def queryDTO = new QueryDto()
+            queryDTO.setTitle(QUERY_TITLE)
+            queryDTO.setContent(QUERY_CONTENT)
+            def result = queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
+            queryService.shareQuery(result.getId())
+        })
+
+        when:
+        1.upto(1, {
+            queryService.getSharedQueries(question.getId())
+        })
+
+        then:
+        true
+    }
+
     @TestConfiguration
     static class QueryServiceImplTestContextConfiguration {
 
