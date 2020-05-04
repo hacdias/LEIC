@@ -106,6 +106,14 @@ public class AnswerQueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public AnswerQueryDto addFurtherClarification(Integer answerQueryId, Integer userId, AnswerQueryDto furtherClarificationDto) {
+        return null;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<AnswerQueryDto> getAnswersToQuery(Integer queryId) {
         queryRepository.findById(queryId)
                 .orElseThrow(() -> new TutorException(QUERY_NOT_FOUND,queryId));
@@ -128,7 +136,7 @@ public class AnswerQueryService {
 
         return answerQueryRepository.findAll()
                 .stream()
-                .filter(answerQuery -> answerQuery.getTeacher().getId() == teacherId)
+                .filter(answerQuery -> answerQuery.getUser().getId() == teacherId)
                 .map(AnswerQueryDto::new)
                 .sorted(Comparator.comparing(AnswerQueryDto::getCreationDate))
                 .collect(Collectors.toList());

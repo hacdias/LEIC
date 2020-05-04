@@ -7,6 +7,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -26,20 +28,36 @@ public class AnswerQuery {
     private Query query;
 
     @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "answer_query_id")
+    private AnswerQuery answerQuery;
+
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User teacher;
+    private User user;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "answer_query", fetch = FetchType.EAGER, orphanRemoval=true)
+    private List<AnswerQuery> answers = new ArrayList<>();
+
     public AnswerQuery(){}
 
-    public AnswerQuery(Query query, User teacher, AnswerQueryDto answerQueryDto) {
+    public AnswerQuery(Query query, User user, AnswerQueryDto answerQueryDto) {
         setContent(answerQueryDto.getContent());
         setQuery(query);
         query.addAnswer(this);
-        setTeacher(teacher);
-        teacher.addAnswer(this);
+        setUser(user);
+        user.addAnswer(this);
+        setCreationDate(DateHandler.toLocalDateTime(answerQueryDto.getCreationDate()));
+    }
+
+    public AnswerQuery(AnswerQuery answerQuery, User user, AnswerQueryDto answerQueryDto) {
+        setContent(answerQueryDto.getContent());
+        setAnswerQuery(answerQuery);
+        answerQuery.addAnswer(this);
+        setUser(user);
+        user.addAnswer(this);
         setCreationDate(DateHandler.toLocalDateTime(answerQueryDto.getCreationDate()));
     }
 
@@ -55,13 +73,23 @@ public class AnswerQuery {
 
     public void setQuery(Query query) { this.query = query; }
 
-    public User getTeacher() { return teacher; }
+    public AnswerQuery getAnswerQuery() { return answerQuery; }
 
-    public void setTeacher(User teacher) { this.teacher = teacher; }
+    public void setAnswerQuery(AnswerQuery answerQuery) { this.answerQuery = answerQuery; }
+
+    public User getUser() { return user; }
+
+    public void setUser(User teacher) { this.user = teacher; }
 
     public LocalDateTime getCreationDate() { return creationDate; }
 
     public void setCreationDate(LocalDateTime creationDate) { this.creationDate = creationDate; }
+
+    public List<AnswerQuery> getAnswers() { return answers; }
+
+    public void setAnswers(List<AnswerQuery> answers) { this.answers = answers; }
+
+    public void addAnswer(AnswerQuery answer) {this.answers.add(answer); }
 
     public void update(AnswerQueryDto answerQueryDto) {
         checkAnswerQueryConsistent(answerQueryDto);
@@ -80,8 +108,8 @@ public class AnswerQuery {
         canRemove();
         getQuery().getAnswers().remove(this);
         query = null;
-        getTeacher().getQueryAnswers().remove(this);
-        teacher = null;
+        getUser().getQueryAnswers().remove(this);
+        user = null;
     }
 
     private void canRemove() { /* for future feature */  }
@@ -91,9 +119,11 @@ public class AnswerQuery {
         return "AnswerQuery{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
-                ", query=" + query +
-                ", teacher=" + teacher +
+                ", query=" + query.getId() +
+                ", answerQuery=" + answerQuery +
+                ", user=" + user +
                 ", creationDate=" + creationDate +
+                ", answers=" + answers +
                 '}';
     }
 
