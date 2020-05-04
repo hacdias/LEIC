@@ -40,6 +40,9 @@ class CreateFurtherClarificationTest extends Specification {
     public static final String QUERY_CONTENT = 'query content'
     public static final String ANSWER_QUERY_CONTENT = 'answer query content'
     public static final String FURTHER_CLARIFICATION_CONTENT_STUDENT = 'further clarification content (student)'
+    public static final String FURTHER_CLARIFICATION_CONTENT_TEACHER = 'further clarification content (teacher)'
+    public static final String ANOTHER_TEACHER_NAME = 'another teacher name'
+    public static final String ANOTHER_TEACHER_USERNAME = 'another teacher username'
 
     @Autowired
     AnswerQueryService answerQueryService
@@ -134,9 +137,60 @@ class CreateFurtherClarificationTest extends Specification {
         student.getQueryAnswers().contains(result)
     }
 
+    def "add further clarification to a answer by teacher"(){
+        given: "create further clarification to an answer"
+        def furtherClarificationDTO = new AnswerQueryDto(answerQuery)
+        furtherClarificationDTO.setContent(FURTHER_CLARIFICATION_CONTENT_TEACHER)
+
+        when:
+        answerQueryService.addFurtherClarification(answerQuery.getId(), teacher.getId(), furtherClarificationDTO)
+
+        then: "the correct further clarification is inside the repository"
+        answerQueryRepository.count() == 3L
+        def result = answerQueryRepository.findAll().get(2)
+        result.getId() != null
+        result.getContent() == FURTHER_CLARIFICATION_CONTENT_TEACHER
+        result.getAnswerQuery().getContent() == ANSWER_QUERY_CONTENT
+        result.getUser().getName() == TEACHER_NAME
+        result.getUser().getUsername() == TEACHER_USERNAME
+        answerQuery.getAnswers().contains(result)
+        student.getQueryAnswers().contains(result)
+    }
+
+    def "teacher doesn't teach course"() {
+        given: "a teacher who doesn't teach the course"
+        def anotherTeacher = new User(ANOTHER_TEACHER_NAME, ANOTHER_TEACHER_USERNAME, 3, User.Role.TEACHER)
+        userRepository.save(anotherTeacher)
+
+        and: "a furtherClarificationDto"
+        def furtherClarificationDto = new AnswerQueryDto()
+        furtherClarificationDto.setContent(FURTHER_CLARIFICATION_CONTENT_TEACHER)
+
+        when:
+        answerQueryService.addFurtherClarification(answerQuery.getId(), anotherTeacher.getId(), furtherClarificationDto)
+
+        then: "exception User didn't answer question"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TEACHER_NOT_IN_COURSE
+    }
+
     @Unroll("invalid arguments: content=#content || errorMessage=#errorMessage ")
     def "update a query with missing information"() {
+        given: "create a answer query"
+        def furtherClarificationDto = new AnswerQueryDto()
+        furtherClarificationDto.setContent(content)
 
+        when:
+        answerQueryService.addFurtherClarification(answerQuery.getId(), furtherClarificationDto)
+
+        then: "exception query is missing data is thrown "
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == errorMessage
+
+        where:
+        content                         || errorMessage
+        null                            || ErrorMessage.ANSWER_QUERY_MISSING_DATA
+        "  "                            || ErrorMessage.ANSWER_QUERY_MISSING_DATA
     }
 
     @TestConfiguration
