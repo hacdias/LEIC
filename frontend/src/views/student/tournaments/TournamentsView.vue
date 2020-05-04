@@ -8,7 +8,6 @@
     />
     <tournament-list
       v-if="!editMode"
-      @deleteTournament="deleteTournament"
       @newTournament="newTournament"
       :tournaments="tournaments"
     />
@@ -33,16 +32,6 @@ export default class TournamentView extends Vue {
   tournament: Tournament | null = null;
   editMode: boolean = false;
 
-  async created() {
-    await this.$store.dispatch('loading');
-    try {
-      this.tournaments = await RemoteServices.getOpenTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-    await this.$store.dispatch('clearLoading');
-  }
-
   changeMode() {
     this.editMode = !this.editMode;
     if (this.editMode) {
@@ -61,15 +50,10 @@ export default class TournamentView extends Vue {
     this.tournament = null;
   }
 
-  deleteTournament(tournamentId: number) {
-    this.tournaments = this.tournaments.filter(
-      tournament => tournament.id !== tournamentId
-    );
-  }
-
   newTournament() {
     this.editMode = true;
     this.tournament = new Tournament();
   }
+
 }
 </script>

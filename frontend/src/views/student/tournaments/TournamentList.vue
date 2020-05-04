@@ -42,6 +42,19 @@
           </template>
           <span>Enroll</span>
         </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="deleteTournament(item.id)"
+              color="red"
+            >delete</v-icon
+            >
+          </template>
+          <span>Delete Tournament</span>
+        </v-tooltip>
       </template>
     </v-data-table>
   </v-card>
@@ -106,6 +119,17 @@ export default class TournamentList extends Vue {
       try {
         await RemoteServices.enroll(tournamentId);
         tournament.enrolled = true;
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+  }
+
+  async deleteTournament(tournamentId: number) {
+    if (confirm('Are you sure you want to delete this tournament?')) {
+      try {
+        await RemoteServices.deleteTournament(tournamentId);
+        this.tournaments = this.tournaments.filter(tournament => tournament.id !== tournamentId);
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
