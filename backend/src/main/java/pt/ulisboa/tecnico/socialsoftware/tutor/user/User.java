@@ -81,7 +81,7 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval=true)
     private List<Query> queries = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", orphanRemoval=true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval=true)
     private List<AnswerQuery> queryAnswers = new ArrayList<>();
 
     public User() {

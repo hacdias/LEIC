@@ -38,7 +38,7 @@ public class AnswerQuery {
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "answer_query", fetch = FetchType.EAGER, orphanRemoval=true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "answerQuery", fetch = FetchType.EAGER, orphanRemoval=true)
     private List<AnswerQuery> answers = new ArrayList<>();
 
     public AnswerQuery(){}

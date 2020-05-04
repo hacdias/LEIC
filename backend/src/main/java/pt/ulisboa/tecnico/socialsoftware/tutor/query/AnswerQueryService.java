@@ -63,16 +63,7 @@ public class AnswerQueryService {
         if (teacher.getRole() != User.Role.TEACHER)
             throw new TutorException(USER_NOT_TEACHER, teacherId);
 
-        Boolean teacherTeaches = false;
-        Question question = query.getQuestion();
-        Course course = question.getCourse();
-        for (CourseExecution courseExecution : teacher.getCourseExecutions()) {
-            if (courseExecution.getCourse() == course) teacherTeaches = true;
-        }
-
-        if (!teacherTeaches) {
-            throw new TutorException(TEACHER_NOT_IN_COURSE);
-        }
+        checkTeacherCanAnswer(query, teacher);
 
         AnswerQuery answerQuery = new AnswerQuery(query, teacher, answerQueryDto);
         answerQuery.setCreationDate(LocalDateTime.now());
@@ -107,7 +98,39 @@ public class AnswerQueryService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public AnswerQueryDto addFurtherClarification(Integer answerQueryId, Integer userId, AnswerQueryDto furtherClarificationDto) {
-        return null;
+        AnswerQuery answerQuery = answerQueryRepository.findById(answerQueryId).orElseThrow(() -> new TutorException(ANSWER_QUERY_NOT_FOUND, answerQueryId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        if (user.getRole() == User.Role.TEACHER) {
+            AnswerQuery tmp = answerQuery;
+            Query query = tmp.getQuery();
+
+            while (query == null) {
+                tmp = tmp.getAnswerQuery();
+                query = tmp.getQuery();
+            }
+
+            checkTeacherCanAnswer(query, user);
+        }
+
+        AnswerQuery furtherClarification = new AnswerQuery(answerQuery, user, furtherClarificationDto);
+        furtherClarification.setCreationDate(LocalDateTime.now());
+        this.entityManager.persist(furtherClarification);
+        return new AnswerQueryDto(answerQuery);
+    }
+
+    private void checkTeacherCanAnswer(Query query, User teacher) {
+        Boolean teacherTeaches = false;
+
+        Question question = query.getQuestion();
+        Course course = question.getCourse();
+        for (CourseExecution courseExecution : teacher.getCourseExecutions()) {
+            if (courseExecution.getCourse() == course) teacherTeaches = true;
+        }
+
+        if (!teacherTeaches) {
+            throw new TutorException(TEACHER_NOT_IN_COURSE);
+        }
     }
 
     @Retryable(
