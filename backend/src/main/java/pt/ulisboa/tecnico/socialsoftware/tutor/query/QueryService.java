@@ -147,17 +147,17 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<QueryDto> getQueriesInTeachersCourse(Integer teacherId) {
-        User teacher = userRepository.findById(teacherId)
-                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,teacherId));
+    public List<QueryDto> getQueriesInCourse(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,userId));
 
-        List<Integer> teacherCourses = teacher.getCourseExecutions().stream()
+        List<Integer> userCourses = user.getCourseExecutions().stream()
                 .map(courseExecution -> courseExecution.getCourse().getId())
                 .collect(Collectors.toList());
 
         return queryRepository.findAll()
                 .stream()
-                .filter(query ->  teacherCourses.contains(query.getQuestion().getCourse().getId()))
+                .filter(query ->  userCourses.contains(query.getQuestion().getCourse().getId()))
                 .map(QueryDto::new)
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());

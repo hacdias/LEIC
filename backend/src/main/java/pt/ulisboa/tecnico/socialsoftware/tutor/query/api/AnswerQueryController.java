@@ -43,6 +43,13 @@ public class AnswerQueryController {
         return this.answerQueryService.createAnswerQuery(queryId, teacher.getId(), answerQueryDto);
     }
 
+    @PostMapping("/answer-queries/{answerQueryId}/further-clarification")
+    @PreAuthorize("hasPermission(#queryId, 'ANSWER.QUERY.ACCESS')")
+    public AnswerQueryDto createFurtherClarification(Principal principal, @PathVariable int answerQueryId, @Valid @RequestBody AnswerQueryDto furtherClarificationDto) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        return this.answerQueryService.addFurtherClarification(answerQueryId, user.getId(), furtherClarificationDto);
+    }
+
     @PutMapping("/answer-queries/{answerQueryId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#answerQueryId, 'ANSWER.QUERY.ALTER')")
     public AnswerQueryDto updateAnswerQuery(@PathVariable Integer answerQueryId, @Valid @RequestBody AnswerQueryDto answerQueryDto) {

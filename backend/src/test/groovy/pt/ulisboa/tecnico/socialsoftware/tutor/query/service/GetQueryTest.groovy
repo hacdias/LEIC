@@ -168,7 +168,7 @@ class GetQueryTest extends Specification {
 
     def 'get queries in teacher courses'() {
         when:
-        def queryDtos = queryService.getQueriesInTeachersCourse(teacher.getId())
+        def queryDtos = queryService.getQueriesInCourse(teacher.getId())
 
         then: 'the query is retrieved'
         queryRepository.count() == 1L
@@ -241,7 +241,7 @@ class GetQueryTest extends Specification {
 
     def 'get queries in teacher courses with invalid id'() {
         when:
-        def queryDtos = queryService.getQueriesInTeachersCourse(USER_INVALID_ID)
+        def queryDtos = queryService.getQueriesInCourse(USER_INVALID_ID)
 
         then: 'exception user not found'
         def exception = thrown(TutorException)

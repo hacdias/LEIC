@@ -42,7 +42,7 @@ public class QueryController {
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<QueryDto> getQueriesInTeachersCourse(Principal principal) {
         User teacher = (User) ((Authentication) principal).getPrincipal();
-        return this.queryService.getQueriesInTeachersCourse(teacher.getId());
+        return this.queryService.getQueriesInCourse(teacher.getId());
     }
 
     @GetMapping("/question/{questionId}/shared-queries")

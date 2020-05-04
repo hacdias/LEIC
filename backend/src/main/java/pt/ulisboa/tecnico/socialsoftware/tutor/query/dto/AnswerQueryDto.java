@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class AnswerQueryDto implements Serializable {
     private Integer id;
+    private Integer queryId;
+    private Integer answerQueryId;
     private String content;
     private String creationDate = null;
     private String byName;
@@ -20,6 +22,11 @@ public class AnswerQueryDto implements Serializable {
 
     public AnswerQueryDto(AnswerQuery answerQuery) {
         setId(answerQuery.getId());
+
+        if (answerQuery.getQuery() != null) { setQueryId(answerQuery.getQuery().getId()); }
+
+        if (answerQuery.getAnswerQuery() != null) { setAnswerQueryId(answerQuery.getAnswerQuery().getId()); }
+
         setContent(answerQuery.getContent());
         setByName(answerQuery.getUser().getName());
         setByUsername(answerQuery.getUser().getUsername());
@@ -34,6 +41,14 @@ public class AnswerQueryDto implements Serializable {
     public Integer getId() { return id; }
 
     public void setId(Integer id) { this.id = id; }
+
+    public Integer getQueryId() { return queryId; }
+
+    public void setQueryId(Integer queryId) { this.queryId = queryId; }
+
+    public Integer getAnswerQueryId() { return answerQueryId; }
+
+    public void setAnswerQueryId(Integer answerQueryId) { this.answerQueryId = answerQueryId; }
 
     public String getContent() { return content; }
 
@@ -59,6 +74,8 @@ public class AnswerQueryDto implements Serializable {
     public String toString() {
         return "AnswerQueryDto{" +
                 "id=" + id +
+                ", queryId=" + queryId +
+                ", answerQueryId=" + answerQueryId +
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", byName='" + byName + '\'' +
