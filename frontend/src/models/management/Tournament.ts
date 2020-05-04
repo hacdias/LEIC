@@ -2,9 +2,9 @@ import Topic from '@/models/management/Topic';
 import { ISOtoString } from '@/services/ConvertDateService';
 
 export default class Tournament {
-  id: number | null = null; //TO DO:check if undefined or null
+  id: number | null = null;
   title: string | null = null;
-  creationDate!: string; //TO DO: check exclamation mark
+  creationDate!: string;
   availableDate!: string;
   conclusionDate!: string;
   numberQuestions: number | null = null;
@@ -13,7 +13,7 @@ export default class Tournament {
 
   constructor(jsonObj?: Tournament) {
     if (jsonObj) {
-      this.id = jsonObj.id; //TO DO: check if id needed
+      this.id = jsonObj.id;
       this.title = jsonObj.title;
       this.numberQuestions = jsonObj.numberQuestions;
       this.topics = jsonObj.topics.map((topic: Topic) => new Topic(topic));

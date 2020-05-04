@@ -880,6 +880,16 @@ export default class RemoteServices {
       });
   }
 
+  static async deleteTournament(tournamentId: number) {
+    return httpClient
+        .delete(`tournaments/${tournamentId}`)
+        .then(response => {
+        return new Tournament(response.data);})
+        .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async exportAll() {
     return httpClient
       .get('/admin/export', {
