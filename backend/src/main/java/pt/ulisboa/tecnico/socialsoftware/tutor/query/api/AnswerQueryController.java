@@ -44,7 +44,7 @@ public class AnswerQueryController {
     }
 
     @PostMapping("/answer-queries/{answerQueryId}/further-clarification")
-    @PreAuthorize("hasPermission(#queryId, 'ANSWER.QUERY.ACCESS')")
+    @PreAuthorize("hasPermission(#answerQueryId, 'ANSWER.QUERY.ACCESS')")
     public AnswerQueryDto createFurtherClarification(Principal principal, @PathVariable int answerQueryId, @Valid @RequestBody AnswerQueryDto furtherClarificationDto) {
         User user = (User) ((Authentication) principal).getPrincipal();
         return this.answerQueryService.addFurtherClarification(answerQueryId, user.getId(), furtherClarificationDto);

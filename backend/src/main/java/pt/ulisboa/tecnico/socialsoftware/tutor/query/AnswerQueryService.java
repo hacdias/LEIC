@@ -116,7 +116,7 @@ public class AnswerQueryService {
         AnswerQuery furtherClarification = new AnswerQuery(answerQuery, user, furtherClarificationDto);
         furtherClarification.setCreationDate(LocalDateTime.now());
         this.entityManager.persist(furtherClarification);
-        return new AnswerQueryDto(answerQuery);
+        return new AnswerQueryDto(furtherClarification);
     }
 
     private void checkTeacherCanAnswer(Query query, User teacher) {
