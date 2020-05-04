@@ -105,11 +105,7 @@ public class TournamentService {
             throw new TutorException(ErrorMessage.USER_NOT_STUDENT, studentId);
         }
 
-        if (!student.getEnrolledTournaments().contains(tournament)) {
-            throw new TutorException(ErrorMessage.STUDENT_NOT_ENROLLED, studentId, tournamentId);
-        }
-
-        if (tournament.getStudent() != student) {
+        if (tournament.getStudent() != student || !student.getCreatedTournaments().contains(tournament)) {
             throw new TutorException(ErrorMessage.STUDENT_NOT_CREATOR, studentId, tournamentId);
         }
 

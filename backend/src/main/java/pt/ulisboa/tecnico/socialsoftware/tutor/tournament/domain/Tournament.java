@@ -197,16 +197,16 @@ public class Tournament {
 
     private void checkConclusionDate(LocalDateTime conclusionDate) {
         if (conclusionDate == null) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date");
         }
         if (this.availableDate != null && this.conclusionDate != null && conclusionDate.isBefore(availableDate)) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date");
         }
     }
 
     public void remove() {
         student.getCreatedTournaments().remove(this);
-        student= null;
+        student = null;
 
         getTopics().forEach(topic -> topic.getTournaments().remove(this));
         getTopics().clear();

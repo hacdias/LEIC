@@ -35,12 +35,12 @@ public class TournamentController {
         return tournamentService.getEnrolledTournaments(studentId, executionId);
     }
 
-    @PostMapping("tournaments/{TournamentId}")
+    @PostMapping("tournaments/{tournamentId}")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public TournamentDto addEnrolledStudentToTournament(Authentication authentication, @PathVariable int TournamentId) {
+    public TournamentDto addEnrolledStudentToTournament(Authentication authentication, @PathVariable int tournamentId) {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
 
-        return tournamentService.addEnrolledStudentToTournament(studentId, TournamentId);
+        return tournamentService.addEnrolledStudentToTournament(studentId, tournamentId);
     }
 
     @PostMapping("/executions/{executionId}/tournaments")
@@ -52,9 +52,9 @@ public class TournamentController {
         return tournamentService.createTournament(executionId, studentId, tournament);
     }
 
-    @DeleteMapping("/tourmaments/{tournamentId}")
+    @DeleteMapping("tournaments/{tournamentId}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.CREATOR')")
-    public ResponseEntity deleteTournament(Authentication authentication, @PathVariable Integer tournamentId) {
+    public ResponseEntity deleteTournament(Authentication authentication, @PathVariable int tournamentId)  {
         Integer studentId = ((User) authentication.getPrincipal()).getId();
 
         tournamentService.removeTournament(studentId, tournamentId);
