@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.2.1">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Add Approved Question to Available Questions" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Altering Approved Questions" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
@@ -22,6 +22,18 @@
         <stringProp name="shareMode">shareMode.all</stringProp>
         <boolProp name="stopThread">true</boolProp>
         <stringProp name="variableNames">title,content,optionsContent,correct</stringProp>
+      </CSVDataSet>
+      <hashTree/>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Data to Alter Approved Question" enabled="true">
+        <stringProp name="filename">QuestionEditData.csv</stringProp>
+        <stringProp name="fileEncoding"></stringProp>
+        <stringProp name="variableNames">updatedTitle,updatedContent,updatedOptionsContent,updatedCorrect</stringProp>
+        <boolProp name="ignoreFirstLine">false</boolProp>
+        <stringProp name="delimiter">,</stringProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <boolProp name="stopThread">true</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
       </CSVDataSet>
       <hashTree/>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -54,11 +66,6 @@
           <elementProp name="justification" elementType="Argument">
             <stringProp name="Argument.name">justification</stringProp>
             <stringProp name="Argument.value">a justification</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="status" elementType="Argument">
-            <stringProp name="Argument.name">status</stringProp>
-            <stringProp name="Argument.value">AVAILABLE</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -170,7 +177,6 @@
 			&quot;content&quot;: &quot;${optionsContent}&quot;,&#xd;
 			&quot;correct&quot;: &quot;${correct}&quot;}]&#xd;
 	}&#xd;
-&#xd;
 }</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -204,8 +210,15 @@
               <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
             </JSONPostProcessor>
             <hashTree/>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">optionId</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.question.options[0].id</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            </JSONPostProcessor>
+            <hashTree/>
             <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion" enabled="true">
-              <stringProp name="BeanShellAssertion.query">${__setProperty(questionId, ${questionId})};</stringProp>
+              <stringProp name="BeanShellAssertion.query">${__setProperty(questionId, ${questionId})};
+${__setProperty(optionId, ${optionId})};</stringProp>
               <stringProp name="BeanShellAssertion.filename"></stringProp>
               <stringProp name="BeanShellAssertion.parameters"></stringProp>
               <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
@@ -490,7 +503,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Add Approved Question to Available Questions" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Alter Approved Question" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -508,7 +521,8 @@
           <stringProp name="filename"></stringProp>
           <stringProp name="parameters"></stringProp>
           <boolProp name="resetInterpreter">false</boolProp>
-          <stringProp name="script">vars.put(&quot;questionId&quot;, props.get(&quot;questionId&quot;));</stringProp>
+          <stringProp name="script">vars.put(&quot;questionId&quot;, props.get(&quot;questionId&quot;));
+vars.put(&quot;optionId&quot;, props.get(&quot;optionId&quot;));</stringProp>
         </BeanShellPreProcessor>
         <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login as Demo Teacher" enabled="true">
@@ -589,13 +603,20 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to add approved question to available questions" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to alter approved questions" enabled="true">
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">${status}</stringProp>
+                  <stringProp name="Argument.value">{&#xd;
+	&quot;title&quot;: &quot;${updatedTitle}&quot;,&#xd;
+	&quot;content&quot;: &quot;${updatedContent}&quot;,&#xd;
+	&quot;options&quot; : [{&#xd;
+		&quot;id&quot;: &quot;${optionId}&quot;,&#xd;
+		&quot;content&quot;: &quot;${updatedOptionsContent}&quot;,&#xd;
+		&quot;correct&quot;: &quot;${updatedCorrect}&quot;}]&#xd;
+}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -604,8 +625,8 @@
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/questions/${questionId}/set-status</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <stringProp name="HTTPSampler.path">/questions/${questionId}</stringProp>
+            <stringProp name="HTTPSampler.method">PUT</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -615,15 +636,41 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">200</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message"></stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">1</intProp>
-            </ResponseAssertion>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert Question.Title" enabled="true">
+              <stringProp name="JSON_PATH">$.title</stringProp>
+              <stringProp name="EXPECTED_VALUE">${updatedTitle}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert Question.Option.Correct" enabled="true">
+              <stringProp name="JSON_PATH">$.options[0].correct</stringProp>
+              <stringProp name="EXPECTED_VALUE">${updatedCorrect}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert Question.Option.Content" enabled="true">
+              <stringProp name="JSON_PATH">$.options[0].content</stringProp>
+              <stringProp name="EXPECTED_VALUE">${updatedOptionsContent}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert Question.Content" enabled="true">
+              <stringProp name="JSON_PATH">$.content</stringProp>
+              <stringProp name="EXPECTED_VALUE">${updatedContent}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
             <hashTree/>
           </hashTree>
           <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
