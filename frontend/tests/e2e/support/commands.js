@@ -260,6 +260,35 @@ Cypress.Commands.add('deleteQueryAnswer', () => {
     .click();
 });
 
+Cypress.Commands.add('showFurtherClarifications', () => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="showFurtherClarificationButton"]')
+    .click();
+});
+
+Cypress.Commands.add('hideFurtherClarifications', () => {
+  cy.get('[data-cy=queryAnswerComponent]')
+    .first()
+    .find('[data-cy="hideFurtherClarificationButton"]')
+    .click();
+});
+
+Cypress.Commands.add('createFurtherClarification', (content) => {
+  cy.get('[data-cy="addClarificationButton"]').click();
+  cy.get('[data-cy="Content"]').focus();
+  if (content != '') cy.get('[data-cy="Content"]').type(content);
+
+  cy.get('[data-cy="saveFurtherClarificationButton"]').click();
+});
+
+Cypress.Commands.add('verifyFurtherClarification', content => {
+  cy.get('[data-cy=furtherClarificationComponent]')
+    .first()
+    .find('[data-cy="furtherClarificationContent"]')
+    .should('have.text', content);
+});
+
 Cypress.Commands.add('navigateTournaments', () => {
   cy.get('[data-cy="tournamentsButton"]').click();
 });

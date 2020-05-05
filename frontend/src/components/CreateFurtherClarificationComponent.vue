@@ -30,7 +30,10 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
+        <v-btn
+          data-cy="cancelButton"
+          color="blue darken-1"
+          @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
         <v-btn
@@ -69,7 +72,7 @@ export default class createFurtherClarificationDialog extends Vue {
     ) {
       await this.$store.dispatch(
         'error',
-        'Further Clarification must have content'
+        'Error: Further Clarification must have content'
       );
       return;
     }

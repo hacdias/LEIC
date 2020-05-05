@@ -11,12 +11,13 @@
   <v-card v-else>
     <v-card-text class="text-left">
       <v-container
+        data-cy="queryAnswerComponent"
         grid-list-md
         fluid
         v-for="answer in answers"
         :key="answer.id"
       >
-        <v-layout data-cy="queryAnswerComponent" column wrap>
+        <v-layout column wrap>
           <v-container class="query-answer-header" grid-list-md fluid>
             <div class="float-right" v-if="isAuthor(answer)">
               <v-tooltip bottom>

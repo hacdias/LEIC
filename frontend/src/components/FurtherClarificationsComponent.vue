@@ -4,6 +4,7 @@
       <v-card-text class="text-left">
         <v-layout column wrap>
           <v-card
+            data-cy="furtherClarificationComponent"
             v-for="clarification in queryAnswer.answers"
             :key="clarification.id"
             color="white"
@@ -14,7 +15,10 @@
                 {{ clarification.creationDate }} <b>by</b>
                 {{ clarification.byName }} ({{ clarification.byUsername }})
               </p>
-              <div class="text--primary pre-formatted">
+              <div
+                data-cy="furtherClarificationContent"
+                class="text--primary pre-formatted"
+              >
                 <p style="margin-bottom:0px">{{ clarification.content }}</p>
               </div>
             </v-card-text>
