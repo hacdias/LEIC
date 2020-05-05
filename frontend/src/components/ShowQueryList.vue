@@ -16,14 +16,10 @@
         {{ query.numberAnswers }}
       </div>
       <div class="col">
-        <v-icon v-if="query.shared"
-          class="mr-1"
-          color=green
+        <v-icon v-if="query.shared" class="mr-1" color="green"
           >fas fa-thumbs-up
         </v-icon>
-        <v-icon v-if="!query.shared"
-          class="mr-1"
-          color=red
+        <v-icon v-if="!query.shared" class="mr-1" color="red"
           >fas fa-thumbs-down
         </v-icon>
       </div>

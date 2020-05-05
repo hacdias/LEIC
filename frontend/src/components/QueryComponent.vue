@@ -52,8 +52,8 @@
           <p>
             {{ query.creationDate }} <b>by</b> {{ query.byName }} ({{
               query.byUsername
-            }})
-            <br> {{ query.shared ? "Shared" : "Not Shared" }}  
+            }}) <br />
+            {{ query.shared ? 'Shared' : 'Not Shared' }}
           </p>
           <div class="text--primary pre-formatted" data-cy="queryContent">
             {{ query.content }}

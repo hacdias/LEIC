@@ -143,7 +143,7 @@ public class AnswerQueryService {
 
         return answerQueryRepository.findAll()
                 .stream()
-                .filter(answerQuery -> answerQuery.getQuery().getId() == queryId)
+                .filter(answerQuery -> answerQuery.getQuery() != null && answerQuery.getQuery().getId() == queryId)
                 .map(AnswerQueryDto::new)
                 .sorted(Comparator.comparing(AnswerQueryDto::getCreationDate))
                 .collect(Collectors.toList());

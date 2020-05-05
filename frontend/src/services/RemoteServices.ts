@@ -678,7 +678,7 @@ export default class RemoteServices {
     return httpClient
       .put(`/answer-queries/${queryAnswer.id}`, queryAnswer)
       .then(response => {
-        return new Query(response.data);
+        return new QueryAnswer(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -688,6 +688,17 @@ export default class RemoteServices {
   static async deleteQueryAnswer(queryAnswerId: number) {
     return httpClient
       .delete(`/answer-queries/${queryAnswerId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createFurtherClarification(furtherClarification: QueryAnswer): Promise<QueryAnswer> {
+    return httpClient
+      .post(`/answer-queries/${Store.getters.getCurrentQueryAnswer.id}/further-clarification`, furtherClarification)
+      .then(response => {
+        return new QueryAnswer(response.data);
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

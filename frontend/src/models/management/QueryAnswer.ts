@@ -6,6 +6,8 @@ export default class QueryAnswer {
   creationDate!: string;
   byName: string = '';
   byUsername: string = '';
+  answers: QueryAnswer[] = [];
+  showNow: boolean | null = false;
 
   constructor(jsonObj?: QueryAnswer) {
     if (jsonObj) {
@@ -16,6 +18,12 @@ export default class QueryAnswer {
 
       if (jsonObj.creationDate)
       this.creationDate = ISOtoString(jsonObj.creationDate);
+
+      if (jsonObj.answers) {
+        this.answers = jsonObj.answers.map(
+          (answer: QueryAnswer) => new QueryAnswer(answer)
+        );
+      }
     }
   }
 }
