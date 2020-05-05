@@ -22,8 +22,8 @@ namespace og {
       return _nodes;
     }
 
-    void accept(basic_ast_visitor *av, int level) {
-      av->do_tuple_node(this, level);
+    void accept(basic_ast_visitor *sp, int level) {
+      sp->do_tuple_node(this, level);
     }
 
   };
