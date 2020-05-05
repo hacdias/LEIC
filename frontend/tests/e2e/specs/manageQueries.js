@@ -114,7 +114,7 @@ describe('Queries and Answers walkthrough', () => {
     
     cy.showFurtherClarifications();
     cy.createFurtherClarification('Test Further Clarification Student');
-    cy.verifyFurtherClarification('Test Further Clarification Student');
+    cy.verifyFurtherClarificationSimple('Test Further Clarification Student');
 
     cy.hideFurtherClarifications();
 
@@ -136,11 +136,55 @@ describe('Queries and Answers walkthrough', () => {
     cy.contains('Logout').click();
   });
 
+  it('login teacher writes further clarification', () => {
+    cy.demoTeacherLogin();
+    cy.navigateQueriesTeachers();
+    cy.navigateQuery('Test Query Updated Again');
+    
+    cy.showFurtherClarifications();
+    cy.createFurtherClarification('Test Further Clarification Teacher');
+    cy.verifyFurtherClarificationComplex('Test Further Clarification Student', 1);
+    cy.verifyFurtherClarificationComplex('Test Further Clarification Teacher', 2);
+
+    cy.hideFurtherClarifications();
+
+    cy.contains('Logout').click();
+  });
+
+  it('login teacher writes invalid further clarification', () => {
+    cy.demoTeacherLogin();
+    cy.navigateQueriesTeachers();
+    cy.navigateQuery('Test Query Updated Again');
+    
+    cy.showFurtherClarifications();
+    cy.createFurtherClarification('');
+    cy.closeErrorMessage();
+    cy.get('[data-cy="cancelButton"]').click();
+
+    cy.hideFurtherClarifications();
+
+    cy.contains('Logout').click();
+  });
+
   it('login student visualizes an answer of teacher', () => {
     cy.demoStudentLogin();
     cy.navigateQueriesStudents();
     cy.navigateQuery('Test Query Updated Again');
     cy.verifyQueryAnswer('Test Query Answer Content Updated Again');
+
+    cy.contains('Logout').click();
+  });
+
+  it('login student sees further clarifications', () => {
+    cy.demoStudentLogin();
+    cy.navigateQueriesStudents();
+    cy.navigateQuery('Test Query Updated Again');
+    
+    cy.showFurtherClarifications();
+    cy.verifyFurtherClarificationComplex('Test Further Clarification Student', 1);
+    cy.verifyFurtherClarificationComplex('Test Further Clarification Teacher', 2);
+
+    cy.hideFurtherClarifications();
 
     cy.contains('Logout').click();
   });

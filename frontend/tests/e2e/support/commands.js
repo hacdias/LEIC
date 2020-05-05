@@ -282,10 +282,13 @@ Cypress.Commands.add('createFurtherClarification', (content) => {
   cy.get('[data-cy="saveFurtherClarificationButton"]').click();
 });
 
-Cypress.Commands.add('verifyFurtherClarification', content => {
-  cy.get('[data-cy=furtherClarificationComponent]')
-    .first()
-    .find('[data-cy="furtherClarificationContent"]')
+Cypress.Commands.add('verifyFurtherClarificationSimple', content => {
+  cy.get('[data-cy=furtherClarificationContent]')
+    .should('have.text', content);
+});
+
+Cypress.Commands.add('verifyFurtherClarificationComplex', (content, n) => {
+  cy.get(':nth-child('+n+') > .v-card__text > [data-cy=furtherClarificationContent]')
     .should('have.text', content);
 });
 

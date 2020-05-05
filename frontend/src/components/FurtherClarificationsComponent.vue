@@ -1,10 +1,9 @@
 <template>
   <div>
-    <v-card grid-list-md fluid color="blue">
+    <v-card grid-list-md fluid color="blue" data-cy="furtherClarificationComponent">
       <v-card-text class="text-left">
         <v-layout column wrap>
           <v-card
-            data-cy="furtherClarificationComponent"
             v-for="clarification in queryAnswer.answers"
             :key="clarification.id"
             color="white"
