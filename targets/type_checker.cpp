@@ -83,6 +83,12 @@ void og::type_checker::processBinaryExpression(cdk::binary_operation_node *const
   else if (acceptDouble && node->left()->is_typed(cdk::TYPE_DOUBLE) && node->right()->is_typed(cdk::TYPE_DOUBLE))
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
 
+  else if (acceptDouble && node->left()->is_typed(cdk::TYPE_DOUBLE) && node->right()->is_typed(cdk::TYPE_INT))
+    node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+
+  else if (acceptDouble && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_DOUBLE))
+    node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+
   else if (acceptPointer && !isAdd && node->left()->is_typed(cdk::TYPE_POINTER) && node->right()->is_typed(cdk::TYPE_POINTER))
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 
@@ -170,7 +176,7 @@ void og::type_checker::do_variable_node(cdk::variable_node *const node, int lvl)
   if (symbol != nullptr) {
     node->type(symbol->type());
   } else {
-    throw "undeclared variable '" + id + "'";
+    throw id;
   }
 }
 
@@ -180,7 +186,7 @@ void og::type_checker::do_rvalue_node(cdk::rvalue_node *const node, int lvl) {
     node->lvalue()->accept(this, lvl);
     node->type(node->lvalue()->type());
   } catch (const std::string &id) {
-    throw "undeclared variable '" + id + "'";
+    throw "undeclared variable on the right side '" + id + "'";
   }
 }
 
@@ -190,7 +196,7 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
   try {
     node->lvalue()->accept(this, lvl);
   } catch (const std::string &id) {
-    throw "undeclared variable '" + id + "'";
+    throw "undeclared variable on an assignment '" + id + "'";
   }
 
   // TODO: check if pointers match
@@ -233,19 +239,17 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_input_node(og::input_node *const node, int lvl) {
-  /* try {
-    node->argument()->accept(this, lvl);
-  } catch (const std::string &id) {
-    throw "undeclared variable '" + id + "'";
-  } */
+  ASSERT_UNSPEC;
+  node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
 }
 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_for_node(og::for_node *const node, int lvl) {
-  // TODO
-  // THIS WAS WHILE'S CODE
-  // node->condition()->accept(this, lvl + 4);
+  if (node->init()) node->init()->accept(this, lvl + 4);
+  if (node->condition()) node->condition()->accept(this, lvl + 4);
+  if (node->end()) node->end()->accept(this, lvl + 4);
+  node->block()->accept(this, lvl + 4);
 }
 
 //---------------------------------------------------------------------------
@@ -279,6 +283,10 @@ void og::type_checker::do_continue_node(og::continue_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) {
+  if (node->declared()) {
+    return;
+  }
+
   if (node->expression()) {
     node->expression()->accept(this, lvl + 2);
   }
@@ -291,8 +299,11 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       throw id + " redeclared";
 
     if (node->type()) {
-      if (node->expression() && node->type() != node->expression()->type())
+      if (node->expression() && node->is_typed(cdk::TYPE_DOUBLE) && node->expression()->is_typed(cdk::TYPE_INT)) {
+        // Do nothing...
+      } else if (node->expression() && node->type() != node->expression()->type()) {
         throw std::string("wrong type for initializer");
+      }
     } else {
       if (node->expression()) {
         node->type(node->expression()->type());
@@ -301,6 +312,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       }
     }
 
+    node->declared(true);
     _parent->set_new_symbol(symbol);
     return;
   }
@@ -329,6 +341,8 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
     _parent->set_new_symbol(symbol);
   }
+
+  node->declared(true);
 }
 
 //---------------------------------------------------------------------------
@@ -373,7 +387,9 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
-  // TODO
+  ASSERT_UNSPEC;
+  node->value()->accept(this, lvl+2);
+  node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 }
 
 void og::type_checker::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
