@@ -841,7 +841,18 @@ export default class RemoteServices {
 
   static async enroll(tournamentId: number): Promise<Tournament> {
     return httpClient
-      .post(`tournaments/${tournamentId}`)
+      .post(`/tournaments/${tournamentId}`)
+      .then(response => {
+        return new Tournament(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async generateTournamentQuiz(tournamentId: number): Promise<Tournament> {
+    return httpClient
+      .post(`/tournaments/${tournamentId}/generate`)
       .then(response => {
         return new Tournament(response.data);
       })
@@ -868,7 +879,7 @@ export default class RemoteServices {
   static async getEnrolledTournaments(): Promise<Tournament[]> {
     return httpClient
       .get(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/EnrolledTournaments`
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/enrolled-tournaments`
       )
       .then(response => {
         return response.data.map((tournament: any) => {
@@ -880,12 +891,36 @@ export default class RemoteServices {
       });
   }
 
+  static async getCreatedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/created-tournaments`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getTournamentQuiz(tournamentId: number): Promise<StatementQuiz> {
+    return httpClient
+      .get(`/tournaments/${tournamentId}/get-quiz`)
+      .then(response => {
+        return new StatementQuiz(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async deleteTournament(tournamentId: number) {
     return httpClient
-        .delete(`tournaments/${tournamentId}`)
-        .then(response => {
-        return new Tournament(response.data);})
-        .catch(async error => {
+      .delete(`/tournaments/${tournamentId}`)
+      .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
   }
