@@ -10,9 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService
-import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query
-import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
@@ -54,13 +51,7 @@ class GetStatisticsTest extends Specification {
     SuggestionRepository suggestionRepository
 
     @Autowired
-    QueryRepository queryRepository
-
-    @Autowired
     SuggestionService suggestionService
-
-    @Autowired
-    QueryService queryService
 
     @Autowired
     UserRepository userRepository
@@ -131,44 +122,8 @@ class GetStatisticsTest extends Specification {
         stats.getApprovedProposedSuggestions() == 1
     }
 
-    def "get statistics and make sure queries info is correct"() {
-        given: "2 queries, 1 shared"
-
-        def query = new Query()
-        query.setTitle(QUERY_TITLE)
-        query.setContent(QUERY_CONTENT)
-        query.setQuestion(question)
-        question.addQuery(query)
-        query.setStudent(student)
-        student.addQuery(query)
-        query.setShared(false)
-        queryRepository.save(query)
-
-        query = new Query()
-        query.setTitle(QUERY_TITLE)
-        query.setContent(QUERY_CONTENT)
-        query.setQuestion(question)
-        question.addQuery(query)
-        query.setStudent(student)
-        student.addQuery(query)
-        query.share()
-        queryRepository.save(query)
-
-        when:
-        def stats = statsService.getStats(student.getId(), courseExecution.getId())
-
-        then: "the statistics are correct"
-        stats.getTotalQueriesSubmitted() == 2
-        stats.getSharedQueries() == 1
-    }
-
     @TestConfiguration
     static class TestContextConfiguration {
-
-        @Bean
-        QueryService queryService() {
-            return new QueryService()
-        }
 
         @Bean
         SuggestionService suggestionService() {

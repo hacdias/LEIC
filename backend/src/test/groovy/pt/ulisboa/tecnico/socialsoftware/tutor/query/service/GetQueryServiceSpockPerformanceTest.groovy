@@ -17,8 +17,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -49,6 +51,9 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
     QuestionRepository questionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+    @Autowired
     QuizQuestionRepository quizQuestionRepository
 
     @Autowired
@@ -67,6 +72,7 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
     def courseExecution
     def question
     def student
+    def quiz
     def quizQuestion
 
     def setup() {
@@ -90,9 +96,15 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         courseExecution.getUsers().add(student)
         userRepository.save(student)
 
+        quiz = new Quiz()
+        quiz.setType("TEST")
+        quizRepository.save(quiz)
+
         quizQuestion = new QuizQuestion()
         quizQuestion.setQuestion(question)
         question.addQuizQuestion(quizQuestion)
+        quizQuestion.setQuiz(quiz)
+        quiz.addQuizQuestion(quizQuestion)
         quizQuestionRepository.save(quizQuestion)
     }
 
@@ -101,6 +113,8 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         student.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
