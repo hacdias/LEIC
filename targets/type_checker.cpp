@@ -93,10 +93,10 @@ void og::type_checker::processBinaryExpression(cdk::binary_operation_node *const
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 
   else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_POINTER))
-    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER)); // TODO: make_reference_type POINTER TO WHERE?
+    node->type(node->right()->type());
 
   else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_POINTER) && node->right()->is_typed(cdk::TYPE_INT))
-    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER)); // TODO: make_reference_type POINTER TO WHERE?
+    node->type(node->left()->type());
 
   else throw std::string("wrong type for binary expression");
 }
@@ -186,7 +186,7 @@ void og::type_checker::do_rvalue_node(cdk::rvalue_node *const node, int lvl) {
     node->lvalue()->accept(this, lvl);
     node->type(node->lvalue()->type());
   } catch (const std::string &id) {
-    throw "undeclared variable on the right side '" + id + "'";
+    throw std::string("undeclared variable on the right side '" + id + "'");
   }
 }
 
@@ -196,19 +196,31 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
   try {
     node->lvalue()->accept(this, lvl);
   } catch (const std::string &id) {
-    throw "undeclared variable on an assignment '" + id + "'";
+    throw std::string("undeclared variable on an assignment '" + id + "'");
   }
-
-  // TODO: check if pointers match
 
   node->rvalue()->accept(this, lvl + 2);
 
-  if (node->lvalue()->is_typed(cdk::TYPE_DOUBLE) && node->rvalue()->is_typed(cdk::TYPE_INT)) {
+  if (node->lvalue()->is_typed(cdk::TYPE_POINTER) && node->rvalue()->is_typed(cdk::TYPE_POINTER)) {
+    std::shared_ptr<cdk::reference_type> lptr = std::static_pointer_cast<cdk::reference_type>(node->lvalue()->type());
+    std::shared_ptr<cdk::reference_type> rptr = std::static_pointer_cast<cdk::reference_type>(node->rvalue()->type());
+
+    // NOTE: this is useful for the cases where we're assigning memory which at the time we don't know the
+    // type! So, if either the left or right value are unspecified but the other side is, then we make them
+    // the same!
+    if (lptr->referenced()->name() == cdk::TYPE_UNSPEC && !rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
+      node->lvalue()->type(node->rvmalue()->type());
+    } else if (!lptr->referenced()->name() == cdk::TYPE_UNSPEC && rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
+      node->rvalue()->type(node->lvalue()->type());
+    }
+
+    // TODO: check if deep pointers match
+  } else if (node->lvalue()->is_typed(cdk::TYPE_DOUBLE) && node->rvalue()->is_typed(cdk::TYPE_INT)) {
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
   } else if (node->lvalue()->is_typed(node->rvalue()->type()->name())) {
     node->type(node->lvalue()->type());
   } else {
-    throw "cannot assign: mismatching types";
+    throw std::string("mismatching types, wants " + cdk::to_string(node->lvalue()->type()) + ", has " + cdk::to_string(node->rvalue()->type()));
   }
 }
 
@@ -222,7 +234,7 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
   node->argument()->accept(this, lvl + 2);
 
   if (node->argument()->is_typed(cdk::TYPE_POINTER)) {
-    throw "cannot print pointer";
+    throw std::string("cannot print pointer");
   }
 
   if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
@@ -230,7 +242,7 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
 
     for (auto type : struct_type->components()) {
       if (type->name() == cdk::TYPE_POINTER) {
-        throw "cannot print pointer";
+        throw std::string("cannot print pointer");
       }
     }
   }
@@ -293,13 +305,19 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
   if (node->identifiers().size() == 1) {
     std::string &id = *node->identifiers().front();
-    auto symbol = og::make_symbol(node->type(), id, 0);
-
-    if (!_symtab.insert(id, symbol))
-      throw id + " redeclared";
 
     if (node->type()) {
-      if (node->expression() && node->is_typed(cdk::TYPE_DOUBLE) && node->expression()->is_typed(cdk::TYPE_INT)) {
+      // NOTE: if it's a ptr<auto> and the rvalue has a defined type, use it.
+      // Otherwise, create an unspecified pointer.
+      if (node->is_typed(cdk::TYPE_POINTER)) {
+        std::shared_ptr<cdk::reference_type> lptr = std::static_pointer_cast<cdk::reference_type>(node->type());
+
+        if (!lptr->referenced() && node->expression() && node->expression()->is_typed(cdk::TYPE_POINTER)) {
+          node->type(node->expression()->type());
+        } else if (!lptr->referenced()) {
+          node->type(cdk::make_reference_type(4, cdk::make_primitive_type(0, cdk::TYPE_UNSPEC)));
+        }
+      } else if (node->expression() && node->is_typed(cdk::TYPE_DOUBLE) && node->expression()->is_typed(cdk::TYPE_INT)) {
         // Do nothing...
       } else if (node->expression() && node->type() != node->expression()->type()) {
         throw std::string("wrong type for initializer");
@@ -312,19 +330,24 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       }
     }
 
+    auto symbol = og::make_symbol(node->type(), id, 0);
+
+    if (!_symtab.insert(id, symbol))
+      throw std::string(id + " redeclared");
+
     node->declared(true);
     _parent->set_new_symbol(symbol);
     return;
   }
 
   if (!node->expression()->is_typed(cdk::TYPE_STRUCT)) {
-    throw "wrong number of identifiers";
+    throw std::string("wrong number of identifiers");
   }
 
   og::tuple_node* tuple = (og::tuple_node*)(node->expression());
 
   if (tuple->nodes()->size() != node->identifiers().size()) {
-    throw "mismatching nodes and identifiers";
+    throw std::string("mismatching nodes and identifiers");
   }
 
   node->type(node->expression()->type());
@@ -337,7 +360,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     auto symbol = og::make_symbol(exp->type(), id, 0);
 
     if (!_symtab.insert(id, symbol))
-      throw id + " redeclared";
+      throw std::string(id + " redeclared");
 
     _parent->set_new_symbol(symbol);
   }
@@ -349,7 +372,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
 void og::type_checker::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   ASSERT_UNSPEC;
-  node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER));
+  node->type(cdk::make_reference_type(4, cdk::make_primitive_type(0, cdk::TYPE_UNSPEC)));
 }
 
 //---------------------------------------------------------------------------
@@ -409,10 +432,6 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
   node->expression()->accept(this, lvl+2);
   node->index()->accept(this, lvl+2);
 
-  if (!node->index()->is_typed(cdk::TYPE_INT)) {
-    throw std::string("wrong index type, must be int");
-  }
-
   if (!node->expression()->is_typed(cdk::TYPE_STRUCT)) {
     throw std::string("cannot index non-struct type");
   }
@@ -430,16 +449,28 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
-  // TODO
+  // TODO: check if dec
 }
 
-
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
+  if (node->identifier() == "og")
+    node->identifier("_main");
+  else if (node->identifier() == "_main")
+    node->identifier("._main");
+
+  auto symbol = _symtab.find(node->identifier());
+  if (symbol != nullptr) {
+    throw std::string(node->identifier() + "redeclared");
+  }
+
   // TODO
 }
 
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
   // TODO
+
+  // FIXME: avoiding some seg faults for now.
+  node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
 }
 
 //---------------------------------------------------------------------------
