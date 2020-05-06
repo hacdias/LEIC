@@ -85,6 +85,28 @@
           data-cy="suggestionPrivacyToggler"
         ></v-checkbox>
       </div>
+      <div class="items custom" data-cy="queriesStats">
+        <div class="project-name ">
+          <p>Queries</p>
+        </div>
+        <div class="small-info">
+          <p data-cy="totalQueriesSubmitted">
+            {{ stats.totalQueriesSubmitted }} Total
+          </p>
+          <p data-cy="sharedQueries">
+            {{ stats.sharedQueries }} Shared
+          </p>
+          <p v-if="stats.totalQueriesSubmitted > 0">
+            {{
+              stats.sharedQueries === 0
+                ? 0
+                : (stats.sharedQueries /
+                    stats.totalQueriesSubmitted) *
+                  100
+            }}% Shared Rate
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
