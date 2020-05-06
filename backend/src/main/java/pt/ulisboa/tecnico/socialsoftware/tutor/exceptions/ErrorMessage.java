@@ -92,7 +92,9 @@ public enum ErrorMessage {
     STUDENT_NOT_ENROLLED("The student %d is not enrolled in tournament %d"),
     STUDENT_NOT_CREATOR("The student %d is not creator of tournament %d"),
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
-    TOPIC_NOT_SELECTED("No topic selected.");
+    TOPIC_NOT_SELECTED("No topic selected."),
+    CANNOT_GENERATE_TOURNAMENT_QUIZ("Tournament %d status doesn't allow tournament quiz generation"),
+    INVALID_STATUS_FOR_TOURNAMENT("Invalid status for tournament");
 
     public final String label;
 

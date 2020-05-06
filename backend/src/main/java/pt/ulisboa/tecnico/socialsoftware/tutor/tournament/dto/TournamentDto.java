@@ -21,6 +21,7 @@ public class TournamentDto implements Serializable {
     private String availableDate = null;
     private String conclusionDate = null;
     private String title;
+    private String status;
     private Integer numberQuestions;
     private Set<TopicDto> topics = new HashSet<>();
 
@@ -33,6 +34,7 @@ public class TournamentDto implements Serializable {
         this.id = tournament.getId();
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
+        this.status = tournament.getStatus().toString();
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -89,6 +91,14 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public Integer getNumberQuestions() {
         return numberQuestions;
     }
@@ -96,6 +106,7 @@ public class TournamentDto implements Serializable {
     public void setNumberQuestions(Integer numberQuestions) {
         this.numberQuestions = numberQuestions;
     }
+
 
     public LocalDateTime getCreationDateDate() {
         if (getCreationDate() == null || getCreationDate().isEmpty()) {
@@ -134,9 +145,10 @@ public class TournamentDto implements Serializable {
     public String toString() {
         return "TournamentDto{" +
                 "id=" + id +
-                ", creationDate=" + creationDate + '\'' +
+                ", status=" + status +
+                ", creationDate='" + creationDate + '\'' +
                 ", availableDate='" + availableDate + '\'' +
-                ", conclusionDate=" + conclusionDate + '\'' +
+                ", conclusionDate='" + conclusionDate + '\'' +
                 ", title=" + title +
                 '}';
     }

@@ -15,6 +15,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 
 
 @Entity
@@ -22,6 +24,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
         name = "tournaments"
         )
 public class Tournament {
+
+    public enum TournamentStatus {
+        CAN_NOT_GENERATE_QUIZ, CAN_GENERATE_QUIZ, QUIZ_GENERATED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +52,9 @@ public class Tournament {
     @Column(name = "number_questions")
     private Integer numberQuestions;
 
+    @Enumerated(EnumType.STRING)
+    private TournamentStatus status = TournamentStatus.CAN_NOT_GENERATE_QUIZ;
+
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "tournaments",  fetch=FetchType.LAZY)
     public Set<Topic> topics = new HashSet<>();
     
@@ -54,7 +63,10 @@ public class Tournament {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_execution_id")
-    private CourseExecution courseExecution;   
+    private CourseExecution courseExecution;
+
+    @OneToOne()
+    public Quiz quiz = null;
     
     public Tournament() {}
 
@@ -66,6 +78,7 @@ public class Tournament {
         setAvailableDate(tournamentDto.getAvailableDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         setTitle(tournamentDto.getTitle());
+        setStatus(tournamentDto.getStatus());
     }
 
     public Integer getId() {
@@ -120,6 +133,20 @@ public class Tournament {
         this.title = title;
     }
 
+    public TournamentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        if (status != null) {
+            try {
+                this.status = TournamentStatus.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                throw new TutorException(INVALID_STATUS_FOR_TOURNAMENT);
+            }
+        }
+    }
+
     public Integer getNumberQuestions() {
         return numberQuestions;
     }
@@ -154,6 +181,9 @@ public class Tournament {
     public void addEnrolledStudent(User student) {
         this.enrolledStudents.add(student);
         student.addEnrolledTournament(this);
+        if (this.enrolledStudents.size() > 1) {
+            this.status = TournamentStatus.CAN_GENERATE_QUIZ;
+        }
     }
 
     public void addTopic(Topic topic) {
@@ -161,17 +191,8 @@ public class Tournament {
         topic.addTournament(this);
     }
 
-    @Override
-    public String toString() {
-        return "Tournament{" +
-                "id=" + id +
-                "student=" + student.getName() +
-                ", creationDate=" + creationDate +
-                ", availableDate=" + availableDate +
-                ", conclusionDate=" + conclusionDate +
-                ", title='" + title + '\'' +
-                ", numberQuestions='" + numberQuestions + '\'' +
-                '}';
+    public void setStatus(TournamentStatus status) {
+        this.status = status;
     }
 
     private void checkTitle(String title) {
@@ -204,6 +225,10 @@ public class Tournament {
         }
     }
 
+    public Quiz getQuiz() {
+        return quiz;
+    }
+
     public void remove() {
         student.getCreatedTournaments().remove(this);
         student = null;
@@ -216,5 +241,19 @@ public class Tournament {
 
         courseExecution.getTournaments().remove(this);
         courseExecution = null;
+    }
+
+    @Override
+    public String toString() {
+        return "Tournament{" +
+                "id=" + id +
+                ", student=" + student.getName() +
+                ", status=" + status +
+                ", creationDate=" + creationDate +
+                ", availableDate=" + availableDate +
+                ", conclusionDate=" + conclusionDate +
+                ", title='" + title + '\'' +
+                ", numberQuestions='" + numberQuestions + '\'' +
+                '}';
     }
 }
