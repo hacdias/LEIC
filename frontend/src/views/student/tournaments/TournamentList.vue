@@ -36,22 +36,19 @@
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom v-if="!item.enrolled">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="enroll(item, item.id)">
-              add</v-icon
-            >
+            <v-icon small class="mr-2" v-on="on" @click="enroll(item, item.id)">add</v-icon>
           </template>
           <span>Enroll</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.enrolled">
           <template v-slot:activator="{ on }">
-            <v-icon
-              small
-              class="mr-2"
-              v-on="on"
-              @click="deleteTournament(item.id)"
-              color="red"
-            >delete</v-icon
-            >
+            <v-icon small class="mr-2" v-on="on" @click="showDetails(item)">visibility</v-icon>
+          </template>
+          <span>View</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="item.creator && item.status != 'QUIZ_GENERATED'">
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on" @click="deleteTournament(item.id)" color="red">delete</v-icon>
           </template>
           <span>Delete Tournament</span>
         </v-tooltip>
@@ -70,6 +67,7 @@ export default class TournamentList extends Vue {
   tournaments: Tournament[] = [];
   tournament: Tournament | null = null;
   enrolledTournaments: Tournament[] = [];
+  createdTournaments: Tournament[] = [];
   search: string = '';
 
   headers: object = [
@@ -108,6 +106,14 @@ export default class TournamentList extends Vue {
           }
         });
       });
+      this.createdTournaments = await RemoteServices.getCreatedTournaments();
+      this.tournaments.forEach(tournament => {
+        this.createdTournaments.forEach(tournament1 => {
+          if (tournament.id == tournament1.id) {
+            tournament.creator = true;
+          }
+        });
+      });
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
@@ -117,7 +123,14 @@ export default class TournamentList extends Vue {
   async enroll(tournament: Tournament, tournamentId: number) {
     if (confirm('Are you sure you want to enroll this tournament?')) {
       try {
-        await RemoteServices.enroll(tournamentId);
+        tournament = await RemoteServices.enroll(tournamentId);
+        this.tournaments = this.tournaments.filter(
+                tournament1 => tournament1.id !== tournament.id
+        );
+        this.tournaments.unshift(tournament);
+        if (this.createdTournaments.find(tournament1 => tournament1.id === tournamentId)) {
+          tournament.creator = true;
+        }
         tournament.enrolled = true;
       } catch (error) {
         await this.$store.dispatch('error', error);
@@ -133,6 +146,24 @@ export default class TournamentList extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+    }
+  }
+
+  async showDetails(tournament: Tournament) {
+    if (tournament.status == 'CAN_GENERATE_QUIZ') {
+      try {
+        await RemoteServices.generateTournamentQuiz(tournament.id);
+        tournament.status = 'QUIZ_GENERATED';
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+    this.$emit('showDetails', tournament);
+  }
+
+  async canDelete(tournament: Tournament) {
+    if (tournament.creator) {
+      return true;
     }
   }
 }
