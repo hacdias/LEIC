@@ -267,13 +267,13 @@ void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_break_node(og::break_node *const node, int lvl) {
-  // TODO
+  // EMPTY
 }
 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_continue_node(og::continue_node *const node, int lvl) {
-  // TODO
+  // EMPTY
 }
 
 //---------------------------------------------------------------------------
@@ -341,7 +341,13 @@ void og::type_checker::do_nullptr_node(og::nullptr_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
-  // TODO
+  ASSERT_UNSPEC;
+  node->argument()->accept(this, lvl + 2);
+
+  if (!node->argument()->is_typed(cdk::TYPE_INT))
+    throw std::string("wrong type in argument of unary expression");
+
+  node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER));
 }
 
 //---------------------------------------------------------------------------
@@ -353,7 +359,7 @@ void og::type_checker::do_mem_addr_node(og::mem_addr_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_block_node(og::block_node *const node, int lvl) {
-  // TODO
+  // EMPTY
 }
 
 //---------------------------------------------------------------------------
