@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <h2>Query History</h2>
+    <question-of-query-component :questionAnswer="query.questionAnswer" />
+    <br />
     <query-component
       data-cy="queryComponent"
       :query="query"
@@ -38,7 +40,6 @@ import EditQueryDialog from '@/views/student/query/EditQueryDialog.vue';
   }
 })
 export default class QueryView extends Vue {
-  createQueryAnswerDialog: boolean = false;
   editQueryDialog: boolean = false;
 
   question: Question | null = null;
@@ -49,22 +50,12 @@ export default class QueryView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.answers = await RemoteServices.getAnswersToQuery();
+      if (this.query && this.query.id)
+        this.answers = await RemoteServices.getAnswersToQuery(this.query.id);
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
-  }
-
-  async newQueryAnswer() {
-    this.currentQueryAnswer = new QueryAnswer();
-    this.createQueryAnswerDialog = true;
-  }
-
-  async onSaveQueryAnswer(queryAnswer: QueryAnswer) {
-    this.answers = this.answers.filter(a => a.id !== queryAnswer.id);
-    this.answers.push(queryAnswer);
-    this.currentQueryAnswer = null;
   }
 
   editQuery() {

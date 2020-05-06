@@ -6,6 +6,7 @@
         <div class="col">Title</div>
         <div class="col">Date Created</div>
         <div class="col">Number of Answers</div>
+        <div class="col">Shared</div>
         <div class="col last-col"></div>
       </li>
       <show-query-list :queries="queries" @see-query="seeQuery" />

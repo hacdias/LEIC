@@ -29,7 +29,7 @@ public class AnswerQueryController {
         return this.answerQueryService.getAnswersToQuery(queryId);
     }
 
-    @GetMapping("/user/answersQueries")
+    @GetMapping("/user/answers-queries")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<AnswerQueryDto> getAnswersByTeacher(Principal principal) {
         User teacher = (User) ((Authentication) principal).getPrincipal();
@@ -43,13 +43,20 @@ public class AnswerQueryController {
         return this.answerQueryService.createAnswerQuery(queryId, teacher.getId(), answerQueryDto);
     }
 
-    @PutMapping("/answerQueries/{answerQueryId}")
+    @PostMapping("/answer-queries/{answerQueryId}/further-clarification")
+    @PreAuthorize("hasPermission(#answerQueryId, 'ANSWER.QUERY.ACCESS')")
+    public AnswerQueryDto createFurtherClarification(Principal principal, @PathVariable int answerQueryId, @Valid @RequestBody AnswerQueryDto furtherClarificationDto) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        return this.answerQueryService.addFurtherClarification(answerQueryId, user.getId(), furtherClarificationDto);
+    }
+
+    @PutMapping("/answer-queries/{answerQueryId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#answerQueryId, 'ANSWER.QUERY.ALTER')")
     public AnswerQueryDto updateAnswerQuery(@PathVariable Integer answerQueryId, @Valid @RequestBody AnswerQueryDto answerQueryDto) {
         return this.answerQueryService.updateAnswerQuery(answerQueryId, answerQueryDto);
     }
 
-    @DeleteMapping("/answerQueries/{answerQueryId}")
+    @DeleteMapping("/answer-queries/{answerQueryId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#answerQueryId, 'ANSWER.QUERY.ALTER')")
     public ResponseEntity removeAnswerQuery(@PathVariable Integer answerQueryId) throws IOException {
         logger.debug("removeAnswerQuery answerQueryId: {}: ", answerQueryId);

@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <h2>Query History</h2>
-    <question-of-query-component :question="question" />
+    <question-of-query-component :questionAnswer="query.questionAnswer" />
     <br />
-    <query-component :query="query" />
+    <query-component :query="query" @share-query="shareQuery" />
     <br />
     <show-query-answer-list
       :answers="answers"
@@ -23,6 +23,7 @@
     <create-query-answer-dialog
       v-if="currentQueryAnswer"
       v-model="createQueryAnswerDialog"
+      :queryId="query.id"
       :queryAnswer="currentQueryAnswer"
       v-on:save-query-answer="onSaveQueryAnswer"
     />
@@ -60,7 +61,6 @@ export default class QueryView extends Vue {
   createQueryAnswerDialog: boolean = false;
   editQueryAnswerDialog: boolean = false;
 
-  question: Question | null = null;
   query: Query | null = this.$store.getters.getCurrentQuery;
   answers: QueryAnswer[] = [];
   currentQueryAnswer: QueryAnswer | null = null;
@@ -68,9 +68,8 @@ export default class QueryView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.answers = await RemoteServices.getAnswersToQuery();
-      if (this.query != null && this.query.questionId != null)
-        this.question = await RemoteServices.getQuestion(this.query.questionId);
+      if (this.query && this.query.id)
+        this.answers = await RemoteServices.getAnswersToQuery(this.query.id);
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
@@ -104,6 +103,20 @@ export default class QueryView extends Vue {
       try {
         await RemoteServices.deleteQueryAnswer(answer.id);
         this.answers = this.answers.filter(a => a.id !== answer.id);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+  }
+
+  async shareQuery() {
+    if (
+      this.query &&
+      this.query.id &&
+      confirm('Are you sure you want to share this query?')
+    ) {
+      try {
+        this.query = (await RemoteServices.shareQuery(this.query.id)).data;
       } catch (error) {
         await this.$store.dispatch('error', error);
       }

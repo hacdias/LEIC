@@ -1,10 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuestionAnswerDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
-
 
 public class QueryDto implements Serializable {
     private Integer id;
@@ -12,24 +12,28 @@ public class QueryDto implements Serializable {
     private String content;
     private String creationDate = null;
     private Integer numberAnswers;
-    private Integer questionId;
+    private QuestionAnswerDto questionAnswer;
     private String byUsername;
     private String byName;
+    private Boolean shared;
 
     public QueryDto() {
     }
 
     public QueryDto(Query query) {
-        this.id = query.getId();
-        this.title = query.getTitle();
-        this.content = query.getContent();
-        this.numberAnswers = query.getAnswers().size();
-        this.questionId = query.getQuestion().getId();
-        this.byUsername = query.getStudent().getUsername();
-        this.byName = query.getStudent().getName();
+        setId(query.getId());
+        setTitle(query.getTitle());
+        setContent(query.getContent());
+        setNumberAnswers(query.getAnswers().size());
+        setQuestionAnswer(new QuestionAnswerDto(query.getQuestionAnswer()));
+        setByUsername(query.getStudent().getUsername());
+        setByName(query.getStudent().getName());
+
+        if (query.getShared() != null) { setShared(query.getShared()); }
+        else { setShared(false); }
 
         if (query.getCreationDate() != null)
-            this.creationDate = query.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            setCreationDate(DateHandler.toISOString(query.getCreationDate()));
     }
 
     public Integer getId() { return id; }
@@ -44,23 +48,31 @@ public class QueryDto implements Serializable {
 
     public void setContent(String content) { this.content = content; }
 
+    public Boolean getShared() { return shared; }
+
+    public void setShared(Boolean shared) { this.shared = shared; }
+
     public String getCreationDate() { return creationDate; }
 
     public void setCreationDate(String creationDate) { this.creationDate = creationDate; }
 
     public Integer getNumberAnswers() { return numberAnswers; }
 
-    public Integer getQuestionId() { return questionId; }
+    public void setNumberAnswers(Integer numberAnswers) {
+        this.numberAnswers = numberAnswers;
+    }
 
-    public void setQuestionId(Integer questionId) { this.questionId = questionId; }
+    public QuestionAnswerDto getQuestionAnswer() { return questionAnswer; }
 
-    public String getbyName() { return this.byName; }
+    public void setQuestionAnswer(QuestionAnswerDto questionAnswer) { this.questionAnswer = questionAnswer; }
 
-    public void setbyUsername(String byUsername) { this.byUsername = byUsername; }
+    public String getByName() { return byName; }
 
-    public String getbyUsername() { return this.byUsername; }
+    public void setByUsername(String byUsername) { this.byUsername = byUsername; }
 
-    public void setbyName(String byName) { this.byName = byName; }
+    public String getByUsername() { return byUsername; }
+
+    public void setByName(String byName) { this.byName = byName; }
 
     @Override
     public String toString() {
@@ -69,6 +81,11 @@ public class QueryDto implements Serializable {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +
+                ", numberAnswers=" + numberAnswers +
+                ", questionAnswer=" + questionAnswer +
+                ", byUsername='" + byUsername + '\'' +
+                ", byName='" + byName + '\'' +
+                ", shared=" + shared +
                 '}';
     }
 }

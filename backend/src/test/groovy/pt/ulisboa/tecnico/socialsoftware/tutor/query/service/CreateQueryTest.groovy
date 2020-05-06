@@ -165,6 +165,7 @@ class CreateQueryTest extends Specification {
         result.getStudent().getUsername() == USER_USERNAME
         question.getQueries().contains(result)
         student.getQueries().contains(result)
+        !result.getShared();
     }
 
     def "create two queries on different questions"() {
@@ -217,6 +218,7 @@ class CreateQueryTest extends Specification {
         result1.getStudent().getUsername() == USER_USERNAME
         question.getQueries().contains(result1)
         student.getQueries().contains(result1)
+        !result1.getShared();
 
         and: "the second query is properly saved"
         result2.getId() != null
@@ -228,6 +230,7 @@ class CreateQueryTest extends Specification {
         result2.getStudent().getUsername() == USER_USERNAME
         question2.getQueries().contains(result2)
         student.getQueries().contains(result2)
+        !result2.getShared();
     }
 
     def "create two queries on same question"() {
@@ -273,6 +276,7 @@ class CreateQueryTest extends Specification {
         result1.getStudent().getUsername() == USER_USERNAME
         question.getQueries().contains(result1)
         student.getQueries().contains(result1)
+        !result1.getShared();
 
         and: "the second query is properly saved"
         result2.getId() != null
@@ -284,6 +288,7 @@ class CreateQueryTest extends Specification {
         result2.getStudent().getUsername() == USER_USERNAME
         question.getQueries().contains(result2)
         student.getQueries().contains(result2)
+        !result2.getShared();
     }
 
     def "not a student creates a query"() {
