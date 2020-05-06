@@ -570,7 +570,11 @@ export default class RemoteServices {
       });
   }
 
-  static createQuery(questionId: number, questionAnswerId: number, query: Query): Promise<Query> {
+  static createQuery(
+    questionId: number,
+    questionAnswerId: number,
+    query: Query
+  ): Promise<Query> {
     return httpClient
       .post(
         `/question/${questionId}/question-answer/${questionAnswerId}/queries`,
@@ -661,7 +665,10 @@ export default class RemoteServices {
       });
   }
 
-  static createQueryAnswer(queryId: number, queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+  static createQueryAnswer(
+    queryId: number,
+    queryAnswer: QueryAnswer
+  ): Promise<QueryAnswer> {
     return httpClient
       .post(`/query/${queryId}/answers`, queryAnswer)
       .then(response => {
@@ -693,11 +700,28 @@ export default class RemoteServices {
       });
   }
 
-  static createFurtherClarification(queryAnswerId: number, furtherClarification: QueryAnswer): Promise<QueryAnswer> {
+  static createFurtherClarification(
+    queryAnswerId: number,
+    furtherClarification: QueryAnswer
+  ): Promise<QueryAnswer> {
     return httpClient
-      .post(`/answer-queries/${queryAnswerId}/further-clarification`, furtherClarification)
+      .post(
+        `/answer-queries/${queryAnswerId}/further-clarification`,
+        furtherClarification
+      )
       .then(response => {
         return new QueryAnswer(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static toggleQueryStatPrivacy(): Promise<void> {
+    return httpClient
+      .post('/queries/toggle-privacy')
+      .then(() => {
+        return;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));

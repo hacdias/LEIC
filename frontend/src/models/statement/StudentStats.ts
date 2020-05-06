@@ -13,6 +13,7 @@ export default class StudentStats {
   sharedQueries!: number;
 
   privateSuggestionStats!: Boolean;
+  privateQueryStats!: Boolean;
 
   constructor(jsonObj?: StudentStats) {
     if (jsonObj) {
@@ -29,6 +30,7 @@ export default class StudentStats {
       this.totalQueriesSubmitted = jsonObj.totalQueriesSubmitted;
       this.sharedQueries = jsonObj.sharedQueries;
       this.privateSuggestionStats = jsonObj.privateSuggestionStats;
+      this.privateQueryStats = jsonObj.privateQueryStats;
     }
   }
 }

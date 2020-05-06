@@ -39,4 +39,8 @@ describe('Check Statistics', () => {
   it('toggle suggestions stats privacy', () => {
     cy.get('[data-cy="suggestionPrivacyToggler"]').check({ force: true }).should('be.checked')      
   });
+
+  it('toggle queries stats privacy', () => {
+    cy.get('[data-cy="queryPrivacyToggler"]').check({ force: true }).should('be.checked')
+  });
 });
