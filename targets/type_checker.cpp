@@ -380,12 +380,6 @@ void og::type_checker::do_block_node(og::block_node *const node, int lvl) {
 
 //---------------------------------------------------------------------------
 
-void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
-  // TODO
-}
-
-//---------------------------------------------------------------------------
-
 void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_UNSPEC;
   node->value()->accept(this, lvl+2);
@@ -433,6 +427,13 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
   node->type(struct_type->component(idx - 1));
 }
 
+//---------------------------------------------------------------------------
+
+void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
+  // TODO
+}
+
+
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
   // TODO
 }
@@ -440,6 +441,8 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
   // TODO
 }
+
+//---------------------------------------------------------------------------
 
 void og::type_checker::do_tuple_node(og::tuple_node *const node, int lvl) {
   ASSERT_UNSPEC;
