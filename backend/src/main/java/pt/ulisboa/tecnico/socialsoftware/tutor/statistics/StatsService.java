@@ -113,6 +113,7 @@ public class StatsService {
         statsDto.setPrivateSuggestionStats(user.getPrivateSuggestionStats());
         statsDto.setTotalQueriesSubmitted(totalQueriesSubmitted);
         statsDto.setSharedQueries(sharedQueries);
+        statsDto.setPrivateQueryStats(user.getPrivateQueryStats());
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);
             statsDto.setImprovedCorrectAnswers(((float)uniqueCorrectAnswers)*100/uniqueQuestions);

@@ -178,4 +178,15 @@ public class QueryService {
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());
     }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void toggleStatsPrivacy(Integer studentId) {
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
+
+        student.setPrivateQueryStats(!student.getPrivateQueryStats());
+    }
 }
