@@ -87,10 +87,10 @@ void og::type_checker::processBinaryExpression(cdk::binary_operation_node *const
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 
   else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_POINTER))
-    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER));
+    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER)); // TODO: make_reference_type POINTER TO WHERE?
 
   else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_POINTER) && node->right()->is_typed(cdk::TYPE_INT))
-    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER));
+    node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER)); // TODO: make_reference_type POINTER TO WHERE?
 
   else throw std::string("wrong type for binary expression");
 }
@@ -347,13 +347,15 @@ void og::type_checker::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl
   if (!node->argument()->is_typed(cdk::TYPE_INT))
     throw std::string("wrong type in argument of unary expression");
 
-  node->type(cdk::make_primitive_type(4, cdk::TYPE_POINTER));
+  node->type(cdk::make_reference_type(4, cdk::make_primitive_type(0, cdk::TYPE_UNSPEC)));
 }
 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
-  // TODO
+  ASSERT_UNSPEC;
+  node->lvalue()->accept(this, lvl + 2);
+  node->type(cdk::make_reference_type(4, node->lvalue()->type()));
 }
 
 //---------------------------------------------------------------------------
@@ -375,7 +377,20 @@ void og::type_checker::do_sizeof_node(og::sizeof_node *const node, int lvl) {
 }
 
 void og::type_checker::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
-  // TODO
+  ASSERT_UNSPEC;
+
+  node->pointer()->accept(this, lvl+2);
+  node->index()->accept(this, lvl+2);
+
+  if (!node->index()->is_typed(cdk::TYPE_INT)) {
+    throw std::string("wrong index type, must be int");
+  }
+
+  if (!node->pointer()->is_typed(cdk::TYPE_POINTER)) {
+    throw std::string("cannot index non-pointer type");
+  }
+
+  node->type(((std::static_pointer_cast<cdk::reference_type>)(node->pointer()->type()))->referenced());
 }
 
 void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
