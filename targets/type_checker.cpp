@@ -394,7 +394,27 @@ void og::type_checker::do_ptr_index_node(og::ptr_index_node *const node, int lvl
 }
 
 void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
-  // TODO
+  ASSERT_UNSPEC;
+
+  node->expression()->accept(this, lvl+2);
+  node->index()->accept(this, lvl+2);
+
+  if (!node->index()->is_typed(cdk::TYPE_INT)) {
+    throw std::string("wrong index type, must be int");
+  }
+
+  if (!node->expression()->is_typed(cdk::TYPE_STRUCT)) {
+    throw std::string("cannot index non-struct type");
+  }
+
+  std::shared_ptr<cdk::structured_type> struct_type = std::static_pointer_cast<cdk::structured_type>(node->expression()->type());
+  unsigned int idx = node->index()->value();
+
+  if (idx > struct_type->length()) {
+    throw std::string("invalid tuple index");
+  }
+
+  node->type(struct_type->component(idx - 1));
 }
 
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
