@@ -342,7 +342,7 @@ public class User implements UserDetails, DomainEntity {
     }
 
     public void setPrivateQueryStats(Boolean privateQueryStats) {
-        this.privateQueryStats = privateSuggestionStats;
+        this.privateQueryStats = privateQueryStats;
     }
 
     @Override
