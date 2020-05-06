@@ -11,6 +11,7 @@ namespace og {
     std::shared_ptr<cdk::basic_type> _type;
     std::string _name;
     long _value; // hack!
+    // TODO: remove value?
 
   public:
     symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, long value) :
@@ -37,6 +38,11 @@ namespace og {
       return _value = v;
     }
   };
+
+  // this function simplifies symbol creation in the type_checker visitor (see below)
+  inline auto make_symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, long value) {
+    return std::make_shared<symbol>(type, name, value);
+  }
 
 } // og
 
