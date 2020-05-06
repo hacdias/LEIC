@@ -80,8 +80,8 @@ var       :              type tIDENTIFIER                        { $$ = new og::
           |              type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
           | tPUBLIC      type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, true, false, $2, $3, $5); }
           | tREQUIRE     type tIDENTIFIER '=' expr               { $$ = new og::var_decl_node(LINE, false, true, $2, $3, $5); }
-          |              tTPAUTO ids '=' tuple                   { $$ = new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); }
-          | tPUBLIC      tTPAUTO ids '=' tuple                   { $$ = new og::var_decl_node(LINE, true, false, new cdk::primitive_type(), $3, $5); }
+          |              tTPAUTO ids '=' tuple                   { $$ = new og::var_decl_node(LINE, false, false, nullptr, $2, $4); }
+          | tPUBLIC      tTPAUTO ids '=' tuple                   { $$ = new og::var_decl_node(LINE, true, false, nullptr, $3, $5); }
           ;
 
 ids       : tIDENTIFIER                                          { $$ = new std::vector<std::string*>(); $$->push_back($1); }
@@ -94,12 +94,12 @@ func      :          type     tIDENTIFIER '(' args ')'           { $$ = new og::
           |          type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, $1, $2, $4, $6); }
           | tPUBLIC  type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, $2, $3, $5, $7); }
           | tREQUIRE type     tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, $2, $3, $5, $7); }
-          |          tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); }
-          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, true, false, new cdk::primitive_type(), $3, $5); }
-          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, true, new cdk::primitive_type(), $3, $5); }
-          |          tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, new cdk::primitive_type(), $2, $4, $6); }
-          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, new cdk::primitive_type(), $3, $5, $7); }
-          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, new cdk::primitive_type(), $3, $5, $7); }
+          |          tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, false, nullptr, $2, $4); }
+          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, true, false, nullptr, $3, $5); }
+          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')'           { $$ = new og::func_decl_node(LINE, false, true, nullptr, $3, $5); }
+          |          tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, false, nullptr, $2, $4, $6); }
+          | tPUBLIC  tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, true, false, nullptr, $3, $5, $7); }
+          | tREQUIRE tTPAUTO  tIDENTIFIER '(' args ')' block     { $$ = new og::func_def_node(LINE, false, true, nullptr, $3, $5, $7); }
           ;
 
 proc      :          tPROCEDURE tIDENTIFIER '(' args ')'         { $$ = new og::func_decl_node(LINE, false, false, new cdk::primitive_type(0, cdk::TYPE_VOID), $2, $4); }
@@ -125,12 +125,12 @@ type      : tTPINT                                               { $$ = new cdk:
           | tTPREAL                                              { $$ = new cdk::primitive_type(8, cdk::TYPE_DOUBLE); }
           | tTPSTRING                                            { $$ = new cdk::primitive_type(4, cdk::TYPE_STRING); }
           | tTPPTR '<' type '>'                                  { $$ = new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>($3)); }
-          | tTPPTR '<' tTPAUTO '>'                               { $$ = new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>(new cdk::primitive_type())); }
+          | tTPPTR '<' tTPAUTO '>'                               { $$ = new cdk::reference_type(4, std::shared_ptr<cdk::basic_type>(nullptr)); }
           ;
 
 bvar      : type tIDENTIFIER                                     { $$ = new og::var_decl_node(LINE, false, false, $1, $2, nullptr); }
           | type tIDENTIFIER '=' expr                            { $$ = new og::var_decl_node(LINE, false, false, $1, $2, $4); }
-          | tTPAUTO ids '=' tuple                                { $$ = new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4); }
+          | tTPAUTO ids '=' tuple                                { $$ = new og::var_decl_node(LINE, false, false, nullptr, $2, $4); }
           ;
 
 bvars     : bvar ';'                                             { $$ = new cdk::sequence_node(LINE, $1); }
@@ -172,7 +172,7 @@ fnvars_aux: fnvar                                                { $$ = new cdk:
           | fnvars_aux ',' fnvar                                 { $$ = new cdk::sequence_node(LINE, $3, $1); }
           ;
 
-fnvars    : tTPAUTO ids '=' tuple                                { $$ = new cdk::sequence_node(LINE, new og::var_decl_node(LINE, false, false, new cdk::primitive_type(), $2, $4)); }
+fnvars    : tTPAUTO ids '=' tuple                                { $$ = new cdk::sequence_node(LINE, new og::var_decl_node(LINE, false, false, nullptr, $2, $4)); }
           | fnvars_aux                                           { $$ = $1; }
           ;
 
