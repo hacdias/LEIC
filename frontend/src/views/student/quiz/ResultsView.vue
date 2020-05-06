@@ -66,9 +66,7 @@
         data-cy="createQueryButton"
         color="primary"
         dark
-        @click="
-          newQuery(statementManager.statementQuiz.questions[questionOrder])
-        "
+        @click="newQuery()"
       >
         Create Query
       </v-btn>
@@ -76,6 +74,12 @@
     <create-query-dialog
       v-if="currentQuery"
       v-model="createQueryDialog"
+      :questionId="
+        statementManager.statementQuiz.questions[questionOrder].questionId
+      "
+      :questionAnswerId="
+        statementManager.statementQuiz.questions[questionOrder].id
+      "
       :query="currentQuery"
       v-on:save-query="onSaveQuery"
     />
@@ -138,8 +142,7 @@ export default class ResultsView extends Vue {
     }
   }
 
-  async newQuery(currentQuestion: StatementQuestion) {
-    await this.$store.dispatch('currentQuestion', currentQuestion);
+  async newQuery() {
     this.currentQuery = new Query();
     this.createQueryDialog = true;
   }

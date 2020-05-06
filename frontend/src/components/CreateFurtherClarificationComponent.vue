@@ -57,6 +57,7 @@ export default class createFurtherClarificationDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: QueryAnswer, required: true })
   readonly furtherClarification!: QueryAnswer;
+  @Prop({ type: Number, required: true }) readonly queryAnswerId!: number;
   createFurtherClarification!: QueryAnswer;
 
   created() {
@@ -80,6 +81,7 @@ export default class createFurtherClarificationDialog extends Vue {
     if (this.createFurtherClarification) {
       try {
         const result = await RemoteServices.createFurtherClarification(
+          this.queryAnswerId,
           this.createFurtherClarification
         );
         this.$emit('save-further-clarification', result);

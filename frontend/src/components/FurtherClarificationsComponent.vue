@@ -1,6 +1,11 @@
 <template>
   <div>
-    <v-card grid-list-md fluid color="blue" data-cy="furtherClarificationComponent">
+    <v-card
+      grid-list-md
+      fluid
+      color="blue"
+      data-cy="furtherClarificationComponent"
+    >
       <v-card-text class="text-left">
         <v-layout column wrap>
           <v-card
@@ -41,6 +46,7 @@
     <create-further-clarification-dialog
       v-if="currentFurtherClarification"
       v-model="createFurtherClarificationDialog"
+      :queryAnswerId="queryAnswer.id"
       :furtherClarification="currentFurtherClarification"
       v-on:save-further-clarification="onSaveFurtherClarification"
     />
@@ -64,7 +70,6 @@ export default class FurtherClarificationsComponent extends Vue {
   currentFurtherClarification: QueryAnswer | null = null;
 
   async addClarification() {
-    this.$store.dispatch('currentQueryAnswer', this.queryAnswer);
     this.currentFurtherClarification = new QueryAnswer();
     this.createFurtherClarificationDialog = true;
   }

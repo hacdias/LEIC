@@ -59,6 +59,8 @@ import RemoteServices from '@/services/RemoteServices';
 @Component
 export default class CreateQueryDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
+  @Prop({ type: Number, required: true }) readonly questionId!: number;
+  @Prop({ type: Number, required: true }) readonly questionAnswerId!: number;
   @Prop({ type: Query, required: true }) readonly query!: Query;
   createQuery!: Query;
 
@@ -77,7 +79,11 @@ export default class CreateQueryDialog extends Vue {
 
     if (this.createQuery) {
       try {
-        const result = await RemoteServices.createQuery(this.createQuery);
+        const result = await RemoteServices.createQuery(
+          this.questionId,
+          this.questionAnswerId,
+          this.createQuery
+        );
         this.$emit('save-query', result);
       } catch (error) {
         await this.$store.dispatch('error', error);

@@ -54,6 +54,7 @@ export default class createQueryAnswerDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: QueryAnswer, required: true })
   readonly queryAnswer!: QueryAnswer;
+  @Prop({ type: Number, required: true }) readonly queryId!: number;
   createQueryAnswer!: QueryAnswer;
 
   created() {
@@ -69,6 +70,7 @@ export default class createQueryAnswerDialog extends Vue {
     if (this.createQueryAnswer) {
       try {
         const result = await RemoteServices.createQueryAnswer(
+          this.queryId,
           this.createQueryAnswer
         );
         this.$emit('save-query-answer', result);

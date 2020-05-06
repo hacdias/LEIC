@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuestionAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.domain.Query;
 
@@ -11,7 +12,7 @@ public class QueryDto implements Serializable {
     private String content;
     private String creationDate = null;
     private Integer numberAnswers;
-    private Integer questionId;
+    private QuestionAnswerDto questionAnswer;
     private String byUsername;
     private String byName;
     private Boolean shared;
@@ -24,7 +25,7 @@ public class QueryDto implements Serializable {
         setTitle(query.getTitle());
         setContent(query.getContent());
         setNumberAnswers(query.getAnswers().size());
-        setQuestionId(query.getQuestion().getId());
+        setQuestionAnswer(new QuestionAnswerDto(query.getQuestionAnswer()));
         setByUsername(query.getStudent().getUsername());
         setByName(query.getStudent().getName());
 
@@ -61,9 +62,9 @@ public class QueryDto implements Serializable {
         this.numberAnswers = numberAnswers;
     }
 
-    public Integer getQuestionId() { return questionId; }
+    public QuestionAnswerDto getQuestionAnswer() { return questionAnswer; }
 
-    public void setQuestionId(Integer questionId) { this.questionId = questionId; }
+    public void setQuestionAnswer(QuestionAnswerDto questionAnswer) { this.questionAnswer = questionAnswer; }
 
     public String getByName() { return byName; }
 
@@ -81,7 +82,7 @@ public class QueryDto implements Serializable {
                 ", content='" + content + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", numberAnswers=" + numberAnswers +
-                ", questionId=" + questionId +
+                ", questionAnswer=" + questionAnswer +
                 ", byUsername='" + byUsername + '\'' +
                 ", byName='" + byName + '\'' +
                 ", shared=" + shared +

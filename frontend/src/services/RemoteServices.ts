@@ -570,10 +570,10 @@ export default class RemoteServices {
       });
   }
 
-  static createQuery(query: Query): Promise<Query> {
+  static createQuery(questionId: number, questionAnswerId: number, query: Query): Promise<Query> {
     return httpClient
       .post(
-        `/question/${Store.getters.getCurrentQuestion.questionId}/question-answer/${Store.getters.getCurrentQuestion.id}/queries`,
+        `/question/${questionId}/question-answer/${questionAnswerId}/queries`,
         query
       )
       .then(response => {
@@ -648,9 +648,9 @@ export default class RemoteServices {
       });
   }
 
-  static getAnswersToQuery(): Promise<QueryAnswer[]> {
+  static getAnswersToQuery(queryId: number): Promise<QueryAnswer[]> {
     return httpClient
-      .get(`/query/${Store.getters.getCurrentQuery.id}/answers`)
+      .get(`/query/${queryId}/answers`)
       .then(response => {
         return response.data.map((query: any) => {
           return new QueryAnswer(query);
@@ -661,9 +661,9 @@ export default class RemoteServices {
       });
   }
 
-  static createQueryAnswer(queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+  static createQueryAnswer(queryId: number, queryAnswer: QueryAnswer): Promise<QueryAnswer> {
     return httpClient
-      .post(`/query/${Store.getters.getCurrentQuery.id}/answers`, queryAnswer)
+      .post(`/query/${queryId}/answers`, queryAnswer)
       .then(response => {
         return new QueryAnswer(response.data);
       })
@@ -693,9 +693,9 @@ export default class RemoteServices {
       });
   }
 
-  static createFurtherClarification(furtherClarification: QueryAnswer): Promise<QueryAnswer> {
+  static createFurtherClarification(queryAnswerId: number, furtherClarification: QueryAnswer): Promise<QueryAnswer> {
     return httpClient
-      .post(`/answer-queries/${Store.getters.getCurrentQueryAnswer.id}/further-clarification`, furtherClarification)
+      .post(`/answer-queries/${queryAnswerId}/further-clarification`, furtherClarification)
       .then(response => {
         return new QueryAnswer(response.data);
       })
