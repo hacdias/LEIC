@@ -105,6 +105,6 @@ describe('Suggestion reviews walkthrough', () => {
       }
     ]);
 
-    cy.deleteApprovedQuestion('Edited Title');
+    cy.deleteQuestion('Edited Title');
   });
 });

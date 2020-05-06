@@ -113,6 +113,41 @@ Cypress.Commands.add('answerQuiz', quizNumber => {
   cy.get('.primary--text > .v-btn__content').click();
 });
 
+Cypress.Commands.add('editSuggestion', (title, options, updatedTitle, updatedContent, updatedOptions) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 6)
+    .find('[data-cy="editSuggestionButton"]')
+    .click();
+  
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').clear();
+  cy.get('[data-cy="Title"]').type(updatedTitle);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').clear();
+  cy.get('[data-cy="Content"]').type(updatedContent);
+
+  for (let i = 0; i < updatedOptions.length; i++) {
+    cy.get(`[data-cy="OptionCorrect[${i}]"]`).focus();
+    if (!options[i].correct && updatedOptions[i].correct) {
+      // Checkbox is hidden so we need to force.
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).check({ force: true });
+    }
+    else if (options[i].correct && !updatedOptions[i].correct) {
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).uncheck({ force: true });
+    }
+    cy.get(`[data-cy="OptionContent[${i}]"]`).focus();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).clear();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).type(updatedOptions[i].content);
+  }
+
+  cy.get('[data-cy="saveSuggestionButton"]').click();
+});
+
 Cypress.Commands.add('deleteSuggestion', title => {
   cy.contains(title)
     .parent()
@@ -171,7 +206,7 @@ Cypress.Commands.add('deleteSuggestionReview', title => {
     .click({ force: true });
 });
 
-Cypress.Commands.add('editApprovedQuestion', (title, options, updatedName, updatedContent, updatedOptions) => {
+Cypress.Commands.add('editApprovedQuestion', (title, options, updatedTitle, updatedContent, updatedOptions) => {
   cy.contains(title)
     .parent()
     .parent()
@@ -181,10 +216,9 @@ Cypress.Commands.add('editApprovedQuestion', (title, options, updatedName, updat
     .find('[data-cy="editQuestionButton"]')
     .click();
   
-  
   cy.get('[data-cy="Title"]').focus();
   cy.get('[data-cy="Title"]').clear();
-  cy.get('[data-cy="Title"]').type(updatedName);
+  cy.get('[data-cy="Title"]').type(updatedTitle);
   cy.get('[data-cy="Question"]').focus();
   cy.get('[data-cy="Question"]').clear();
   cy.get('[data-cy="Question"]').type(updatedContent);
@@ -206,7 +240,7 @@ Cypress.Commands.add('editApprovedQuestion', (title, options, updatedName, updat
   cy.get('[data-cy="saveQuestionButton"]').click();
 });
 
-Cypress.Commands.add('deleteApprovedQuestion', (title) => {
+Cypress.Commands.add('deleteQuestion', (title) => {
   cy.contains(title)
     .parent()
     .parent()
