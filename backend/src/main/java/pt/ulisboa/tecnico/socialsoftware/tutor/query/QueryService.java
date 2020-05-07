@@ -104,6 +104,17 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public QueryDto shareQuery(Integer queryId) {
+        Query query = queryRepository.findById(queryId).orElseThrow(() -> new TutorException(QUERY_NOT_FOUND, queryId));
+        query.share();
+        return new QueryDto(query);
+    }
+
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<QueryDto> getQueriesToQuestion(Integer questionId) {
             questionRepository.findById(questionId)
                     .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
@@ -136,17 +147,33 @@ public class QueryService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<QueryDto> getQueriesInTeachersCourse(Integer teacherId) {
-        User teacher = userRepository.findById(teacherId)
-                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,teacherId));
+    public List<QueryDto> getQueriesInCourse(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND,userId));
 
-        List<Integer> teacherCourses = teacher.getCourseExecutions().stream()
+        List<Integer> userCourses = user.getCourseExecutions().stream()
                 .map(courseExecution -> courseExecution.getCourse().getId())
                 .collect(Collectors.toList());
 
         return queryRepository.findAll()
                 .stream()
-                .filter(query ->  teacherCourses.contains(query.getQuestion().getCourse().getId()))
+                .filter(query ->  userCourses.contains(query.getQuestion().getCourse().getId()))
+                .map(QueryDto::new)
+                .sorted(Comparator.comparing(QueryDto::getCreationDate))
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<QueryDto> getSharedQueries(Integer questionId) {
+        questionRepository.findById(questionId)
+                .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND,questionId));
+
+        return queryRepository.findAll()
+                .stream()
+                .filter(query -> query.getQuestion().getId() == questionId && query.getShared())
                 .map(QueryDto::new)
                 .sorted(Comparator.comparing(QueryDto::getCreationDate))
                 .collect(Collectors.toList());

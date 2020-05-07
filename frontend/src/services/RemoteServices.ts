@@ -570,10 +570,10 @@ export default class RemoteServices {
       });
   }
 
-  static createQuery(query: Query): Promise<Query> {
+  static createQuery(questionId: number, questionAnswerId: number, query: Query): Promise<Query> {
     return httpClient
       .post(
-        `/question/${Store.getters.getCurrentQuestion.questionId}/questionAnswer/${Store.getters.getCurrentQuestion.id}/queries`,
+        `/question/${questionId}/question-answer/${questionAnswerId}/queries`,
         query
       )
       .then(response => {
@@ -601,6 +601,12 @@ export default class RemoteServices {
     });
   }
 
+  static async shareQuery(queryId: number) {
+    return httpClient.put(`/queries/${queryId}/share`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
+  }
+
   static getSubmittedQueries(): Promise<Query[]> {
     return httpClient
       .get('/user/queries')
@@ -616,7 +622,7 @@ export default class RemoteServices {
 
   static getSubmittedQueriesInCourse(): Promise<Query[]> {
     return httpClient
-      .get('/teacher/queriesInCourses')
+      .get('/teacher/queries-in-courses')
       .then(response => {
         return response.data.map((query: any) => {
           return new Query(query);
@@ -627,9 +633,24 @@ export default class RemoteServices {
       });
   }
 
-  static getAnswersToQuery(): Promise<QueryAnswer[]> {
+  static getSharedQueries(): Promise<Query[]> {
     return httpClient
-      .get(`/query/${Store.getters.getCurrentQuery.id}/answers`)
+      .get(
+        `/question/${Store.getters.getCurrentQuestion.questionId}/shared-queries`
+      )
+      .then(response => {
+        return response.data.map((query: any) => {
+          return new Query(query);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getAnswersToQuery(queryId: number): Promise<QueryAnswer[]> {
+    return httpClient
+      .get(`/query/${queryId}/answers`)
       .then(response => {
         return response.data.map((query: any) => {
           return new QueryAnswer(query);
@@ -640,9 +661,9 @@ export default class RemoteServices {
       });
   }
 
-  static createQueryAnswer(queryAnswer: QueryAnswer): Promise<QueryAnswer> {
+  static createQueryAnswer(queryId: number, queryAnswer: QueryAnswer): Promise<QueryAnswer> {
     return httpClient
-      .post(`/query/${Store.getters.getCurrentQuery.id}/answers`, queryAnswer)
+      .post(`/query/${queryId}/answers`, queryAnswer)
       .then(response => {
         return new QueryAnswer(response.data);
       })
@@ -655,9 +676,9 @@ export default class RemoteServices {
     queryAnswer: QueryAnswer
   ): Promise<QueryAnswer> {
     return httpClient
-      .put(`/answerQueries/${queryAnswer.id}`, queryAnswer)
+      .put(`/answer-queries/${queryAnswer.id}`, queryAnswer)
       .then(response => {
-        return new Query(response.data);
+        return new QueryAnswer(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -666,7 +687,18 @@ export default class RemoteServices {
 
   static async deleteQueryAnswer(queryAnswerId: number) {
     return httpClient
-      .delete(`/answerQueries/${queryAnswerId}`)
+      .delete(`/answer-queries/${queryAnswerId}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static createFurtherClarification(queryAnswerId: number, furtherClarification: QueryAnswer): Promise<QueryAnswer> {
+    return httpClient
+      .post(`/answer-queries/${queryAnswerId}/further-clarification`, furtherClarification)
+      .then(response => {
+        return new QueryAnswer(response.data);
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

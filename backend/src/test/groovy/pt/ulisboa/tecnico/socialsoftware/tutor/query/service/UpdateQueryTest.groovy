@@ -125,6 +125,7 @@ class UpdateQueryTest extends Specification {
         result.getAnswers() == query.getAnswers()
         result.getCreationDate() == query.getCreationDate()
         result.getQuestion() == query.getQuestion()
+        !result.getShared();
     }
 
     def "update a query with answers"() {
@@ -147,6 +148,24 @@ class UpdateQueryTest extends Specification {
         then: "the query an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.QUERY_IS_ANSWERED
+    }
+
+    def "approve a query to shared"() {
+        when:
+        queryService.shareQuery(query.getId())
+
+        then: "the query is changed"
+        queryRepository.count() == 1L
+        def result = queryRepository.findAll().get(0)
+        result.getId() == query.getId()
+        result.getShared();
+        and: 'are not changed'
+        result.getTitle() == QUERY_TITLE
+        result.getContent() == QUERY_CONTENT
+        result.getStudent() == query.getStudent()
+        result.getAnswers() == query.getAnswers()
+        result.getCreationDate() == query.getCreationDate()
+        result.getQuestion() == query.getQuestion()
     }
 
     @Unroll("invalid arguments: content=#content | title=#title || errorMessage=#errorMessage ")
