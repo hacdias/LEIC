@@ -80,6 +80,11 @@ Cypress.Commands.add('navigateSuggestions', () => {
   cy.get('[data-cy="suggestionsButton"]').click();
 });
 
+Cypress.Commands.add('navigateQuestions', () => {
+  cy.get('[data-cy="managementButton"]').click();
+  cy.get('[data-cy="questionsButton"]').click();
+});
+
 Cypress.Commands.add('createSuggestion', (name, content, options) => {
   cy.get('[data-cy="createSuggestionButton"]').click();
   cy.get('[data-cy="Title"]').focus();
@@ -108,6 +113,41 @@ Cypress.Commands.add('answerQuiz', quizNumber => {
   cy.get('.primary--text > .v-btn__content').click();
 });
 
+Cypress.Commands.add('editSuggestion', (title, options, updatedTitle, updatedContent, updatedOptions) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 6)
+    .find('[data-cy="editSuggestionButton"]')
+    .click();
+  
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').clear();
+  cy.get('[data-cy="Title"]').type(updatedTitle);
+  cy.get('[data-cy="Content"]').focus();
+  cy.get('[data-cy="Content"]').clear();
+  cy.get('[data-cy="Content"]').type(updatedContent);
+
+  for (let i = 0; i < updatedOptions.length; i++) {
+    cy.get(`[data-cy="OptionCorrect[${i}]"]`).focus();
+    if (!options[i].correct && updatedOptions[i].correct) {
+      // Checkbox is hidden so we need to force.
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).check({ force: true });
+    }
+    else if (options[i].correct && !updatedOptions[i].correct) {
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).uncheck({ force: true });
+    }
+    cy.get(`[data-cy="OptionContent[${i}]"]`).focus();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).clear();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).type(updatedOptions[i].content);
+  }
+
+  cy.get('[data-cy="saveSuggestionButton"]').click();
+});
+
 Cypress.Commands.add('deleteSuggestion', title => {
   cy.contains(title)
     .parent()
@@ -117,6 +157,97 @@ Cypress.Commands.add('deleteSuggestion', title => {
     .children()
     .should('have.length', 6)
     .find('[data-cy="deleteSuggestionButton"]')
+    .click();
+});
+
+Cypress.Commands.add('navigateSuggestionsTeacher', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestions').click();
+});
+
+Cypress.Commands.add('navigateSuggestionReviews', () => {
+  cy.contains('Management').click();
+  cy.contains('Suggestion Reviews').click();
+});
+
+Cypress.Commands.add(
+  'createSuggestionReview',
+  (title, approved, justification) => {
+    cy.contains(title)
+      .parent()
+      .parent()
+      .parent()
+      .should('have.length', 1)
+      .children()
+      .should('have.length', 6)
+      .find('[data-cy="createSuggestionReviewButton"]')
+      .click();
+
+    cy.get('[data-cy="Approved"]').focus();
+    if (approved) {
+      cy.get('[data-cy="Approved"]').check({ force: true });
+    }
+    cy.get('[data-cy="Justification"]').focus();
+    cy.get('[data-cy="Justification"]').type(justification);
+
+    cy.get('[data-cy="saveSuggestionReviewButton"]').click();
+  }
+);
+
+Cypress.Commands.add('deleteSuggestionReview', title => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 4)
+    .find('[data-cy="deleteSuggestionReviewButton"]')
+    .click({ force: true });
+});
+
+Cypress.Commands.add('editApprovedQuestion', (title, options, updatedTitle, updatedContent, updatedOptions) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 10)
+    .find('[data-cy="editQuestionButton"]')
+    .click();
+  
+  cy.get('[data-cy="Title"]').focus();
+  cy.get('[data-cy="Title"]').clear();
+  cy.get('[data-cy="Title"]').type(updatedTitle);
+  cy.get('[data-cy="Question"]').focus();
+  cy.get('[data-cy="Question"]').clear();
+  cy.get('[data-cy="Question"]').type(updatedContent);
+
+  for (let i = 0; i < updatedOptions.length; i++) {
+    cy.get(`[data-cy="OptionCorrect[${i}]"]`).focus();
+    if (!options[i].correct && updatedOptions[i].correct) {
+      // Checkbox is hidden so we need to force.
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).check({ force: true });
+    }
+    else if (options[i].correct && !updatedOptions[i].correct) {
+      cy.get(`[data-cy="OptionCorrect[${i}]"]`).uncheck({ force: true });
+    }
+    cy.get(`[data-cy="OptionContent[${i}]"]`).focus();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).clear();
+    cy.get(`[data-cy="OptionContent[${i}]"]`).type(updatedOptions[i].content);
+  }
+
+  cy.get('[data-cy="saveQuestionButton"]').click();
+});
+
+Cypress.Commands.add('deleteQuestion', (title) => {
+  cy.contains(title)
+    .parent()
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 10)
+    .find('[data-cy="deleteQuestionButton"]')
     .click();
 });
 
@@ -351,50 +482,4 @@ Cypress.Commands.add('enrollTournament', name => {
   cy.contains('Yes')
     .parent()
     .should('have.text', 'Yes');
-});
-
-Cypress.Commands.add('navigateSuggestionsTeacher', () => {
-  cy.contains('Management').click();
-  cy.contains('Suggestions').click();
-});
-
-Cypress.Commands.add('navigateSuggestionReviews', () => {
-  cy.contains('Management').click();
-  cy.contains('Suggestion Reviews').click();
-});
-
-Cypress.Commands.add(
-  'createSuggestionReview',
-  (title, approved, justification) => {
-    cy.contains(title)
-      .parent()
-      .parent()
-      .parent()
-      .should('have.length', 1)
-      .children()
-      .should('have.length', 6)
-      .find('[data-cy="createSuggestionReviewButton"]')
-      .click();
-
-    cy.get('[data-cy="Approved"]').focus();
-    if (approved) {
-      cy.get('[data-cy="Approved"]').check();
-    }
-    cy.get('[data-cy="Justification"]').focus();
-    cy.get('[data-cy="Justification"]').type(justification);
-
-    cy.get('[data-cy="saveSuggestionReviewButton"]').click();
-  }
-);
-
-Cypress.Commands.add('deleteSuggestionReview', title => {
-  cy.contains(title)
-    .parent()
-    .parent()
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', 4)
-    .find('[data-cy="deleteSuggestionReviewButton"]')
-    .click({ force: true });
 });
