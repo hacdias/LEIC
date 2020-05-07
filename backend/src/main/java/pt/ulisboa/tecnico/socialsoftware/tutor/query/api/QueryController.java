@@ -79,4 +79,11 @@ public class QueryController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/queries/toggle-privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void togglePrivacy(Authentication authentication) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+        queryService.toggleStatsPrivacy(studentId);
+    }
 }

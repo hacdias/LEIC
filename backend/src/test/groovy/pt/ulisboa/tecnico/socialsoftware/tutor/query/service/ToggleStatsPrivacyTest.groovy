@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.query.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -8,10 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.SuggestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.repository.SuggestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.query.QueryService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -34,16 +31,10 @@ class ToggleStatsPrivacyTest extends Specification {
     CourseExecutionRepository courseExecutionRepository
 
     @Autowired
-    QuestionRepository questionRepository
-
-    @Autowired
-    SuggestionRepository suggestionRepository
-
-    @Autowired
-    SuggestionService suggestionService
-
-    @Autowired
     UserRepository userRepository
+
+    @Autowired
+    QueryService queryService
 
     def course
     def courseExecution
@@ -64,27 +55,22 @@ class ToggleStatsPrivacyTest extends Specification {
 
     def "toggle privacy setting"() {
         given: "the current privacy setting"
-        def prv = student.getPrivateSuggestionStats()
+        def prv = student.getPrivateQueryStats()
 
         when:
-        suggestionService.toggleStatsPrivacy(student.getId())
+        queryService.toggleStatsPrivacy(student.getId())
 
         then: "the correct setting is stored"
 
-        prv != student.getPrivateSuggestionStats()
+        prv != student.getPrivateQueryStats()
     }
 
     @TestConfiguration
     static class TestContextConfiguration {
 
         @Bean
-        SuggestionService suggestionService() {
-            return new SuggestionService()
-        }
-
-        @Bean
-        QuestionService questionService() {
-            return new QuestionService()
+        QueryService queryService() {
+            return new QueryService()
         }
     }
 }

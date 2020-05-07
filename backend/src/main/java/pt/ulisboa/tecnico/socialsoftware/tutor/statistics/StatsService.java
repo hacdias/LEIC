@@ -94,6 +94,12 @@ public class StatsService {
                 .filter(suggestion -> suggestion.getStatus() == Suggestion.Status.APPROVED)
                 .count();
 
+        int totalQueriesSubmitted = (int) user.getQueries().stream().count();
+
+        int sharedQueries = (int) user.getQueries().stream()
+                .filter(query -> query.getShared())
+                .count();
+
         Course course = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId)).getCourse();
 
         int totalAvailableQuestions = questionRepository.getAvailableQuestionsSize(course.getId());
@@ -105,6 +111,9 @@ public class StatsService {
         statsDto.setTotalProposedSuggestions(totalProposedSuggestions);
         statsDto.setApprovedProposedSuggestions(approvedProposedSuggestions);
         statsDto.setPrivateSuggestionStats(user.getPrivateSuggestionStats());
+        statsDto.setTotalQueriesSubmitted(totalQueriesSubmitted);
+        statsDto.setSharedQueries(sharedQueries);
+        statsDto.setPrivateQueryStats(user.getPrivateQueryStats());
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);
             statsDto.setImprovedCorrectAnswers(((float)uniqueCorrectAnswers)*100/uniqueQuestions);

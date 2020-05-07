@@ -61,6 +61,9 @@ class CreateQueryTest extends Specification {
     QuestionRepository questionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+    @Autowired
     QuizQuestionRepository quizQuestionRepository
 
     @Autowired
@@ -82,6 +85,7 @@ class CreateQueryTest extends Specification {
     def question2
     def student
     def student2
+    def quiz
     def quizQuestion
     def quizQuestion2
 
@@ -120,14 +124,22 @@ class CreateQueryTest extends Specification {
         courseExecution.getUsers().add(student2)
         userRepository.save(student2)
 
+        quiz = new Quiz()
+        quiz.setType("TEST")
+        quizRepository.save(quiz)
+
         quizQuestion = new QuizQuestion()
         quizQuestion.setQuestion(question)
         question.addQuizQuestion(quizQuestion)
+        quizQuestion.setQuiz(quiz)
+        quiz.addQuizQuestion(quizQuestion)
         quizQuestionRepository.save(quizQuestion)
 
         quizQuestion2 = new QuizQuestion()
         quizQuestion2.setQuestion(question2)
         question2.addQuizQuestion(quizQuestion2)
+        quizQuestion2.setQuiz(quiz)
+        quiz.addQuizQuestion(quizQuestion2)
         quizQuestionRepository.save(quizQuestion2)
     }
 
@@ -136,6 +148,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         student.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
@@ -173,6 +187,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         student.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
@@ -238,6 +254,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         student.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
@@ -302,6 +320,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         user.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
@@ -334,6 +354,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student2)
         student2.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
@@ -361,6 +383,8 @@ class CreateQueryTest extends Specification {
         def quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student2)
         student2.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
         def questionAnswer = new QuestionAnswer()
