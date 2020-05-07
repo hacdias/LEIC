@@ -21,6 +21,7 @@ public class StatsDto implements Serializable {
 
     private Boolean privateSuggestionStats = false;
     private Boolean privateQueryStats = false;
+    private Boolean privateTournamentStats = false;
 
     public Boolean getPrivateSuggestionStats() {
         return privateSuggestionStats;
@@ -120,9 +121,11 @@ public class StatsDto implements Serializable {
 
     public Boolean getPrivateQueryStats() { return privateQueryStats; }
 
+    public void setPrivateQueryStats(Boolean privateQueryStats) { this.privateQueryStats = privateQueryStats; }
+
     public Boolean getPrivateTournamentStats() { return privateTournamentStats; }
 
-    public void setPrivateQueryStats(Boolean privateQueryStats) { this.privateQueryStats = privateQueryStats; }
+    public void setPrivateTournamentStats(Boolean privateTournamentStats) {this.privateTournamentStats = privateTournamentStats; }
 
     public Integer getEnrolledTournaments() {
         return enrolledTournaments;
@@ -168,6 +171,7 @@ public class StatsDto implements Serializable {
                 ", totalTournamentAnswers=" + totalTournamentAnswers +
                 ", privateSuggestionStats=" + privateSuggestionStats +
                 ", privateQueryStats=" + privateQueryStats +
+                ", privateTournamentsStats=" + privateTournamentStats +
                 '}';
     }
 }

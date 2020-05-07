@@ -136,6 +136,7 @@ public class StatsService {
         statsDto.setEnrolledTournaments(enrolledTournaments);
         statsDto.setTotalTournamentAnswers(totalTournamentAnswers);
         statsDto.setCorrectTournamentAnswers(correctTournamentAnswers);
+        statsDto.setPrivateTournamentStats(user.getPrivateTournamentStats());
 
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);

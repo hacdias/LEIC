@@ -54,6 +54,7 @@ public class User implements UserDetails, DomainEntity {
 
     private Boolean privateSuggestionStats;
     private Boolean privateQueryStats;
+    private Boolean privateTournamentStats;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -105,6 +106,7 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectStudentAnswers = 0;
         this.privateSuggestionStats = true;
         this.privateQueryStats = true;
+        this.privateTournamentStats = true;
     }
 
     @Override
@@ -345,6 +347,18 @@ public class User implements UserDetails, DomainEntity {
         this.privateQueryStats = privateQueryStats;
     }
 
+    public Boolean getPrivateTournamentStats() {
+        if (privateTournamentStats == null) {
+            return false;
+        }
+        return privateTournamentStats;
+    }
+
+    public void setPrivateTournamentStats(Boolean privateTournamentStats) { this.privateTournamentStats = privateTournamentStats;
+    }
+
+
+
     @Override
     public String toString() {
         return "User{" +
@@ -365,6 +379,7 @@ public class User implements UserDetails, DomainEntity {
                 ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
                 ", privateSuggestionStats=" + privateSuggestionStats +
                 ", privateQueryStats=" + privateQueryStats +
+                ", privateTournamentStats=" + privateTournamentStats +
                 ", creationDate=" + creationDate +
                 ", lastAccess=" + lastAccess +
                 ", quizAnswers=" + quizAnswers +

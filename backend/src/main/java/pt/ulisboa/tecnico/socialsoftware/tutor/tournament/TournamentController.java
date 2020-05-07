@@ -87,6 +87,13 @@ public class TournamentController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/tournaments/toggle-privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void togglePrivacy(Authentication authentication) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+        tournamentService.toggleStatsPrivacy(studentId);
+    }
+
     private void formatDates(TournamentDto tournament) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 

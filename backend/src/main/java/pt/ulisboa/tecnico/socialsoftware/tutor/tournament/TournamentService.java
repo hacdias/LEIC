@@ -285,4 +285,16 @@ public class TournamentService {
                 .filter(question -> !Collections.disjoint(question.getTopics(), tournament.getTopics()))
                 .collect(Collectors.toList());
     }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void toggleStatsPrivacy(Integer studentId) {
+        User student = userRepository.findById(studentId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, studentId));
+
+        student.setPrivateTournamentStats(!student.getPrivateTournamentStats());
+    }
+
 }
