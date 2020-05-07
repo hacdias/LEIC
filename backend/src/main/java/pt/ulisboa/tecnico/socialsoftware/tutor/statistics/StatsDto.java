@@ -120,6 +120,8 @@ public class StatsDto implements Serializable {
 
     public Boolean getPrivateQueryStats() { return privateQueryStats; }
 
+    public Boolean getPrivateTournamentStats() { return privateTournamentStats; }
+
     public void setPrivateQueryStats(Boolean privateQueryStats) { this.privateQueryStats = privateQueryStats; }
 
     public Integer getEnrolledTournaments() {

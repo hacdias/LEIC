@@ -109,6 +109,23 @@
           data-cy="queryPrivacyToggler"
         ></v-checkbox>
       </div>
+      <div class="items custom" data-cy="tournamentStats">
+        <div class="project-name ">
+          <p>Tournaments</p>
+        </div>
+        <div class="small-info">
+          <p data-cy="enrolledTournaments">
+            {{ stats.enrolledTournaments }} Enrolled
+          </p>
+          <p v-if="stats.totalTournamentAnswers > 0">
+            {{
+            stats.correctTournamentAnswers === 0
+            ? 0
+            : (stats.correctTournamentAnswers / stats.totalTournamentAnswers) * 100
+            }}% Correct Tournament Answers
+          </p>
+        </div>
+       </div>
     </div>
   </div>
 </template>
