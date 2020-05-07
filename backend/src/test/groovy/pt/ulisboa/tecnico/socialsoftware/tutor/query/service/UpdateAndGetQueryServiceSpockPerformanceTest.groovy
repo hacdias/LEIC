@@ -26,7 +26,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class GetQueryServiceSpockPerformanceTest extends Specification {
+class UpdateAndGetQueryServiceSpockPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -35,8 +35,13 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
     public static final String OPTION_CONTENT = "optionId content"
     public static final String USER_NAME = "Student Name"
     public static final String USER_USERNAME = "Student Username"
+    public static final String TEACHER_NAME = "Teacher Name"
+    public static final String TEACHER_USERNAME = "Teacher Username"
     public static final String QUERY_TITLE = 'query title'
     public static final String QUERY_CONTENT = 'query content'
+    public static final String QUERY_NEW_TITLE = 'new query title'
+    public static final String QUERY_NEW_CONTENT = 'new query content'
+
 
     @Autowired
     QueryService queryService
@@ -74,6 +79,9 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
     def student
     def quiz
     def quizQuestion
+    def quizAnswer
+    def questionAnswer
+    def queries
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -106,69 +114,57 @@ class GetQueryServiceSpockPerformanceTest extends Specification {
         quizQuestion.setQuiz(quiz)
         quiz.addQuizQuestion(quizQuestion)
         quizQuestionRepository.save(quizQuestion)
-    }
 
-    def "create a 1000 queries and fetch them 10 000 times" () {
-        given: "answer to the question by student"
-        def quizAnswer = new QuizAnswer()
+        quizAnswer = new QuizAnswer()
         quizAnswer.setUser(student)
         student.addQuizAnswer(quizAnswer)
         quizAnswer.setQuiz(quiz)
         quiz.addQuizAnswer(quizAnswer)
         quizAnswerRepository.save(quizAnswer)
 
-        def questionAnswer = new QuestionAnswer()
+        questionAnswer = new QuestionAnswer()
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswer.setQuizQuestion(quizQuestion)
         quizAnswer.addQuestionAnswer(questionAnswer)
         quizQuestion.addQuestionAnswer(questionAnswer)
         questionAnswerRepository.save(questionAnswer)
 
-        and: "1000 queries"
+        "1000 queries"
+        queries = new ArrayList<QueryDto>()
         1.upto(1, {
             and: "a queryDTO"
             def queryDTO = new QueryDto()
             queryDTO.setTitle(QUERY_TITLE)
             queryDTO.setContent(QUERY_CONTENT)
-            queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
+            queries.add(queryService.createQuery(question.getId(), student.getId(),questionAnswer.getId(),queryDTO))
         })
+    }
+
+    def "update a 1000 queries" () {
+        given: "create a queryDto"
+        def queryDto = new QueryDto()
+        queryDto.setTitle(QUERY_NEW_TITLE)
+        queryDto.setContent(QUERY_NEW_CONTENT)
 
         when:
         1.upto(1, {
-            queryService.getQueriesToQuestion(question.getId())
+            queryService.updateQuery(queries.get(it-1).getId(), queryDto)
         })
 
         then:
         true
     }
 
-    def "create and share 1000 queries and fetch them 10 000 times" () {
-        given: "answer to the question by student"
-        def quizAnswer = new QuizAnswer()
-        quizAnswer.setUser(student)
-        student.addQuizAnswer(quizAnswer)
-        quizAnswerRepository.save(quizAnswer)
-
-        def questionAnswer = new QuestionAnswer()
-        questionAnswer.setQuizAnswer(quizAnswer)
-        questionAnswer.setQuizQuestion(quizQuestion)
-        quizAnswer.addQuestionAnswer(questionAnswer)
-        quizQuestion.addQuestionAnswer(questionAnswer)
-        questionAnswerRepository.save(questionAnswer)
-
-        and: "1000 queries"
-        1.upto(1, {
-            and: "a queryDTO"
-            def queryDTO = new QueryDto()
-            queryDTO.setTitle(QUERY_TITLE)
-            queryDTO.setContent(QUERY_CONTENT)
-            def result = queryService.createQuery(question.getId(), student.getId(), questionAnswer.getId(), queryDTO)
-            queryService.shareQuery(result.getId())
-        })
+    def "share a 1000 queries" () {
+        given: "a teacher who teaches the course"
+        def teacher = new User(TEACHER_NAME, TEACHER_USERNAME, 2, User.Role.TEACHER)
+        teacher.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(teacher)
+        userRepository.save(teacher)
 
         when:
         1.upto(1, {
-            queryService.getSharedQueries(question.getId())
+            queryService.shareQuery(queries.get(it-1).getId())
         })
 
         then:

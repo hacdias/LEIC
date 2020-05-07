@@ -53,6 +53,7 @@ public class User implements UserDetails, DomainEntity {
     private Integer numberOfCorrectStudentAnswers;
 
     private Boolean privateSuggestionStats;
+    private Boolean privateQueryStats;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -81,7 +82,7 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", fetch= FetchType.LAZY, orphanRemoval=true)
     private List<Query> queries = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher", orphanRemoval=true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval=true)
     private List<AnswerQuery> queryAnswers = new ArrayList<>();
 
     public User() {
@@ -103,6 +104,7 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectInClassAnswers = 0;
         this.numberOfCorrectStudentAnswers = 0;
         this.privateSuggestionStats = true;
+        this.privateQueryStats = true;
     }
 
     @Override
@@ -332,6 +334,17 @@ public class User implements UserDetails, DomainEntity {
         this.privateSuggestionStats = privateSuggestionStats;
     }
 
+    public Boolean getPrivateQueryStats() {
+        if (privateQueryStats == null) {
+            return false;
+        }
+        return privateQueryStats;
+    }
+
+    public void setPrivateQueryStats(Boolean privateQueryStats) {
+        this.privateQueryStats = privateQueryStats;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -351,6 +364,7 @@ public class User implements UserDetails, DomainEntity {
                 ", numberOfCorrectInClassAnswers=" + numberOfCorrectInClassAnswers +
                 ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
                 ", privateSuggestionStats=" + privateSuggestionStats +
+                ", privateQueryStats=" + privateQueryStats +
                 ", creationDate=" + creationDate +
                 ", lastAccess=" + lastAccess +
                 ", quizAnswers=" + quizAnswers +

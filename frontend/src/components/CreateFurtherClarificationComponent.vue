@@ -9,10 +9,10 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          New Query Answer
+          New Further Clarification
         </span>
       </v-card-title>
-      <v-card-text class="text-left" v-if="createQueryAnswer">
+      <v-card-text class="text-left" v-if="createFurtherClarification">
         <v-container grid-list-md fluid>
           <v-layout column wrap>
             <v-flex xs24 sm12 md12>
@@ -20,7 +20,7 @@
                 data-cy="Content"
                 outline
                 rows="10"
-                v-model="createQueryAnswer.content"
+                v-model="createFurtherClarification.content"
                 label="Content"
               ></v-textarea>
             </v-flex>
@@ -30,13 +30,16 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
+        <v-btn
+          data-cy="cancelButton"
+          color="blue darken-1"
+          @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
         <v-btn
           color="blue darken-1"
-          @click="saveQueryAnswer"
-          data-cy="saveQueryAnswerButton"
+          @click="saveFurtherClarification"
+          data-cy="saveFurtherClarificationButton"
           >Save
         </v-btn>
       </v-card-actions>
@@ -50,30 +53,38 @@ import QueryAnswer from '@/models/management/QueryAnswer';
 import RemoteServices from '@/services/RemoteServices';
 
 @Component
-export default class createQueryAnswerDialog extends Vue {
+export default class createFurtherClarificationDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: QueryAnswer, required: true })
-  readonly queryAnswer!: QueryAnswer;
-  @Prop({ type: Number, required: true }) readonly queryId!: number;
-  createQueryAnswer!: QueryAnswer;
+  readonly furtherClarification!: QueryAnswer;
+  @Prop({ type: Number, required: true }) readonly queryAnswerId!: number;
+  createFurtherClarification!: QueryAnswer;
 
   created() {
-    this.createQueryAnswer = new QueryAnswer(this.queryAnswer);
+    this.createFurtherClarification = new QueryAnswer(
+      this.furtherClarification
+    );
   }
 
-  async saveQueryAnswer() {
-    if (this.createQueryAnswer && !this.createQueryAnswer.content) {
-      await this.$store.dispatch('error', 'Answer Query must have content');
+  async saveFurtherClarification() {
+    if (
+      this.createFurtherClarification &&
+      !this.createFurtherClarification.content
+    ) {
+      await this.$store.dispatch(
+        'error',
+        'Error: Further Clarification must have content'
+      );
       return;
     }
 
-    if (this.createQueryAnswer) {
+    if (this.createFurtherClarification) {
       try {
-        const result = await RemoteServices.createQueryAnswer(
-          this.queryId,
-          this.createQueryAnswer
+        const result = await RemoteServices.createFurtherClarification(
+          this.queryAnswerId,
+          this.createFurtherClarification
         );
-        this.$emit('save-query-answer', result);
+        this.$emit('save-further-clarification', result);
       } catch (error) {
         await this.$store.dispatch('error', error);
       }

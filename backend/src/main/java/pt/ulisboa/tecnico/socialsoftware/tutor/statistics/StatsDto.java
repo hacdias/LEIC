@@ -13,8 +13,11 @@ public class StatsDto implements Serializable {
     private Integer totalAvailableQuestions = 0;
     private Integer totalProposedSuggestions = 0;
     private Integer approvedProposedSuggestions = 0;
+    private Integer totalQueriesSubmitted = 0;
+    private Integer sharedQueries = 0;
 
     private Boolean privateSuggestionStats = false;
+    private Boolean privateQueryStats = false;
 
     public Boolean getPrivateSuggestionStats() {
         return privateSuggestionStats;
@@ -104,6 +107,18 @@ public class StatsDto implements Serializable {
         this.totalProposedSuggestions = totalProposedSuggestions;
     }
 
+    public Integer getTotalQueriesSubmitted() { return totalQueriesSubmitted; }
+
+    public void setTotalQueriesSubmitted(Integer totalQueriesSubmitted) { this.totalQueriesSubmitted = totalQueriesSubmitted; }
+
+    public Integer getSharedQueries() { return sharedQueries; }
+
+    public void setSharedQueries(Integer sharedQueries) { this.sharedQueries = sharedQueries; }
+
+    public Boolean getPrivateQueryStats() { return privateQueryStats; }
+
+    public void setPrivateQueryStats(Boolean privateQueryStats) { this.privateQueryStats = privateQueryStats; }
+
     @Override
     public String toString() {
         return "StatsDto{" +
@@ -117,6 +132,10 @@ public class StatsDto implements Serializable {
                 ", totalAvailableQuestions=" + totalAvailableQuestions +
                 ", totalProposedSuggestions=" + totalProposedSuggestions +
                 ", approvedProposedSuggestions=" + approvedProposedSuggestions +
+                ", totalQueriesSubmitted=" + totalQueriesSubmitted +
+                ", sharedQueries=" + sharedQueries +
+                ", privateSuggestionStats=" + privateSuggestionStats +
+                ", privateQueryStats=" + privateQueryStats +
                 '}';
     }
 }

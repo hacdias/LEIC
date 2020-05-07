@@ -53,7 +53,7 @@
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/management/questions">
+            <v-list-item to="/management/questions" data-cy="questionsButton">
               <v-list-item-action>
                 <v-icon>question_answer</v-icon>
               </v-list-item-action>
@@ -185,7 +185,7 @@
                 <v-list-item-title>Scan</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/solved">
+            <v-list-item to="/student/solved" data-cy="quizzesSolvedButton">
               <v-list-item-action>
                 <v-icon>done</v-icon>
               </v-list-item-action>

@@ -94,12 +94,14 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(userId, assessmentService.findAssessmentCourseExecution(id).getCourseExecutionId());
                 case "QUIZ.ACCESS":
                     return userHasThisExecution(userId, quizService.findQuizCourseExecution(id).getCourseExecutionId());
-                case "QUERY.ALTER":
-                    return userCanAlterQuery(userId, id);
-                case "ANSWER.QUERY.ALTER":
-                    return userCanAlterAnswerQuery(userId, id);
                 case "QUERY.ACCESS":
                     return userCanAddAnswerQuery(userId, id);
+                case "QUERY.ALTER":
+                    return userCanAlterQuery(userId, id);
+                case "ANSWER.QUERY.ACCESS":
+                    return userCanAddFurtherClarification(userId, id);
+                case "ANSWER.QUERY.ALTER":
+                    return userCanAlterAnswerQuery(userId, id);
                 case "SUGGESTION.AUTHOR":
                     return userIsSuggestionAuthor(userId, id);
                 case "SUGGESTION.ACCESS":
@@ -146,8 +148,18 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean userCanAddAnswerQuery(int userId, int queryId) {
-        List<QueryDto> queries = queryService.getQueriesInTeachersCourse(userId);
+        List<QueryDto> queries = queryService.getQueriesInCourse(userId);
         return queries.stream().anyMatch(queryDto -> queryDto.getId() == queryId);
+    }
+
+    private boolean userCanAddFurtherClarification(int userId, int answerQueryId) {
+        AnswerQueryDto answerQueryDto = answerQueryService.findAnswerQueryById(answerQueryId);
+
+        while (answerQueryDto.getQueryId() == null) {
+            answerQueryDto = answerQueryService.findAnswerQueryById(answerQueryDto.getAnswerQueryId());
+        }
+
+        return userCanAddAnswerQuery(userId, answerQueryDto.getQueryId());
     }
 
     private boolean userIsTournamentCreator(int userId, int tournamentId) {

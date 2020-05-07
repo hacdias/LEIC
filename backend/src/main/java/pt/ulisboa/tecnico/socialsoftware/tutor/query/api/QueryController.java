@@ -38,14 +38,20 @@ public class QueryController {
         return this.queryService.getQueriesByStudent(student.getId());
     }
 
-    @GetMapping("/teacher/queriesInCourses")
+    @GetMapping("/teacher/queries-in-courses")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<QueryDto> getQueriesInTeachersCourse(Principal principal) {
         User teacher = (User) ((Authentication) principal).getPrincipal();
-        return this.queryService.getQueriesInTeachersCourse(teacher.getId());
+        return this.queryService.getQueriesInCourse(teacher.getId());
     }
 
-    @PostMapping("/question/{questionId}/questionAnswer/{questionAnswerId}/queries")
+    @GetMapping("/question/{questionId}/shared-queries")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
+    public List<QueryDto> getSharedQueries(@PathVariable int questionId) {
+        return this.queryService.getSharedQueries(questionId);
+    }
+
+    @PostMapping("/question/{questionId}/question-answer/{questionAnswerId}/queries")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public QueryDto createQuery(Principal principal, @PathVariable int questionId, @PathVariable int questionAnswerId, @Valid @RequestBody QueryDto queryDto) {
         User student = (User) ((Authentication) principal).getPrincipal();
@@ -58,6 +64,12 @@ public class QueryController {
         return this.queryService.updateQuery(queryId, queryDto);
     }
 
+    @PutMapping("/queries/{queryId}/share")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#queryId, 'QUERY.ACCESS')")
+    public QueryDto shareQuery(@PathVariable Integer queryId) {
+        return this.queryService.shareQuery(queryId);
+    }
+
     @DeleteMapping("/queries/{queryId}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#queryId, 'QUERY.ALTER')")
     public ResponseEntity removeQuery(@PathVariable Integer queryId) throws IOException {
@@ -66,5 +78,12 @@ public class QueryController {
         queryService.removeQuery(queryId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/queries/toggle-privacy")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void togglePrivacy(Authentication authentication) {
+        Integer studentId = ((User) authentication.getPrincipal()).getId();
+        queryService.toggleStatsPrivacy(studentId);
     }
 }

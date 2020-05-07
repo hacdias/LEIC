@@ -6,6 +6,7 @@ import Course from '@/models/user/Course';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import User from '@/models/user/User';
 import Query from './models/management/Query';
+import QueryAnswer from './models/management/QueryAnswer';
 import Suggestion from '@/models/management/Suggestion';
 
 interface State {

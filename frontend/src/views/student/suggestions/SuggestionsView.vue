@@ -74,7 +74,12 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.status !== 'APPROVED'">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editSuggestion(item)"
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="editSuggestion(item)"
+              data-cy="editSuggestionButton"
               >edit</v-icon
             >
           </template>

@@ -4,6 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -16,6 +20,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.AnswerQueryRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.repository.QueryRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -51,6 +59,18 @@ class GetQueryTest extends Specification {
     QuestionRepository questionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+    @Autowired
+    QuizQuestionRepository quizQuestionRepository
+
+    @Autowired
+    QuizAnswerRepository quizAnswerRepository
+
+    @Autowired
+    QuestionAnswerRepository questionAnswerRepository
+
+    @Autowired
     UserRepository userRepository
 
     @Autowired
@@ -65,6 +85,10 @@ class GetQueryTest extends Specification {
     def student
     def query
     def teacher
+    def quiz
+    def quizQuestion
+    def quizAnswer
+    def questionAnswer
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -94,13 +118,41 @@ class GetQueryTest extends Specification {
         courseExecution.getUsers().add(teacher)
         userRepository.save(teacher)
 
+        quiz = new Quiz()
+        quiz.setType("TEST")
+        quizRepository.save(quiz)
+
+        quizQuestion = new QuizQuestion()
+        quizQuestion.setQuestion(question)
+        question.addQuizQuestion(quizQuestion)
+        quizQuestion.setQuiz(quiz)
+        quiz.addQuizQuestion(quizQuestion)
+        quizQuestionRepository.save(quizQuestion)
+
+        quizAnswer = new QuizAnswer()
+        quizAnswer.setUser(student)
+        student.addQuizAnswer(quizAnswer)
+        quizAnswer.setQuiz(quiz)
+        quiz.addQuizAnswer(quizAnswer)
+        quizAnswerRepository.save(quizAnswer)
+
+        questionAnswer = new QuestionAnswer()
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        quizAnswer.addQuestionAnswer(questionAnswer)
+        quizQuestion.addQuestionAnswer(questionAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
         query = new Query()
         query.setTitle(QUERY_TITLE)
         query.setContent(QUERY_CONTENT)
         query.setQuestion(question)
+        query.setShared(false)
         question.addQuery(query)
         query.setStudent(student)
         student.addQuery(query)
+        query.setQuestionAnswer(questionAnswer)
+        questionAnswer.addQuery(query)
         queryRepository.save(query)
     }
 
@@ -115,10 +167,12 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDto.getTitle() == query.getTitle()
         queryDto.getContent() == query.getContent()
         queryDto.getId() == result.getId()
+        queryDto.getShared() == result.getShared()
     }
 
     def 'get queries to a question'() {
@@ -132,12 +186,14 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
     }
 
     def 'get queries by a student'() {
@@ -151,17 +207,19 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
     }
 
     def 'get queries in teacher courses'() {
         when:
-        def queryDtos = queryService.getQueriesInTeachersCourse(teacher.getId())
+        def queryDtos = queryService.getQueriesInCourse(teacher.getId())
 
         then: 'the query is retrieved'
         queryRepository.count() == 1L
@@ -170,12 +228,39 @@ class GetQueryTest extends Specification {
         student.getQueries().size() == 1
         result.getQuestion() == question
         question.getQueries().size() == 1
+        !result.getShared()
         and: 'the return statement contains one query'
         queryDtos.size() == 1
         def queryResult = queryDtos.get(0)
         queryResult.getTitle() == query.getTitle()
         queryResult.getContent() == query.getContent()
         queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
+    }
+
+    def 'get shared queries to question'() {
+        given: 'a shared query'
+        query.share()
+
+        when:
+        def queryDtos = queryService.getSharedQueries(question.getId())
+
+        then: 'the query is retrieved'
+        queryRepository.count() == 1L
+        def result = queryRepository.findAll().get(0)
+        result.getStudent() == student
+        student.getQueries().size() == 1
+        result.getQuestion() == question
+        question.getQueries().size() == 1
+        result.getShared()
+        and: 'the return statement contains one query'
+        queryDtos.size() == 1
+        def queryResult = queryDtos.get(0)
+        queryResult.getTitle() == query.getTitle()
+        queryResult.getContent() == query.getContent()
+        queryResult.getId() == result.getId()
+        queryResult.getShared() == result.getShared()
+
     }
 
     def 'get query by id with invalid id'() {
@@ -207,7 +292,7 @@ class GetQueryTest extends Specification {
 
     def 'get queries in teacher courses with invalid id'() {
         when:
-        def queryDtos = queryService.getQueriesInTeachersCourse(USER_INVALID_ID)
+        def queryDtos = queryService.getQueriesInCourse(USER_INVALID_ID)
 
         then: 'exception user not found'
         def exception = thrown(TutorException)

@@ -7,6 +7,7 @@
       :search="search"
       :sort-by="['creationDate']"
       sort-desc
+      data-cy="questionsTable"
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -60,6 +61,7 @@
           v-model="item.status"
           :items="statusList"
           dense
+          data-cy="statusSelect"
           @change="setStatus(item.id, item.status)"
         >
           <template v-slot:selection="{ item }">
@@ -107,7 +109,12 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="editQuestion(item)"
+              data-cy="editQuestionButton"
               >edit</v-icon
             >
           </template>
@@ -122,6 +129,7 @@
               v-on="on"
               @click="deleteQuestion(item)"
               color="red"
+              data-cy="deleteQuestionButton"
               >delete</v-icon
             >
           </template>

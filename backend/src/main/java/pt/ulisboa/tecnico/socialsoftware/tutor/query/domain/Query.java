@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.query.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.query.dto.QueryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -24,6 +25,9 @@ public class Query {
     private String content;
 
     private String title;
+
+    @Column(name = "shared")
+    private Boolean shared;
 
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
@@ -49,15 +53,19 @@ public class Query {
     public Query(Question question, User student, QuestionAnswer question_answer, QueryDto queryDto) {
         checkQueryConsistent(queryDto);
 
-        this.title = queryDto.getTitle();
-        this.content = queryDto.getContent();
+        setTitle(queryDto.getTitle());
+        setContent(queryDto.getContent());
 
-        this.question = question;
+        setQuestion(question);
         question.addQuery(this);
-        this.student = student;
+        setStudent(student);
         student.addQuery(this);
-        this.question_answer = question_answer;
+        setQuestionAnswer(question_answer);
         question_answer.addQuery(this);
+        if (queryDto.getShared() != null) { setShared(queryDto.getShared()); }
+        else { setShared(false); }
+
+        setCreationDate(DateHandler.toLocalDateTime(queryDto.getCreationDate()));
     }
 
     public Integer getId() { return id; }
@@ -67,6 +75,14 @@ public class Query {
     public String getContent() { return content;}
 
     public void setContent(String content) { this.content = content;}
+
+    public Boolean getShared() { return shared; }
+
+    public void setShared(Boolean shared) { this.shared = shared; }
+
+    public QuestionAnswer getQuestionAnswer() { return question_answer; }
+
+    public void setQuestionAnswer(QuestionAnswer question_answer) { this.question_answer = question_answer; }
 
     public String getTitle() { return title;}
 
@@ -97,7 +113,11 @@ public class Query {
 
         setTitle(queryDto.getTitle());
         setContent(queryDto.getContent());
+        if (queryDto.getShared() != null) { setShared(queryDto.getShared()); }
+        else { setShared(false); }
     }
+
+    public void share() { setShared(true); }
 
     public void remove() {
         canRemove();
@@ -129,9 +149,11 @@ public class Query {
                 "id=" + id +
                 ", content='" + content + '\'' +
                 ", title='" + title + '\'' +
+                ", shared=" + shared +
                 ", creationDate=" + creationDate +
-                ", student=" + student +
+                ", student=" + student.getUsername() +
                 ", question=" + question +
+                ", question_answer=" + question_answer +
                 ", answers=" + answers +
                 '}';
     }

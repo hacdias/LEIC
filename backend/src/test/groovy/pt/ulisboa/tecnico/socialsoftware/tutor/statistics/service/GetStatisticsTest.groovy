@@ -32,6 +32,8 @@ class GetStatisticsTest extends Specification {
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String QUESTION_TITLE = 'a question title'
     public static final String QUESTION_CONTENT = 'a question content'
+    public static final String QUERY_TITLE = 'a query title'
+    public static final String QUERY_CONTENT = 'a query content'
     public static final String OPTION_CONTENT = "option id content"
     public static final String STUDENT_NAME = "Anonymous User"
     public static final String STUDENT_USERNAME = "anon"
@@ -61,6 +63,7 @@ class GetStatisticsTest extends Specification {
     def courseExecution
     def student
     def questionDto
+    def question
 
     def setup () {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -73,6 +76,15 @@ class GetStatisticsTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         userRepository.save(student)
+
+        question = new Question()
+        question.setKey(1)
+        question.setCourse(course)
+        question.setTitle(QUESTION_TITLE)
+        question.setContent(QUESTION_CONTENT)
+        question.setStatus(Question.Status.AVAILABLE)
+        course.addQuestion(question)
+        questionRepository.save(question)
     }
 
     def "get statistics and make sure suggestions info is correct"() {

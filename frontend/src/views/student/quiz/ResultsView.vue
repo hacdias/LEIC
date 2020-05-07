@@ -49,19 +49,37 @@
     />
     <div class="query-content">
       <v-btn
-        data-cy="createQueryButton"
+        :style="'margin: 10px'"
+        data-cy="showQueriesButton"
         color="primary"
         dark
         @click="
-          newQuery(statementManager.statementQuiz.questions[questionOrder])
+          seeSharedQueries(
+            statementManager.statementQuiz.questions[questionOrder]
+          )
         "
       >
-        I have a doubt about this question!
+        Check Queries
+      </v-btn>
+      <v-btn
+        :style="'margin: 10px'"
+        data-cy="createQueryButton"
+        color="primary"
+        dark
+        @click="newQuery()"
+      >
+        Create Query
       </v-btn>
     </div>
     <create-query-dialog
       v-if="currentQuery"
       v-model="createQueryDialog"
+      :questionId="
+        statementManager.statementQuiz.questions[questionOrder].questionId
+      "
+      :questionAnswerId="
+        statementManager.statementQuiz.questions[questionOrder].id
+      "
       :query="currentQuery"
       v-on:save-query="onSaveQuery"
     />
@@ -124,8 +142,7 @@ export default class ResultsView extends Vue {
     }
   }
 
-  async newQuery(currentQuestion: StatementQuestion) {
-    await this.$store.dispatch('currentQuestion', currentQuestion);
+  async newQuery() {
     this.currentQuery = new Query();
     this.createQueryDialog = true;
   }
@@ -133,6 +150,11 @@ export default class ResultsView extends Vue {
   async onSaveQuery(query: Query) {
     this.createQueryDialog = false;
     this.currentQuery = null;
+  }
+
+  async seeSharedQueries(currentQuestion: StatementQuestion) {
+    await this.$store.dispatch('currentQuestion', currentQuestion);
+    await this.$router.push({ name: 'see-shared-queries' });
   }
 
   @Watch('createQueryDialog')

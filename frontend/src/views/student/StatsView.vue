@@ -85,6 +85,30 @@
           data-cy="suggestionPrivacyToggler"
         ></v-checkbox>
       </div>
+      <div class="items custom" data-cy="queriesStats">
+        <div class="project-name ">
+          <p>Queries</p>
+        </div>
+        <div class="small-info">
+          <p data-cy="totalQueriesSubmitted">
+            {{ stats.totalQueriesSubmitted }} Total
+          </p>
+          <p data-cy="sharedQueries">{{ stats.sharedQueries }} Shared</p>
+          <p v-if="stats.totalQueriesSubmitted > 0">
+            {{
+              stats.sharedQueries === 0
+                ? 0
+                : (stats.sharedQueries / stats.totalQueriesSubmitted) * 100
+            }}% Shared Rate
+          </p>
+        </div>
+        <v-checkbox
+          @change="toggleQueryPrivacy()"
+          v-model="stats.privateQueryStats"
+          label="Private"
+          data-cy="queryPrivacyToggler"
+        ></v-checkbox>
+      </div>
     </div>
   </div>
 </template>
@@ -121,6 +145,20 @@ export default class StatsView extends Vue {
       );
       if (this.stats !== null) {
         this.stats.privateSuggestionStats = !this.stats.privateSuggestionStats;
+      }
+    }
+  }
+
+  async toggleQueryPrivacy() {
+    try {
+      await RemoteServices.toggleQueryStatPrivacy();
+    } catch (error) {
+      await this.$store.dispatch(
+        'error',
+        new Error('Could not toggle queries privacy.')
+      );
+      if (this.stats !== null) {
+        this.stats.privateQueryStats = !this.stats.privateQueryStats;
       }
     }
   }

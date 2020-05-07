@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2>Submitted Queries In Course</h2>
+    <h2>Shared Queries to the Question</h2>
     <ul>
       <li class="list-header">
         <div class="col">Title</div>
@@ -9,15 +9,7 @@
         <div class="col">Shared</div>
         <div class="col last-col"></div>
       </li>
-      <show-query-list
-        :queries="queriesUnanswered(queries)"
-        @see-query="seeQuery"
-      />
-      <br />
-      <show-query-list
-        :queries="queriesAnswered(queries)"
-        @see-query="seeQuery"
-      />
+      <show-query-list :queries="queries" @see-query="seeQuery" />
     </ul>
   </div>
 </template>
@@ -39,25 +31,15 @@ export default class SubmittedQueriesView extends Vue {
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.queries = (
-        await RemoteServices.getSubmittedQueriesInCourse()
-      ).reverse();
+      this.queries = (await RemoteServices.getSharedQueries()).reverse();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
   }
 
-  queriesUnanswered(queries: Query[]) {
-    return this.queries.filter(query => query.numberAnswers == 0);
-  }
-
-  queriesAnswered(queries: Query[]) {
-    return this.queries.filter(query => query.numberAnswers != 0);
-  }
-
   async seeQuery() {
-    await this.$router.push({ name: 'see-query-management' });
+    await this.$router.push({ name: 'see-query-student' });
   }
 }
 </script>

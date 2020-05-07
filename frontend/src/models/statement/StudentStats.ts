@@ -9,8 +9,11 @@ export default class StudentStats {
   uniqueWrongAnswers!: number;
   totalProposedSuggestions!: number;
   approvedProposedSuggestions!: number;
+  totalQueriesSubmitted!: number;
+  sharedQueries!: number;
 
   privateSuggestionStats!: Boolean;
+  privateQueryStats!: Boolean;
 
   constructor(jsonObj?: StudentStats) {
     if (jsonObj) {
@@ -24,7 +27,10 @@ export default class StudentStats {
       this.totalAvailableQuestions = jsonObj.totalAvailableQuestions;
       this.totalProposedSuggestions = jsonObj.totalProposedSuggestions;
       this.approvedProposedSuggestions = jsonObj.approvedProposedSuggestions;
+      this.totalQueriesSubmitted = jsonObj.totalQueriesSubmitted;
+      this.sharedQueries = jsonObj.sharedQueries;
       this.privateSuggestionStats = jsonObj.privateSuggestionStats;
+      this.privateQueryStats = jsonObj.privateQueryStats;
     }
   }
 }
