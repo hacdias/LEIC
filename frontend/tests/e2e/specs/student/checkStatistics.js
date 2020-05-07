@@ -43,4 +43,9 @@ describe('Check Statistics', () => {
   it('toggle queries stats privacy', () => {
     cy.get('[data-cy="queryPrivacyToggler"]').check({ force: true }).should('be.checked')
   });
+
+  it('toggle tournaments stats privacy', () => {
+    cy.get('[data-cy="tournamentPrivacyToggler"]').check({ force: true }).should('be.checked')
+  });
+
 });

@@ -17,6 +17,7 @@ export default class StudentStats {
 
   privateSuggestionStats!: Boolean;
   privateQueryStats!: Boolean;
+  privateTournamentStats!: Boolean;
 
   constructor(jsonObj?: StudentStats) {
     if (jsonObj) {
@@ -37,6 +38,7 @@ export default class StudentStats {
       this.totalTournamentAnswers = jsonObj.totalTournamentAnswers;
       this.privateSuggestionStats = jsonObj.privateSuggestionStats;
       this.privateQueryStats = jsonObj.privateQueryStats;
+      this.privateTournamentStats = jsonObj.privateTournamentStats;
     }
   }
 }
