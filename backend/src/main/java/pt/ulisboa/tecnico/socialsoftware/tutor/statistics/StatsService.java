@@ -18,6 +18,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.suggestions.domain.Suggestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -104,6 +105,24 @@ public class StatsService {
 
         int totalAvailableQuestions = questionRepository.getAvailableQuestionsSize(course.getId());
 
+        int enrolledTournaments = (int) user.getEnrolledTournaments().stream().count();
+
+        int correctTournamentAnswers = (int) user.getQuizAnswers().stream()
+                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                .filter(quizAnswer -> quizAnswer.getQuiz().getTournament() != null)
+                .map(QuizAnswer::getQuestionAnswers)
+                .flatMap(Collection::stream)
+                .map(QuestionAnswer::getOption)
+                .filter(Objects::nonNull)
+                .filter(Option::getCorrect).count();
+
+        int totalTournamentAnswers = (int) user.getQuizAnswers().stream()
+                .filter(quizAnswer -> quizAnswer.canResultsBePublic(executionId))
+                .filter(quizAnswer -> quizAnswer.getQuiz().getTournament() != null)
+                .map(QuizAnswer::getQuestionAnswers)
+                .mapToLong(Collection::size)
+                .sum();
+
         statsDto.setTotalQuizzes(totalQuizzes);
         statsDto.setTotalAnswers(totalAnswers);
         statsDto.setTotalUniqueQuestions(uniqueQuestions);
@@ -114,6 +133,10 @@ public class StatsService {
         statsDto.setTotalQueriesSubmitted(totalQueriesSubmitted);
         statsDto.setSharedQueries(sharedQueries);
         statsDto.setPrivateQueryStats(user.getPrivateQueryStats());
+        statsDto.setEnrolledTournaments(enrolledTournaments);
+        statsDto.setTotalTournamentAnswers(totalTournamentAnswers);
+        statsDto.setCorrectTournamentAnswers(correctTournamentAnswers);
+
         if (totalAnswers != 0) {
             statsDto.setCorrectAnswers(((float)correctAnswers)*100/totalAnswers);
             statsDto.setImprovedCorrectAnswers(((float)uniqueCorrectAnswers)*100/uniqueQuestions);

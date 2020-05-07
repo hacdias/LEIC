@@ -65,7 +65,10 @@ public class Tournament {
     @JoinColumn(name = "course_execution_id")
     private CourseExecution courseExecution;
 
-    @OneToOne()
+
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "quiz_id")
     public Quiz quiz = null;
     
     public Tournament() {}
@@ -227,6 +230,11 @@ public class Tournament {
 
     public Quiz getQuiz() {
         return quiz;
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
+        quiz.setTournament(this);
     }
 
     public void remove() {
