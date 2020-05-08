@@ -36,6 +36,20 @@ describe('Check Statistics', () => {
       });
   });
 
+  it('see tournament statistics', () => {
+    cy.get('[data-cy="enrolledTournaments"]')
+      .invoke('text')
+      .then(text => {
+        expect(text.trim()).to.match(/^[0-9]+ Enrolled$/);
+      });
+
+    cy.get('[data-cy="totalTournamentAnswers"]')
+      .invoke('text')
+      .then(text => {
+        expect(text.trim()).to.match(/^[0-9]+ Tournament Quiz Answers$/);
+      });
+  });
+
   it('toggle suggestions stats privacy', () => {
     cy.get('[data-cy="suggestionPrivacyToggler"]').check({ force: true }).should('be.checked')      
   });
@@ -43,4 +57,9 @@ describe('Check Statistics', () => {
   it('toggle queries stats privacy', () => {
     cy.get('[data-cy="queryPrivacyToggler"]').check({ force: true }).should('be.checked')
   });
+
+  it('toggle tournaments stats privacy', () => {
+    cy.get('[data-cy="tournamentPrivacyToggler"]').check({ force: true }).should('be.checked')
+  });
+
 });

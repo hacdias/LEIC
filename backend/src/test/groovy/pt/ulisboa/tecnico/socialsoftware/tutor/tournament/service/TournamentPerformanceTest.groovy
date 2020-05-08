@@ -101,6 +101,7 @@ class TournamentPerformanceTest extends Specification {
             tournamentDto.setAvailableDate(availableDate.format(formatter))
             tournamentDto.setConclusionDate(conclusionDate.format(formatter))
             tournamentDto.addTopic(topicDto)
+            tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
 
             tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
         })

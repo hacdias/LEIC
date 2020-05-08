@@ -109,6 +109,32 @@
           data-cy="queryPrivacyToggler"
         ></v-checkbox>
       </div>
+      <div class="items custom" data-cy="tournamentStats">
+        <div class="project-name ">
+          <p>Tournaments</p>
+        </div>
+        <div class="small-info">
+          <p data-cy="enrolledTournaments">
+            {{ stats.enrolledTournaments }} Enrolled
+          </p>
+          <p data-cy="totalTournamentAnswers">
+            {{ stats.totalTournamentAnswers }} Tournament Quiz Answers
+          </p>
+          <p v-if="stats.totalTournamentAnswers > 0">
+            {{
+            stats.correctTournamentAnswers === 0
+            ? 0
+            : (stats.correctTournamentAnswers / stats.totalTournamentAnswers) * 100
+            }}% Correct Tournament Quiz Answers
+          </p>
+        </div>
+        <v-checkbox
+          @change="toggleTournamentPrivacy()"
+          v-model="stats.privateTournamentStats"
+          label="Private"
+          data-cy="tournamentPrivacyToggler"
+        ></v-checkbox>
+       </div>
     </div>
   </div>
 </template>
@@ -162,6 +188,21 @@ export default class StatsView extends Vue {
       }
     }
   }
+
+  async toggleTournamentPrivacy() {
+      try {
+        await RemoteServices.toggleTournamentStatPrivacy();
+      } catch (error) {
+        await this.$store.dispatch(
+          'error',
+          new Error('Could not toggle tournament privacy.')
+        );
+        if (this.stats !== null) {
+          this.stats.privateTournamentStats = !this.stats.privateTournamentStats;
+        }
+      }
+    }
+
 }
 </script>
 

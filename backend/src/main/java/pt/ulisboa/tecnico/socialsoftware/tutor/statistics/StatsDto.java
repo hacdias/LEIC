@@ -15,9 +15,13 @@ public class StatsDto implements Serializable {
     private Integer approvedProposedSuggestions = 0;
     private Integer totalQueriesSubmitted = 0;
     private Integer sharedQueries = 0;
+    private Integer enrolledTournaments = 0;
+    private Integer correctTournamentAnswers = 0;
+    private Integer totalTournamentAnswers = 0;
 
     private Boolean privateSuggestionStats = false;
     private Boolean privateQueryStats = false;
+    private Boolean privateTournamentStats = false;
 
     public Boolean getPrivateSuggestionStats() {
         return privateSuggestionStats;
@@ -119,6 +123,34 @@ public class StatsDto implements Serializable {
 
     public void setPrivateQueryStats(Boolean privateQueryStats) { this.privateQueryStats = privateQueryStats; }
 
+    public Boolean getPrivateTournamentStats() { return privateTournamentStats; }
+
+    public void setPrivateTournamentStats(Boolean privateTournamentStats) {this.privateTournamentStats = privateTournamentStats; }
+
+    public Integer getEnrolledTournaments() {
+        return enrolledTournaments;
+    }
+
+    public void setEnrolledTournaments(Integer enrolledTournaments) {
+        this.enrolledTournaments = enrolledTournaments;
+    }
+
+    public Integer getCorrectTournamentAnswers() {
+        return correctTournamentAnswers;
+    }
+
+    public void setCorrectTournamentAnswers(Integer correctTournamentAnswers) {
+        this.correctTournamentAnswers = correctTournamentAnswers;
+    }
+
+    public void setTotalTournamentAnswers(Integer totalTournamentAnswers) {
+        this.totalTournamentAnswers = totalTournamentAnswers;
+    }
+
+    public Integer getTotalTournamentAnswers() {
+        return totalTournamentAnswers;
+    }
+
     @Override
     public String toString() {
         return "StatsDto{" +
@@ -134,8 +166,12 @@ public class StatsDto implements Serializable {
                 ", approvedProposedSuggestions=" + approvedProposedSuggestions +
                 ", totalQueriesSubmitted=" + totalQueriesSubmitted +
                 ", sharedQueries=" + sharedQueries +
+                ", enrolledTournaments=" + enrolledTournaments +
+                ", correctTournamentAnswers=" + correctTournamentAnswers +
+                ", totalTournamentAnswers=" + totalTournamentAnswers +
                 ", privateSuggestionStats=" + privateSuggestionStats +
                 ", privateQueryStats=" + privateQueryStats +
+                ", privateTournamentsStats=" + privateTournamentStats +
                 '}';
     }
 }

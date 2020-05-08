@@ -11,9 +11,13 @@ export default class StudentStats {
   approvedProposedSuggestions!: number;
   totalQueriesSubmitted!: number;
   sharedQueries!: number;
+  enrolledTournaments!: number;
+  correctTournamentAnswers!: number;
+  totalTournamentAnswers!: number;
 
   privateSuggestionStats!: Boolean;
   privateQueryStats!: Boolean;
+  privateTournamentStats!: Boolean;
 
   constructor(jsonObj?: StudentStats) {
     if (jsonObj) {
@@ -29,8 +33,12 @@ export default class StudentStats {
       this.approvedProposedSuggestions = jsonObj.approvedProposedSuggestions;
       this.totalQueriesSubmitted = jsonObj.totalQueriesSubmitted;
       this.sharedQueries = jsonObj.sharedQueries;
+      this.enrolledTournaments = jsonObj.enrolledTournaments;
+      this.correctTournamentAnswers = jsonObj.correctTournamentAnswers;
+      this.totalTournamentAnswers = jsonObj.totalTournamentAnswers;
       this.privateSuggestionStats = jsonObj.privateSuggestionStats;
       this.privateQueryStats = jsonObj.privateQueryStats;
+      this.privateTournamentStats = jsonObj.privateTournamentStats;
     }
   }
 }

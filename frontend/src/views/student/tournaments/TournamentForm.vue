@@ -3,7 +3,7 @@
     <v-card-title>
       <span>New Tournament</span>
 
-      <v-spacer />
+      <v-spacer></v-spacer>
 
       <v-btn color="primary" dark @click="switchMode">
         {{ editMode ? 'Close' : 'Create' }}
@@ -72,7 +72,6 @@
       >
         <template v-slot:item.topics="{ item }">
           <span v-for="topic in item.topics" :key="topic.id">
-            //check if topic or TournamentTopic
             {{ topic.name }}
           </span>
         </template>
@@ -177,6 +176,7 @@ export default class TournamentForm extends Vue {
   async save() {
     try {
       this.tournament.topics = this.tournamentTopics;
+      this.tournament.status = 'CAN_NOT_GENERATE_QUIZ';
       let updatedTournament = await RemoteServices.saveTournament(
         this.tournament
       );

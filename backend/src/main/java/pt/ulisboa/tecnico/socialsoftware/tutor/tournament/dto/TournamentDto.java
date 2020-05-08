@@ -21,8 +21,10 @@ public class TournamentDto implements Serializable {
     private String availableDate = null;
     private String conclusionDate = null;
     private String title;
+    private String status;
     private Integer numberQuestions;
     private Set<TopicDto> topics = new HashSet<>();
+    private Integer quizId;
 
     @Transient
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -33,6 +35,15 @@ public class TournamentDto implements Serializable {
         this.id = tournament.getId();
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
+        this.status = tournament.getStatus().toString();
+
+
+        if (tournament.getQuiz() != null) {
+            this.quizId = tournament.getQuiz().getId();
+        }
+        else {
+            this.quizId = null;
+        }
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -89,12 +100,28 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public Integer getNumberQuestions() {
         return numberQuestions;
     }
 
     public void setNumberQuestions(Integer numberQuestions) {
         this.numberQuestions = numberQuestions;
+    }
+
+    public void setQuizId(Integer quizId) {
+        this.quizId = quizId;
+    }
+
+    public Integer getQuizId() {
+        return quizId;
     }
 
     public LocalDateTime getCreationDateDate() {
@@ -134,9 +161,11 @@ public class TournamentDto implements Serializable {
     public String toString() {
         return "TournamentDto{" +
                 "id=" + id +
-                ", creationDate=" + creationDate + '\'' +
+                ", status=" + status +
+                ", quizId=" + quizId +
+                ", creationDate='" + creationDate + '\'' +
                 ", availableDate='" + availableDate + '\'' +
-                ", conclusionDate=" + conclusionDate + '\'' +
+                ", conclusionDate='" + conclusionDate + '\'' +
                 ", title=" + title +
                 '}';
     }
