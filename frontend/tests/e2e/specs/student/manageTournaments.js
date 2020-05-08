@@ -1,4 +1,8 @@
+const loadTournament = 'tests/e2e/support/tournament/loadTournament.sql'
+
 describe('Tournament walkthrough', () => {
+
+
   beforeEach(() => {
     cy.demoStudentLogin();
     cy.navigateTournaments();
@@ -14,5 +18,16 @@ describe('Tournament walkthrough', () => {
 
   it('login sees and enrolls a tournament', () => {
     cy.enrollTournament();
+  });
+
+  it('login sees and cancels tournament', () => {
+    cy.cancelTournament();
+  });
+
+  it('login sees and enrolls a tournament', () => {
+    cy.enrollTournament();
+  });
+  it('login sees, enrolls and checks quiz generated', () => {
+    cy.checkQuizGeneration();
   });
 });

@@ -483,3 +483,10 @@ Cypress.Commands.add('enrollTournament', name => {
     .parent()
     .should('have.text', 'Yes');
 });
+
+Cypress.Commands.add('cancelTournament', name => {
+  cy.get('[data-cy="deleteTournament"]').click();
+  cy.contains('No')
+    .should('not.exist');
+});
+
