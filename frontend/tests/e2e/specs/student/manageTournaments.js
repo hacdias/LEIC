@@ -38,7 +38,6 @@ describe('Tournament walkthrough', () => {
   });
 
   it ('login sees and answers tournament quiz', () => {
-    //cy.enrollTournament();
     cy.answerQuiz();
   });
 });
