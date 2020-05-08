@@ -48,14 +48,14 @@
         <span>Tournament Quiz</span>
       <v-spacer></v-spacer>
        <v-chip label :color="tournament.status === 'QUIZ_GENERATED' ? 'green' : 'red'" @click="solveQuiz">
-        <span>{{ tournament.status === 'QUIZ_GENERATED' ? 'Generated - Click here to solve the quiz' : 'Conditions for quiz generation not satisfied'}}</span>
+        <span data-cy="status">{{ tournament.status === 'QUIZ_GENERATED' ? 'Generated - Click here to solve the quiz' : 'Conditions for quiz generation not satisfied'}}</span>
       </v-chip>
     </v-card-title>
   </v-card>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Tournament from '@/models/management/Tournament';
 import Topic from '@/models/management/Topic';

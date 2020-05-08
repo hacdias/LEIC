@@ -42,13 +42,13 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.enrolled">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="showDetails(item)">visibility</v-icon>
+            <v-icon small class="mr-2" v-on="on" data-cy="showDetails" @click="showDetails(item)">visibility</v-icon>
           </template>
           <span>View</span>
         </v-tooltip>
         <v-tooltip bottom v-if="item.creator && item.status != 'QUIZ_GENERATED'">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="deleteTournament(item.id)" color="red">delete</v-icon>
+            <v-icon small class="mr-2" v-on="on" @click="deleteTournament(item.id)" color="red" data-cy="deleteTournament" >delete</v-icon>
           </template>
           <span>Delete Tournament</span>
         </v-tooltip>

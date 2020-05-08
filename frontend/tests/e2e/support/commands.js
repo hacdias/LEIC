@@ -487,6 +487,28 @@ Cypress.Commands.add('enrollTournament', name => {
 Cypress.Commands.add('cancelTournament', name => {
   cy.get('[data-cy="deleteTournament"]').click();
   cy.contains('No')
-    .should('not.exist');
+    .should('exist');
 });
 
+Cypress.Commands.add('checkQuizGeneration', name => {
+  cy.get('[data-cy="showDetails"]').click();
+  cy.contains('Generated - Click here to solve the quiz')
+    .should('exist');
+});
+
+Cypress.Commands.add('answerQuiz', name => {
+  cy.get('[data-cy="showDetails"]').click();
+  cy.get('[data-cy="status"]').click();
+  cy.get('.option-letter').first().click();
+  cy.get('.right-button').first().click();
+  cy.get('.option-letter').first().click();
+  cy.get('.right-button').first().click();
+  cy.get('.option-letter').first().click();
+  cy.get('.right-button').first().click();
+  cy.get('.option-letter').first().click();
+  cy.get('.right-button').first().click();
+  cy.get('.option-letter').first().click();
+  cy.get('.end-quiz').click();
+  cy.contains('I\'m sure')
+    .parent().click();
+});

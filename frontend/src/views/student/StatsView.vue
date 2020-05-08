@@ -117,12 +117,15 @@
           <p data-cy="enrolledTournaments">
             {{ stats.enrolledTournaments }} Enrolled
           </p>
+          <p data-cy="totalTournamentAnswers">
+            {{ stats.totalTournamentAnswers }} Tournament Quiz Answers
+          </p>
           <p v-if="stats.totalTournamentAnswers > 0">
             {{
             stats.correctTournamentAnswers === 0
             ? 0
             : (stats.correctTournamentAnswers / stats.totalTournamentAnswers) * 100
-            }}% Correct Tournament Answers
+            }}% Correct Tournament Quiz Answers
           </p>
         </div>
         <v-checkbox
