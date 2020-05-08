@@ -128,7 +128,7 @@ class GetTournamentQuizTest extends Specification {
 
     def "tournament quiz is fetched"() {
 
-        given: "a tournament with 2 questions"
+        given: "a tournament with a quiz"
         tournament.setNumberQuestions(2)
         tournament.setStatus(Tournament.TournamentStatus.CAN_GENERATE_QUIZ.toString())
         tournamentService.generateTournamentQuiz(tournament.getId());

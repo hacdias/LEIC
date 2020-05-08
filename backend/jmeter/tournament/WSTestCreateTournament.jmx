@@ -334,14 +334,10 @@
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">DELETE FROM topics_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM users_enrolled_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM users_created_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM tournaments 
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;); </stringProp>
+          <stringProp name="query">DELETE FROM topics_tournaments;
+DELETE FROM users_enrolled_tournaments;
+DELETE FROM users_created_tournaments;
+DELETE FROM tournaments ;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>

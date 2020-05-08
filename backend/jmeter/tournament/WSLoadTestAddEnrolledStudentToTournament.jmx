@@ -87,8 +87,8 @@
           <stringProp name="query">do $$
 begin
 for r in 1..101 loop
-INSERT INTO tournaments (available_date, conclusion_date, creation_date, number_questions, title, course_execution_id, user_id) VALUES (&apos;2019-03-28 22:20&apos;, &apos;2021-03-29 22:20&apos;, &apos;2020-03-27 22:20&apos;, r, &apos;Title1&apos;, 11, 647); 
-INSERT INTO topics_tournaments (topics_id, tournaments_id) VALUES (83, (SELECT id FROM tournaments WHERE tournaments.number_questions = r));
+INSERT INTO tournaments (available_date, conclusion_date, creation_date, number_questions, title, course_execution_id, user_id, status) VALUES (&apos;2019-03-28 22:20&apos;, &apos;2021-03-29 22:20&apos;, &apos;2029-03-27 22:20&apos;, r, &apos;Title1&apos;, 11, 647, &apos;CAN_NOT_GENERATE_QUIZ&apos;); 
+INSERT INTO topics_tournaments (topics_id, tournaments_id) VALUES (108, (SELECT id FROM tournaments WHERE tournaments.number_questions = r));
 INSERT INTO users_enrolled_tournaments (enrolled_students_id, enrolled_tournaments_id) VALUES (647, (SELECT id FROM tournaments WHERE tournaments.number_questions = r));
 INSERT INTO users_created_tournaments (user_id, created_tournaments_id) VALUES (647, (SELECT id FROM tournaments WHERE tournaments.number_questions = r));
 end loop;
@@ -328,7 +328,7 @@ $$;</stringProp>
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">tournaments/${tournamentId}</stringProp>
+            <stringProp name="HTTPSampler.path">/tournaments/${tournamentId}</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -469,14 +469,10 @@ $$;</stringProp>
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">DELETE FROM topics_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM users_enrolled_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM users_created_tournaments
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;);
-DELETE FROM tournaments 
-	WHERE EXISTS (SELECT 1 FROM tournaments WHERE tournaments.title LIKE  &apos;Title%&apos;); </stringProp>
+          <stringProp name="query">DELETE FROM topics_tournaments;
+DELETE FROM users_enrolled_tournaments;
+DELETE FROM users_created_tournaments;
+DELETE FROM tournaments;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>

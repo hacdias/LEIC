@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.service
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
+
 //-----------External Imports-----------
 import spock.lang.Specification
 import org.springframework.context.annotation.Bean
@@ -108,6 +110,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
         tournamentDto.addTopic(topicDto)
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
         
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
@@ -145,7 +148,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
         tournamentDto.addTopic(topicDto)
         tournamentDto.addTopic(topicDto2)
-        
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
         
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
@@ -184,6 +187,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
         tournamentDto.addTopic(topicDto)
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
 
         when:
         tournamentService.createTournament(courseExecution.getId(), teacher.getId(), tournamentDto)
@@ -207,6 +211,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
         tournamentDto.addTopic(topicDto)
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
         
         def tournamentDto2 = new TournamentDto()
         tournamentDto2.setTitle(TOURNAMENT_TITLE)
@@ -214,6 +219,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto2.setAvailableDate(availableDate.format(formatter))
         tournamentDto2.setConclusionDate(conclusionDate.format(formatter))
         tournamentDto2.addTopic(topicDto)
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
 
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
@@ -251,6 +257,7 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setAvailableDate(available_Date)
         tournamentDto.setConclusionDate(conclusion_Date)
         tournamentDto.addTopic(topicDto)
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
 
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
@@ -280,7 +287,8 @@ class CreateTournamentTest extends Specification {
         tournamentDto.setNumberQuestions(1)
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        
+        tournamentDto.setStatus(Tournament.TournamentStatus.CAN_NOT_GENERATE_QUIZ.toString())
+
         when:
         tournamentService.createTournament(courseExecution.getId(), student.getId(), tournamentDto)
 

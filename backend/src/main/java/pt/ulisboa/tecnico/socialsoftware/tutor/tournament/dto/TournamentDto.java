@@ -24,6 +24,7 @@ public class TournamentDto implements Serializable {
     private String status;
     private Integer numberQuestions;
     private Set<TopicDto> topics = new HashSet<>();
+    private Integer quizId;
 
     @Transient
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -35,6 +36,14 @@ public class TournamentDto implements Serializable {
         this.title = tournament.getTitle();
         this.numberQuestions = tournament.getNumberQuestions();
         this.status = tournament.getStatus().toString();
+
+
+        if (tournament.getQuiz() != null) {
+            this.quizId = tournament.getQuiz().getId();
+        }
+        else {
+            this.quizId = null;
+        }
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -107,6 +116,13 @@ public class TournamentDto implements Serializable {
         this.numberQuestions = numberQuestions;
     }
 
+    public void setQuizId(Integer quizId) {
+        this.quizId = quizId;
+    }
+
+    public Integer getQuizId() {
+        return quizId;
+    }
 
     public LocalDateTime getCreationDateDate() {
         if (getCreationDate() == null || getCreationDate().isEmpty()) {
@@ -146,6 +162,7 @@ public class TournamentDto implements Serializable {
         return "TournamentDto{" +
                 "id=" + id +
                 ", status=" + status +
+                ", quizId=" + quizId +
                 ", creationDate='" + creationDate + '\'' +
                 ", availableDate='" + availableDate + '\'' +
                 ", conclusionDate='" + conclusionDate + '\'' +
