@@ -1,9 +1,14 @@
 const loadTournament = 'tests/e2e/support/tournament/loadTournament.sql'
+const deleteTournament = 'tests/e2e/support/tournament/deleteTournament.sql'
 
 describe('Tournament walkthrough', () => {
 
-  beforeEach(() => {
+  before(() => {
     cy.databaseRunFile(loadTournament);
+  });
+
+  after(() => {
+    cy.databaseRunFile(deleteTournament);
   });
 
   beforeEach(() => {
