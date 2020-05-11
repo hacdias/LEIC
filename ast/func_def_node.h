@@ -38,6 +38,10 @@ namespace og {
       return _identifier;
     }
 
+    inline void identifier(std::string id) {
+      _identifier = id;
+    }
+
     inline cdk::sequence_node *args() {
       return _args;
     }

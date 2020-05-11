@@ -449,6 +449,11 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
+  if (node->identifier() == "og")
+    node->identifier("_main");
+  else if (node->identifier() == "_main")
+    node->identifier("._main");
+  
   // TODO: check if dec
 }
 
@@ -469,6 +474,11 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
   // TODO
 
+  if (node->identifier() == "og")
+    node->identifier("_main");
+  else if (node->identifier() == "_main")
+    node->identifier("._main");
+    
   // FIXME: avoiding some seg faults for now.
   node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
 }

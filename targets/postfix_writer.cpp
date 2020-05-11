@@ -40,6 +40,7 @@ void og::postfix_writer::do_integer_node(cdk::integer_node * const node, int lvl
 }
 
 void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   int lbl1;
 
   /* generate the string */
@@ -178,12 +179,13 @@ void og::postfix_writer::do_evaluation_node(og::evaluation_node * const node, in
 }
 
 void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
-  /* ASSERT_SAFE_EXPRESSIONS;
+  ASSERT_SAFE_EXPRESSIONS;
   node->argument()->accept(this, lvl); // determine the value to print
+  
   if (node->argument()->is_typed(cdk::TYPE_INT)) {
     _pf.CALL("printi");
     _pf.TRASH(4); // delete the printed value
-  } else if (node->argument()->type()->name() == basic_type::TYPE_DOUBLE) {
+  } else if (node->argument()->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.CALL("printd");
     _pf.TRASH(8); // delete the printed value's address
   } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
@@ -193,6 +195,8 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
     std::cerr << "ERROR: CANNOT HAPPEN!" << std::endl;
     exit(1);
   }
+
+  // TODO: print multiple values
 
   if (node->has_newline()) _pf.CALL("println"); // print a newline */
 }
@@ -300,14 +304,19 @@ void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_block_node(og::block_node *const node, int lvl) {
+  // _symtab.push();
+  if(node->declarations()){ node->declarations()->accept(this, lvl+2); }
+  if(node->instructions()){ node->instructions()->accept(this, lvl+2); }
+  // _symtab.pop();
   // TODO
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
-  // TODO: this was from program node
-  /*
+  ASSERT_SAFE_EXPRESSIONS;
+  // TODO: THIS IS JUST SIMPLE CODE! CHANGE ASAP
+
   // Note that Simple doesn't have functions. Thus, it doesn't need
   // a function node. However, it must start in the main function.
   // The ProgramNode (representing the whole program) doubles as a
@@ -316,11 +325,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   // generate the main function (RTS mandates that its name be "_main")
   _pf.TEXT();
   _pf.ALIGN();
-  _pf.GLOBAL("_main", _pf.FUNC());
-  _pf.LABEL("_main");
+  _pf.GLOBAL(node->identifier(), _pf.FUNC());
+  _pf.LABEL(node->identifier());
   _pf.ENTER(0);  // Simple doesn't implement local variables
 
-  node->statements()->accept(this, lvl);
+  node->block()->accept(this, lvl);
 
   // end the main function
   _pf.INT(0);
@@ -333,7 +342,6 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _pf.EXTERN("printi");
   _pf.EXTERN("prints");
   _pf.EXTERN("println");
-  */
 }
 
 //---------------------------------------------------------------------------
@@ -359,5 +367,6 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
 }
 
 void og::postfix_writer::do_tuple_node(og::tuple_node *const node, int lvl) {
-  // TODO
+  ASSERT_SAFE_EXPRESSIONS;
+  node->nodes()->accept(this, lvl + 2);
 }

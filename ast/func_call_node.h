@@ -19,9 +19,14 @@ namespace og {
     }
 
   public:
-    inline std::string &identifier() {
+    inline std::string identifier() {
       return _identifier;
     }
+
+    inline void identifier(std::string id) {
+      _identifier = id;
+    }
+  
     inline cdk::sequence_node *expressions() {
       return _expressions;
     }
