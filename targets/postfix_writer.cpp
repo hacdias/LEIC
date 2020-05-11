@@ -16,7 +16,9 @@ void og::postfix_writer::do_double_node(cdk::double_node * const node, int lvl) 
   // EMPTY
 }
 void og::postfix_writer::do_not_node(cdk::not_node * const node, int lvl) {
-  // EMPTY
+  ASSERT_SAFE_EXPRESSIONS;
+  node->argument()->accept(this, lvl);
+  _pf.NOT();
 }
 void og::postfix_writer::do_and_node(cdk::and_node * const node, int lvl) {
   // EMPTY
@@ -59,7 +61,11 @@ void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) 
 void og::postfix_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   node->argument()->accept(this, lvl); // determine the value
-  _pf.NEG(); // 2-complement
+  if (node->is_typed(cdk::TYPE_DOUBLE)) {
+    _pf.DNEG();
+  } else {
+    _pf.NEG(); // is int
+  }
 }
 
 //---------------------------------------------------------------------------
