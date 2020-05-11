@@ -26,3 +26,4 @@ RUN wget $EXAMPLES_URL -O examples.zip && \
 
 COPY Makefile /proj/Makefile
 COPY xmlall.sh /proj/xmlall.sh
+COPY testall.sh /proj/examples/testall.sh
