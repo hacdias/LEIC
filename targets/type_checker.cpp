@@ -209,7 +209,7 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
     // type! So, if either the left or right value are unspecified but the other side is, then we make them
     // the same!
     if (lptr->referenced()->name() == cdk::TYPE_UNSPEC && !rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
-      node->lvalue()->type(node->rvmalue()->type());
+      node->lvalue()->type(node->rvalue()->type());
     } else if (!lptr->referenced()->name() == cdk::TYPE_UNSPEC && rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
       node->rvalue()->type(node->lvalue()->type());
     }
