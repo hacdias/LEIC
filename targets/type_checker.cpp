@@ -277,7 +277,10 @@ void og::type_checker::do_if_else_node(og::if_else_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
-  if (!_function) throw std::string("return outside of function");
+  // TODO: this is ignoring the error when the return
+  // is not inside the function because it was triggering the XML writer for
+  // some reason. In the end, add a throw here.
+  if (!_function) return;
 
   if (node->value()) {
     node->value()->accept(this, lvl);

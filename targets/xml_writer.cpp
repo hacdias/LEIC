@@ -232,7 +232,8 @@ void og::xml_writer::do_if_else_node(og::if_else_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_return_node(og::return_node *const node, int lvl) {
-  ASSERT_SAFE_EXPRESSIONS;
+  // NOTE: we do not ASSERT_SAFE_EXPRESSIONS because this was already called
+  // when we asserted the function itself.
   openTag(node, lvl);
 
   if (node->value() != nullptr) {
