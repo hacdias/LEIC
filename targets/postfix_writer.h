@@ -5,6 +5,7 @@
 
 #include <sstream>
 #include <cdk/emitters/basic_postfix_emitter.h>
+#include <stack>
 
 namespace og {
 
@@ -16,6 +17,8 @@ namespace og {
     std::shared_ptr<og::symbol> _function = nullptr;
     cdk::basic_postfix_emitter &_pf;
     int _lbl;
+    std::stack<std::string> _condfor;
+    std::stack<std::string> _endfor;
 
     bool _inside_function = false;
 

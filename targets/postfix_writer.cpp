@@ -253,12 +253,16 @@ void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   }
 
   _pf.ALIGN();
-  _pf.LABEL(mklbl(cond));
+  std::string condfor = mklbl(cond);
+  _condfor.push(condfor);
+  _pf.LABEL(condfor);
 
   os() << "\t\t\t;; FOR CONDITION" << std::endl;
   if (node->condition()) {
     node->condition()->accept(this, lvl);
-    _pf.JZ(mklbl(for_end));
+    std::string endfor = mklbl(for_end);
+    _endfor.push(endfor);
+    _pf.JZ(endfor);
   }
 
   os() << "\t\t\t;; FOR BLOCK" << std::endl;
@@ -302,8 +306,7 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
-  // NOTE: does not require ASSERT_SAFE_EXPRESSIONS. Why? This is already called
-  // on the function declaration that traverses all children.
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
@@ -318,14 +321,17 @@ void og::postfix_writer::do_id_node(og::id_node *const node, int lvl) {
 
 void og::postfix_writer::do_break_node(og::break_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  _pf.JMP(_endfor.top());
+  _endfor.pop();
+  _condfor.pop();
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  _pf.JMP(_condfor.top());
+  //TODO remove confor from string stack when for ends
 }
 
 //---------------------------------------------------------------------------
@@ -383,21 +389,31 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
 
 void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  
+  if(_inside_function)
+    _pf.INT(0);
+  else
+    _pf.SINT(0);
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+
+  node->argument()->accept(this, lvl + 2);
+  _pf.INT(3);
+  _pf.SHTL();
+  _pf.ALLOC();
+  _pf.SP();
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  
+  node->lvalue()->accept(this, lvl + 2);
 }
 
 //---------------------------------------------------------------------------
@@ -421,12 +437,6 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   // main function node.
 
   // generate the main function (RTS mandates that its name be "_main")
-
-  _symtab.push();
-  if (node->args()) {
-    // TODO: do things!
-  }
-
   _pf.TEXT();
   _pf.ALIGN();
   _pf.GLOBAL(node->identifier(), _pf.FUNC());
@@ -436,7 +446,6 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _inside_function = true;
   node->block()->accept(this, lvl);
   _inside_function = false;
-  _symtab.pop();
 
   // end the main function
   _pf.INT(0);
@@ -455,7 +464,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  if(node->is_typed(cdk::TYPE_INT))
+    _pf.INT(4);
+  if(node->is_typed(cdk::TYPE_DOUBLE))
+    _pf.INT(8);
+  // TODO string and pointer
 }
 
 void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
