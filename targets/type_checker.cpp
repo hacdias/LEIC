@@ -499,6 +499,8 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 
   node->block()->accept(this, lvl + 2);
 
+  // TODO: assign new type
+
   _function = nullptr;
 }
 
