@@ -402,11 +402,10 @@ void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_block_node(og::block_node *const node, int lvl) {
-  // _symtab.push();
+  _symtab.push();
   if(node->declarations()){ node->declarations()->accept(this, lvl+2); }
   if(node->instructions()){ node->instructions()->accept(this, lvl+2); }
-  // _symtab.pop();
-  // TODO
+  _symtab.pop();
 }
 
 //---------------------------------------------------------------------------
