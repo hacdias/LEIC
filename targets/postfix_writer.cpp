@@ -421,6 +421,12 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   // main function node.
 
   // generate the main function (RTS mandates that its name be "_main")
+
+  _symtab.push();
+  if (node->args()) {
+    // TODO: do things!
+  }
+
   _pf.TEXT();
   _pf.ALIGN();
   _pf.GLOBAL(node->identifier(), _pf.FUNC());
@@ -430,6 +436,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _inside_function = true;
   node->block()->accept(this, lvl);
   _inside_function = false;
+  _symtab.pop();
 
   // end the main function
   _pf.INT(0);
