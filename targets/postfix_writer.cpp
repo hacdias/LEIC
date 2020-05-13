@@ -302,7 +302,8 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
-  ASSERT_SAFE_EXPRESSIONS;
+  // NOTE: does not require ASSERT_SAFE_EXPRESSIONS. Why? This is already called
+  // on the function declaration that traverses all children.
   // TODO
 }
 

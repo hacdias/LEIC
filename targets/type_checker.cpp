@@ -484,9 +484,7 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
     node->identifier("_main");
   else if (node->identifier() == "_main")
     node->identifier("._main");
-  
-  // TODO: check if dec
-    
+
   _function = make_symbol(node->type(), node->identifier());
 
   auto existent = _symtab.find(node->identifier());
@@ -498,9 +496,10 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   }
 
   node->block()->accept(this, lvl + 2);
-
-  // TODO: assign new type
-
+  node->type(_function->type());
+  if  (node->type() == nullptr) {
+    throw std::string("could not infer function return type");
+  }
   _function = nullptr;
 }
 
@@ -511,7 +510,7 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
     node->identifier("_main");
   else if (node->identifier() == "_main")
     node->identifier("._main");
-    
+
   // FIXME: avoiding some seg faults for now.
   node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
 }
