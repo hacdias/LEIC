@@ -243,17 +243,35 @@ void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
 
 void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
-  /* THIS WAS WHILE'S CODE
-  ASSERT_SAFE_EXPRESSIONS;
-  int lbl1, lbl2;
-  _pf.LABEL(mklbl(lbl1 = ++_lbl));
-  node->condition()->accept(this, lvl);
-  _pf.JZ(mklbl(lbl2 = ++_lbl));
-  node->block()->accept(this, lvl + 2);
-  _pf.JMP(mklbl(lbl1));
-  _pf.LABEL(mklbl(lbl2));
-  */
+
+  int cond = ++_lbl;
+  int for_end = ++_lbl;
+
+  os() << "\t\t\t;; FOR INIT" << std::endl;
+  if (node->init()) {
+    node->init()->accept(this, lvl);
+  }
+
+  _pf.ALIGN();
+  _pf.LABEL(mklbl(cond));
+
+  os() << "\t\t\t;; FOR CONDITION" << std::endl;
+  if (node->condition()) {
+    node->condition()->accept(this, lvl);
+    _pf.JZ(mklbl(for_end));
+  }
+
+  os() << "\t\t\t;; FOR BLOCK" << std::endl;
+  node->block()->accept(this, lvl);
+
+  os() << "\t\t\t;; FOR INCR" << std::endl;
+  if (node->end()) {
+    node->end()->accept(this, lvl);
+  }
+
+  os() << "\t\t\t;; FOR END" << std::endl;
+  _pf.JMP(mklbl(cond));
+  _pf.LABEL(mklbl(for_end));
 }
 
 //---------------------------------------------------------------------------
