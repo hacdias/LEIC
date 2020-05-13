@@ -14,8 +14,8 @@ namespace og {
     // TODO: remove value?
 
   public:
-    symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, long value) :
-        _type(type), _name(name), _value(value) {
+    symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name) :
+        _type(type), _name(name), _value(0) {
     }
 
     virtual ~symbol() {
@@ -24,6 +24,9 @@ namespace og {
 
     std::shared_ptr<cdk::basic_type> type() const {
       return _type;
+    }
+    void type(std::shared_ptr<cdk::basic_type> type) {
+      _type = type;
     }
     bool is_typed(cdk::typename_type name) const {
       return _type->name() == name;
@@ -40,8 +43,8 @@ namespace og {
   };
 
   // this function simplifies symbol creation in the type_checker visitor (see below)
-  inline auto make_symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, long value) {
-    return std::make_shared<symbol>(type, name, value);
+  inline auto make_symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name) {
+    return std::make_shared<symbol>(type, name);
   }
 
 } // og

@@ -277,7 +277,23 @@ void og::type_checker::do_if_else_node(og::if_else_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
-  // TODO
+  if (!_function) throw std::string("return outside of function");
+
+  if (node->value()) {
+    node->value()->accept(this, lvl);
+
+    if (_function->type() == nullptr) {
+      _function->type(node->value()->type());
+    } else if (_function->type() != node->value()->type()) {
+      throw std::string("function has wrong return type");
+    }
+  } else {
+    if (_function->type() == nullptr) {
+      _function->type(cdk::make_primitive_type(0, cdk::TYPE_VOID));
+    } else if (!_function->is_typed(cdk::TYPE_VOID)) {
+      throw std::string("function must return void");
+    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -330,7 +346,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       }
     }
 
-    auto symbol = og::make_symbol(node->type(), id, 0);
+    auto symbol = og::make_symbol(node->type(), id);
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
@@ -357,7 +373,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     std::string &id = *node->identifiers().at(i);
     cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
 
-    auto symbol = og::make_symbol(exp->type(), id, 0);
+    auto symbol = og::make_symbol(exp->type(), id);
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
@@ -398,7 +414,8 @@ void og::type_checker::do_mem_addr_node(og::mem_addr_node *const node, int lvl) 
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_block_node(og::block_node *const node, int lvl) {
-  // EMPTY
+  if (node->declarations()) node->declarations()->accept(this, lvl+2);
+  if (node->instructions()) node->instructions()->accept(this, lvl+2);
 }
 
 //---------------------------------------------------------------------------
@@ -448,15 +465,6 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
 
 //---------------------------------------------------------------------------
 
-void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
-  if (node->identifier() == "og")
-    node->identifier("_main");
-  else if (node->identifier() == "_main")
-    node->identifier("._main");
-  
-  // TODO: check if dec
-}
-
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
   if (node->identifier() == "og")
     node->identifier("_main");
@@ -469,6 +477,29 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
   }
 
   // TODO
+}
+
+void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
+  if (node->identifier() == "og")
+    node->identifier("_main");
+  else if (node->identifier() == "_main")
+    node->identifier("._main");
+  
+  // TODO: check if dec
+    
+  _function = make_symbol(node->type(), node->identifier());
+
+  auto existent = _symtab.find(node->identifier());
+  if (existent != nullptr) {
+    // TODO: compare if declarations are the same.
+  } else {
+    _symtab.insert(node->identifier(), _function);
+    _parent->set_new_symbol(_function);
+  }
+
+  node->block()->accept(this, lvl + 2);
+
+  _function = nullptr;
 }
 
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
