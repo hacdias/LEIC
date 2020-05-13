@@ -13,8 +13,12 @@ namespace og {
   //!
   class postfix_writer: public basic_ast_visitor {
     cdk::symbol_table<og::symbol> &_symtab;
+    std::shared_ptr<og::symbol> _function = nullptr;
     cdk::basic_postfix_emitter &_pf;
     int _lbl;
+
+    bool _inside_function = false;
+
 
   public:
     postfix_writer(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab,
@@ -37,6 +41,8 @@ namespace og {
         oss << "_L" << lbl;
       return oss.str();
     }
+
+  void do_var_decl_node_helper(std::shared_ptr<og::symbol> symbol, cdk::expression_node* expression, int lvl);
 
   public:
   // do not edit these lines

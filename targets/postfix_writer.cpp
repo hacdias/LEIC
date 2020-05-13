@@ -12,9 +12,6 @@ void og::postfix_writer::do_nil_node(cdk::nil_node * const node, int lvl) {
 void og::postfix_writer::do_data_node(cdk::data_node * const node, int lvl) {
   // EMPTY
 }
-void og::postfix_writer::do_double_node(cdk::double_node * const node, int lvl) {
-  // EMPTY
-}
 void og::postfix_writer::do_not_node(cdk::not_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   node->argument()->accept(this, lvl);
@@ -38,22 +35,33 @@ void og::postfix_writer::do_sequence_node(cdk::sequence_node * const node, int l
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_integer_node(cdk::integer_node * const node, int lvl) {
-  _pf.INT(node->value()); // push an integer
+  ASSERT_SAFE_EXPRESSIONS;
+  if (_inside_function) _pf.INT(node->value());
+  else _pf.SINT(node->value());
+}
+
+void og::postfix_writer::do_double_node(cdk::double_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
+  if (_inside_function) _pf.DOUBLE(node->value());
+  else _pf.SDOUBLE(node->value());
 }
 
 void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  int lbl1;
+  int new_lbl;
 
-  /* generate the string */
-  _pf.RODATA(); // strings are DATA readonly
-  _pf.ALIGN(); // make sure we are aligned
-  _pf.LABEL(mklbl(lbl1 = ++_lbl)); // give the string a name
-  _pf.SSTRING(node->value()); // output string characters
+  _pf.RODATA();
+  _pf.ALIGN();
+  _pf.LABEL(mklbl(new_lbl = ++_lbl));
+  _pf.SSTRING(node->value());
 
-  /* leave the address on the stack */
-  _pf.TEXT(); // return to the TEXT segment
-  _pf.ADDR(mklbl(lbl1)); // the string to be printed
+  // if (_function != nullptr) {
+  _pf.TEXT();
+  _pf.ADDR(mklbl(new_lbl));
+  // } else {
+  //   _pf.DATA();
+  //   _pf.SADDR(mklbl(new_lbl));
+  // }
 }
 
 //---------------------------------------------------------------------------
@@ -141,7 +149,7 @@ void og::postfix_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 
 void og::postfix_writer::do_variable_node(cdk::variable_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // simplified generation: all variables are global
+  // TODO simplified generation: all variables are global
   _pf.ADDR(node->name());
 }
 
@@ -295,8 +303,53 @@ void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl
 
 //---------------------------------------------------------------------------
 
+void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> symbol, cdk::expression_node *expression, int lvl) {
+  // TODO actually declare variable here
+  // TODO: this assumes it'll always be global
+  if (expression == nullptr) {
+    _pf.BSS(); // uninitialized vars
+  } else {
+    _pf.DATA(); // initialized variables
+  }
+
+  _pf.ALIGN();
+  _pf.GLOBAL(symbol->name(), _pf.OBJ());
+  _pf.LABEL(symbol->name());
+
+  if (expression == nullptr) {
+    // Allocate required memory for unitiliazed variables.
+    _pf.SALLOC(symbol->type()->size());
+    return;
+  }
+
+  if (symbol->type()->name() == cdk::TYPE_DOUBLE && expression->is_typed(cdk::TYPE_INT)) {
+    // TODO: convert int para double.
+    expression->accept(this, lvl);
+  } else {
+    expression->accept(this, lvl);
+  }
+}
+
 void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
+
+  if (node->identifiers().size() == 1) {
+    // Single variable that _MAY_ be a tuple.
+    std::string &id = *node->identifiers().at(0);
+    std::shared_ptr<og::symbol> symbol = _symtab.find(id);
+    do_var_decl_node_helper(symbol, node->expression(), lvl);
+    return;
+  }
+
+  // Multiple variables!
+  og::tuple_node* tuple = (og::tuple_node*)(node->expression());
+  for (size_t i = 0; i < node->identifiers().size(); i++) {
+    std::string &id = *node->identifiers().at(i);
+    cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
+    std::shared_ptr<og::symbol> symbol = _symtab.find(id);
+    do_var_decl_node_helper(symbol, exp, lvl);
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -345,7 +398,9 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _pf.LABEL(node->identifier());
   _pf.ENTER(0);  // Simple doesn't implement local variables
 
+  _inside_function = true;
   node->block()->accept(this, lvl);
+  _inside_function = false;
 
   // end the main function
   _pf.INT(0);
