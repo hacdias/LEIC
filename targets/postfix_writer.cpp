@@ -18,9 +18,11 @@ void og::postfix_writer::do_not_node(cdk::not_node * const node, int lvl) {
   _pf.NOT();
 }
 void og::postfix_writer::do_and_node(cdk::and_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // EMPTY
 }
 void og::postfix_writer::do_or_node(cdk::or_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // EMPTY
 }
 
@@ -55,13 +57,13 @@ void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) 
   _pf.LABEL(mklbl(new_lbl = ++_lbl));
   _pf.SSTRING(node->value());
 
-  // if (_function != nullptr) {
-  _pf.TEXT();
-  _pf.ADDR(mklbl(new_lbl));
-  // } else {
-  //   _pf.DATA();
-  //   _pf.SADDR(mklbl(new_lbl));
-  // }
+  if (_inside_function) {
+    _pf.TEXT();
+    _pf.ADDR(mklbl(new_lbl));
+  } else {
+    _pf.DATA();
+    _pf.SADDR(mklbl(new_lbl));
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -228,6 +230,8 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
+
   /*TODO ASSERT_SAFE_EXPRESSIONS;
   _pf.CALL("readi");
   _pf.LDFVAL32();
@@ -238,6 +242,7 @@ void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
   /* THIS WAS WHILE'S CODE
   ASSERT_SAFE_EXPRESSIONS;
@@ -279,6 +284,7 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
@@ -292,12 +298,14 @@ void og::postfix_writer::do_id_node(og::id_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_break_node(og::break_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
@@ -355,18 +363,21 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
@@ -418,22 +429,27 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
 void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   // TODO
 }
 
