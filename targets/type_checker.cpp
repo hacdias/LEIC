@@ -528,6 +528,11 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
   //std::cout << "func_call" << std::endl;
   // TODO
 
+  if (node->identifier() == "og")
+    node->identifier("_main");
+  else if (node->identifier() == "_main")
+    node->identifier("._main");
+
   auto existent = _symtab.find(node->identifier());
 
   if(existent != nullptr) {
@@ -537,13 +542,6 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
   } else {
     throw std::string("undeclared function '" + node->identifier() + "'");
   }
-
-  /* henrique stuff
-  if (node->identifier() == "og")
-    node->identifier("_main");
-  else if (node->identifier() == "_main")
-    node->identifier("._main");
-  */
 
   // FIXME: avoiding some seg faults for now. // FIXED
   //node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
