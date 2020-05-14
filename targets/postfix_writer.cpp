@@ -473,7 +473,6 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO: probably the type struct will need override.
   // TODO: string?
   _pf.INT(node->type()->size());
 }
