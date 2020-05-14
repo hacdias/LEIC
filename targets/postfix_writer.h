@@ -17,8 +17,10 @@ namespace og {
     std::shared_ptr<og::symbol> _function = nullptr;
     cdk::basic_postfix_emitter &_pf;
     int _lbl;
-    std::stack<std::string> _condfor;
-    std::stack<std::string> _endfor;
+
+    std::stack<int> _for_cond;
+    std::stack<int> _for_incr;
+    std::stack<int> _for_end;
 
     bool _inside_function = false;
 
