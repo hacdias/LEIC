@@ -473,11 +473,9 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  /* if(node->is_typed(cdk::TYPE_INT))
-    _pf.INT(4);
-  if(node->is_typed(cdk::TYPE_DOUBLE))
-    _pf.INT(8); */
-  // TODO string and pointer
+  // TODO: probably the type struct will need override.
+  // TODO: string?
+  _pf.INT(node->type()->size());
 }
 
 void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
