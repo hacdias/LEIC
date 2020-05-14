@@ -287,6 +287,8 @@ void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
 
     if (_function->type() == nullptr) {
       _function->type(node->value()->type());
+    } else if (_function->is_typed(cdk::TYPE_DOUBLE) && node->value()->is_typed(cdk::TYPE_INT)) {
+      _function->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
     } else if (_function->type() != node->value()->type()) {
       throw std::string("function has wrong return type");
     }
@@ -469,20 +471,29 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
+  //std::cout << "func_decl" << std::endl;
+
   if (node->identifier() == "og")
     node->identifier("_main");
   else if (node->identifier() == "_main")
     node->identifier("._main");
+  
+  _function = make_symbol(node->type(), node->identifier());
 
   auto symbol = _symtab.find(node->identifier());
   if (symbol != nullptr) {
     throw std::string(node->identifier() + "redeclared");
+  } else {
+    _symtab.insert(node->identifier(), _function);
+    _parent->set_new_symbol(_function);
   }
 
   // TODO
 }
 
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
+  //std::cout << "func_def" << std::endl;
+  
   if (node->identifier() == "og")
     node->identifier("_main");
   else if (node->identifier() == "_main")
@@ -492,12 +503,18 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 
   auto existent = _symtab.find(node->identifier());
   if (existent != nullptr) {
-    // TODO: compare if declarations are the same.
+    if(true /* TODO: compare if declarations are the same.*/) {
+      _symtab.replace(node->identifier(), _function);
+      _parent->set_new_symbol(_function);
+    } else {
+      throw std::string("declarations are not the same");
+    }
   } else {
     _symtab.insert(node->identifier(), _function);
     _parent->set_new_symbol(_function);
   }
 
+  node->args()->accept(this, lvl +2);
   node->block()->accept(this, lvl + 2);
   node->type(_function->type());
   if  (node->type() == nullptr) {
@@ -507,15 +524,29 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 }
 
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
+  ASSERT_UNSPEC;
+  //std::cout << "func_call" << std::endl;
   // TODO
 
+  auto existent = _symtab.find(node->identifier());
+
+  if(existent != nullptr) {
+    node->type(existent->type());
+    if(node->expressions()->size() != 0)
+      node->expressions()->accept(this, lvl + 4);
+  } else {
+    throw std::string("undeclared function '" + node->identifier() + "'");
+  }
+
+  /* henrique stuff
   if (node->identifier() == "og")
     node->identifier("_main");
   else if (node->identifier() == "_main")
     node->identifier("._main");
+  */
 
-  // FIXME: avoiding some seg faults for now.
-  node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
+  // FIXME: avoiding some seg faults for now. // FIXED
+  //node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
 }
 
 //---------------------------------------------------------------------------
