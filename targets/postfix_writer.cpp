@@ -244,8 +244,13 @@ void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
 void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  int cond = ++_lbl;
+  int for_cond = ++_lbl;
+  int for_incr = ++_lbl;
   int for_end = ++_lbl;
+
+  _for_cond.push(for_cond);
+  _for_incr.push(for_incr);
+  _for_end.push(for_end);
 
   os() << "\t\t\t;; FOR INIT" << std::endl;
   if (node->init()) {
@@ -253,29 +258,30 @@ void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   }
 
   _pf.ALIGN();
-  std::string condfor = mklbl(cond);
-  _condfor.push(condfor);
-  _pf.LABEL(condfor);
 
   os() << "\t\t\t;; FOR CONDITION" << std::endl;
+  _pf.LABEL(mklbl(for_cond));
   if (node->condition()) {
     node->condition()->accept(this, lvl);
-    std::string endfor = mklbl(for_end);
-    _endfor.push(endfor);
-    _pf.JZ(endfor);
+    _pf.JZ(mklbl(for_end));
   }
 
   os() << "\t\t\t;; FOR BLOCK" << std::endl;
   node->block()->accept(this, lvl);
 
+  _pf.LABEL(mklbl(for_incr));
   os() << "\t\t\t;; FOR INCR" << std::endl;
   if (node->end()) {
     node->end()->accept(this, lvl);
   }
 
   os() << "\t\t\t;; FOR END" << std::endl;
-  _pf.JMP(mklbl(cond));
+  _pf.JMP(mklbl(for_cond));
   _pf.LABEL(mklbl(for_end));
+
+  _for_cond.pop();
+  _for_incr.pop();
+  _for_end.pop();
 }
 
 //---------------------------------------------------------------------------
@@ -321,17 +327,14 @@ void og::postfix_writer::do_id_node(og::id_node *const node, int lvl) {
 
 void og::postfix_writer::do_break_node(og::break_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  _pf.JMP(_endfor.top());
-  _endfor.pop();
-  _condfor.pop();
+  _pf.JMP(mklbl(_for_end.top()));
 }
 
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  _pf.JMP(_condfor.top());
-  //TODO remove confor from string stack when for ends
+  _pf.JMP(mklbl(_for_incr.top()));
 }
 
 //---------------------------------------------------------------------------
@@ -436,6 +439,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   // The ProgramNode (representing the whole program) doubles as a
   // main function node.
 
+  _symtab.push();
+  if (node->args()) {
+    // TODO: do things!
+  }
+
   // generate the main function (RTS mandates that its name be "_main")
   _pf.TEXT();
   _pf.ALIGN();
@@ -446,6 +454,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _inside_function = true;
   node->block()->accept(this, lvl);
   _inside_function = false;
+  _symtab.pop();
 
   // end the main function
   _pf.INT(0);
@@ -464,11 +473,8 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  if(node->is_typed(cdk::TYPE_INT))
-    _pf.INT(4);
-  if(node->is_typed(cdk::TYPE_DOUBLE))
-    _pf.INT(8);
-  // TODO string and pointer
+  // TODO: string?
+  _pf.INT(node->type()->size());
 }
 
 void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
