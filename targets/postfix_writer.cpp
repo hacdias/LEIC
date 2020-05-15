@@ -470,6 +470,9 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     } else {
       std::cerr << "cannot initialize" << std::endl;
     }
+  } else if (_in_function_args) {
+    // When these are function arguments, we don't do anything because the space
+    // is already allocated elsewhere :D
   } else {
     // Global variables
     if (expression == nullptr) {
@@ -662,7 +665,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     for (int ax = node->expressions()->size(); ax > 0; ax--) {
       cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(ax - 1));
       std::shared_ptr<og::symbol> param = symbol->params()->at(ax - 1);
-    
+
       arg->accept(this, lvl + 2);
       args_size += param->type()->size();
 

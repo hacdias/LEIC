@@ -222,6 +222,8 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
   } else {
     throw std::string("mismatching types, wants " + cdk::to_string(node->lvalue()->type()) + ", has " + cdk::to_string(node->rvalue()->type()));
   }
+
+  node->type(node->lvalue()->type());
 }
 
 //---------------------------------------------------------------------------
