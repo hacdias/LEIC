@@ -51,6 +51,9 @@ namespace og {
     void offset(int offset) {
       _offset = offset;
     }
+    bool is_public() { return _is_public; }
+    bool is_required() { return _is_required; }
+    bool is_function() { return _is_function; }
   };
 
   // this function simplifies symbol creation in the type_checker visitor (see below)

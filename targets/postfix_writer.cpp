@@ -151,8 +151,12 @@ void og::postfix_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
 
 void og::postfix_writer::do_variable_node(cdk::variable_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO simplified generation: all variables are global
-  _pf.ADDR(node->name());
+  auto symbol = _symtab.find(node->name());
+  if (symbol->offset() == 0) { // global
+    _pf.ADDR(symbol->name());
+  } else {
+    _pf.LOCAL(symbol->offset());
+  }
 }
 
 void og::postfix_writer::do_rvalue_node(cdk::rvalue_node * const node, int lvl) {
@@ -340,29 +344,65 @@ void og::postfix_writer::do_continue_node(og::continue_node *const node, int lvl
 //---------------------------------------------------------------------------
 
 void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> symbol, cdk::expression_node *expression, int lvl) {
-  // TODO actually declare variable here
-  // TODO: this assumes it'll always be global
-  if (expression == nullptr) {
-    _pf.BSS(); // uninitialized vars
+  int offset = 0;
+  int typesize = symbol->type()->size();
+
+  if (_inside_function) {
+    _offset -= typesize;
+    offset = _offset;
+  } else if (_in_function_args) {
+    offset = _offset;
+    _offset += typesize;
   } else {
-    _pf.DATA(); // initialized variables
+    offset = 0; // global variable
   }
 
-  _pf.ALIGN();
-  _pf.GLOBAL(symbol->name(), _pf.OBJ());
-  _pf.LABEL(symbol->name());
+  symbol->offset(offset);
 
-  if (expression == nullptr) {
-    // Allocate required memory for unitiliazed variables.
-    _pf.SALLOC(symbol->type()->size());
-    return;
-  }
+  if (symbol->is_required()) {
+    // TODO: is external
+  } else if (_inside_function) {
+    // if we are dealing with local variables, then no action is needed
+    // unless an initializer exists
+    if (!expression) {
+      return;
+    }
 
-  if (symbol->type()->name() == cdk::TYPE_DOUBLE && expression->is_typed(cdk::TYPE_INT)) {
-    // TODO: convert int para double.
-    expression->accept(this, lvl);
+    if (symbol->type()->name() == cdk::TYPE_INT || symbol->type()->name() == cdk::TYPE_STRING || symbol->type()->name() == cdk::TYPE_POINTER) {
+      _pf.LOCAL(symbol->offset());
+      _pf.STINT();
+    } else if (symbol->type()->name() == cdk::TYPE_DOUBLE) {
+      _pf.LOCAL(symbol->offset());
+      _pf.STDOUBLE();
+    } else if (symbol->type()->name() == cdk::TYPE_STRUCT) {
+      // TODO: do something
+    } else {
+      std::cerr << "cannot initialize" << std::endl;
+    }
   } else {
-    expression->accept(this, lvl);
+    // Global variables
+    if (expression == nullptr) {
+      _pf.BSS(); // uninitialized vars
+    } else {
+      _pf.DATA(); // initialized variables
+    }
+
+    _pf.ALIGN();
+    _pf.GLOBAL(symbol->name(), _pf.OBJ());
+    _pf.LABEL(symbol->name());  
+    if (expression == nullptr) {
+      // Allocate required memory for unitiliazed variables.
+      _pf.SALLOC(symbol->type()->size());
+      return;
+    }
+
+    if (symbol->type()->name() == cdk::TYPE_DOUBLE && expression->is_typed(cdk::TYPE_INT)) {
+      cdk::integer_node* int_node = dynamic_cast<cdk::integer_node*>(expression);
+      cdk::double_node double_int(int_node->lineno(), int_node->value());
+      double_int.accept(this, lvl);
+    } else {
+      expression->accept(this, lvl);
+    }
   }
 }
 
