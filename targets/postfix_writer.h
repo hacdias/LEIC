@@ -2,6 +2,7 @@
 #define __OG_TARGETS_POSTFIX_WRITER_H__
 
 #include "targets/basic_ast_visitor.h"
+#include "targets/frame_size_calculator.h"
 
 #include <sstream>
 #include <cdk/emitters/basic_postfix_emitter.h>
@@ -23,6 +24,8 @@ namespace og {
     std::stack<int> _for_end;
 
     bool _inside_function = false;
+    bool _in_function_args = false;
+    int _offset = 0;
 
 
   public:

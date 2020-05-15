@@ -519,7 +519,7 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
     throw std::string("could not infer function return type");
   }
   
-  _function->offset(_function->type()->size()); // offset for returning value
+  _function->offset(-_function->type()->size()); // offset for returning value
   _function = nullptr;
 }
 

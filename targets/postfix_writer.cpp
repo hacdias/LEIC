@@ -392,7 +392,7 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
 
 void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  
+
   if(_inside_function)
     _pf.INT(0);
   else
@@ -415,7 +415,7 @@ void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int l
 
 void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  
+
   node->lvalue()->accept(this, lvl + 2);
 }
 
@@ -432,41 +432,54 @@ void og::postfix_writer::do_block_node(og::block_node *const node, int lvl) {
 
 void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO: THIS IS JUST SIMPLE CODE! CHANGE ASAP
 
-  // Note that Simple doesn't have functions. Thus, it doesn't need
-  // a function node. However, it must start in the main function.
-  // The ProgramNode (representing the whole program) doubles as a
-  // main function node.
+  // remember symbol so that args and body know
+  _function = new_symbol();
+  // _functions_to_declare.erase(_function->name());
+  reset_new_symbol();
 
-  _symtab.push();
+  _offset = 8; // prepare for arguments (4: remember to account for return address)
+  _symtab.push(); // scope of args
   if (node->args()) {
-    // TODO: do things!
+    _in_function_args = true; //FIXME really needed?
+    for (size_t i = 0; i < node->args()->size(); i++) {
+      cdk::basic_node *arg = node->args()->node(i);
+      if (arg == nullptr) break; // this means an empty sequence of arguments
+      arg->accept(this, 0); // the function symbol is at the top of the stack
+    }
+    _in_function_args = false; //FIXME really needed?
   }
 
   // generate the main function (RTS mandates that its name be "_main")
   _pf.TEXT();
   _pf.ALIGN();
-  _pf.GLOBAL(node->identifier(), _pf.FUNC());
-  _pf.LABEL(node->identifier());
-  _pf.ENTER(0);  // Simple doesn't implement local variables
+  if (node->is_public()) _pf.GLOBAL(_function->name(), _pf.FUNC());
+  _pf.LABEL(_function->name());
+
+  // compute stack size to be reserved for local variables
+  frame_size_calculator lsc(_compiler, _symtab);
+  node->accept(&lsc, lvl);
+  _pf.ENTER(lsc.localsize()); // total stack size reserved for local variables
 
   _inside_function = true;
-  node->block()->accept(this, lvl);
+  _offset = -_function->type()->size();
+  node->block()->accept(this, lvl + 4);
   _inside_function = false;
   _symtab.pop();
 
   // end the main function
-  _pf.INT(0);
-  _pf.STFVAL32();
+  // _pf.INT(0);
+  // _pf.STFVAL32();
   _pf.LEAVE();
   _pf.RET();
 
-  // these are just a few library function imports
-  _pf.EXTERN("readi");
-  _pf.EXTERN("printi");
-  _pf.EXTERN("prints");
-  _pf.EXTERN("println");
+  if (node->identifier() == "_main") {
+    // these are just a few library function imports
+    _pf.EXTERN("readi");
+    _pf.EXTERN("printi");
+    _pf.EXTERN("prints");
+    _pf.EXTERN("println");
+  }
 }
 
 //---------------------------------------------------------------------------
