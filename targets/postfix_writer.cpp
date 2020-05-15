@@ -312,28 +312,27 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
 
-/*
-   // should not reach here without returning a value (if not void)
-  if (_function->type()->name() != basic_type::TYPE_VOID) {
-    node->retval()->accept(this, lvl + 2);
+  if (_function->type()->name() == cdk::TYPE_VOID) {
+    _pf.LEAVE();
+    _pf.RET();
+    return;
+  }
 
-    if (_function->type()->name() == basic_type::TYPE_INT || _function->type()->name() == basic_type::TYPE_STRING
-        || _function->type()->name() == basic_type::TYPE_POINTER) {
-      _pf.STFVAL32();
-    } else if (_function->type()->name() == basic_type::TYPE_DOUBLE) {
-      if (node->retval()->type()->name() == basic_type::TYPE_INT)
-        _pf.I2D();
-      _pf.STFVAL64();
-    } else {
-      std::cerr << node->lineno() << ": should not happen: unknown return type" << std::endl;
-    }
-  } */
+  node->value()->accept(this, lvl + 2);
 
-  // TODO: substituir por valores corretos.
-  _pf.INT(0);
-  _pf.STFVAL32();
+  if (_function->type()->name() == cdk::TYPE_INT ||
+    _function->type()->name() == cdk::TYPE_STRING ||
+    _function->type()->name() == cdk::TYPE_POINTER) {
+    _pf.STFVAL32();
+  } else if (_function->type()->name() == cdk::TYPE_DOUBLE) {
+    if (node->value()->type()->name() == cdk::TYPE_INT)
+      _pf.I2D();
+
+    _pf.STFVAL64();
+  } else {
+    // TODO: autos e inválidos
+  }
 
   _pf.LEAVE();
   _pf.RET();
@@ -414,7 +413,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
 
     _pf.ALIGN();
     _pf.GLOBAL(symbol->name(), _pf.OBJ());
-    _pf.LABEL(symbol->name());  
+    _pf.LABEL(symbol->name());
     if (expression == nullptr) {
       // Allocate required memory for unitiliazed variables.
       _pf.SALLOC(symbol->type()->size());
