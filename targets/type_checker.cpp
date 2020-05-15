@@ -497,7 +497,7 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   else if (node->identifier() == "_main")
     node->identifier("._main");
 
-  _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), false);
+  _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
 
   auto existent = _symtab.find(node->identifier());
   if (existent != nullptr) {
@@ -535,16 +535,17 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
 
   auto existent = _symtab.find(node->identifier());
 
-  if(existent != nullptr) {
-    node->type(existent->type());
-    if(node->expressions()->size() != 0)
-      node->expressions()->accept(this, lvl + 4);
-  } else {
+  if (!existent) {
     throw std::string("undeclared function '" + node->identifier() + "'");
   }
 
-  // FIXME: avoiding some seg faults for now. // FIXED
-  //node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
+  if (!existent->is_function()) {
+    throw std::string(node->identifier() + "is not a function");
+  }
+
+  node->type(existent->type());
+  if(node->expressions()->size() != 0)
+    node->expressions()->accept(this, lvl + 4);
 }
 
 //---------------------------------------------------------------------------
