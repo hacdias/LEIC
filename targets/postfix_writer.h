@@ -51,6 +51,7 @@ namespace og {
     }
 
   void do_var_decl_node_helper(std::shared_ptr<og::symbol> symbol, cdk::expression_node* expression, int lvl);
+  void do_binary_int_double_helper(cdk::binary_operation_node * const node, int lvl);
 
   public:
   // do not edit these lines
