@@ -277,10 +277,7 @@ void og::type_checker::do_if_else_node(og::if_else_node *const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
-  // TODO: this is ignoring the error when the return
-  // is not inside the function because it was triggering the XML writer for
-  // some reason. In the end, add a throw here.
-  if (!_function) return;
+  if (!_function) throw std::string("return outside of function");
 
   if (node->value()) {
     node->value()->accept(this, lvl);
@@ -497,30 +494,20 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   else if (node->identifier() == "_main")
     node->identifier("._main");
 
-  _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
+  auto symbol = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
 
   auto existent = _symtab.find(node->identifier());
   if (existent != nullptr) {
     if(true /* TODO: compare if declarations are the same.*/) {
-      _symtab.replace(node->identifier(), _function);
-      // _parent->set_new_symbol(_function);
+      _symtab.replace(node->identifier(), symbol);
+      // _parent->set_new_symbol(symbol);
     } else {
       throw std::string("declarations are not the same");
     }
   } else {
-    _symtab.insert(node->identifier(), _function);
-    // _parent->set_new_symbol(_function);
+    _symtab.insert(node->identifier(), symbol);
+    //  parent->set_new_symbol(symbol);
   }
-
-  node->args()->accept(this, lvl +2);
-  node->block()->accept(this, lvl + 2);
-  node->type(_function->type());
-  if  (node->type() == nullptr) {
-    throw std::string("could not infer function return type");
-  }
-  
-  _function->offset(-_function->type()->size()); // offset for returning value
-  _function = nullptr;
 }
 
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {

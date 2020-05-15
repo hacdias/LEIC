@@ -15,7 +15,7 @@ namespace og {
   //!
   class postfix_writer: public basic_ast_visitor {
     cdk::symbol_table<og::symbol> &_symtab;
-    std::shared_ptr<og::symbol> _function = nullptr;
+    std::shared_ptr<og::symbol> _function;
     cdk::basic_postfix_emitter &_pf;
     int _lbl;
 
