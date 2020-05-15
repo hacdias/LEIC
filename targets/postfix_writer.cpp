@@ -479,7 +479,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     }
 
     _pf.ALIGN();
-    _pf.GLOBAL(symbol->name(), _pf.OBJ());
+    if (symbol->offset() == 0) _pf.GLOBAL(symbol->name(), _pf.OBJ());
     _pf.LABEL(symbol->name());
     if (expression == nullptr) {
       // Allocate required memory for unitiliazed variables.
@@ -534,10 +534,11 @@ void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) 
 
 void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
+  std::shared_ptr<cdk::reference_type> type = std::static_pointer_cast<cdk::reference_type>(node->type());
 
   node->argument()->accept(this, lvl + 2);
-  _pf.INT(3);
-  _pf.SHTL();
+  _pf.INT(type->referenced()->size());
+  _pf.MUL();
   _pf.ALLOC();
   _pf.SP();
 }
@@ -624,7 +625,12 @@ void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
 
 void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+
+  node->pointer()->accept(this, lvl);
+  node->index()->accept(this, lvl);
+  _pf.INT(node->type()->size());
+  _pf.MUL();
+  _pf.ADD(); // add pointer and index
 }
 
 void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
@@ -640,27 +646,35 @@ void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int l
 void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
+  std::shared_ptr<og::symbol> symbol = _symtab.find(node->identifier());
+  if (!symbol) {
+    throw std::string("function does not exist");
+  }
+
+  std::shared_ptr<cdk::basic_type> type = symbol->type();
+  if (!type) {
+    throw std::string("could not infer function return type");
+  }
+
   size_t args_size = 0;
 
   if (node->expressions()) { // Has args.
     for (int ax = node->expressions()->size(); ax > 0; ax--) {
       cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(ax - 1));
+      std::shared_ptr<og::symbol> param = symbol->params()->at(ax - 1);
+    
       arg->accept(this, lvl + 2);
-      args_size += arg->type()->size();
+      args_size += param->type()->size();
+
+      if (param->type()->name() == cdk::TYPE_DOUBLE && arg->is_typed(cdk::TYPE_INT)) {
+        _pf.I2D();
+      }
     }
   }
 
   _pf.CALL(node->identifier());
   if (args_size != 0) {
     _pf.TRASH(args_size);
-  }
-
-  std::shared_ptr<og::symbol> symbol = _symtab.find(node->identifier());
-  std::shared_ptr<cdk::basic_type> type = symbol->type();
-
-  if (!type) {
-    // must not happen
-    throw std::string("could not infer function return type");
   }
 
   if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_POINTER || type->name() == cdk::TYPE_STRING) {

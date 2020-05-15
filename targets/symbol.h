@@ -17,6 +17,7 @@ namespace og {
     bool _is_required;
     bool _is_function;
     int _offset = 0;
+    std::vector<std::shared_ptr<symbol>> _params; // a function parameters :)
 
   public:
     symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, bool is_public, bool is_required, bool is_function) :
@@ -51,9 +52,18 @@ namespace og {
     void offset(int offset) {
       _offset = offset;
     }
-    bool is_public() { return _is_public; }
-    bool is_required() { return _is_required; }
-    bool is_function() { return _is_function; }
+    bool is_public() {
+      return _is_public;
+    }
+    bool is_required() {
+      return _is_required;
+    }
+    bool is_function() {
+      return _is_function;
+    }
+    std::vector<std::shared_ptr<symbol>> *params() {
+      return &_params;
+    }
   };
 
   // this function simplifies symbol creation in the type_checker visitor (see below)

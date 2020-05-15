@@ -330,6 +330,14 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       if (node->is_typed(cdk::TYPE_POINTER)) {
         std::shared_ptr<cdk::reference_type> lptr = std::static_pointer_cast<cdk::reference_type>(node->type());
 
+        // NOTE: fix those unspecs :)
+        if (node->expression()) {
+          std::shared_ptr<cdk::reference_type> rptr = std::static_pointer_cast<cdk::reference_type>(node->expression()->type());
+          if (rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
+            node->expression()->type(node->type());
+          }
+        }
+
         if (!lptr->referenced() && node->expression() && node->expression()->is_typed(cdk::TYPE_POINTER)) {
           node->type(node->expression()->type());
         } else if (!lptr->referenced()) {
@@ -355,6 +363,11 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
     node->declared(true);
     // _parent->set_new_symbol(symbol);
+
+    if (_in_function_args) {
+      _function->params()->push_back(symbol);
+    }
+
     return;
   }
 
@@ -379,6 +392,10 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
+
+    if (_in_function_args) {
+      _function->params()->push_back(symbol);
+    }
 
     // _parent->set_new_symbol(symbol);
   }
@@ -486,6 +503,17 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
     _symtab.insert(node->identifier(), _function);
     // _parent->set_new_symbol(_function);
   }
+
+  _in_function_args = true;
+
+  if (node->args()) {
+    _symtab.push();
+    node->args()->accept(this, lvl + 2);
+    _symtab.pop();
+  }
+
+  _in_function_args = false;
+  _function = nullptr;
 }
 
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
