@@ -197,15 +197,8 @@ void og::postfix_writer::do_assignment_node(cdk::assignment_node * const node, i
 
 void og::postfix_writer::do_evaluation_node(og::evaluation_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  node->argument()->accept(this, lvl); // determine the value
-  if (node->argument()->is_typed(cdk::TYPE_INT)) {
-    _pf.TRASH(4); // delete the evaluated value
-  } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
-    _pf.TRASH(4); // delete the evaluated value's address
-  } else {
-    std::cerr << "ERROR: CANNOT HAPPEN!" << std::endl;
-    exit(1);
-  }
+  node->argument()->accept(this, lvl);
+  _pf.TRASH(node->argument()->type()->size());
 }
 
 void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
@@ -221,8 +214,10 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
   } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
     _pf.CALL("prints");
     _pf.TRASH(4); // delete the printed value's address
+  } else if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
+    std::cerr << node->lineno() << "TODO, TYPE STRUCT" << std::endl;
   } else {
-    std::cerr << "ERROR: CANNOT HAPPEN!" << std::endl;
+    std::cerr << node->lineno() << "CANNOT HAPPEN" << std::endl;
     exit(1);
   }
 
