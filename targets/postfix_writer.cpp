@@ -318,6 +318,30 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   // TODO
+
+/*
+   // should not reach here without returning a value (if not void)
+  if (_function->type()->name() != basic_type::TYPE_VOID) {
+    node->retval()->accept(this, lvl + 2);
+
+    if (_function->type()->name() == basic_type::TYPE_INT || _function->type()->name() == basic_type::TYPE_STRING
+        || _function->type()->name() == basic_type::TYPE_POINTER) {
+      _pf.STFVAL32();
+    } else if (_function->type()->name() == basic_type::TYPE_DOUBLE) {
+      if (node->retval()->type()->name() == basic_type::TYPE_INT)
+        _pf.I2D();
+      _pf.STFVAL64();
+    } else {
+      std::cerr << node->lineno() << ": should not happen: unknown return type" << std::endl;
+    }
+  } */
+
+  // TODO: substituir por valores corretos.
+  _pf.INT(0);
+  _pf.STFVAL32();
+
+  _pf.LEAVE();
+  _pf.RET();
 }
 
 //---------------------------------------------------------------------------
@@ -347,6 +371,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
   int offset = 0;
   int typesize = symbol->type()->size();
 
+  os() << "       ;; ARG: " << symbol->name() << ", " << typesize << std::endl;
+
   if (_inside_function) {
     _offset -= typesize;
     offset = _offset;
@@ -356,6 +382,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
   } else {
     offset = 0; // global variable
   }
+
+  os() << "         ;; OFFSET: " << symbol->name() << ", " << offset << std::endl;
 
   symbol->offset(offset);
 
@@ -368,6 +396,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       return;
     }
 
+    expression->accept(this, lvl);
     if (symbol->type()->name() == cdk::TYPE_INT || symbol->type()->name() == cdk::TYPE_STRING || symbol->type()->name() == cdk::TYPE_POINTER) {
       _pf.LOCAL(symbol->offset());
       _pf.STINT();
@@ -376,6 +405,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       _pf.STDOUBLE();
     } else if (symbol->type()->name() == cdk::TYPE_STRUCT) {
       // TODO: do something
+      std::cout << "do sth" << std::endl;
     } else {
       std::cerr << "cannot initialize" << std::endl;
     }
