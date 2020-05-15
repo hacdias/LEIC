@@ -578,7 +578,32 @@ void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int l
 
 void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+
+  size_t args_size = 0;
+
+  if (node->expressions()) { // Has args.
+    for (int ax = node->expressions()->size(); ax > 0; ax--) {
+      cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(ax - 1));
+      arg->accept(this, lvl + 2);
+      args_size += arg->type()->size();
+    }
+  }
+
+  _pf.CALL(node->identifier());
+  if (args_size != 0) {
+    _pf.TRASH(args_size);
+  }
+
+  std::shared_ptr<og::symbol> symbol = _symtab.find(node->identifier());
+
+  std::shared_ptr<cdk::basic_type> type = symbol->type();
+  if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_POINTER || type->name() == cdk::TYPE_STRING) {
+    _pf.LDFVAL32();
+  } else if (type->name() == cdk::TYPE_DOUBLE) {
+    _pf.LDFVAL64();
+  } else if (type->name() == cdk::TYPE_STRUCT) {
+    // TODO
+  }
 }
 
 void og::postfix_writer::do_tuple_node(og::tuple_node *const node, int lvl) {
