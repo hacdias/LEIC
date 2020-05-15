@@ -551,7 +551,6 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
 void og::postfix_writer::do_sizeof_node(og::sizeof_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO: string?
   _pf.INT(node->value()->type()->size());
 }
 
