@@ -351,7 +351,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       }
     }
 
-    auto symbol = og::make_symbol(node->type(), id);
+    auto symbol = og::make_symbol(node->type(), id, node->is_public(), node->is_require(), false);
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
@@ -378,7 +378,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     std::string &id = *node->identifiers().at(i);
     cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
 
-    auto symbol = og::make_symbol(exp->type(), id);
+    auto symbol = og::make_symbol(exp->type(), id, node->is_public(), node->is_require(), false);
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
@@ -478,7 +478,7 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
   else if (node->identifier() == "_main")
     node->identifier("._main");
   
-  _function = make_symbol(node->type(), node->identifier());
+  _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
 
   auto symbol = _symtab.find(node->identifier());
   if (symbol != nullptr) {
@@ -499,7 +499,7 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   else if (node->identifier() == "_main")
     node->identifier("._main");
 
-  _function = make_symbol(node->type(), node->identifier());
+  _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), false);
 
   auto existent = _symtab.find(node->identifier());
   if (existent != nullptr) {

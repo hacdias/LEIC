@@ -13,9 +13,13 @@ namespace og {
     long _value; // hack!
     // TODO: remove value?
 
+    bool _is_public;
+    bool _is_required;
+    bool _is_function;
+
   public:
-    symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name) :
-        _type(type), _name(name), _value(0) {
+    symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, bool is_public, bool is_required, bool is_function) :
+        _type(type), _name(name), _value(0), _is_public(is_public), _is_required(is_required), _is_function(is_function) {
     }
 
     virtual ~symbol() {
@@ -43,8 +47,8 @@ namespace og {
   };
 
   // this function simplifies symbol creation in the type_checker visitor (see below)
-  inline auto make_symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name) {
-    return std::make_shared<symbol>(type, name);
+  inline auto make_symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, bool is_public, bool is_required, bool is_function) {
+    return std::make_shared<symbol>(type, name, is_public, is_required, is_function);
   }
 
 } // og
