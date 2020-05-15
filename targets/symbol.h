@@ -16,6 +16,7 @@ namespace og {
     bool _is_public;
     bool _is_required;
     bool _is_function;
+    int _offset = 0;
 
   public:
     symbol(std::shared_ptr<cdk::basic_type> type, const std::string &name, bool is_public, bool is_required, bool is_function) :
@@ -43,6 +44,12 @@ namespace og {
     }
     long value(long v) {
       return _value = v;
+    }
+    int offset() const {
+      return _offset;
+    }
+    void offset(int offset) {
+      _offset = offset;
     }
   };
 

@@ -477,23 +477,21 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
     node->identifier("_main");
   else if (node->identifier() == "_main")
     node->identifier("._main");
-  
+
   _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
 
-  auto symbol = _symtab.find(node->identifier());
-  if (symbol != nullptr) {
-    throw std::string(node->identifier() + "redeclared");
+  auto previous = _symtab.find(node->identifier());
+  if (previous != nullptr) {
+    if (false /* TODO: check if arguments are correct */) {
+      throw std::string(node->identifier() + "redeclared");
+    }
   } else {
     _symtab.insert(node->identifier(), _function);
     _parent->set_new_symbol(_function);
   }
-
-  // TODO
 }
 
 void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) {
-  //std::cout << "func_def" << std::endl;
-  
   if (node->identifier() == "og")
     node->identifier("_main");
   else if (node->identifier() == "_main")
@@ -520,6 +518,8 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   if  (node->type() == nullptr) {
     throw std::string("could not infer function return type");
   }
+  
+  _function->offset(_function->type()->size()); // offset for returning value
   _function = nullptr;
 }
 
