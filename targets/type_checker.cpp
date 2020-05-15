@@ -190,40 +190,110 @@ void og::type_checker::do_rvalue_node(cdk::rvalue_node *const node, int lvl) {
   }
 }
 
+void og::type_checker::throw_cannot_assign(std::shared_ptr<cdk::basic_type> typel, std::shared_ptr<cdk::basic_type> typer) {
+  throw std::string("cannot assign " + cdk::to_string(typel) + " to type " + cdk::to_string(typer));
+}
+
 void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int lvl) {
   ASSERT_UNSPEC;
 
-  try {
-    node->lvalue()->accept(this, lvl);
-  } catch (const std::string &id) {
-    throw std::string("undeclared variable on an assignment '" + id + "'");
-  }
+  // For the sake of readability...
+  cdk::lvalue_node* lvalue = node->lvalue();
+  cdk::expression_node* rvalue = node->rvalue();
 
-  node->rvalue()->accept(this, lvl + 2);
+  lvalue->accept(this, lvl);
+  rvalue->accept(this, lvl + 2);
 
-  if (node->lvalue()->is_typed(cdk::TYPE_POINTER) && node->rvalue()->is_typed(cdk::TYPE_POINTER)) {
-    std::shared_ptr<cdk::reference_type> lptr = std::static_pointer_cast<cdk::reference_type>(node->lvalue()->type());
-    std::shared_ptr<cdk::reference_type> rptr = std::static_pointer_cast<cdk::reference_type>(node->rvalue()->type());
+  // Note to self: wouldn't it just be easier to check the cases we don't want to
+  // support? Or would that open a door for unthought cases?
 
-    // NOTE: this is useful for the cases where we're assigning memory which at the time we don't know the
-    // type! So, if either the left or right value are unspecified but the other side is, then we make them
-    // the same!
-    if (lptr->referenced()->name() == cdk::TYPE_UNSPEC && !rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
-      node->lvalue()->type(node->rvalue()->type());
-    } else if (!lptr->referenced()->name() == cdk::TYPE_UNSPEC && rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
-      node->rvalue()->type(node->lvalue()->type());
+  if (lvalue->is_typed(cdk::TYPE_INT)) {
+    if (rvalue->is_typed(cdk::TYPE_INT)) {
+      node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
+    } else if (rvalue->is_typed(cdk::TYPE_UNSPEC)) {
+      node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
+      rvalue->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
+    } else {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
+    }
+  } else if (lvalue->is_typed(cdk::TYPE_DOUBLE)) {
+    if (rvalue->is_typed(cdk::TYPE_DOUBLE) || rvalue->is_typed(cdk::TYPE_INT)) {
+      node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+    } else if (rvalue->is_typed(cdk::TYPE_UNSPEC)) {
+      node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+      rvalue->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+    } else {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
+    }
+  } else if (lvalue->is_typed(cdk::TYPE_POINTER)) {
+    if (rvalue->is_typed(cdk::TYPE_POINTER)) {
+      std::shared_ptr<cdk::reference_type> ltype = std::static_pointer_cast<cdk::reference_type>(lvalue->type());
+      std::shared_ptr<cdk::reference_type> rtype = std::static_pointer_cast<cdk::reference_type>(rvalue->type());
+
+      // Iteratively check pointers depth!
+      while (true) {
+        std::shared_ptr<cdk::basic_type> lref = ltype->referenced();
+        std::shared_ptr<cdk::basic_type> rref = rtype->referenced();
+
+        if (lref->name() == cdk::TYPE_UNSPEC && rref->name() != cdk::TYPE_UNSPEC) {
+          lvalue->type(rvalue->type());
+          node->type(rvalue->type());
+          break;
+        } else if (rref->name() == cdk::TYPE_UNSPEC && lref->name() != cdk::TYPE_UNSPEC) {
+          rvalue->type(lvalue->type());
+          node->type(lvalue->type());
+          break;
+        } else if (lref->name() == cdk::TYPE_POINTER && rref->name() == cdk::TYPE_POINTER) {
+          ltype = std::static_pointer_cast<cdk::reference_type>(lref);
+          rtype = std::static_pointer_cast<cdk::reference_type>(rref);
+        } else if (lref->name() == rref->name()) {
+          node->type(lvalue->type());
+          break;
+        } else {
+          throw_cannot_assign(rvalue->type(), lvalue->type());
+        }
+      }
+    } else if (rvalue->is_typed(cdk::TYPE_UNSPEC)) {
+      node->type(cdk::make_primitive_type(4, cdk::TYPE_ERROR));
+      rvalue->type(cdk::make_primitive_type(4, cdk::TYPE_ERROR));
+    } else {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
+    }
+  } else if (lvalue->is_typed(cdk::TYPE_STRING)) {
+    if (rvalue->is_typed(cdk::TYPE_STRING)) {
+      node->type(cdk::make_primitive_type(4, cdk::TYPE_STRING));
+    } else if (rvalue->is_typed(cdk::TYPE_UNSPEC)) {
+      node->type(cdk::make_primitive_type(4, cdk::TYPE_STRING));
+      rvalue->type(cdk::make_primitive_type(4, cdk::TYPE_STRING));
+    } else {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
+    }
+  } else if (lvalue->is_typed(cdk::TYPE_STRUCT)) {
+    if (!rvalue->is_typed(cdk::TYPE_STRUCT)) {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
     }
 
-    // TODO: check if deep pointers match
-  } else if (node->lvalue()->is_typed(cdk::TYPE_DOUBLE) && node->rvalue()->is_typed(cdk::TYPE_INT)) {
-    node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
-  } else if (node->lvalue()->is_typed(node->rvalue()->type()->name())) {
-    node->type(node->lvalue()->type());
-  } else {
-    throw std::string("mismatching types, wants " + cdk::to_string(node->lvalue()->type()) + ", has " + cdk::to_string(node->rvalue()->type()));
-  }
+    std::shared_ptr<cdk::structured_type> ltype = std::static_pointer_cast<cdk::structured_type>(lvalue->type());
+    std::shared_ptr<cdk::structured_type> rtype = std::static_pointer_cast<cdk::structured_type>(rvalue->type());
 
-  node->type(node->lvalue()->type());
+    if (ltype->length() != rtype->length()) {
+      throw_cannot_assign(rvalue->type(), lvalue->type());
+    }
+
+    for (size_t i = 0; i < ltype->length(); i++) {
+      std::shared_ptr<cdk::basic_type> lt = ltype->component(i);
+      std::shared_ptr<cdk::basic_type> rt = rtype->component(i);
+
+      if (lt != rt) {
+        throw_cannot_assign(rvalue->type(), lvalue->type());
+      }
+    }
+
+    // Profit?
+    node->type(lvalue->type());
+  } else {
+    throw std::string("unknown types in assignment");
+  }
 }
 
 //---------------------------------------------------------------------------
