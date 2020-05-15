@@ -474,9 +474,8 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   ASSERT_SAFE_EXPRESSIONS;
 
   // remember symbol so that args and body know
-  _function = new_symbol();
   // _functions_to_declare.erase(_function->name());
-  reset_new_symbol();
+  _function = _symtab.find(node->identifier());
 
   _offset = 8; // prepare for arguments (4: remember to account for return address)
   _symtab.push(); // scope of args
@@ -503,7 +502,9 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   _inside_function = true;
   _offset = -_function->type()->size();
+  os() << "        ;; before body " << std::endl;
   node->block()->accept(this, lvl + 4);
+  os() << "        ;; after body " << std::endl;
   _inside_function = false;
   _symtab.pop();
 

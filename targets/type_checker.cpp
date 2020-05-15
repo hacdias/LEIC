@@ -357,7 +357,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       throw std::string(id + " redeclared");
 
     node->declared(true);
-    _parent->set_new_symbol(symbol);
+    // _parent->set_new_symbol(symbol);
     return;
   }
 
@@ -383,7 +383,7 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");
 
-    _parent->set_new_symbol(symbol);
+    // _parent->set_new_symbol(symbol);
   }
 
   node->declared(true);
@@ -487,7 +487,7 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
     }
   } else {
     _symtab.insert(node->identifier(), _function);
-    _parent->set_new_symbol(_function);
+    // _parent->set_new_symbol(_function);
   }
 }
 
@@ -503,13 +503,13 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   if (existent != nullptr) {
     if(true /* TODO: compare if declarations are the same.*/) {
       _symtab.replace(node->identifier(), _function);
-      _parent->set_new_symbol(_function);
+      // _parent->set_new_symbol(_function);
     } else {
       throw std::string("declarations are not the same");
     }
   } else {
     _symtab.insert(node->identifier(), _function);
-    _parent->set_new_symbol(_function);
+    // _parent->set_new_symbol(_function);
   }
 
   node->args()->accept(this, lvl +2);
