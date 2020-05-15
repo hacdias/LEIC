@@ -609,6 +609,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
     // these are just a few library function imports
     _pf.EXTERN("readi");
     _pf.EXTERN("printi");
+    _pf.EXTERN("printd");
     _pf.EXTERN("prints");
     _pf.EXTERN("println");
   }
@@ -655,8 +656,13 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
   }
 
   std::shared_ptr<og::symbol> symbol = _symtab.find(node->identifier());
-
   std::shared_ptr<cdk::basic_type> type = symbol->type();
+
+  if (!type) {
+    // must not happen
+    throw std::string("could not infer function return type");
+  }
+
   if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_POINTER || type->name() == cdk::TYPE_STRING) {
     _pf.LDFVAL32();
   } else if (type->name() == cdk::TYPE_DOUBLE) {
