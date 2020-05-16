@@ -602,7 +602,7 @@ void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) 
 
 void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  std::shared_ptr<cdk::reference_type> type = std::static_pointer_cast<cdk::reference_type>(node->type());
+  std::shared_ptr<cdk::reference_type> type = cdk::reference_type_cast(node->type());
   node->argument()->accept(this, lvl + 2);
   _pf.INT(type->referenced()->size());
   _pf.MUL();

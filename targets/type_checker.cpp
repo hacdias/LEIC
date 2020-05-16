@@ -217,8 +217,8 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
     }
   } else if (lvalue->is_typed(cdk::TYPE_POINTER)) {
     if (rvalue->is_typed(cdk::TYPE_POINTER)) {
-      std::shared_ptr<cdk::reference_type> ltype = std::static_pointer_cast<cdk::reference_type>(lvalue->type());
-      std::shared_ptr<cdk::reference_type> rtype = std::static_pointer_cast<cdk::reference_type>(rvalue->type());
+      std::shared_ptr<cdk::reference_type> ltype = cdk::reference_type_cast(lvalue->type());
+      std::shared_ptr<cdk::reference_type> rtype = cdk::reference_type_cast(rvalue->type());
 
       // Iteratively check pointers depth!
       while (true) {
@@ -234,8 +234,8 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
           node->type(lvalue->type());
           break;
         } else if (lref->name() == cdk::TYPE_POINTER && rref->name() == cdk::TYPE_POINTER) {
-          ltype = std::static_pointer_cast<cdk::reference_type>(lref);
-          rtype = std::static_pointer_cast<cdk::reference_type>(rref);
+          ltype = cdk::reference_type_cast(lref);
+          rtype = cdk::reference_type_cast(rref);
         } else if (lref->name() == rref->name()) {
           node->type(lvalue->type());
           break;
@@ -263,8 +263,8 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
       throw_cannot_assign(rvalue->type(), lvalue->type());
     }
 
-    std::shared_ptr<cdk::structured_type> ltype = std::static_pointer_cast<cdk::structured_type>(lvalue->type());
-    std::shared_ptr<cdk::structured_type> rtype = std::static_pointer_cast<cdk::structured_type>(rvalue->type());
+    std::shared_ptr<cdk::structured_type> ltype = cdk::structured_type_cast(lvalue->type());
+    std::shared_ptr<cdk::structured_type> rtype = cdk::structured_type_cast(rvalue->type());
 
     if (ltype->length() != rtype->length()) {
       throw_cannot_assign(rvalue->type(), lvalue->type());
@@ -300,7 +300,7 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
   }
 
   if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
-    std::shared_ptr<cdk::structured_type> struct_type = std::static_pointer_cast<cdk::structured_type>(node->argument()->type());
+    std::shared_ptr<cdk::structured_type> struct_type = cdk::structured_type_cast(node->argument()->type());
 
     for (auto type : struct_type->components()) {
       if (type->name() == cdk::TYPE_POINTER) {
@@ -394,11 +394,11 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
       // NOTE: if it's a ptr<auto> and the rvalue has a defined type, use it.
       // Otherwise, create an unspecified pointer.
       if (node->is_typed(cdk::TYPE_POINTER)) {
-        std::shared_ptr<cdk::reference_type> lptr = std::static_pointer_cast<cdk::reference_type>(node->type());
+        std::shared_ptr<cdk::reference_type> lptr = cdk::reference_type_cast(node->type());
 
         // NOTE: fix those unspecs :)
         if (node->expression()) {
-          std::shared_ptr<cdk::reference_type> rptr = std::static_pointer_cast<cdk::reference_type>(node->expression()->type());
+          std::shared_ptr<cdk::reference_type> rptr = cdk::reference_type_cast(node->expression()->type());
           if (rptr->referenced()->name() == cdk::TYPE_UNSPEC) {
             node->expression()->type(node->type());
           }
@@ -524,7 +524,7 @@ void og::type_checker::do_ptr_index_node(og::ptr_index_node *const node, int lvl
     throw std::string("cannot index non-pointer type");
   }
 
-  node->type(((std::static_pointer_cast<cdk::reference_type>)(node->pointer()->type()))->referenced());
+  node->type(((cdk::reference_type_cast)(node->pointer()->type()))->referenced());
 }
 
 void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
@@ -537,7 +537,7 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
     throw std::string("cannot index non-struct type");
   }
 
-  std::shared_ptr<cdk::structured_type> struct_type = std::static_pointer_cast<cdk::structured_type>(node->expression()->type());
+  std::shared_ptr<cdk::structured_type> struct_type = cdk::structured_type_cast(node->expression()->type());
   unsigned int idx = node->index()->value();
 
   if (idx > struct_type->length()) {
