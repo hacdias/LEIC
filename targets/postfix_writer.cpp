@@ -403,7 +403,7 @@ void og::postfix_writer::do_if_else_node(og::if_else_node * const node, int lvl)
 void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  if (_function->type()->name() == cdk::TYPE_VOID) {
+  if (_function->is_typed(cdk::TYPE_VOID)) {
     _pf.LEAVE();
     _pf.RET();
     return;
@@ -483,18 +483,18 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
 
     expression->accept(this, lvl);
 
-    if (symbol->type()->name() == cdk::TYPE_INT ||
-      symbol->type()->name() == cdk::TYPE_STRING ||
-      symbol->type()->name() == cdk::TYPE_POINTER) {
+    if (symbol->is_typed(cdk::TYPE_INT) ||
+      symbol->is_typed(cdk::TYPE_STRING) ||
+      symbol->is_typed(cdk::TYPE_POINTER)) {
       _pf.LOCAL(symbol->offset());
       _pf.STINT();
-    } else if (symbol->type()->name() == cdk::TYPE_DOUBLE) {
+    } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
       if (expression->is_typed(cdk::TYPE_INT)) {
         _pf.I2D();
       }
       _pf.LOCAL(symbol->offset());
       _pf.STDOUBLE();
-    } else if (symbol->type()->name() == cdk::TYPE_STRUCT) {
+    } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
       // TODO: do something
       std::cout << "TODO: initialize type struct" << std::endl;
     } else {
@@ -689,8 +689,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     throw std::string("function does not exist");
   }
 
-  std::shared_ptr<cdk::basic_type> type = symbol->type();
-  if (!type) {
+  if (!symbol->type()) {
     throw std::string("could not infer function return type");
   }
 
@@ -704,7 +703,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
       arg->accept(this, lvl + 2);
       args_size += param->type()->size();
 
-      if (param->type()->name() == cdk::TYPE_DOUBLE && arg->is_typed(cdk::TYPE_INT)) {
+      if (param->is_typed(cdk::TYPE_DOUBLE) && arg->is_typed(cdk::TYPE_INT)) {
         _pf.I2D();
       }
     }
@@ -715,13 +714,10 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     _pf.TRASH(args_size);
   }
 
-  if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_POINTER || type->name() == cdk::TYPE_STRING) {
+  if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_POINTER) || symbol->is_typed(cdk::TYPE_STRING) || symbol->is_typed(cdk::TYPE_STRUCT)) {
     _pf.LDFVAL32();
-  } else if (type->name() == cdk::TYPE_DOUBLE) {
+  } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.LDFVAL64();
-  } else if (type->name() == cdk::TYPE_STRUCT) {
-    // TODO: este é o caso em que enviamos tuplos! Na minha opinião, devemos mandar a posição do primeiro dado,
-    // logo, isto seria também um inteiro e poderia ser juntado ao primeiro if.
   }
 }
 
