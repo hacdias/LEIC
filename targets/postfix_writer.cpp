@@ -424,8 +424,25 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
 
     _pf.STFVAL64();
   } else if (_function->is_typed(cdk::TYPE_STRUCT)) {
-    // TODO: autos e inválidos
-    std::cout << "TODO: return type struct" << std::endl;
+    std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->value()->type());
+    int offset = tuple_type->size();
+    size_t length = tuple_type->length();
+
+    for (int i = length - 1; i >= 0; i--) {
+      std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
+      offset -= type->size();
+      _pf.LOCV(8);
+      _pf.INT(offset);
+      _pf.ADD();
+
+      if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
+        _pf.STINT();
+      } else if (type->name() == cdk::TYPE_DOUBLE) {
+        _pf.STDOUBLE();
+      } else {
+        throw std::string("invalid struct element type");
+      }
+    }
   } else {
     throw std::string("invalid type toreturn");
   }
@@ -622,6 +639,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _offset = 8; // prepare for arguments (4: remember to account for return address)
   _symtab.push(); // scope of args
 
+  if (!_function->type() || _function->is_typed(cdk::TYPE_STRUCT)) {
+    // Update the offset when we're returning a struct!
+    _offset += 4;
+  }
+
   if (node->args()) {
     _in_function_args = true; //FIXME really needed?
 
@@ -728,15 +750,52 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     }
   }
 
+  int ret_lbl = -1;
+
+  // If we're returning a struct a type, we need to allocate space
+  // for it beforehand and pass the memory address as the first argument
+  // of the function.
+  if (node->is_typed(cdk::TYPE_STRUCT)) {
+    ret_lbl = ++_lbl;
+    _pf.BSS();
+    _pf.ALIGN();
+    _pf.LABEL(mklbl(ret_lbl));
+    _pf.SALLOC(symbol->type()->size());
+    _pf.TEXT();
+    _pf.ADDR(mklbl(ret_lbl));
+  }
+
   _pf.CALL(node->identifier());
   if (args_size != 0) {
     _pf.TRASH(args_size);
   }
 
-  if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_POINTER) || symbol->is_typed(cdk::TYPE_STRING) || symbol->is_typed(cdk::TYPE_STRUCT)) {
+  if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_POINTER) || symbol->is_typed(cdk::TYPE_STRING)) {
     _pf.LDFVAL32();
   } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.LDFVAL64();
+  } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
+    std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->type());
+    int offset = 0;
+
+    for (int i = 0; i < tuple_type->length(); i++) {
+      std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
+
+      _pf.ADDR(mklbl(ret_lbl));
+      _pf.INT(offset);
+      _pf.ADD();
+
+      if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
+        _pf.LDINT();
+      } else if (type->name() == cdk::TYPE_DOUBLE) {
+        _pf.LDDOUBLE();
+      } else {
+        throw std::string("invalid struct element type");
+      }
+
+      offset += type->size();
+    }
+    // TODO: how to free the memory?
   }
 }
 
