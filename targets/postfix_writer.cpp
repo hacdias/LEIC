@@ -778,7 +778,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->type());
     int offset = 0;
 
-    for (int i = 0; i < tuple_type->length(); i++) {
+    for (size_t i = 0; i < tuple_type->length(); i++) {
       std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
 
       _pf.ADDR(mklbl(ret_lbl));
