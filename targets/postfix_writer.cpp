@@ -668,7 +668,19 @@ void og::postfix_writer::do_ptr_index_node(og::ptr_index_node *const node, int l
 
 void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+
+  unsigned int id = node->index()->value();
+  node->expression()->accept(this, lvl);
+
+  std::shared_ptr<cdk::structured_type> struct_type = cdk::structured_type_cast(node->expression()->type());
+  
+  size_t offset = 0;
+  for (size_t i = 0; i <= id; i++) {
+    offset += struct_type->component(i)->size();
+  }
+
+  _pf.INT(offset);
+  _pf.ADD();
 }
 
 void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
