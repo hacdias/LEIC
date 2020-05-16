@@ -4,9 +4,10 @@
 #include "targets/basic_ast_visitor.h"
 #include "targets/frame_size_calculator.h"
 
+#include <set>
+#include <stack>
 #include <sstream>
 #include <cdk/emitters/basic_postfix_emitter.h>
-#include <stack>
 
 namespace og {
 
@@ -27,6 +28,7 @@ namespace og {
     bool _in_function_args = false;
     int _offset = 0;
 
+    std::set<std::string> _functions_to_declare;
 
   public:
     postfix_writer(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab,

@@ -45,125 +45,115 @@ void og::type_checker::processUnaryExpression(cdk::unary_operation_node *const n
   ASSERT_UNSPEC;
   node->argument()->accept(this, lvl + 2);
 
-  if (acceptInt && node->argument()->is_typed(cdk::TYPE_INT))
+  if (acceptInt && node->argument()->is_typed(cdk::TYPE_INT)) {
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
-
-  else if (acceptDouble && node->argument()->is_typed(cdk::TYPE_DOUBLE))
+  } else if (acceptDouble && node->argument()->is_typed(cdk::TYPE_DOUBLE)) {
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
-
-  else
+  } else {
     throw std::string("wrong type in argument of unary expression");
+  }
 }
 
 void og::type_checker::do_neg_node(cdk::neg_node *const node, int lvl) {
-  // int, double
-  processUnaryExpression(node, lvl, true, true);
+  processUnaryExpression(node, lvl, true, true); // int, double
 }
 
 void og::type_checker::do_id_node(og::id_node *const node, int lvl) {
-  // int, double
-  processUnaryExpression(node, lvl, true, true);
+  processUnaryExpression(node, lvl, true, true); // int, double
 }
 
 void og::type_checker::do_not_node(cdk::not_node *const node, int lvl) {
-  // int
-  processUnaryExpression(node, lvl, true, false);
+  processUnaryExpression(node, lvl, true, false); // int
 }
 
 //---------------------------------------------------------------------------
 
 void og::type_checker::processBinaryExpression(cdk::binary_operation_node *const node, int lvl, bool acceptInt, bool acceptDouble, bool acceptPointer, bool isAdd) {
   ASSERT_UNSPEC;
-  node->left()->accept(this, lvl + 2);
-  node->right()->accept(this, lvl + 2);
 
-  if (acceptInt && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_INT))
+  // For the sake of readability...
+  cdk::expression_node *left = node->left();
+  cdk::expression_node *right = node->right();
+
+  left->accept(this, lvl + 2);
+  right->accept(this, lvl + 2);
+
+  if (acceptInt && left->is_typed(cdk::TYPE_INT) && right->is_typed(cdk::TYPE_INT)) {
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 
-  else if (acceptDouble && node->left()->is_typed(cdk::TYPE_DOUBLE) && node->right()->is_typed(cdk::TYPE_DOUBLE))
+  } else if (acceptDouble && left->is_typed(cdk::TYPE_DOUBLE) && right->is_typed(cdk::TYPE_DOUBLE)) {
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
 
-  else if (acceptDouble && node->left()->is_typed(cdk::TYPE_DOUBLE) && node->right()->is_typed(cdk::TYPE_INT))
+  } else if (acceptDouble && left->is_typed(cdk::TYPE_DOUBLE) && right->is_typed(cdk::TYPE_INT)) {
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
 
-  else if (acceptDouble && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_DOUBLE))
+  } else if (acceptDouble && left->is_typed(cdk::TYPE_INT) && right->is_typed(cdk::TYPE_DOUBLE)) {
     node->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
 
-  else if (acceptPointer && !isAdd && node->left()->is_typed(cdk::TYPE_POINTER) && node->right()->is_typed(cdk::TYPE_POINTER))
+  } else if (acceptPointer && !isAdd && left->is_typed(cdk::TYPE_POINTER) && right->is_typed(cdk::TYPE_POINTER)) {
     node->type(cdk::make_primitive_type(4, cdk::TYPE_INT));
 
-  else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_POINTER))
-    node->type(node->right()->type());
+  } else if (acceptPointer && isAdd && left->is_typed(cdk::TYPE_INT) && right->is_typed(cdk::TYPE_POINTER)) {
+    node->type(right->type());
 
-  else if (acceptPointer && isAdd && node->left()->is_typed(cdk::TYPE_POINTER) && node->right()->is_typed(cdk::TYPE_INT))
-    node->type(node->left()->type());
+  } else if (acceptPointer && isAdd && left->is_typed(cdk::TYPE_POINTER) && right->is_typed(cdk::TYPE_INT)) {
+    node->type(left->type());
 
-  else throw std::string("wrong type for binary expression");
+  } else {
+    throw std::string("wrong type for binary expression");
+  }
 }
 
 void og::type_checker::do_add_node(cdk::add_node *const node, int lvl) {
-  // int, real, pointer
-  processBinaryExpression(node, lvl, true, true, true, true);
+  processBinaryExpression(node, lvl, true, true, true, true); // int, real, pointer
 }
 
 void og::type_checker::do_sub_node(cdk::sub_node *const node, int lvl) {
-  // int, real, pointer
-  processBinaryExpression(node, lvl, true, true, true, false);
+  processBinaryExpression(node, lvl, true, true, true, false); // int, real, pointer
 }
 
 void og::type_checker::do_mul_node(cdk::mul_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_div_node(cdk::div_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_mod_node(cdk::mod_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_lt_node(cdk::lt_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_le_node(cdk::le_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_ge_node(cdk::ge_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_gt_node(cdk::gt_node *const node, int lvl) {
-  // int, real
-  processBinaryExpression(node, lvl, true, true, false, false);
+  processBinaryExpression(node, lvl, true, true, false, false); // int, real
 }
 
 void og::type_checker::do_ne_node(cdk::ne_node *const node, int lvl) {
-  // int, real, pointer
-  processBinaryExpression(node, lvl, true, true, true, false);
+  processBinaryExpression(node, lvl, true, true, true, false); // int, real, pointer
 }
 
 void og::type_checker::do_eq_node(cdk::eq_node *const node, int lvl) {
-  // int, real, pointer
-  processBinaryExpression(node, lvl, true, true, true, false);
+  processBinaryExpression(node, lvl, true, true, true, false); // int, real, pointer
 }
 
 void og::type_checker::do_and_node(cdk::and_node *const node, int lvl) {
-  // int
-  processBinaryExpression(node, lvl, true, false, false, false);
+  processBinaryExpression(node, lvl, true, false, false, false); // int
 }
 
 void og::type_checker::do_or_node(cdk::or_node *const node, int lvl) {
-  // int
-  processBinaryExpression(node, lvl, true, false, false, false);
+  processBinaryExpression(node, lvl, true, false, false, false); // int
 }
 
 //---------------------------------------------------------------------------
@@ -389,11 +379,15 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     return;
   }
 
+  // We're not using _parent->set_new_symbol on this function because since we have
+  // more than one variable here (such as, `auto a, b = 1, 5`), it would render
+  // itself useless when using it on the writers.
+
   if (node->expression()) {
     node->expression()->accept(this, lvl + 2);
   }
 
-  if (node->identifiers().size() == 1) {
+  if (node->identifiers().size() == 1) { // BEGIN SINGLE VARIABLE
     std::string &id = *node->identifiers().front();
 
     if (node->type()) {
@@ -430,18 +424,18 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
     auto symbol = og::make_symbol(node->type(), id, node->is_public(), node->is_require(), false);
 
-    if (!_symtab.insert(id, symbol))
+    if (!_symtab.insert(id, symbol)) {
       throw std::string(id + " redeclared");
+    }
 
     node->declared(true);
-    // _parent->set_new_symbol(symbol);
 
     if (_in_function_args) {
       _function->params()->push_back(symbol);
     }
 
     return;
-  }
+  } // END SINGLE VARIABLE
 
   if (!node->expression()->is_typed(cdk::TYPE_STRUCT)) {
     throw std::string("wrong number of identifiers");
@@ -468,8 +462,6 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     if (_in_function_args) {
       _function->params()->push_back(symbol);
     }
-
-    // _parent->set_new_symbol(symbol);
   }
 
   node->declared(true);
@@ -488,8 +480,9 @@ void og::type_checker::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl
   ASSERT_UNSPEC;
   node->argument()->accept(this, lvl + 2);
 
-  if (!node->argument()->is_typed(cdk::TYPE_INT))
+  if (!node->argument()->is_typed(cdk::TYPE_INT)) {
     throw std::string("wrong type in argument of unary expression");
+  }
 
   node->type(cdk::make_reference_type(4, cdk::make_primitive_type(0, cdk::TYPE_UNSPEC)));
 }
@@ -557,23 +550,22 @@ void og::type_checker::do_tuple_index_node(og::tuple_index_node *const node, int
 //---------------------------------------------------------------------------
 
 void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl) {
-  //std::cout << "func_decl" << std::endl;
-
-  if (node->identifier() == "og")
+  if (node->identifier() == "og") {
     node->identifier("_main");
-  else if (node->identifier() == "_main")
+  } else if (node->identifier() == "_main") {
     node->identifier("._main");
+  }
 
   _function = make_symbol(node->type(), node->identifier(), node->is_public(), node->is_required(), true);
 
   auto previous = _symtab.find(node->identifier());
   if (previous != nullptr) {
-    if (false /* TODO: check if arguments are correct */) {
+    if (false /* TODO: check if arguments are the same */) {
       throw std::string(node->identifier() + "redeclared");
     }
   } else {
     _symtab.insert(node->identifier(), _function);
-    // _parent->set_new_symbol(_function);
+    _parent->set_new_symbol(_function);
   }
 
   _in_function_args = true;
@@ -600,39 +592,40 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
   if (existent != nullptr) {
     if(true /* TODO: compare if declarations are the same.*/) {
       _symtab.replace(node->identifier(), symbol);
-      // _parent->set_new_symbol(symbol);
+      _parent->set_new_symbol(symbol);
     } else {
       throw std::string("declarations are not the same");
     }
   } else {
     _symtab.insert(node->identifier(), symbol);
-    //  parent->set_new_symbol(symbol);
+    _parent->set_new_symbol(symbol);
   }
 }
 
 void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl) {
   ASSERT_UNSPEC;
-  //std::cout << "func_call" << std::endl;
-  // TODO
 
-  if (node->identifier() == "og")
+  if (node->identifier() == "og") {
     node->identifier("_main");
-  else if (node->identifier() == "_main")
+  } else if (node->identifier() == "_main") {
     node->identifier("._main");
+  }
 
-  auto existent = _symtab.find(node->identifier());
+  auto function = _symtab.find(node->identifier());
 
-  if (!existent) {
+  if (!function) {
     throw std::string("undeclared function '" + node->identifier() + "'");
   }
 
-  if (!existent->is_function()) {
+  if (!function->is_function()) {
     throw std::string(node->identifier() + "is not a function");
   }
 
-  node->type(existent->type());
-  if(node->expressions()->size() != 0)
+  node->type(function->type());
+  if (node->expressions() && node->expressions()->size() != 0)
     node->expressions()->accept(this, lvl + 4);
+
+  // TODO: check if node->expressions() types match function->params() types.
 }
 
 //---------------------------------------------------------------------------
@@ -648,8 +641,9 @@ void og::type_checker::do_tuple_node(og::tuple_node *const node, int lvl) {
 
   std::vector<std::shared_ptr<cdk::basic_type>> *types = new std::vector<std::shared_ptr<cdk::basic_type>>();
 
-  for (size_t i = 0; i < node->nodes()->size(); i++)
+  for (size_t i = 0; i < node->nodes()->size(); i++) {
     types->push_back(((cdk::expression_node*)(node->nodes()->node(i)))->type());
+  }
 
   // TODO: works?
   node->type(cdk::make_structured_type(*types));

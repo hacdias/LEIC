@@ -9,18 +9,22 @@
 void og::postfix_writer::do_nil_node(cdk::nil_node * const node, int lvl) {
   // EMPTY
 }
+
 void og::postfix_writer::do_data_node(cdk::data_node * const node, int lvl) {
   // EMPTY
 }
+
 void og::postfix_writer::do_not_node(cdk::not_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   node->argument()->accept(this, lvl);
   _pf.NOT();
 }
+
 void og::postfix_writer::do_and_node(cdk::and_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   // EMPTY
 }
+
 void og::postfix_writer::do_or_node(cdk::or_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   // EMPTY
@@ -38,25 +42,29 @@ void og::postfix_writer::do_sequence_node(cdk::sequence_node * const node, int l
 
 void og::postfix_writer::do_integer_node(cdk::integer_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  if (_inside_function) _pf.INT(node->value());
-  else _pf.SINT(node->value());
+  if (_inside_function) {
+    _pf.INT(node->value());
+  } else {
+    _pf.SINT(node->value());
+  }
 }
 
 void og::postfix_writer::do_double_node(cdk::double_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  if (_inside_function) _pf.DOUBLE(node->value());
-  else _pf.SDOUBLE(node->value());
+  if (_inside_function) {
+    _pf.DOUBLE(node->value());
+  } else {
+    _pf.SDOUBLE(node->value());
+  }
 }
 
 void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   int new_lbl;
-
   _pf.RODATA();
   _pf.ALIGN();
   _pf.LABEL(mklbl(new_lbl = ++_lbl));
   _pf.SSTRING(node->value());
-
   if (_inside_function) {
     _pf.TEXT();
     _pf.ADDR(mklbl(new_lbl));
@@ -70,11 +78,12 @@ void og::postfix_writer::do_string_node(cdk::string_node * const node, int lvl) 
 
 void og::postfix_writer::do_neg_node(cdk::neg_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  node->argument()->accept(this, lvl); // determine the value
+
+  node->argument()->accept(this, lvl);
   if (node->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.DNEG();
   } else {
-    _pf.NEG(); // is int
+    _pf.NEG();
   }
 }
 
@@ -128,6 +137,7 @@ void og::postfix_writer::do_sub_node(cdk::sub_node * const node, int lvl) {
     _pf.SUB();
   }
 }
+
 void og::postfix_writer::do_mul_node(cdk::mul_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
@@ -147,6 +157,7 @@ void og::postfix_writer::do_mul_node(cdk::mul_node * const node, int lvl) {
     _pf.MUL();
   }
 }
+
 void og::postfix_writer::do_div_node(cdk::div_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
@@ -166,12 +177,14 @@ void og::postfix_writer::do_div_node(cdk::div_node * const node, int lvl) {
     _pf.DIV();
   }
 }
+
 void og::postfix_writer::do_mod_node(cdk::mod_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   node->left()->accept(this, lvl);
   node->right()->accept(this, lvl);
   _pf.MOD();
 }
+
 void og::postfix_writer::do_binary_int_double_helper(cdk::binary_operation_node* const node, int lvl) {
   node->left()->accept(this, lvl + 2);
   if (node->left()->is_typed(cdk::TYPE_INT) && node->right()->is_typed(cdk::TYPE_DOUBLE)) {
@@ -183,31 +196,37 @@ void og::postfix_writer::do_binary_int_double_helper(cdk::binary_operation_node*
     _pf.I2D();
   }
 }
+
 void og::postfix_writer::do_lt_node(cdk::lt_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
   _pf.LT();
 }
+
 void og::postfix_writer::do_le_node(cdk::le_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
   _pf.LE();
 }
+
 void og::postfix_writer::do_ge_node(cdk::ge_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
   _pf.GE();
 }
+
 void og::postfix_writer::do_gt_node(cdk::gt_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
   _pf.GT();
 }
+
 void og::postfix_writer::do_ne_node(cdk::ne_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
   _pf.NE();
 }
+
 void og::postfix_writer::do_eq_node(cdk::eq_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   do_binary_int_double_helper(node, lvl);
@@ -232,8 +251,7 @@ void og::postfix_writer::do_rvalue_node(cdk::rvalue_node * const node, int lvl) 
   if (node->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.LDDOUBLE();
   } else {
-    // integers, strings, pointers and structs
-    _pf.LDINT();
+    _pf.LDINT(); // integers, strings, pointers and structs
   }
 }
 
@@ -243,8 +261,7 @@ void og::postfix_writer::do_assignment_node(cdk::assignment_node * const node, i
 
   if (node->is_typed(cdk::TYPE_DOUBLE)) {
     if (node->rvalue()->is_typed(cdk::TYPE_INT)) {
-      // convert int to double
-      _pf.I2D();
+      _pf.I2D(); // int to double
     }
     _pf.DUP64();
   } else {
@@ -270,27 +287,32 @@ void og::postfix_writer::do_evaluation_node(og::evaluation_node * const node, in
 
 void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  node->argument()->accept(this, lvl); // determine the value to print
+  node->argument()->accept(this, lvl);
 
   if (node->argument()->is_typed(cdk::TYPE_INT)) {
+    _functions_to_declare.insert("printi");
     _pf.CALL("printi");
-    _pf.TRASH(4); // delete the printed value
+    _pf.TRASH(4);
   } else if (node->argument()->is_typed(cdk::TYPE_DOUBLE)) {
+    _functions_to_declare.insert("printd");
     _pf.CALL("printd");
-    _pf.TRASH(8); // delete the printed value's address
+    _pf.TRASH(8);
   } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
+    _functions_to_declare.insert("prints");
     _pf.CALL("prints");
-    _pf.TRASH(4); // delete the printed value's address
+    _pf.TRASH(4);
   } else if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
-    std::cerr << node->lineno() << "TODO, TYPE STRUCT" << std::endl;
+    // TODO: print the struct, for each element and print each element.
+    std::cerr << node->lineno() << "TODO: WRITE TYPE STRUCT" << std::endl;
   } else {
-    std::cerr << node->lineno() << "CANNOT HAPPEN" << std::endl;
+    throw std::string("unsupported type to print");
     exit(1);
   }
 
-  // TODO: print multiple values
-
-  if (node->has_newline()) _pf.CALL("println"); // print a newline */
+  if (node->has_newline()) {
+    _functions_to_declare.insert("println");
+    _pf.CALL("println");
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -298,11 +320,11 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  /*TODO ASSERT_SAFE_EXPRESSIONS;
-  _pf.CALL("readi");
-  _pf.LDFVAL32();
-  node->argument()->accept(this, lvl);
-  _pf.STINT(); */
+  // TODO: implement this. Provavelmente é parecido ao do gr8.
+  // _pf.CALL("readi");
+  // _pf.LDFVAL32();
+  // node->argument()->accept(this, lvl);
+  // _pf.STINT();
 }
 
 //---------------------------------------------------------------------------
@@ -314,6 +336,7 @@ void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   int for_incr = ++_lbl;
   int for_end = ++_lbl;
 
+  // Keep labels information so we can use them on breaks and continues.
   _for_cond.push(for_cond);
   _for_incr.push(for_incr);
   _for_end.push(for_end);
@@ -388,17 +411,21 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
 
   node->value()->accept(this, lvl + 2);
 
-  if (_function->type()->name() == cdk::TYPE_INT ||
-    _function->type()->name() == cdk::TYPE_STRING ||
-    _function->type()->name() == cdk::TYPE_POINTER) {
+  if (_function->is_typed(cdk::TYPE_INT) ||
+    _function->is_typed(cdk::TYPE_STRING) ||
+    _function->is_typed(cdk::TYPE_POINTER)) {
     _pf.STFVAL32();
-  } else if (_function->type()->name() == cdk::TYPE_DOUBLE) {
-    if (node->value()->type()->name() == cdk::TYPE_INT)
+  } else if (_function->is_typed(cdk::TYPE_DOUBLE)) {
+    if (node->value()->is_typed(cdk::TYPE_INT)) {
       _pf.I2D();
+    }
 
     _pf.STFVAL64();
-  } else {
+  } else if (_function->is_typed(cdk::TYPE_STRUCT)) {
     // TODO: autos e inválidos
+    std::cout << "TODO: return type struct" << std::endl;
+  } else {
+    throw std::string("invalid type toreturn");
   }
 
   _pf.LEAVE();
@@ -432,8 +459,6 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
   int offset = 0;
   int typesize = symbol->type()->size();
 
-  os() << "       ;; ARG: " << symbol->name() << ", " << typesize << std::endl;
-
   if (_inside_function) {
     _offset -= typesize;
     offset = _offset;
@@ -444,35 +469,40 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     offset = 0; // global variable
   }
 
-  os() << "         ;; OFFSET: " << symbol->name() << ", " << offset << std::endl;
-
   symbol->offset(offset);
 
   if (symbol->is_required()) {
     // TODO: is external
   } else if (_inside_function) {
     // if we are dealing with local variables, then no action is needed
-    // unless an initializer exists
+    // unless an initializer exists because we already allocate the
+    // memory space when defining a function.
     if (!expression) {
       return;
     }
 
     expression->accept(this, lvl);
-    if (symbol->type()->name() == cdk::TYPE_INT || symbol->type()->name() == cdk::TYPE_STRING || symbol->type()->name() == cdk::TYPE_POINTER) {
+
+    if (symbol->type()->name() == cdk::TYPE_INT ||
+      symbol->type()->name() == cdk::TYPE_STRING ||
+      symbol->type()->name() == cdk::TYPE_POINTER) {
       _pf.LOCAL(symbol->offset());
       _pf.STINT();
     } else if (symbol->type()->name() == cdk::TYPE_DOUBLE) {
+      if (expression->is_typed(cdk::TYPE_INT)) {
+        _pf.I2D();
+      }
       _pf.LOCAL(symbol->offset());
       _pf.STDOUBLE();
     } else if (symbol->type()->name() == cdk::TYPE_STRUCT) {
       // TODO: do something
-      std::cout << "do sth" << std::endl;
+      std::cout << "TODO: initialize type struct" << std::endl;
     } else {
-      std::cerr << "cannot initialize" << std::endl;
+      throw std::string("invalid initializer");
     }
   } else if (_in_function_args) {
     // When these are function arguments, we don't do anything because the space
-    // is already allocated elsewhere :D
+    // is already allocated elsewhere.
   } else {
     // Global variables
     if (expression == nullptr) {
@@ -482,7 +512,9 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     }
 
     _pf.ALIGN();
-    if (symbol->offset() == 0) _pf.GLOBAL(symbol->name(), _pf.OBJ());
+    if (symbol->is_public()) {
+      _pf.GLOBAL(symbol->name(), _pf.OBJ());
+    }
     _pf.LABEL(symbol->name());
     if (expression == nullptr) {
       // Allocate required memory for unitiliazed variables.
@@ -502,17 +534,16 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
 
 void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
 
   if (node->identifiers().size() == 1) {
-    // Single variable that _MAY_ be a tuple.
+    // Single variable that may be a true tuple.
     std::string &id = *node->identifiers().at(0);
     std::shared_ptr<og::symbol> symbol = _symtab.find(id);
     do_var_decl_node_helper(symbol, node->expression(), lvl);
     return;
   }
 
-  // Multiple variables!
+  // Just a collection of multiple variables.
   og::tuple_node* tuple = (og::tuple_node*)(node->expression());
   for (size_t i = 0; i < node->identifiers().size(); i++) {
     std::string &id = *node->identifiers().at(i);
@@ -527,10 +558,11 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
 void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  if(_inside_function)
+  if (_inside_function)  {
     _pf.INT(0);
-  else
+  } else {
     _pf.SINT(0);
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -538,7 +570,6 @@ void og::postfix_writer::do_nullptr_node(og::nullptr_node *const node, int lvl) 
 void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   std::shared_ptr<cdk::reference_type> type = std::static_pointer_cast<cdk::reference_type>(node->type());
-
   node->argument()->accept(this, lvl + 2);
   _pf.INT(type->referenced()->size());
   _pf.MUL();
@@ -550,7 +581,6 @@ void og::postfix_writer::do_mem_alloc_node(og::mem_alloc_node *const node, int l
 
 void og::postfix_writer::do_mem_addr_node(og::mem_addr_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-
   node->lvalue()->accept(this, lvl + 2);
 }
 
@@ -569,28 +599,38 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   ASSERT_SAFE_EXPRESSIONS;
 
   // remember symbol so that args and body know
-  // _functions_to_declare.erase(_function->name());
-  _function = _symtab.find(node->identifier());
+  _function = new_symbol();
+  _functions_to_declare.erase(_function->name());
+  reset_new_symbol();
 
   _offset = 8; // prepare for arguments (4: remember to account for return address)
   _symtab.push(); // scope of args
+
   if (node->args()) {
     _in_function_args = true; //FIXME really needed?
+
     for (size_t i = 0; i < node->args()->size(); i++) {
       cdk::basic_node *arg = node->args()->node(i);
-      if (arg == nullptr) break; // this means an empty sequence of arguments
-      arg->accept(this, 0); // the function symbol is at the top of the stack
+      arg->accept(this, 0);
     }
+
     _in_function_args = false; //FIXME really needed?
   }
 
-  // generate the main function (RTS mandates that its name be "_main")
   _pf.TEXT();
   _pf.ALIGN();
-  if (node->is_public()) _pf.GLOBAL(_function->name(), _pf.FUNC());
+  if (node->is_public()) {
+    _pf.GLOBAL(_function->name(), _pf.FUNC());
+  }
   _pf.LABEL(_function->name());
 
   // compute stack size to be reserved for local variables
+  // TODO (IMPORTANTE) isto está a falhar porque quando visita declações de 'auto' estas nao
+  // têm o tipo definido, ainda. Não sei como é que devemos fazer isto aqui.
+  // Por um lado, talvez fosse interessante arranjar uma função que fizesse isto,
+  // e ao mesmo tempo chamasse o type checker quando há autos. É por isto que há
+  // bastantes seg faults. Isto passa lá, mas o tipo é nullptr. Logo dá seg fault
+  // ao tentar aceder. MAS NAO PODEMOS TIRAR ISTO, temos e que RESOLVER de alguma forma.
   frame_size_calculator lsc(_compiler, _symtab);
   node->accept(&lsc, lvl);
   _pf.ENTER(lsc.localsize()); // total stack size reserved for local variables
@@ -603,20 +643,16 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _inside_function = false;
   _symtab.pop();
 
-  // end the main function
-  // _pf.INT(0);
-  // _pf.STFVAL32();
   _pf.LEAVE();
   _pf.RET();
 
   if (node->identifier() == "_main") {
-    // these are just a few library function imports
-    _pf.EXTERN("readi");
-    _pf.EXTERN("printi");
-    _pf.EXTERN("printd");
-    _pf.EXTERN("prints");
-    _pf.EXTERN("println");
+    // declare external functions
+    for (std::string s : _functions_to_declare)
+      _pf.EXTERN(s);
   }
+
+  _function = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -643,7 +679,12 @@ void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, i
 
 void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // TODO
+  std::shared_ptr<og::symbol> function = new_symbol();
+   if (!function) {
+    return;
+  }
+  _functions_to_declare.insert(function->name());
+  reset_new_symbol();
 }
 
 void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int lvl) {
@@ -661,7 +702,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
 
   size_t args_size = 0;
 
-  if (node->expressions()) { // Has args.
+  if (node->expressions()) {
     for (int ax = node->expressions()->size(); ax > 0; ax--) {
       cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(ax - 1));
       std::shared_ptr<og::symbol> param = symbol->params()->at(ax - 1);
@@ -685,7 +726,8 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
   } else if (type->name() == cdk::TYPE_DOUBLE) {
     _pf.LDFVAL64();
   } else if (type->name() == cdk::TYPE_STRUCT) {
-    // TODO
+    // TODO: este é o caso em que enviamos tuplos! Na minha opinião, devemos mandar a posição do primeiro dado,
+    // logo, isto seria também um inteiro e poderia ser juntado ao primeiro if.
   }
 }
 
