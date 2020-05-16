@@ -720,14 +720,6 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
   ASSERT_SAFE_EXPRESSIONS;
 
   std::shared_ptr<og::symbol> symbol = _symtab.find(node->identifier());
-  if (!symbol) {
-    throw std::string("function does not exist");
-  }
-
-  if (!symbol->type()) {
-    throw std::string("could not infer function return type");
-  }
-
   size_t args_size = 0;
 
   if (node->expressions()) {

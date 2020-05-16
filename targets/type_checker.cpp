@@ -621,6 +621,10 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
     throw std::string(node->identifier() + "is not a function");
   }
 
+  if (!function->type()) {
+    throw std::string("could not infer function return type");
+  }
+
   node->type(function->type());
   if (node->expressions() && node->expressions()->size() != 0)
     node->expressions()->accept(this, lvl + 4);

@@ -91,7 +91,9 @@ void og::frame_size_calculator::do_mem_addr_node(og::mem_addr_node *const node, 
 void og::frame_size_calculator::do_mem_alloc_node(og::mem_alloc_node *const node, int lvl) {}
 void og::frame_size_calculator::do_nullptr_node(og::nullptr_node *const node, int lvl) {}
 void og::frame_size_calculator::do_ptr_index_node(og::ptr_index_node *const node, int lvl) {}
-void og::frame_size_calculator::do_return_node(og::return_node *const node, int lvl) {}
+void og::frame_size_calculator::do_return_node(og::return_node *const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
+}
 void og::frame_size_calculator::do_sizeof_node(og::sizeof_node *const node, int lvl) {}
 void og::frame_size_calculator::do_tuple_index_node(og::tuple_index_node *const node, int lvl) {}
 void og::frame_size_calculator::do_tuple_node(og::tuple_node *const node, int lvl) {}
@@ -129,6 +131,6 @@ void og::frame_size_calculator::do_var_decl_node(og::var_decl_node * const node,
 }
 
 void og::frame_size_calculator::do_func_def_node(og::func_def_node * const node, int lvl) {
-  _localsize += node->type()->size(); // save space for the function's return type
   node->block()->accept(this, lvl + 2);
+  _localsize += _function->type()->size(); // save space for the function's return type
 }
