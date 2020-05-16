@@ -1,5 +1,6 @@
 #include <string>
 #include "targets/frame_size_calculator.h"
+#include "targets/type_checker.h"
 #include "targets/symbol.h"
 #include "ast/all.h"
 
@@ -98,11 +99,13 @@ void og::frame_size_calculator::do_write_node(og::write_node *const node, int lv
 void og::frame_size_calculator::do_variable_node(cdk::variable_node * const node, int lvl) {}
 void og::frame_size_calculator::do_func_decl_node(og::func_decl_node *const node, int lvl) {}
 void og::frame_size_calculator::do_block_node(og::block_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   if (node->declarations()) node->declarations()->accept(this, lvl + 2);
   if (node->instructions()) node->instructions()->accept(this, lvl + 2);
 }
 
 void og::frame_size_calculator::do_for_node(og::for_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   if (node->init()) {
     node->init()->accept(this, lvl + 2);
   }
@@ -110,15 +113,18 @@ void og::frame_size_calculator::do_for_node(og::for_node * const node, int lvl) 
 }
 
 void og::frame_size_calculator::do_if_node(og::if_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   node->block()->accept(this, lvl + 2);
 }
 
 void og::frame_size_calculator::do_if_else_node(og::if_else_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   node->thenblock()->accept(this, lvl + 2);
   if (node->elseblock()) node->elseblock()->accept(this, lvl + 2);
 }
 
 void og::frame_size_calculator::do_var_decl_node(og::var_decl_node * const node, int lvl) {
+  ASSERT_SAFE_EXPRESSIONS;
   _localsize += node->type()->size();
 }
 

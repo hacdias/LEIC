@@ -625,13 +625,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _pf.LABEL(_function->name());
 
   // compute stack size to be reserved for local variables
-  // TODO (IMPORTANTE) isto está a falhar porque quando visita declações de 'auto' estas nao
-  // têm o tipo definido, ainda. Não sei como é que devemos fazer isto aqui.
-  // Por um lado, talvez fosse interessante arranjar uma função que fizesse isto,
-  // e ao mesmo tempo chamasse o type checker quando há autos. É por isto que há
-  // bastantes seg faults. Isto passa lá, mas o tipo é nullptr. Logo dá seg fault
-  // ao tentar aceder. MAS NAO PODEMOS TIRAR ISTO, temos e que RESOLVER de alguma forma.
-  frame_size_calculator lsc(_compiler, _symtab);
+  frame_size_calculator lsc(_compiler, _symtab, _function, _in_function_args);
   node->accept(&lsc, lvl);
   _pf.ENTER(lsc.localsize()); // total stack size reserved for local variables
 
