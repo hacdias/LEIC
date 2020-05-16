@@ -348,6 +348,31 @@ void og::type_checker::do_return_node(og::return_node *const node, int lvl) {
       _function->type(node->value()->type());
     } else if (_function->is_typed(cdk::TYPE_DOUBLE) && node->value()->is_typed(cdk::TYPE_INT)) {
       _function->type(cdk::make_primitive_type(8, cdk::TYPE_DOUBLE));
+    } else if (_function->is_typed(cdk::TYPE_STRUCT)) {
+      std::shared_ptr<cdk::structured_type> curr_type = cdk::structured_type_cast(_function->type());
+      std::shared_ptr<cdk::structured_type> new_type = cdk::structured_type_cast(node->value()->type());
+      std::vector<std::shared_ptr<cdk::basic_type>> *types = new std::vector<std::shared_ptr<cdk::basic_type>>();
+
+      if (curr_type->length() != new_type->length()) {
+        throw std::string("function has wrong return type");
+      }
+
+      for (size_t i = 0; i < curr_type->length(); i++) {
+        std::shared_ptr<cdk::basic_type> ct = curr_type->component(i);
+        std::shared_ptr<cdk::basic_type> nt = new_type->component(i);
+
+        if (ct->name() == nt->name()) {
+          types->push_back(ct);
+        } else if (ct->name() == cdk::TYPE_INT && nt->name() == cdk::TYPE_DOUBLE) {
+          types->push_back(nt);
+        } else if (nt->name() == cdk::TYPE_INT && ct->name() == cdk::TYPE_DOUBLE) {
+          types->push_back(ct);
+        } else {
+          throw std::string("function has wrong return type");
+        }
+      }
+
+      _function->type(cdk::make_structured_type(*types));
     } else if (_function->type() != node->value()->type()) {
       throw std::string("function has wrong return type");
     }

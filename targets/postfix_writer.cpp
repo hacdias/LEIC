@@ -447,19 +447,26 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
     _pf.STFVAL64();
   } else if (_function->is_typed(cdk::TYPE_STRUCT)) {
     std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->value()->type());
-    int offset = tuple_type->size();
-    size_t length = tuple_type->length();
+    std::shared_ptr<cdk::structured_type> func_type = cdk::structured_type_cast(_function->type());
+    int offset = func_type->size();
+    size_t length = func_type->length();
 
     for (int i = length - 1; i >= 0; i--) {
-      std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
-      offset -= type->size();
+      std::shared_ptr<cdk::basic_type> vtype = tuple_type->component(i);
+      std::shared_ptr<cdk::basic_type> ftype = func_type->component(i);
+      offset -= ftype->size();
+
+      if (vtype->name() == cdk::TYPE_INT && ftype->name() == cdk::TYPE_DOUBLE) {
+        _pf.I2D();
+      }
+      
       _pf.LOCV(8);
       _pf.INT(offset);
       _pf.ADD();
 
-      if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
+      if (ftype->name() == cdk::TYPE_INT || ftype->name() == cdk::TYPE_STRING || ftype->name() == cdk::TYPE_POINTER) {
         _pf.STINT();
-      } else if (type->name() == cdk::TYPE_DOUBLE) {
+      } else if (ftype->name() == cdk::TYPE_DOUBLE) {
         _pf.STDOUBLE();
       } else {
         throw std::string("invalid struct element type");
