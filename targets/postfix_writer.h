@@ -29,6 +29,7 @@ namespace og {
     int _offset = 0;
 
     bool _is_true_order = false;
+    bool _is_struct_lval = false;
 
     std::set<std::string> _functions_to_declare;
 

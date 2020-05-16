@@ -241,6 +241,7 @@ void og::postfix_writer::do_variable_node(cdk::variable_node * const node, int l
   if (symbol->offset() == 0) { // global
     _pf.ADDR(symbol->name());
   } else {
+    if (symbol->is_typed(cdk::TYPE_STRUCT)) _is_struct_lval = true; // Hack, not proud!
     _pf.LOCAL(symbol->offset());
   }
 }
@@ -459,7 +460,7 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
       if (vtype->name() == cdk::TYPE_INT && ftype->name() == cdk::TYPE_DOUBLE) {
         _pf.I2D();
       }
-      
+
       _pf.LOCV(8);
       _pf.INT(offset);
       _pf.ADD();
@@ -529,6 +530,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       return;
     }
 
+    _is_struct_lval = false; // Hack!
     expression->accept(this, lvl);
 
     if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_STRING) || symbol->is_typed(cdk::TYPE_POINTER)) {
@@ -547,10 +549,19 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
 
       for (size_t i = 0; i < tuple_type->length(); i++) {
         std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
+
+        if (_is_struct_lval) {
+          _pf.DUP32();
+          _pf.INT(offset - symbol->offset());
+          _pf.ADD();
+        }
+
         if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
+          if (_is_struct_lval) _pf.LDINT();
           _pf.LOCAL(offset);
           _pf.STINT();
         } else if (type->name() == cdk::TYPE_DOUBLE) {
+          if (_is_struct_lval) _pf.LDDOUBLE();
           _pf.LOCAL(offset);
           _pf.STDOUBLE();
         } else {
