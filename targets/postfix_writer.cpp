@@ -304,8 +304,28 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
     _pf.CALL("prints");
     _pf.TRASH(4);
   } else if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
-    // TODO: print the struct, for each element and print each element.
-    std::cerr << node->lineno() << "TODO: WRITE TYPE STRUCT" << std::endl;
+    std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->argument()->type());
+    size_t length = tuple_type->length();
+
+    for (size_t i = 0; i < length; i++) {
+      std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
+
+      if (type->name() == cdk::TYPE_INT) {
+        _functions_to_declare.insert("printi");
+        _pf.CALL("printi");
+        _pf.TRASH(4);
+      } else if (type->name() == cdk::TYPE_DOUBLE) {
+        _functions_to_declare.insert("printd");
+        _pf.CALL("printd");
+        _pf.TRASH(8);
+      } else if (type->name() == cdk::TYPE_STRING) {
+        _functions_to_declare.insert("prints");
+        _pf.CALL("prints");
+        _pf.TRASH(4);
+      } else {
+        throw std::string("invalid struct element type");
+      }
+    }
   } else {
     throw std::string("unsupported type to print");
     exit(1);
@@ -411,7 +431,9 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
     return;
   }
 
+  _is_true_order = true; // Hack!
   node->value()->accept(this, lvl + 2);
+  _is_true_order = false;
 
   if (_function->is_typed(cdk::TYPE_INT) ||
     _function->is_typed(cdk::TYPE_STRING) ||
@@ -514,12 +536,10 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
       // Let's just say structs are... interesting!
       std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(symbol->type());
-      int offset = symbol->offset() + tuple_type->size();
-      size_t length = tuple_type->length();
+      int offset = symbol->offset();
 
-      for (int i = length - 1; i >= 0; i--) {
+      for (size_t i = 0; i < tuple_type->length(); i++) {
         std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
-        offset -= type->size();
         if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
           _pf.LOCAL(offset);
           _pf.STINT();
@@ -529,6 +549,7 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
         } else {
           throw std::string("invalid struct element type");
         }
+        offset += type->size();
       }
     } else {
       throw std::string("invalid initializer");
@@ -555,6 +576,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       return;
     }
 
+    _is_true_order = true; // Hack!
+
     if (symbol->type()->name() == cdk::TYPE_DOUBLE && expression->is_typed(cdk::TYPE_INT)) {
       cdk::integer_node* int_node = dynamic_cast<cdk::integer_node*>(expression);
       cdk::double_node double_int(int_node->lineno(), int_node->value());
@@ -562,6 +585,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
     } else {
       expression->accept(this, lvl);
     }
+
+    _is_true_order = false;
   }
 }
 
@@ -576,13 +601,47 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
     return;
   }
 
-  // Just a collection of multiple variables.
-  og::tuple_node* tuple = (og::tuple_node*)(node->expression());
-  for (size_t i = 0; i < node->identifiers().size(); i++) {
-    std::string &id = *node->identifiers().at(i);
-    cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
-    std::shared_ptr<og::symbol> symbol = _symtab.find(id);
-    do_var_decl_node_helper(symbol, exp, lvl);
+  // Collection of variables! There MUST be an initializer (expression).
+
+  if (_inside_function) {
+    node->expression()->accept(this, lvl);
+
+    for (size_t i = 0; i < node->identifiers().size(); i++) {
+      std::string &id = *node->identifiers().at(i);
+      std::shared_ptr<og::symbol> symbol = _symtab.find(id);
+
+      int typesize = symbol->type()->size();
+      _offset -= typesize;
+      symbol->offset(_offset);
+
+      if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_STRING) || symbol->is_typed(cdk::TYPE_POINTER)) {
+        _pf.LOCAL(symbol->offset());
+        _pf.STINT();
+      } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
+        // if (node->expression()->is_typed(cdk::TYPE_INT)) {
+        //   _pf.I2D();
+        // }
+        _pf.LOCAL(symbol->offset());
+        _pf.STDOUBLE();
+      } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
+        // ?
+      } else {
+        throw std::string("invalid initializer");
+      }
+
+    }
+  } else if  (_in_function_args) {
+    // Do nothing!
+  } else {
+    // This is a global declaration of a tuple. Hence, the initializers
+    // must be literals.
+    og::tuple_node* tuple = (og::tuple_node*)(node->expression());
+    for (size_t i = 0; i < node->identifiers().size(); i++) {
+      std::string &id = *node->identifiers().at(i);
+      cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
+      std::shared_ptr<og::symbol> symbol = _symtab.find(id);
+      do_var_decl_node_helper(symbol, exp, lvl);
+    }
   }
 }
 
@@ -776,10 +835,11 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
     _pf.LDFVAL64();
   } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
     std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(node->type());
-    int offset = 0;
+    int offset = tuple_type->size();
 
-    for (size_t i = 0; i < tuple_type->length(); i++) {
+    for (int i = tuple_type->length() - 1; i >= 0; i--) {
       std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
+      offset -= type->size();
 
       _pf.ADDR(mklbl(ret_lbl));
       _pf.INT(offset);
@@ -792,8 +852,6 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
       } else {
         throw std::string("invalid struct element type");
       }
-
-      offset += type->size();
     }
     // TODO: how to free the memory?
   }
@@ -801,5 +859,12 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
 
 void og::postfix_writer::do_tuple_node(og::tuple_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  node->nodes()->accept(this, lvl + 2);
+
+  if (_is_true_order) {
+    node->nodes()->accept(this, lvl + 2);
+  } else {
+    for (int i = node->nodes()->size() - 1; i >= 0 ; i--) {
+      node->nodes()->node(i)->accept(this, lvl + 2);
+    }
+  }
 }

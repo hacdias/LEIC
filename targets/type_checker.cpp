@@ -441,9 +441,8 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
     throw std::string("wrong number of identifiers");
   }
 
-  og::tuple_node* tuple = (og::tuple_node*)(node->expression());
-
-  if (tuple->nodes()->size() != node->identifiers().size()) {
+  std::shared_ptr<cdk::structured_type> struct_type = cdk::structured_type_cast(node->expression()->type());
+  if (struct_type->length() != node->identifiers().size()) {
     throw std::string("mismatching nodes and identifiers");
   }
 
@@ -452,9 +451,9 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
   // TODO: is this working?
   for (size_t i = 0; i < node->identifiers().size(); i++) {
     std::string &id = *node->identifiers().at(i);
-    cdk::expression_node* exp = (cdk::expression_node*)(tuple->nodes()->node(i));
+    std::shared_ptr<cdk::basic_type> subtype = struct_type->component(i);
 
-    auto symbol = og::make_symbol(exp->type(), id, node->is_public(), node->is_require(), false);
+    auto symbol = og::make_symbol(subtype, id, node->is_public(), node->is_require(), false);
 
     if (!_symtab.insert(id, symbol))
       throw std::string(id + " redeclared");

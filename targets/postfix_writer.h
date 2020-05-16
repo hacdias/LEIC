@@ -28,6 +28,8 @@ namespace og {
     bool _in_function_args = false;
     int _offset = 0;
 
+    bool _is_true_order = false;
+
     std::set<std::string> _functions_to_declare;
 
   public:
