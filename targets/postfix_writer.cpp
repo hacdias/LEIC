@@ -483,12 +483,12 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       return;
     }
 
+    expression->accept(this, lvl);
+
     if (symbol->is_typed(cdk::TYPE_INT) || symbol->is_typed(cdk::TYPE_STRING) || symbol->is_typed(cdk::TYPE_POINTER)) {
-      expression->accept(this, lvl);
       _pf.LOCAL(symbol->offset());
       _pf.STINT();
     } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
-      expression->accept(this, lvl);
       if (expression->is_typed(cdk::TYPE_INT)) {
         _pf.I2D();
       }
@@ -496,30 +496,22 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
       _pf.STDOUBLE();
     } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
       // Let's just say structs are... interesting!
-      int offset = symbol->offset();
-      auto tuple_type = std::static_pointer_cast<cdk::structured_type>(symbol->type());
-      og::tuple_node* tuple = (og::tuple_node*)expression;
+      std::shared_ptr<cdk::structured_type> tuple_type = cdk::structured_type_cast(symbol->type());
+      int offset = symbol->offset() + tuple_type->size();
+      size_t length = tuple_type->length();
 
-      for (unsigned int i = 0; i < tuple_type->length(); i++) {
+      for (int i = length - 1; i >= 0; i--) {
         std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
-        cdk::expression_node* node = ((cdk::expression_node*)(tuple->nodes()->node(i)));
-
+        offset -= type->size();
         if (type->name() == cdk::TYPE_INT || type->name() == cdk::TYPE_STRING || type->name() == cdk::TYPE_POINTER) {
-          node->accept(this, lvl);
           _pf.LOCAL(offset);
           _pf.STINT();
         } else if (type->name() == cdk::TYPE_DOUBLE) {
-          node->accept(this, lvl);
-          if (node->is_typed(cdk::TYPE_INT)) {
-            _pf.I2D();
-          }
           _pf.LOCAL(offset);
           _pf.STDOUBLE();
         } else {
           throw std::string("invalid struct element type");
         }
-
-        offset += type->size();
       }
     } else {
       throw std::string("invalid initializer");
