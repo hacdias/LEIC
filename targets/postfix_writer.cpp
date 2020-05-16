@@ -250,8 +250,10 @@ void og::postfix_writer::do_rvalue_node(cdk::rvalue_node * const node, int lvl) 
   node->lvalue()->accept(this, lvl);
   if (node->is_typed(cdk::TYPE_DOUBLE)) {
     _pf.LDDOUBLE();
+  } else if (!node->is_typed(cdk::TYPE_STRUCT)) {
+    _pf.LDINT(); // integers, strings and pointers
   } else {
-    _pf.LDINT(); // integers, strings, pointers and structs
+    // structs must be indexed!
   }
 }
 
@@ -671,12 +673,11 @@ void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, i
 
   unsigned int id = node->index()->value();
   node->expression()->accept(this, lvl);
-
   std::shared_ptr<cdk::structured_type> struct_type = cdk::structured_type_cast(node->expression()->type());
-  
+
   size_t offset = 0;
-  for (size_t i = 0; i <= id; i++) {
-    offset += struct_type->component(i)->size();
+  for (size_t i = 1; i < id; i++) {
+    offset += struct_type->component(i - 1)->size();
   }
 
   _pf.INT(offset);
