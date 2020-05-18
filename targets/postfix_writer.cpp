@@ -260,6 +260,9 @@ void og::postfix_writer::do_rvalue_node(cdk::rvalue_node * const node, int lvl) 
 
 void og::postfix_writer::do_assignment_node(cdk::assignment_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
+
+  _lvalue_type = node->lvalue()->type();
+
   node->rvalue()->accept(this, lvl);
 
   if (node->is_typed(cdk::TYPE_DOUBLE)) {
@@ -343,17 +346,19 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  if( _lvalue_type->name() == cdk::TYPE_INT ) {
+  if( node->is_typed(cdk::TYPE_INT) ) {
     _functions_to_declare.insert("readi");
     _pf.CALL("readi");
     _pf.LDFVAL32();
-  } else if ( _lvalue_type->name() == cdk::TYPE_DOUBLE ) {
+  } else if ( node->is_typed(cdk::TYPE_DOUBLE) ) {
     _functions_to_declare.insert("readd");
     _pf.CALL("readd");
     _pf.LDFVAL64();
   } else {
     throw std::string("invalid type to input");
   }
+
+  _lvalue_type = cdk::make_primitive_type(0, cdk::TYPE_VOID);
 }
 
 //---------------------------------------------------------------------------
@@ -616,6 +621,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
 
 void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
+
+  _lvalue_type = node->type();
 
   if (node->identifiers().size() == 1) {
     // Single variable that may be a true tuple.

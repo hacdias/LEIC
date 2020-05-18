@@ -194,8 +194,6 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
   lvalue->accept(this, lvl);
   rvalue->accept(this, lvl + 2);
 
-  _lvalue_type = lvalue->type();
-
   // Note to self: wouldn't it just be easier to check the cases we don't want to
   // support? Or would that open a door for unthought cases?
 
