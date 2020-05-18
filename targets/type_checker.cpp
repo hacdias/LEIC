@@ -194,6 +194,8 @@ void og::type_checker::do_assignment_node(cdk::assignment_node *const node, int 
   lvalue->accept(this, lvl);
   rvalue->accept(this, lvl + 2);
 
+  _lvalue_type = lvalue->type();
+
   // Note to self: wouldn't it just be easier to check the cases we don't want to
   // support? Or would that open a door for unthought cases?
 
@@ -314,7 +316,7 @@ void og::type_checker::do_write_node(og::write_node *const node, int lvl) {
 
 void og::type_checker::do_input_node(og::input_node *const node, int lvl) {
   ASSERT_UNSPEC;
-  node->type(cdk::make_primitive_type(0, cdk::TYPE_UNSPEC));
+  node->type(_lvalue_type);
 }
 
 //---------------------------------------------------------------------------

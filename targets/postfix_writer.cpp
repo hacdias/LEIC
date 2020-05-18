@@ -343,10 +343,12 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  if( _input.is_typed(cdk::TYPE_INT) ) {
+  if( _lvalue_type->name() == cdk::TYPE_INT ) {
+    _functions_to_declare.insert("readi");
     _pf.CALL("readi");
     _pf.LDFVAL32();
-  } else if ( _input.is_typed(cdk::TYPE_DOUBLE) ) {
+  } else if ( _lvalue_type->name() == cdk::TYPE_DOUBLE ) {
+    _functions_to_declare.insert("readd");
     _pf.CALL("readd");
     _pf.LDFVAL64();
   } else {
@@ -744,7 +746,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _pf.LABEL(_function->name());
 
   // compute stack size to be reserved for local variables
-  frame_size_calculator lsc(_compiler, _symtab, _function, _in_function_args);
+  frame_size_calculator lsc(_compiler, _symtab, _function, _in_function_args, _lvalue_type);
   node->accept(&lsc, lvl);
   _pf.ENTER(lsc.localsize()); // total stack size reserved for local variables
 

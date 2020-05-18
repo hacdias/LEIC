@@ -12,11 +12,12 @@ namespace og {
     cdk::symbol_table<og::symbol> &_symtab;
     std::shared_ptr<og::symbol> _function;
     bool _in_function_args;
+    std::shared_ptr<cdk::basic_type> _lvalue_type;
     basic_ast_visitor *_parent;
 
   public:
-    type_checker(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab, std::shared_ptr<og::symbol> function, bool in_function_args,  basic_ast_visitor *parent) :
-        basic_ast_visitor(compiler), _symtab(symtab), _function(function), _in_function_args(in_function_args), _parent(parent) {
+    type_checker(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab, std::shared_ptr<og::symbol> function, bool in_function_args, std::shared_ptr<cdk::basic_type> lvalue_type,  basic_ast_visitor *parent) :
+        basic_ast_visitor(compiler), _symtab(symtab), _function(function), _in_function_args(in_function_args), _lvalue_type(lvalue_type), _parent(parent) {
     }
 
   public:
@@ -47,9 +48,9 @@ namespace og {
 //     HELPER MACRO FOR TYPE CHECKING
 //---------------------------------------------------------------------------
 
-#define CHECK_TYPES(compiler, symtab, function, in_func_args, node) { \
+#define CHECK_TYPES(compiler, symtab, function, in_func_args, lvalue_type, node) { \
   try { \
-    og::type_checker checker(compiler, symtab, function, in_func_args, this); \
+    og::type_checker checker(compiler, symtab, function, in_func_args, lvalue_type, this); \
     (node)->accept(&checker, 0); \
   } \
   catch (const std::string &problem) { \
@@ -58,6 +59,6 @@ namespace og {
   } \
 }
 
-#define ASSERT_SAFE_EXPRESSIONS CHECK_TYPES(_compiler, _symtab, _function, _in_function_args, node)
+#define ASSERT_SAFE_EXPRESSIONS CHECK_TYPES(_compiler, _symtab, _function, _in_function_args, _lvalue_type, node)
 
 #endif
