@@ -343,11 +343,15 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
 void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
-  // TODO: implement this. Provavelmente é parecido ao do gr8.
-  // _pf.CALL("readi");
-  // _pf.LDFVAL32();
-  // node->argument()->accept(this, lvl);
-  // _pf.STINT();
+  if( _input.is_typed(cdk::TYPE_INT) ) {
+    _pf.CALL("readi");
+    _pf.LDFVAL32();
+  } else if ( _input.is_typed(cdk::TYPE_DOUBLE) ) {
+    _pf.CALL("readd");
+    _pf.LDFVAL64();
+  } else {
+    throw std::string("invalid type to input");
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -474,7 +478,7 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
       }
     }
   } else {
-    throw std::string("invalid type toreturn");
+    throw std::string("invalid type to return");
   }
 
   _pf.LEAVE();

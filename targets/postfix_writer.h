@@ -33,6 +33,8 @@ namespace og {
 
     std::set<std::string> _functions_to_declare;
 
+    og::input_node _input;
+
   public:
     postfix_writer(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab,
                    cdk::basic_postfix_emitter &pf) :
