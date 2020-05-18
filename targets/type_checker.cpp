@@ -473,7 +473,6 @@ void og::type_checker::do_var_decl_node(og::var_decl_node *const node, int lvl) 
 
   node->type(node->expression()->type());
 
-  // TODO: is this working?
   for (size_t i = 0; i < node->identifiers().size(); i++) {
     std::string &id = *node->identifiers().at(i);
     std::shared_ptr<cdk::basic_type> subtype = struct_type->component(i);
@@ -673,6 +672,5 @@ void og::type_checker::do_tuple_node(og::tuple_node *const node, int lvl) {
     types->push_back(((cdk::expression_node*)(node->nodes()->node(i)))->type());
   }
 
-  // TODO: works?
   node->type(cdk::make_structured_type(*types));
 }

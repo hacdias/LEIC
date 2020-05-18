@@ -10,9 +10,6 @@ namespace og {
   class symbol {
     std::shared_ptr<cdk::basic_type> _type;
     std::string _name;
-    long _value; // hack!
-    // TODO: remove value?
-
     bool _is_public;
     bool _is_required;
     bool _is_function;
