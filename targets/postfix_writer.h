@@ -16,24 +16,21 @@ namespace og {
   //!
   class postfix_writer: public basic_ast_visitor {
     cdk::symbol_table<og::symbol> &_symtab;
-    std::shared_ptr<og::symbol> _function;
     cdk::basic_postfix_emitter &_pf;
-    int _lbl;
+    std::shared_ptr<og::symbol> _function;
 
     std::stack<int> _for_cond;
     std::stack<int> _for_incr;
     std::stack<int> _for_end;
+    std::set<std::string> _symbols_to_declare;
+    std::shared_ptr<cdk::basic_type> _lvalue_type;
 
+    int _lbl;
+    int _offset = 0;
     bool _inside_function = false;
     bool _in_function_args = false;
-    int _offset = 0;
-
     bool _is_true_order = false;
     bool _is_struct_lval = false;
-
-    std::set<std::string> _symbols_to_declare;
-
-    std::shared_ptr<cdk::basic_type> _lvalue_type;
 
   public:
     postfix_writer(std::shared_ptr<cdk::compiler> compiler, cdk::symbol_table<og::symbol> &symtab,

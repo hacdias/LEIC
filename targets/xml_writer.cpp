@@ -232,8 +232,7 @@ void og::xml_writer::do_if_else_node(og::if_else_node * const node, int lvl) {
 //---------------------------------------------------------------------------
 
 void og::xml_writer::do_return_node(og::return_node *const node, int lvl) {
-  // NOTE: we do not // ASSERT_SAFE_EXPRESSIONS; because this was already called
-  // when we asserted the function itself.
+  // ASSERT_SAFE_EXPRESSIONS;
   openTag(node, lvl);
 
   if (node->value() != nullptr) {
@@ -268,7 +267,7 @@ void og::xml_writer::do_var_decl_node(og::var_decl_node *const node, int lvl) {
   os() << std::string(lvl, ' ') << "<" << node->label()
     << " is_public='" << node->is_public()
     << "' is_require='" << node->is_require()
-    << "' type='" << cdk::to_string(node->type())
+    << "' type='" << (node->type() ? cdk::to_string(node->type()) : "auto")
     << "'>" << std::endl;
 
   openTag("identifiers", lvl + 2);
@@ -335,7 +334,7 @@ void og::xml_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) 
     << " is_public='" << node->is_public()
     << "' is_required='" << node->is_required()
     << "' id='" << node->identifier()
-    << "' type='" << cdk::to_string(node->type())
+    << "' type='" << (node->type() ? cdk::to_string(node->type()) : "auto")
     << "'>" << std::endl;
 
   openTag("args", lvl+2);
@@ -356,7 +355,7 @@ void og::xml_writer::do_func_def_node(og::func_def_node *const node, int lvl) {
     << " is_public='" << node->is_public()
     << "' is_required='" << node->is_required()
     << "' id='" << node->identifier()
-    << "' type='" << cdk::to_string(node->type())
+    << "' type='" << (node->type() ? cdk::to_string(node->type()) : "auto")
     << "'>" << std::endl;
 
   openTag("args", lvl + 2);
