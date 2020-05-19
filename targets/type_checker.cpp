@@ -583,8 +583,15 @@ void og::type_checker::do_func_decl_node(og::func_decl_node *const node, int lvl
 
   auto previous = _symtab.find(node->identifier());
   if (previous != nullptr) {
-    if (false /* TODO: check if arguments are the same */) {
-      throw std::string(node->identifier() + "redeclared");
+    //TODO check if parameters are the same
+    if (node->args()->size() == previous->params()->size()) {
+      for(size_t i; i < node->args()->size(); i++) {
+        cdk::typed_node* new_arg = (cdk::typed_node*) node->args()->node(i);
+        if(new_arg->type()->name() != previous->params()->at(i)->type()->name())
+          throw std::string(node->identifier() + " redeclared with different parameters");
+      }
+    } else {
+      throw std::string(node->identifier() + " redeclared with a different number of parameters");
     }
   } else {
     _symtab.insert(node->identifier(), _function);
@@ -613,7 +620,13 @@ void og::type_checker::do_func_def_node(og::func_def_node *const node, int lvl) 
 
   auto existent = _symtab.find(node->identifier());
   if (existent != nullptr) {
-    if(true /* TODO: compare if declarations are the same.*/) {
+    // TODO: compare if declarations are the same.
+    if (node->args()->size() == existent->params()->size()) {
+      for(size_t i; i < node->args()->size(); i++) {
+        cdk::typed_node* new_arg = (cdk::typed_node*) node->args()->node(i);
+        if(new_arg->type()->name() != existent->params()->at(i)->type()->name())
+          throw std::string("declarations are not the same");
+      }
       _symtab.replace(node->identifier(), symbol);
       _parent->set_new_symbol(symbol);
     } else {
@@ -653,6 +666,15 @@ void og::type_checker::do_func_call_node(og::func_call_node *const node, int lvl
     node->expressions()->accept(this, lvl + 4);
 
   // TODO: check if node->expressions() types match function->params() types.
+  for(size_t i = 0; i < node->expressions()->size(); i++) {
+    cdk::typed_node* expr = (cdk::typed_node*) node->expressions()->node(i);
+    if(expr->is_typed(cdk::TYPE_INT) && (function->params()->at(i)->is_typed(cdk::TYPE_INT) || function->params()->at(i)->is_typed(cdk::TYPE_DOUBLE)));
+    else if(function->params()->at(i)->is_typed(cdk::TYPE_INT) && (expr->is_typed(cdk::TYPE_INT) || expr->is_typed(cdk::TYPE_DOUBLE)));
+    else if(expr->is_typed(cdk::TYPE_DOUBLE) && (function->params()->at(i)->is_typed(cdk::TYPE_INT) && function->params()->at(i)->is_typed(cdk::TYPE_DOUBLE)));
+    else if(function->params()->at(i)->is_typed(cdk::TYPE_DOUBLE) && (expr->is_typed(cdk::TYPE_INT) && expr->is_typed(cdk::TYPE_DOUBLE)));
+    else if(expr->type()->name() != function->params()->at(i)->type()->name())
+      throw std::string("expression type does not match parameter");
+  }
 }
 
 //---------------------------------------------------------------------------
