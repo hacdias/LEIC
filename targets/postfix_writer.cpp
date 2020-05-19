@@ -316,15 +316,15 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
   node->argument()->accept(this, lvl);
 
   if (node->argument()->is_typed(cdk::TYPE_INT)) {
-    _functions_to_declare.insert("printi");
+    _symbols_to_declare.insert("printi");
     _pf.CALL("printi");
     _pf.TRASH(4);
   } else if (node->argument()->is_typed(cdk::TYPE_DOUBLE)) {
-    _functions_to_declare.insert("printd");
+    _symbols_to_declare.insert("printd");
     _pf.CALL("printd");
     _pf.TRASH(8);
   } else if (node->argument()->is_typed(cdk::TYPE_STRING)) {
-    _functions_to_declare.insert("prints");
+    _symbols_to_declare.insert("prints");
     _pf.CALL("prints");
     _pf.TRASH(4);
   } else if (node->argument()->is_typed(cdk::TYPE_STRUCT)) {
@@ -335,15 +335,15 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
       std::shared_ptr<cdk::basic_type> type = tuple_type->component(i);
 
       if (type->name() == cdk::TYPE_INT) {
-        _functions_to_declare.insert("printi");
+        _symbols_to_declare.insert("printi");
         _pf.CALL("printi");
         _pf.TRASH(4);
       } else if (type->name() == cdk::TYPE_DOUBLE) {
-        _functions_to_declare.insert("printd");
+        _symbols_to_declare.insert("printd");
         _pf.CALL("printd");
         _pf.TRASH(8);
       } else if (type->name() == cdk::TYPE_STRING) {
-        _functions_to_declare.insert("prints");
+        _symbols_to_declare.insert("prints");
         _pf.CALL("prints");
         _pf.TRASH(4);
       } else {
@@ -356,7 +356,7 @@ void og::postfix_writer::do_write_node(og::write_node * const node, int lvl) {
   }
 
   if (node->has_newline()) {
-    _functions_to_declare.insert("println");
+    _symbols_to_declare.insert("println");
     _pf.CALL("println");
   }
 }
@@ -367,11 +367,11 @@ void og::postfix_writer::do_input_node(og::input_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
 
   if( node->is_typed(cdk::TYPE_INT) ) {
-    _functions_to_declare.insert("readi");
+    _symbols_to_declare.insert("readi");
     _pf.CALL("readi");
     _pf.LDFVAL32();
   } else if ( node->is_typed(cdk::TYPE_DOUBLE) ) {
-    _functions_to_declare.insert("readd");
+    _symbols_to_declare.insert("readd");
     _pf.CALL("readd");
     _pf.LDFVAL64();
   } else {
@@ -552,7 +552,8 @@ void og::postfix_writer::do_var_decl_node_helper(std::shared_ptr<og::symbol> sym
   symbol->offset(offset);
 
   if (symbol->is_required()) {
-    // TODO: is external
+    // External symbol...
+    _symbols_to_declare.insert(symbol->name());
   } else if (_inside_function) {
     // if we are dealing with local variables, then no action is needed
     // unless an initializer exists because we already allocate the
@@ -738,7 +739,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   // remember symbol so that args and body know
   _function = new_symbol();
-  _functions_to_declare.erase(_function->name());
+  _symbols_to_declare.erase(_function->name());
   reset_new_symbol();
 
   _offset = 8; // prepare for arguments (4: remember to account for return address)
@@ -785,7 +786,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   if (node->identifier() == "_main") {
     // declare external functions
-    for (std::string s : _functions_to_declare) {
+    for (std::string s : _symbols_to_declare) {
       _pf.EXTERN(s);
     }
   }
@@ -832,7 +833,7 @@ void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int l
    if (!function) {
     return;
   }
-  _functions_to_declare.insert(function->name());
+  _symbols_to_declare.insert(function->name());
   reset_new_symbol();
 }
 

@@ -31,7 +31,7 @@ namespace og {
     bool _is_true_order = false;
     bool _is_struct_lval = false;
 
-    std::set<std::string> _functions_to_declare;
+    std::set<std::string> _symbols_to_declare;
 
     std::shared_ptr<cdk::basic_type> _lvalue_type;
 
