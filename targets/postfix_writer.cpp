@@ -22,12 +22,30 @@ void og::postfix_writer::do_not_node(cdk::not_node * const node, int lvl) {
 
 void og::postfix_writer::do_and_node(cdk::and_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // EMPTY
+  int lbl = ++_lbl;
+
+  node->left()->accept(this, lvl + 2);
+  _pf.DUP32();
+  _pf.JZ(mklbl(lbl)); // evaluate the second expression only if the first is true
+
+  node->right()->accept(this, lvl + 2);
+  _pf.AND();
+  _pf.ALIGN();
+  _pf.LABEL(mklbl(lbl));
 }
 
 void og::postfix_writer::do_or_node(cdk::or_node * const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
-  // EMPTY
+  int lbl = ++_lbl;
+
+  node->left()->accept(this, lvl + 2);
+  _pf.DUP32();
+  _pf.JNZ(mklbl(lbl)); // evaluate the second expression only if the first is false
+
+  node->right()->accept(this, lvl + 2);
+  _pf.OR();
+  _pf.ALIGN();
+  _pf.LABEL(mklbl(lbl));
 }
 
 //---------------------------------------------------------------------------
@@ -241,7 +259,9 @@ void og::postfix_writer::do_variable_node(cdk::variable_node * const node, int l
   if (symbol->offset() == 0) { // global
     _pf.ADDR(symbol->name());
   } else {
-    if (symbol->is_typed(cdk::TYPE_STRUCT)) _is_struct_lval = true; // Hack, not proud!
+    if (symbol->is_typed(cdk::TYPE_STRUCT)) {
+      _is_struct_lval = true; // Hack, not proud!
+    }
     _pf.LOCAL(symbol->offset());
   }
 }
@@ -649,13 +669,8 @@ void og::postfix_writer::do_var_decl_node(og::var_decl_node *const node, int lvl
         _pf.LOCAL(symbol->offset());
         _pf.STINT();
       } else if (symbol->is_typed(cdk::TYPE_DOUBLE)) {
-        // if (node->expression()->is_typed(cdk::TYPE_INT)) {
-        //   _pf.I2D();
-        // }
         _pf.LOCAL(symbol->offset());
         _pf.STDOUBLE();
-      } else if (symbol->is_typed(cdk::TYPE_STRUCT)) {
-        // ?
       } else {
         throw std::string("invalid initializer");
       }
@@ -735,14 +750,14 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   }
 
   if (node->args()) {
-    _in_function_args = true; //FIXME really needed?
+    _in_function_args = true;
 
     for (size_t i = 0; i < node->args()->size(); i++) {
       cdk::basic_node *arg = node->args()->node(i);
       arg->accept(this, 0);
     }
 
-    _in_function_args = false; //FIXME really needed?
+    _in_function_args = false;
   }
 
   _pf.TEXT();
@@ -770,8 +785,9 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   if (node->identifier() == "_main") {
     // declare external functions
-    for (std::string s : _functions_to_declare)
+    for (std::string s : _functions_to_declare) {
       _pf.EXTERN(s);
+    }
   }
 
   _function = nullptr;
@@ -884,7 +900,7 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
         throw std::string("invalid struct element type");
       }
     }
-    // TODO: how to free the memory?
+    // TODO: how to free the memory in BSS segment?
   }
 }
 
