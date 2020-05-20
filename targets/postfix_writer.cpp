@@ -783,8 +783,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _inside_function = false;
   _symtab.pop();
 
-  _pf.LEAVE();
-  _pf.RET();
+  if (_function->is_typed(cdk::TYPE_VOID)) {
+    // only add this to procedures. functions already return.
+    _pf.LEAVE();
+    _pf.RET();
+  }
 
   if (!_function->is_typed(cdk::TYPE_VOID) && _return_count == 0) {
     // probably this should've been in the type checker, but it was easier this way
