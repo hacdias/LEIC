@@ -463,6 +463,7 @@ void og::postfix_writer::do_return_node(og::return_node *const node, int lvl) {
     return;
   }
 
+  _return_count++;
   _is_true_order = true; // Hack!
   node->value()->accept(this, lvl + 2);
   _is_true_order = false;
@@ -742,6 +743,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _symbols_to_declare.erase(_function->name());
   reset_new_symbol();
 
+  _return_count = 0;
   _offset = 8; // prepare for arguments (4: remember to account for return address)
   _symtab.push(); // scope of args
 
@@ -783,6 +785,11 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   _pf.LEAVE();
   _pf.RET();
+
+  if (!_function->is_typed(cdk::TYPE_VOID) && _return_count == 0) {
+    // probably this should've been in the type checker, but it was easier this way
+    throw std::string("1 or more returns are required");
+  }
 
   if (node->identifier() == "_main") {
     // declare external functions

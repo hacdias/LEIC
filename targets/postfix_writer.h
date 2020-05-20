@@ -27,6 +27,7 @@ namespace og {
 
     int _lbl;
     int _offset = 0;
+    int _return_count = 0;
     bool _inside_function = false;
     bool _in_function_args = false;
     bool _is_true_order = false;
