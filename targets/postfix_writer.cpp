@@ -830,9 +830,7 @@ void og::postfix_writer::do_tuple_index_node(og::tuple_index_node *const node, i
 void og::postfix_writer::do_func_decl_node(og::func_decl_node *const node, int lvl) {
   ASSERT_SAFE_EXPRESSIONS;
   std::shared_ptr<og::symbol> function = new_symbol();
-   if (!function) {
-    return;
-  }
+
   _symbols_to_declare.insert(function->name());
   reset_new_symbol();
 }
