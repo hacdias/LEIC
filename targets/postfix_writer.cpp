@@ -776,7 +776,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
   _pf.ENTER(lsc.localsize()); // total stack size reserved for local variables
 
   _inside_function = true;
-  _offset = -_function->type()->size();
+  _offset = 0;
   os() << "        ;; before body " << std::endl;
   node->block()->accept(this, lvl + 4);
   os() << "        ;; after body " << std::endl;
