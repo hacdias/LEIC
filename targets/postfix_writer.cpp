@@ -395,30 +395,25 @@ void og::postfix_writer::do_for_node(og::for_node *const node, int lvl) {
   _for_incr.push(for_incr);
   _for_end.push(for_end);
 
-  os() << "\t\t\t;; FOR INIT" << std::endl;
   if (node->init()) {
     node->init()->accept(this, lvl);
   }
 
   _pf.ALIGN();
 
-  os() << "\t\t\t;; FOR CONDITION" << std::endl;
   _pf.LABEL(mklbl(for_cond));
   if (node->condition()) {
     node->condition()->accept(this, lvl);
     _pf.JZ(mklbl(for_end));
   }
 
-  os() << "\t\t\t;; FOR BLOCK" << std::endl;
   node->block()->accept(this, lvl);
 
   _pf.LABEL(mklbl(for_incr));
-  os() << "\t\t\t;; FOR INCR" << std::endl;
   if (node->end()) {
     node->end()->accept(this, lvl);
   }
 
-  os() << "\t\t\t;; FOR END" << std::endl;
   _pf.JMP(mklbl(for_cond));
   _pf.LABEL(mklbl(for_end));
 
@@ -777,9 +772,7 @@ void og::postfix_writer::do_func_def_node(og::func_def_node *const node, int lvl
 
   _inside_function = true;
   _offset = 0;
-  os() << "        ;; before body " << std::endl;
   node->block()->accept(this, lvl + 4);
-  os() << "        ;; after body " << std::endl;
   _inside_function = false;
   _symtab.pop();
 
@@ -852,9 +845,9 @@ void og::postfix_writer::do_func_call_node(og::func_call_node *const node, int l
   size_t args_size = 0;
 
   if (node->expressions()) {
-    for (int ax = node->expressions()->size(); ax > 0; ax--) {
-      cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(ax - 1));
-      std::shared_ptr<og::symbol> param = symbol->params()->at(ax - 1);
+    for (size_t i = node->expressions()->size(); i > 0; i--) {
+      cdk::expression_node *arg = dynamic_cast<cdk::expression_node*>(node->expressions()->node(i - 1));
+      std::shared_ptr<og::symbol> param = symbol->params()->at(i - 1);
 
       arg->accept(this, lvl + 2);
       args_size += param->type()->size();
