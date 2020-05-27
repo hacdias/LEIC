@@ -5,7 +5,7 @@ This is a gRPC application, composed of three modules:
 - [server](server/) - implementation of service
 - [client](client/) - invocation of service
 
-See the README for each module.  
+See the README for each module.
 Start at contract, then go to server, and finally go to the client.
 
 The example can be extended with additional data in the messages and with security protections.
@@ -14,17 +14,11 @@ The example can be extended with additional data in the messages and with securi
 
 ## Authors
 
-**Group ...**
+**Group A46**
 
-*(fill-in line above with group identifier e.g. A07 or T22; and then delete this line)*
-
-... [...](mailto:...@tecnico.ulisboa.pt)
-
-... [...](mailto:...@tecnico.ulisboa.pt)
-
-... [...](mailto:...@tecnico.ulisboa.pt)
-
-*(fill-in lines above with student number, name, and email; and then delete this line)*
+- [89455 - Henrique Afonso Coelho Dias](mailto:henrique.dias@tecnico.ulisboa.pt)
+- [89466 - Isabel Santos Ramos Soares](mailto:isabel.r.soares@tecnico.ulisboa.pt)
+- [89535 - Rodrigo Borges Pessoa de Sousa](mailto:rodrigo.b.sousa@tecnico.ulisboa.pt)
 
 ----
 

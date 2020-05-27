@@ -6,12 +6,53 @@ import com.google.type.Money;
 
 import io.grpc.stub.StreamObserver;
 import pt.tecnico.supplier.domain.Supplier;
-import pt.tecnico.supplier.grpc.Product;
-import pt.tecnico.supplier.grpc.ProductsRequest;
-import pt.tecnico.supplier.grpc.ProductsResponse;
-import pt.tecnico.supplier.grpc.SupplierGrpc;
+import pt.tecnico.supplier.grpc.*;
+
+import java.security.MessageDigest;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.InputStream;
+import java.security.Key;
 
 public class SupplierServiceImpl extends SupplierGrpc.SupplierImplBase {
+	private static byte[] digestAndCipher(byte[] bytes, Key key) throws Exception {
+		// get a message digest object using the specified algorithm
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+		// calculate the digest and print it out
+		messageDigest.update(bytes);
+		byte[] digest = messageDigest.digest();
+		System.out.println("Digest:");
+		System.out.println(printHexBinary(digest));
+
+		// get an AES cipher object
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, key);
+		byte[] cipherDigest = cipher.doFinal(digest);
+
+		System.out.println("Cyphered Digest:");
+		System.out.println(printHexBinary(cipherDigest));
+
+		return cipherDigest;
+	}
+
+	public static Key readKey(String resourcePath) throws Exception {
+		System.out.println("Reading key from resource " + resourcePath + " ...");
+
+		InputStream fis = Thread.currentThread()
+			.getContextClassLoader()
+			.getResourceAsStream(resourcePath);
+		byte[] encoded = new byte[fis.available()];
+		fis.read(encoded);
+		fis.close();
+
+		System.out.println("Key:");
+		System.out.println(printHexBinary(encoded));
+		SecretKeySpec keySpec = new SecretKeySpec(encoded, "AES");
+
+		return keySpec;
+	}
+
 
 	/**
 	 * Set flag to true to print debug messages. The flag can be set using the
@@ -49,7 +90,7 @@ public class SupplierServiceImpl extends SupplierGrpc.SupplierImplBase {
 	}
 
 	@Override
-	public void listProducts(ProductsRequest request, StreamObserver<ProductsResponse> responseObserver) {
+	public void listProducts(ProductsRequest request, StreamObserver<SignedResponse> responseObserver) {
 		debug("listProducts called");
 
 		debug("Received request:");
@@ -68,17 +109,25 @@ public class SupplierServiceImpl extends SupplierGrpc.SupplierImplBase {
 		}
 		ProductsResponse response = responseBuilder.build();
 
-		debug("Response to send:");
-		debug(response.toString());
-		debug("in binary hexadecimals:");
-		byte[] responseBinary = response.toByteArray();
-		debug(printHexBinary(responseBinary));
-		debug(String.format("%d bytes%n", responseBinary.length));
+		try {
+			byte[] digest = digestAndCipher(response.toByteArray(), SupplierServiceImpl.readKey("secret.key"));
+			Signature sig = Signature.newBuilder()
+					.setValue(com.google.protobuf.ByteString.copyFrom(digest))
+					.build();
 
-		// send single response back
-		responseObserver.onNext(response);
-		// complete call
-		responseObserver.onCompleted();
+			SignedResponse res = SignedResponse.newBuilder()
+					.setResponse(response)
+					.setSignature(sig)
+					.build();
+
+			responseObserver.onNext(res);
+			responseObserver.onCompleted();
+
+		} catch (Exception exp) {
+			System.out.println("Dei uma exceção, que foi:");
+			System.out.println(exp.toString());
+			// Linda, não quero saber!
+		}
 	}
 
 }

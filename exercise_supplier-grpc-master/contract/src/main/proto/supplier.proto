@@ -9,7 +9,6 @@ option java_outer_classname = "SupplierProtobuf";
 
 import "google/type/money.proto";
 
-
 // product information
 message Product {
   string identifier = 1;
@@ -22,11 +21,21 @@ message ProductsRequest {
   // empty
 }
 
+message Signature {
+  string signerId = 1;
+  bytes value = 2;
+}
+
 message ProductsResponse {
   string supplierIdentifier = 1;
   repeated Product product = 2;
 }
 
+message SignedResponse {
+  ProductsResponse response = 1;
+  Signature signature = 2;
+}
+
 service Supplier {
-  rpc listProducts(ProductsRequest) returns (ProductsResponse);
+  rpc listProducts(ProductsRequest) returns (SignedResponse);
 }
