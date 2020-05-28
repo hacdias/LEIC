@@ -14,7 +14,8 @@ message Product {
   string identifier = 1;
   string description = 2;
   int32 quantity = 3;
-  google.type.Money price = 4;
+  float discount = 4;
+  google.type.Money price = 5;
 }
 
 message ProductsRequest {
@@ -24,6 +25,7 @@ message ProductsRequest {
 message Signature {
   string signerId = 1;
   bytes value = 2;
+  int64 timestamp = 3;
 }
 
 message ProductsResponse {

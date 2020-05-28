@@ -81,6 +81,7 @@ public class SupplierServiceImpl extends SupplierGrpc.SupplierImplBase {
 		productBuilder.setIdentifier(p.getId());
 		productBuilder.setDescription(p.getDescription());
 		productBuilder.setQuantity(p.getQuantity());
+		productBuilder.setDiscount(p.getDiscount());
 
 		Money.Builder moneyBuilder = Money.newBuilder();
 		moneyBuilder.setCurrencyCode("EUR").setUnits(p.getPrice());
@@ -113,6 +114,7 @@ public class SupplierServiceImpl extends SupplierGrpc.SupplierImplBase {
 			byte[] digest = digestAndCipher(response.toByteArray(), SupplierServiceImpl.readKey("secret.key"));
 			Signature sig = Signature.newBuilder()
 					.setValue(com.google.protobuf.ByteString.copyFrom(digest))
+					.setTimestamp(System.currentTimeMillis())
 					.build();
 
 			SignedResponse res = SignedResponse.newBuilder()

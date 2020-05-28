@@ -73,11 +73,11 @@ public class Supplier {
 			throw new InputException(inputName + " cannot be empty or whitespace!");
 	}
 
-	public void addProduct(String productId, String description, int quantity, int price) throws InputException {
+	public void addProduct(String productId, String description, int quantity, int price, float discount) throws InputException {
 		validateTextInput("Product identifier", productId);
 		validateTextInput("Description", description);
 		if (acceptProduct(productId, description, quantity, price)) {
-			products.put(productId, new Product(productId, description, quantity, price));
+			products.put(productId, new Product(productId, description, quantity, price, discount));
 		}
 	}
 
@@ -111,9 +111,9 @@ public class Supplier {
 	public void demoData() throws InputException {
 		products.clear();
 		this.id = "Sports Store";
-		addProduct("A1", "Soccer ball", 22, 10);
-		addProduct("B2", "Basketball", 100, 12);
-		addProduct("C3", "Volley ball", 7, 8);
+		addProduct("A1", "Soccer ball", 22, 10, 0.0f);
+		addProduct("B2", "Basketball", 100, 12, 0.0f);
+		addProduct("C3", "Volley ball", 7, 8, 0.1f);
 	}
 
 }

@@ -13,13 +13,16 @@ public class Product {
 	private volatile int quantity;
 	/** Price of product */
 	private int price;
+	/** Discount of product */
+	private float discount;
 
 	/** Create a new product */
-	public Product(String pid, String description, int quantity, int price) {
+	public Product(String pid, String description, int quantity, int price, float discount) {
 		this.productId = pid;
 		this.description = description;
 		this.quantity = quantity;
 		this.price = price;
+		this.discount = discount;
 	}
 
 	public String getId() {
@@ -32,6 +35,10 @@ public class Product {
 
 	public int getPrice() {
 		return price;
+	}
+
+	public float getDiscount() {
+		return discount;
 	}
 
 	/** Synchronized locks object before returning quantity */

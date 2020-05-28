@@ -75,6 +75,10 @@ public class SupplierClient {
 		System.out.println("Remote call...");
 		SignedResponse response = stub.listProducts(request);
 
+		if (Math.abs(System.currentTimeMillis() - response.getSignature().getTimestamp()) > 100) {
+			System.out.println("Too much time. Get a better Internet connection.");
+		}
+
 		boolean isCorrect = redigestDecipherAndCompare(
 			response.getSignature().getValue().toByteArray(),
 			response.getResponse().toByteArray()
@@ -116,25 +120,25 @@ public class SupplierClient {
 		try {
 			// get a message digest object using the specified algorithm
 			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-	
+
 			// calculate the digest and print it out
 			messageDigest.update(bytes);
 			byte[] digest = messageDigest.digest();
 			System.out.println("New digest:");
 			System.out.println(printHexBinary(digest));
-	
+
 			// get an AES cipher object
 			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-	
+
 			cipher.init(Cipher.DECRYPT_MODE, SupplierClient.readKey("secret.key"));
 			byte[] decipheredDigest = cipher.doFinal(cipherDigest);
 			System.out.println("Deciphered Digest:");
 			System.out.println(printHexBinary(decipheredDigest));
-	
+
 			// compare digests
 			if (digest.length != decipheredDigest.length)
 				return false;
-	
+
 			for (int i = 0; i < digest.length; i++)
 				if (digest[i] != decipheredDigest[i])
 					return false;
