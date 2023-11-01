@@ -1,0 +1,12 @@
+*.o
+.vscode
+*.res
+inputs/*.txt
+*.old
+*.speedups.csv
+*.zip
+/CircuitRouter-ParSolver/CircuitRouter-ParSolver
+/CircuitRouter-SeqSolver/CircuitRouter-SeqSolver
+/CircuitRouter-SimpleShell/CircuitRouter-SimpleShell
+/CircuitRouter-AdvShell/CircuitRouter-AdvShell
+/CircuitRouter-Client/CircuitRouter-Client
