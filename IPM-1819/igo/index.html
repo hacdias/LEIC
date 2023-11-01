@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iGo</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/picker.min.css">
+  <link rel="stylesheet" href="css/fontawesome.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dn">
+  <div id="controls">
+    <button id="contacless" onclick="showModal('sim-payment')">
+      <img src="assets/contacless.png">
+    </button>
+    <button id="start-call" onclick="showModal('sim-call')">
+      <span class="fas fa-phone"></span>
+    </button>
+    <button id="send-message" onclick="showModal('sim-message')">
+      <span class="fas fa-comments"></span>
+    </button>
+    <button id="send-recommendation" onclick="showModal('sim-recommendation')">
+      <span class="fas fa-map-pin"></span>
+    </button>
+  </div>
+
+  <div class="overlay-modal"></div>
+
+  <form class="modal" id="sim-payment" action="#" onsubmit="runModal(simulatePayment, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
+    <label>Vendedor</label>
+    <input type="text">
+    <label>Valor (€)</label>
+    <input type="number">
+    <input type="submit" value="Simular Pagamento" >
+  </form>
+
+  <form class="modal" id="sim-message" action="#" onsubmit="runModal(simulateMessage, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <label>Mensagem</label>
+    <input type="text">
+    <input type="submit" value="Simular Mensagem" >
+  </form>
+
+  <form class="modal" id="sim-call" action="#" onsubmit="runModal(simulateCall, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <input type="submit" value="Simular Chamada">
+  </form>
+
+  <form class="modal" id="sim-recommendation" action="#" onsubmit="runModal(simulateRecommendation, this)">
+    <div class="close" onclick="closeModals(this)"><span class="fas fa-times"></span></div>
+
+    <label>Contacto</label>
+    <select class="contact-list">
+
+    </select>
+    <input type="submit" value="Simular Recomendação">
+  </form>
+
+  <div id="container">
+    <div id="watch">
+      <div class="keyboard" id="text-keyboard">
+        <input class="result" type="text"></input>
+        <table>
+          <tr>
+            <td class="key" data-value="1">. , ! ?</td>
+            <td class="key" data-value="2">ABC</td>
+            <td class="key" data-value="3">DEF</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="4">GHI</td>
+            <td class="key" data-value="5">JKL</td>
+            <td class="key" data-value="6">MNO</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="7">PQRS</td>
+            <td class="key" data-value="8">TUV</td>
+            <td class="key" data-value="9">WXYZ</td>
+          </tr>
+          <tr>
+            <td class="backspace"><i class="fas fa-backspace"></i></td>
+            <td class="space">_</td>
+            <td class="enter">↵</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="keyboard" id="num-keyboard">
+        <input class="result" type="text"></input>
+        <table>
+          <tr>
+            <td class="key" data-value="1">1</td>
+            <td class="key" data-value="2">2</td>
+            <td class="key" data-value="3">3</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="4">4</td>
+            <td class="key" data-value="5">5</td>
+            <td class="key" data-value="6">6</td>
+          </tr>
+          <tr>
+            <td class="key" data-value="7">7</td>
+            <td class="key" data-value="8">8</td>
+            <td class="key" data-value="9">9</td>
+          </tr>
+          <tr>
+            <td class="backspace"><i class="fas fa-backspace"></i></td>
+            <td class="key" data-value="0">0</td>
+            <td class="enter">↵</td>
+          </tr>
+        </table>
+      </div>
+
+      <div id="overlay"></div>
+
+      <div id="status">
+        <i class="fas fa-signal"></i>
+        <i id="gotmessage" class="fas goto fa-envelope" data-to="people"></i>
+        <span class="clock"></span>
+        <i class="fas fa-battery-three-quarters"></i>
+      </div>
+
+      <div id="screen-space">
+        <!-- Lock Screen -->
+        <div class="screen" id="lockscreen">
+          <div class="clock"></div>
+          <span class="goto" data-to="mainmenu">
+            <i class="fas fa-4x fa-fingerprint"></i>
+          </span>
+        </div>
+
+        <!-- Main Menu -->
+        <div class="screen" id="mainmenu">
+          <ul>
+            <li class="goto" data-to="people"><i class="fas fa-user-friends"></i></li>
+            <li class="goto" data-to="gps"><i class="fas fa-map-marked-alt"></i></li>
+            <li class="goto" data-to="places"><i class="fas fa-map-pin"></i></li>
+            <li class="goto" data-to="budget-list"><i class="fas fa-donate"></i></li>
+            <li class="goto" data-to="flashlight"><i class="fas fa-lightbulb"></i></li>
+            <li class="goto" data-to="faq"><i class="fas fa-question"></i></li>
+          </ul>
+        </div>
+
+        <!-- People Menu -->
+        <div class="screen" id="people" data-name="Amigos" data-call="updatePeople">
+          <template>
+            <div class="tpl item goto" data-to="person-info">
+              <div>
+                <img class="picture" src="assets/people/${picture}">
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas fa-ruler"></i> <span class="distance"></span>m</p>
+              </div>
+              <div>
+                <i class="gotmsg fas fa-envelope"></i>
+              </div>
+            </div>
+          </template>
+          <button class="goto blue" id="new-contact-btn" data-to="new-person">
+            <i class="fas fa-plus"></i> Novo Contacto
+          </button>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+        </div>
+
+        <!-- Person Info -->
+        <div class="screen" id="person-info" data-call="updatePersonDetails">
+          <p class="name">Primo Joaquim</p>
+          <div>
+            <img class="picture" src="assets/people/joaquim_fonseca.JPG">
+            <div>
+              <p class="phone">+351 968 899 886</p>
+              <p><i class="fas fa-ruler"></i> <span class="distance">4m</p>
+              <p><i class="fas fa-clock"></i> <span class="last-seen">5 mins atrás</span></p>
+            </div>
+          </div>
+
+          <div class="flex f-50">
+            <button class="msg-btn goto blue" data-to="messages">
+              <i class="fas fa-comments"></i>
+            </button>
+            <button class="call-btn ok" onclick="callContact(this)">
+              <i class="fas fa-phone"></i>
+            </button>
+          </div>
+
+          <button class="blue" onclick="seePersonInMap(this)">
+            <i class="fas fa-map-pin"></i> Ver no mapa
+          </button>
+
+          <button class="msg-btn goto blue" data-to="share-place">
+            <i class="fas fa-map-marked-alt"></i> Recomendar local
+          </button>
+
+          <button class="msg-btn goto blue" data-to="lend-money">
+            <i class="fas fa-money-bill-alt"></i> Emprestar dinheiro
+          </button>
+
+          <button class="cancel" onclick="deletePerson(this)">
+            <i class="fas fa-trash"></i> Apagar contacto
+          </button>
+        </div>
+
+        <!-- New Person -->
+        <div class="screen" id="new-person" data-name="Novo Contacto">
+          <input placeholder="Nome (até 16 carateres)" id="new-person-name" type="text" oninput="onNewPersonChange()"></input>
+          <input placeholder="Número (9 digitos)" id="new-person-phone" type="number" oninput="onNewPersonChange()"></input>
+          <div class="flex f-50">
+            <button class="cancel" type="button" onclick="runAndBack(clearNewPerson)">Cancelar</button>
+            <button class="ok disabled" id="new-person-submit" type="button" onclick="createPerson()">Adicionar</button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="screen" id="messages" data-call="fillMessages" data-name="Mensagens">
+          <template>
+            <div class="tpl">
+              <img class="picture" src="">
+              <div class="message"></div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Messages go here -->
+          </div>
+
+          <div class="input-with-icon">
+            <input placeholder="Mensagem..." oninput="onMessageInput(this)" id="msg-kb" type="text"-></input>
+            <span class="fas fa-reply disabled" data-to="gps-reply" onclick="replyMessage(this)"></span>
+          </div>
+        </div>
+
+        <!-- Call -->
+        <div class="screen" id="call" data-name="Em chamada..." data-call="fillCall">
+          <img class="picture" src="assets/people/joaquim_fonseca.JPG">
+          <p class="name">Primo Joaquim</p>
+          <button class="cancel">
+            <i class="fas fa-phone-slash"></i>
+          </button>
+        </div>
+
+        <!-- Receiving Call -->
+        <div class="screen" id="calling" data-name="A receber chamada..." data-call="receiveCall">
+          <img class="picture" src="assets/people/joaquim_fonseca.JPG">
+          <p class="name">Primo Joaquim</p>
+          <button class="ok">
+            <i class="fas fa-phone"></i>
+          </button>          
+          <button class="cancel">
+            <i class="fas fa-phone-slash"></i>
+          </button>
+        </div>
+
+        <!-- Share Place -->
+        <div class="screen" id="share-place" data-call="sharePlace">
+          <div class="item category goto" data-to="share-place-list" data-args="restaurants#Restaurantes">
+            <i class="restaurants fas fa-utensils"></i>
+            <p>Restaurantes</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="parks#Parques">
+            <i class="parks fas fa-tree"></i>
+            <p>Parques</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="monuments#Monumentos">
+            <i class="monuments fas fa-landmark"></i>
+            <p>Monumentos</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="markets#Mercados">
+            <i class="markets fas fa-store"></i>
+            <p>Mercados</p>
+          </div>
+          <div class="item category goto" data-to="share-place-list" data-args="diversions#Diversões">
+            <i class="fas fa-chess"></i>
+            <p>Diversões</p>
+          </div>
+        </div>
+
+        <!-- Share Place List -->
+        <div class="screen" id="share-place-list" data-name="Recomendar Local" data-call="fillSharePlacesList">
+          <template>
+            <div class="tpl item goto">
+              <div>
+                <i class="fas kind-icon"></i>
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas info-icon"></i> <span class="info"></span></p>
+              </div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+        </div>
+        
+        <!-- Lend Money -->
+        <div class="screen" id="lend-money" data-name="Emprestar dinheiro">
+            <input placeholder="Quantia (100€ máx.)" id="lend-money-amount" type="number" oninput="onMoneyChange()"></input>
+            <div class="flex f-50">
+              <button class="cancel" type="button" onclick="runAndBack(clearLendMoney)">Cancelar</button>
+              <button class="ok disabled" id="lend-money-submit" type="button" onclick="lendMoney(this)">Emprestar</button>
+            </div>
+          </div>
+
+        <!-- Places List -->
+        <div class="screen" id="places-list" data-call="fillPlacesList">
+          <template>
+            <div class="tpl item goto" data-to="place-desc">
+              <div>
+                <i class="fas kind-icon"></i>
+              </div>
+              <div>
+                <p class="name"></p>
+                <p><i class="fas info-icon"></i> <span class="info"></span></p>
+              </div>
+            </div>
+          </template>
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+          <div class="empty-content">
+            <p>Não há locais nesta categoria.</p>
+          </div>
+        </div>
+
+        <!-- Place Desc -->
+        <div class="screen" id="place-desc" data-call="fillPlaceDesc">
+          <div>
+            <p>Classificação</p>
+            <div class="rating">
+              <!-- Rating goes here -->
+            </div>
+          </div>
+
+          <p class="price-para" style="margin: 0.5em 0; font-size: 0.8em;"><span class="price"></span>€ por pessoa.</p>
+
+          <button class="blue goto-gps" onclick="onGotoGpsClick(this)">
+            <i class="fas fa-directions"></i> Ir
+          </button>
+
+          <button class="book-btn goto blue" data-to="place-booking">
+            <i class="fas fa-book-open"></i> Reservar
+          </button>
+
+          <button class="unbook-btn cancel" onclick="removeReservation(this)">
+            <i class="fas fa-book-open"></i> Cancelar Reserva
+          </button>
+
+          <button class="fav-btn blue" onclick="addFavourite(this)">
+            <i class="fas fa-star"></i> Adicionar aos Favoritos
+          </button>
+
+          <button class="unfav-btn cancel" onclick="removeFavourite(this)">
+            <i class="fas fa-star"></i> Remover dos Favoritos
+          </button>
+        </div>
+
+        <div class="screen" id="place-booking" data-name="Reservar" data-call="fillBookingDetails">
+          <input placeholder="Pessoas (30 máx)" type="text" id="new-booking-people" oninput="onNewBookingChange()"></input>
+          <div>
+            <input id="new-booking-date" placeholder="Data" type="text" onchange="onNewBookingChange()"></input>
+            <input id="new-booking-time" placeholder="Horas" type="text" onchange="onNewBookingChange()"></input>
+          </div>
+
+          <div class="flex f-50">
+            <button class="cancel" onclick="runAndBack(clearBooking)">
+              Cancelar
+            </button>
+
+            <button class="book-btn ok disabled" onclick="createBooking(this)">
+              Reservar
+            </button>
+          </div>
+        </div>
+
+        <div class="screen goto" data-to="mainmenu" id="flashlight" data-call="turnOnFlashLight" data-name="Lanterna">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+
+        <div class="screen" id="gps" data-name="GPS">
+          <div class="gps-search">
+            <input id="gps-input" placeholder="Insira destino" type="text" oninput="updateGpsResults(this)"></input>
+            <span class="fas fa-search goto" data-to="gps-path"></span>
+          </div>
+
+          <ul class="gps-results"></ul>
+        </div>
+
+        <div class="screen" data-call="showGpsPath" id="gps-path" data-name="Percurso">
+          <button id="start-route-button" class="goto" data-to="gps-route">Começar</button>
+        </div>
+
+        <div class="screen" data-call="startGpsRoute" id="gps-route" data-name="Percurso">
+          <button id="start-route-button" class="dn" onclick="showScreen('mainmenu')">Concluir</button>
+        </div>
+
+        <div class="screen" id="places" data-name="Guia">
+          <div class="item category goto" data-to="places-list" data-args="reservations#Reservas">
+            <i class="reservations fas fa-book"></i>
+            <p>Reservas</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="recommended#Recomendados">
+            <i class="recommended fas fa-certificate"></i>
+            <p>Recomendados</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="favourites#Favoritos">
+            <i class="favourites fas fa-star"></i>
+            <p>Favoritos</p>
+          </div>
+          <div class="item category goto" data-to="all-places">
+            <i class="fas fa-map-marker-alt" style="color: #e67e22"></i>
+            <p>Locais</p>
+          </div>
+        </div>
+
+        <div class="screen" id="all-places" data-name="Locais">
+          <div class="item category goto" data-to="places-list" data-args="restaurants#Restaurantes">
+            <i class="restaurants fas fa-utensils"></i>
+            <p>Restaurantes</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="parks#Parques">
+            <i class="parks fas fa-tree"></i>
+            <p>Parques</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="monuments#Monumentos">
+            <i class="monuments fas fa-landmark"></i>
+            <p>Monumentos</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="markets#Mercados">
+            <i class="markets fas fa-store"></i>
+            <p>Mercados</p>
+          </div>
+          <div class="item category goto" data-to="places-list" data-args="diversions#Diversões">
+            <i class="fas fa-chess"></i>
+            <p>Diversões</p>
+          </div>
+        </div>
+
+        <!-- Budget List -->
+        <div class="screen" id="budget-list" data-call="fillBudgetList" data-name="Orçamentos">
+          <button class="goto blue" data-to="create-budget" id="new-budget-button">
+            <i class="fas fa-plus"></i> Novo Orçamento
+          </button>
+
+          <template>
+            <div class="tpl item goto" data-to="budget-desc">
+              <div>
+                <i class="fas fa-plane"></i>
+              </div>
+              <div>
+                <p class="name">NAME</p>
+                <p><i class="far fa-calendar-alt"></i> <span class="date">DATE</span></p>
+              </div>
+            </div>
+          </template>
+
+          <div class="content">
+            <!-- Content goes here -->
+          </div>
+        </div>
+
+        <!-- Budget Description -->
+        <div class="screen" id="budget-desc" data-call="fillBudgetDesc">
+          <div id="budget-bar">
+            <div></div>
+            <span id="budget-spent"></span>
+            <span id="budget-max"></span>
+          </div>
+
+          <button class="blue only-current goto" data-to="create-expense">
+            <i class="fas fa-money-bill"></i> Nova Despesa
+          </button>
+
+          <div id="budget-expenses">
+            <template>
+              <div class="tpl expense">
+                <div>
+                  <p class="name">${name}</p>
+                  <p>Despesa: <span class="value"></span> €</p>
+                </div>
+              </div>
+            </template>
+
+            <div class="content">
+              <!-- Expenses go here -->
+            </div>
+          </div>
+
+          <div id="budget-actions" class="only-current">
+            <button class="blue" onclick="endBudget()" >
+              <i class="fas fa-book-open"></i> Concluir Viagem
+            </button>
+
+            <button class="cancel" onclick="deleteBudget()">
+              <i class="fas fa-trash-alt"></i> Apagar
+            </button>
+          </div>
+        </div>
+
+        <div class="screen" id="create-budget" data-name="Novo Orçamento">
+          <input placeholder="Nome" id="new-budget-name" type="text" oninput="onNewBudgetChange()"></input>
+          <input placeholder="Valor" id="new-budget-value" type="number" oninput="onNewBudgetChange()"></input>
+          <div class="flex f-50">
+            <button class="cancel" type="button" onclick="runAndBack(clearBudget)">Cancelar</button>
+            <button class="ok disabled" id="new-budget-submit" type="button" onclick="createBudget()">Criar</button>
+          </div>
+        </div>
+
+        <div class="screen" id="create-expense" data-name="Nova Despesa">
+          <input placeholder="Nome" id="new-expense-name" type="text" oninput="onNewExpenseChange()"></input>
+          <input placeholder="Valor" id="new-expense-value" type="number" oninput="onNewExpenseChange()"></input>
+          <div class="flex f-50">
+            <button class="cancel" type="button" onclick="runAndBack(clearExpense)">Cancelar</button>
+            <button class="ok disabled" id="new-expense-submit" type="button" onclick="createExpense()">Criar</button>
+          </div>
+        </div>
+
+        <div class="screen" id="faq" data-name="FAQ">
+          <h1>FAQ</h1>
+
+          <p>Porque só consigo reservar com meia hora de antecedência?</p>
+          <p>Por uma questão de logística dos negociantes, só é possível efetuar reservas com, no mínimo, meia hora de antecência e, no máximo, um ano.</p>
+          
+          <p>O meu orçamento chegou ao fim. Posso gastar mais dinheiro?</p>
+          <p>Sim, pode. No entanto, sempre que efetuar uma compra será avisado de que está a exceder o orçamento.</p>
+          
+          <p>Como adicionar um amigo?</p>
+          <p>Dirija-se ao menu inicial, pessoas e selecione "Criar contacto".</p>
+        </div>
+      </div>
+
+      <div id="backbar">
+        <span id="only-mainmenu">
+          <i class="fas fa-cog"></i>
+        </span>
+        <span id="not-mainmenu">
+          <span class="goto" data-to="--back">
+            <i class="fas fa-angle-left"></i>
+          </span>
+          <span id="current-screen-name"></span>
+        </span>
+        <span id="only-call">
+          <span class="call" id="endCall">
+            <i class="fas fa-angle-left"></i>
+          </span>
+          <span id="current-screen-name"></span>
+        </span>
+      </div>
+    </div>
+
+    <div id="confirmation-box">
+      <p>Pergunta?</p>
+
+      <div class="flex f-50">
+        <button id="left-confirm" type="button">Cancelar</button>
+        <button class="ok" id="right-confirm" type="button">Sim</button>
+      </div>
+    </div>
+
+    <div class="goto" data-to="mainmenu" data-needsunlock="true" id="mainbutton"></div>
+  </div>
+
+  <script src="./js/lib/picker.min.js"></script>
+  <script src="./js/keyboard.js"></script>
+  <script src="./js/avatar.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/budget.js"></script>
+  <script src="./js/places.js"></script>
+  <script src="./js/gps.js"></script>
+  <script src="./js/people.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
