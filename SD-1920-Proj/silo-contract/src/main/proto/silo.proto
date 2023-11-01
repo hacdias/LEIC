@@ -1,0 +1,176 @@
+//
+// Protocol buffers definition for Silo server
+//
+syntax = "proto3";
+package pt.tecnico.sauron.silo.grpc;
+import "google/protobuf/timestamp.proto";
+
+enum ObservationType {
+    PERSON = 0;
+    CAR = 1;
+};
+
+enum ResponseStatus {
+    SUCCESS = 0;
+    DUPLICATE_CAMERA = 1;
+    INVALID_CAMERA = 2;
+    INVALID_CAMERA_NAME = 3;
+    INVALID_CAMERA_COORDINATES = 4;
+    INVALID_IDENTIFIER = 5;
+    NO_OBSERVATION_FOUND = 6;
+}
+
+message Timestamp {
+    repeated int32 value = 1;
+}
+
+message Observation {
+    ObservationType type = 1;
+    string identifier = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    string cameraName = 4;
+}
+
+message Camera {
+    string name = 1;
+    double latitude = 2;
+    double longitude = 3;
+}
+
+message ObservationInfo {
+    Observation observation = 1;
+    Camera camera = 2;
+}
+
+message CamJoinRequest {
+    Camera camera = 1;
+    Timestamp timestamp = 2;
+    string uuid = 3;
+}
+
+message CamJoinResponse {
+    ResponseStatus status = 1;
+    Timestamp timestamp = 2;
+}
+
+message CamInfoRequest {
+    string name = 1;
+    Timestamp timestamp = 2;
+}
+
+message CamInfoResponse {
+    Camera camera = 1;
+    ResponseStatus status = 2;
+    Timestamp timestamp = 3;
+}
+
+message ReportRequest {
+    string cameraName = 1;
+    repeated Observation observations = 2;
+    Timestamp timestamp = 3;
+    string uuid = 4;
+}
+
+message ReportResponse {
+    ResponseStatus status = 1;
+    Timestamp timestamp = 2;
+}
+
+message TrackRequest {
+    ObservationType type = 1;
+    string identifier = 2;
+    Timestamp timestamp = 3;
+}
+
+message TrackResponse {
+    ResponseStatus status = 1;
+    ObservationInfo observation = 2;
+    Timestamp timestamp = 3;
+}
+
+message TrackMatchRequest {
+    ObservationType type = 1;
+    string pattern = 2;
+    Timestamp timestamp = 3;
+}
+
+message TrackMatchResponse {
+    ResponseStatus status = 1;
+    repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
+}
+
+message TraceRequest {
+    ObservationType type = 1;
+    string identifier = 2;
+    Timestamp timestamp = 3;
+}
+
+message TraceResponse {
+    ResponseStatus status = 1;
+    repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
+}
+
+message CtrlPingRequest {
+    Timestamp timestamp = 1;
+}
+
+message CtrlPingResponse {
+    ResponseStatus status = 1;
+    repeated Camera cameras = 2;
+    repeated ObservationInfo observations = 3;
+    Timestamp timestamp = 4;
+}
+
+message CtrlClearRequest {
+    Timestamp timestamp = 1;
+}
+
+message CtrlClearResponse {
+    ResponseStatus status = 1;
+    Timestamp timestamp = 2;
+}
+
+message CtrlInitRequest {
+    repeated Camera cameras = 1;
+    repeated ObservationInfo observations = 2;
+    Timestamp timestamp = 3;
+}
+
+message CtrlInitResponse {
+    ResponseStatus status = 1;
+    Timestamp timestamp = 2;
+}
+
+message Log {
+    int32 instance = 1;
+    Timestamp prev = 2;
+    Timestamp timestamp = 3;
+    string uuid = 4;
+    Camera camera = 5;
+    repeated Observation observations = 6;
+}
+
+message GossipRequest {
+    Timestamp timestamp = 1;
+    repeated Log log = 2;
+    int32 instance = 3;
+}
+
+message GossipResponse {
+
+}
+
+service Sauron {
+    rpc ctrlPing(CtrlPingRequest) returns (CtrlPingResponse);
+    rpc ctrlClear(CtrlClearRequest) returns (CtrlClearResponse);
+    rpc ctrlInit(CtrlInitRequest) returns (CtrlInitResponse);
+    rpc camJoin(CamJoinRequest) returns (CamJoinResponse);
+    rpc camInfo(CamInfoRequest) returns (CamInfoResponse);
+    rpc report(ReportRequest) returns (ReportResponse);
+    rpc track(TrackRequest) returns (TrackResponse);
+    rpc trackMatch(TrackMatchRequest) returns (TrackMatchResponse);
+    rpc trace(TraceRequest) returns (TraceResponse);
+    rpc gossip(GossipRequest) returns (GossipResponse);
+}
