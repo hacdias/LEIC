@@ -1,0 +1,1 @@
+double pot(double, double);
